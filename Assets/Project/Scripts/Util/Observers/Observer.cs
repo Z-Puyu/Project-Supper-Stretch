@@ -1,5 +1,4 @@
-﻿using Project.Scripts.Events;
-using UnityEngine.Events;
+﻿using UnityEngine.Events;
 
 namespace Project.Scripts.Util.Observers;
 
