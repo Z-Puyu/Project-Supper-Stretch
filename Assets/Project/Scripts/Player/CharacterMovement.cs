@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -11,8 +12,16 @@ public class CharacterMovement : MonoBehaviour {
     private static readonly int AnimParam = Animator.StringToHash("Move");
     
     private Vector3 damping = Vector3.zero;
+    private Vector3 velocity = Vector3.zero;
+    
     private CharacterController? Controller { get; set; }
-    public Vector3 Velocity { private get; set; } // Always normalised
+
+    public Vector3 Velocity {
+        private get => (this.CameraTransform!.TransformDirection(this.velocity) with { y = 0 }).normalized *
+                       ((int)this.MovementMode + 1);
+        set => this.velocity = value;
+    }
+
     private Vector3 CurrVelocity { get; set; } = Vector3.zero;
     public Mode MovementMode { get; private set; } = Mode.Walk;
     public bool Locked { get; set; }
@@ -23,20 +32,25 @@ public class CharacterMovement : MonoBehaviour {
     [NotNull]
     [field: SerializeField]
     private Transform? CharacterTransform { get; set; }
+    
+    private Transform? CameraTransform { get; set; }
 
     [field: SerializeField, Range(0, 1)]
     private float Acceleration { get; set; } = 0.9f;
     
-    [field: SerializeField] 
-    private float TurnSpeed { get; set; } = 1;
+    [field: SerializeField, Range(0, 1)] 
+    private float TurnSpeed { get; set; } = 0.2f;
 
     private void Awake() {
         this.Controller = this.GetComponent<CharacterController>();
     }
 
+    private void Start() {
+        this.CameraTransform = Camera.main?.transform ?? this.CharacterTransform;
+    }
+
     public void StopImmediately() {
         this.Velocity = Vector3.zero; // This will stop both movement and rotation :O
-        this.CharacterTransform.localRotation = Quaternion.identity;
     }
     
     public void SwitchMode(Mode mode) {
@@ -48,15 +62,14 @@ public class CharacterMovement : MonoBehaviour {
         if (direction.magnitude == 0) {
             return;
         }
-        
+
         Quaternion rotation = Quaternion.LookRotation(direction);
-        this.transform.rotation = Quaternion.RotateTowards(this.transform.rotation, rotation, this.TurnSpeed);
+        this.CharacterTransform.rotation = Quaternion.Slerp(this.CharacterTransform.rotation, rotation, this.TurnSpeed);
     }
 
     private void Update() {
-        int speed = (int)this.MovementMode + 1;
         float t = 1 - this.Acceleration;
-        this.CurrVelocity = Vector3.SmoothDamp(this.CurrVelocity, this.Velocity * speed, ref this.damping, t);
+        this.CurrVelocity = Vector3.SmoothDamp(this.CurrVelocity, this.Velocity, ref this.damping, t);
         this.Animator?.SetFloat(CharacterMovement.AnimParam, this.CurrVelocity.magnitude);
         this.TurnTowards(this.Velocity);
         this.Controller?.Move(this.CurrVelocity * Time.deltaTime);

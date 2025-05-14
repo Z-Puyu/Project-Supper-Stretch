@@ -211,7 +211,7 @@ namespace Project.Scripts.Player
                 {
                     ""name"": """",
                     ""id"": ""450de669-cae8-46e0-9a90-0dd617029830"",
-                    ""path"": ""<Keyboard>/alt"",
+                    ""path"": ""<Keyboard>/leftAlt"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

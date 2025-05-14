@@ -17,7 +17,7 @@ public class PlayerInputInterpreter : MonoBehaviour {
         switch (context.phase) {
             case InputActionPhase.Performed:
                 Vector2 input = context.ReadValue<Vector2>();
-                Vector3 movement = new Vector3(input.normalized.x, 0, input.normalized.y);
+                Vector3 movement = new Vector3(input.x, 0, input.y);
                 this.MovementComponent.Velocity = movement;
                 break;
             case InputActionPhase.Canceled:
@@ -37,7 +37,6 @@ public class PlayerInputInterpreter : MonoBehaviour {
     
     public void Run(InputAction.CallbackContext context) {
         if (context.canceled) {
-            Debug.Log("Shift released");
             this.MovementComponent.SwitchMode(CharacterMovement.Mode.Walk);
         } else if (!this.MovementComponent.Locked && context.started) {
             this.MovementComponent.SwitchMode(CharacterMovement.Mode.Run);
