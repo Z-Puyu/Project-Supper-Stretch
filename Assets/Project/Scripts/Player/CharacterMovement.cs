@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.Events;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,24 +8,16 @@ namespace Project.Scripts.Player;
 
 [RequireComponent(typeof(CharacterController))]
 public class CharacterMovement : MonoBehaviour {
-    public enum Mode { Walk, Run, Sprint }
+    public enum Mode { Walk = 1, Run = 2, Sprint = 3 }
     
     private static readonly int AnimParam = Animator.StringToHash("Move");
     
     private Vector3 damping = Vector3.zero;
-    private Vector3 velocity = Vector3.zero;
+    private Vector3 direction = Vector3.zero;
     
+    #region Components
+    [NotNull]
     private CharacterController? Controller { get; set; }
-
-    public Vector3 Velocity {
-        private get => (this.CameraTransform!.TransformDirection(this.velocity) with { y = 0 }).normalized *
-                       ((int)this.MovementMode + 1);
-        set => this.velocity = value;
-    }
-
-    private Vector3 CurrVelocity { get; set; } = Vector3.zero;
-    public Mode MovementMode { get; private set; } = Mode.Walk;
-    public bool Locked { get; set; }
     
     [field: SerializeField]
     private Animator? Animator { get; set; }
@@ -34,12 +27,29 @@ public class CharacterMovement : MonoBehaviour {
     private Transform? CharacterTransform { get; set; }
     
     private Transform? CameraTransform { get; set; }
+    #endregion
+
+    /// <summary>
+    /// The direction of movement as a unit vector.
+    /// </summary>
+    public Vector3 Direction {
+        private get => this.CameraTransform!.TransformDirection(this.direction).normalized;
+        set => this.direction = value;
+    }
+
+    #region Movement Parameters
+    private bool IsPaused { get; set; }
+    private Vector3 Velocity { get; set; } = Vector3.zero;
+    private float FallingSpeed { get; set; }
+    public Mode MovementMode { get; private set; } = Mode.Walk;
+    public bool Locked { get; set; }
 
     [field: SerializeField, Range(0, 1)]
     private float Acceleration { get; set; } = 0.9f;
     
     [field: SerializeField, Range(0, 1)] 
     private float TurnSpeed { get; set; } = 0.2f;
+    #endregion
 
     private void Awake() {
         this.Controller = this.GetComponent<CharacterController>();
@@ -48,9 +58,13 @@ public class CharacterMovement : MonoBehaviour {
     private void Start() {
         this.CameraTransform = Camera.main?.transform ?? this.CharacterTransform;
     }
+    
+    public void OnInterrupted(GameEvent<bool> @event) {
+        this.IsPaused = @event.Data;
+    }
 
     public void StopImmediately() {
-        this.Velocity = Vector3.zero; // This will stop both movement and rotation :O
+        this.Direction = Vector3.zero; // This will stop both movement and rotation :O
     }
     
     public void SwitchMode(Mode mode) {
@@ -58,20 +72,37 @@ public class CharacterMovement : MonoBehaviour {
         this.damping = Vector3.zero;
     }
     
-    private void TurnTowards(Vector3 direction) {
-        if (direction.magnitude == 0) {
+    private void TurnTowards(Vector3 dir) {
+        if (dir.magnitude == 0) {
             return;
         }
+        
+        Quaternion target = Quaternion.LookRotation(dir with { y = 0 });
+        this.CharacterTransform.rotation = Quaternion.Slerp(this.CharacterTransform.rotation, target, this.TurnSpeed);
+    }
 
-        Quaternion rotation = Quaternion.LookRotation(direction);
-        this.CharacterTransform.rotation = Quaternion.Slerp(this.CharacterTransform.rotation, rotation, this.TurnSpeed);
+    private void Fall(float t) {
+        if (this.Controller.isGrounded) {
+            this.FallingSpeed = 0;
+        } else {
+            this.FallingSpeed += Physics.gravity.y * t;
+        }
     }
 
     private void Update() {
+        if (this.IsPaused) {
+            return;
+        }
+        
         float t = 1 - this.Acceleration;
-        this.CurrVelocity = Vector3.SmoothDamp(this.CurrVelocity, this.Velocity, ref this.damping, t);
-        this.Animator?.SetFloat(CharacterMovement.AnimParam, this.CurrVelocity.magnitude);
-        this.TurnTowards(this.Velocity);
-        this.Controller?.Move(this.CurrVelocity * Time.deltaTime);
+        this.Velocity = Vector3.SmoothDamp(this.Velocity, this.Direction * (int)this.MovementMode, ref this.damping, t);
+        this.Animator?.SetFloat(CharacterMovement.AnimParam, this.Velocity.magnitude);
+        if (this.Velocity.magnitude == 0) {
+            return;
+        }
+        
+        this.TurnTowards(this.Direction);
+        this.Fall(Time.deltaTime);
+        this.Controller.Move(this.Velocity with { y = this.FallingSpeed } * Time.deltaTime);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AYellowpaper.SerializedCollections;
 using Project.Scripts.Util;
 using Project.Scripts.Util.Linq;
 using UnityEngine;
@@ -24,3 +25,29 @@ public abstract class EventChannel<T> : ScriptableObject {
         }
     }
 }
+
+/*[CreateAssetMenu(fileName = "Int Event Channel", menuName = "Event System/Int Event Channel")]
+public class IntEventChannel : EventChannel<int>;
+
+[CreateAssetMenu(fileName = "Float Event Channel", menuName = "Event System/Float Event Channel")]
+public class FloatEventChannel : EventChannel<float>;
+
+[CreateAssetMenu(fileName = "Vector2 Event Channel", menuName = "Event System/Vector2 Event Channel")]
+public class Vector2EventChannel : EventChannel<Vector2>;   
+
+[CreateAssetMenu(fileName = "Vector3 Event Channel", menuName = "Event System/Vector3 Event Channel")]
+public class Vector3EventChannel : EventChannel<Vector3>;   
+
+[CreateAssetMenu(fileName = "Vector4 Event Channel", menuName = "Event System/Vector4 Event Channel")]
+public class Vector4EventChannel : EventChannel<Vector4>;
+
+[CreateAssetMenu(fileName = "Dictionary Event Channel", menuName = "Event System/Dictionary Event Channel")]
+public class DictionaryEventChannel : EventChannel<SerializedDictionary<string, object>>;
+
+[CreateAssetMenu(fileName = "GameObject Event Channel", menuName = "Event System/GameObject Event Channel")]
+public class GameObjectEventChannel : EventChannel<GameObject>;
+
+[CreateAssetMenu(fileName = "List Event Channel", menuName = "Event System/List Event Channel")]
+public class TransformEventChannel : EventChannel<List<object>>;*/
+
+

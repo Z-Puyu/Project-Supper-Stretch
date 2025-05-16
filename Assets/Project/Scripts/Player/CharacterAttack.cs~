@@ -1,0 +1,12 @@
+using UnityEngine;
+
+namespace Project.Scripts.Player;
+
+public class CharacterAttack {
+    [field: SerializeField] 
+    private Animator? Animator { get; set; }
+    
+    public void Attack(int tag) {
+        this.Animator?.SetTrigger(tag);
+    }
+}

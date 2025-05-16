@@ -128,6 +128,24 @@ namespace Project.Scripts.Player
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""ca1b717c-c806-4661-bd09-8152a6fd0bcc"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightHandAttack"",
+                    ""type"": ""Button"",
+                    ""id"": ""3e9dd9df-ccad-4c0a-a69c-b5689b7ebc20"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -218,6 +236,28 @@ namespace Project.Scripts.Player
                     ""action"": ""Sprint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7e48a45d-6a2e-499e-9a32-54c614c0bd56"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2150f1eb-cf5a-4da0-88a5-197b818d36fc"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightHandAttack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -230,6 +270,8 @@ namespace Project.Scripts.Player
             m_Player_LockWalking = m_Player.FindAction("LockWalking", throwIfNotFound: true);
             m_Player_Run = m_Player.FindAction("Run", throwIfNotFound: true);
             m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
+            m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
+            m_Player_RightHandAttack = m_Player.FindAction("RightHandAttack", throwIfNotFound: true);
         }
 
         ~@InputActions()
@@ -314,6 +356,8 @@ namespace Project.Scripts.Player
         private readonly InputAction m_Player_LockWalking;
         private readonly InputAction m_Player_Run;
         private readonly InputAction m_Player_Sprint;
+        private readonly InputAction m_Player_Jump;
+        private readonly InputAction m_Player_RightHandAttack;
         /// <summary>
         /// Provides access to input actions defined in input action map "Player".
         /// </summary>
@@ -341,6 +385,14 @@ namespace Project.Scripts.Player
             /// Provides access to the underlying input action "Player/Sprint".
             /// </summary>
             public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
+            /// <summary>
+            /// Provides access to the underlying input action "Player/Jump".
+            /// </summary>
+            public InputAction @Jump => m_Wrapper.m_Player_Jump;
+            /// <summary>
+            /// Provides access to the underlying input action "Player/RightHandAttack".
+            /// </summary>
+            public InputAction @RightHandAttack => m_Wrapper.m_Player_RightHandAttack;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -379,6 +431,12 @@ namespace Project.Scripts.Player
                 @Sprint.started += instance.OnSprint;
                 @Sprint.performed += instance.OnSprint;
                 @Sprint.canceled += instance.OnSprint;
+                @Jump.started += instance.OnJump;
+                @Jump.performed += instance.OnJump;
+                @Jump.canceled += instance.OnJump;
+                @RightHandAttack.started += instance.OnRightHandAttack;
+                @RightHandAttack.performed += instance.OnRightHandAttack;
+                @RightHandAttack.canceled += instance.OnRightHandAttack;
             }
 
             /// <summary>
@@ -402,6 +460,12 @@ namespace Project.Scripts.Player
                 @Sprint.started -= instance.OnSprint;
                 @Sprint.performed -= instance.OnSprint;
                 @Sprint.canceled -= instance.OnSprint;
+                @Jump.started -= instance.OnJump;
+                @Jump.performed -= instance.OnJump;
+                @Jump.canceled -= instance.OnJump;
+                @RightHandAttack.started -= instance.OnRightHandAttack;
+                @RightHandAttack.performed -= instance.OnRightHandAttack;
+                @RightHandAttack.canceled -= instance.OnRightHandAttack;
             }
 
             /// <summary>
@@ -470,6 +534,20 @@ namespace Project.Scripts.Player
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnSprint(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Jump" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnJump(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "RightHandAttack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnRightHandAttack(InputAction.CallbackContext context);
         }
     }
 }

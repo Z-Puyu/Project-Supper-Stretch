@@ -47,9 +47,16 @@
     <Analyzer Include="F:\UnityEditor\6000.1.2f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Project\Scripts\AbilitySystem\Abilities\Ability.cs" />
+    <Compile Include="Assets\Project\Scripts\AbilitySystem\Abilities\Effects\AbilityEffect.cs" />
+    <Compile Include="Assets\Project\Scripts\Player\EquipmentSocket.cs" />
+    <Compile Include="Assets\Project\Scripts\Player\CharacterJump.cs" />
+    <Compile Include="Assets\Project\Scripts\Player\CharacterAttack.cs" />
+    <Compile Include="Assets\Project\Scripts\Player\EquipmentSystem.cs" />
     <Compile Include="Assets\Project\Scripts\Test.cs" />
     <Compile Include="Assets\Project\Scripts\Player\CharacterMovement.cs" />
     <Compile Include="Assets\Project\Scripts\Player\InputActions.cs" />
+    <Compile Include="Assets\Project\Scripts\Player\PlayerInputInterpretor.cs" />
     <None Include="Assets\Project\Scripts\csc.rsp" />
     <None Include="Assets\Project\Scripts\Project.Scripts.asmdef" />
     <Reference Include="UnityEngine">
@@ -831,6 +838,10 @@
     <ProjectReference Include="AYellowpaper.SerializedCollections.csproj">
       <Project>{56bf9be0-1ff6-11ff-9940-8d60e585b542}</Project>
       <Name>AYellowpaper.SerializedCollections</Name>
+    </ProjectReference>
+    <ProjectReference Include="Project.Scripts.Events.csproj">
+      <Project>{2c8fcbea-76fb-095e-34d6-7a6b1bd3b7b2}</Project>
+      <Name>Project.Scripts.Events</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

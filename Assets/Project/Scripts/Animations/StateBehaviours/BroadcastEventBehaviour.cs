@@ -1,0 +1,18 @@
+﻿using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.Events;
+using UnityEngine;
+
+namespace Project.Scripts.Animations.StateBehaviours;
+
+public abstract class BroadcastEventBehaviour<T> : AnimatorStateBehaviour where T : notnull {
+    [field: SerializeField]
+    private EventChannel<T>? NotificationChannel { get; set; }
+    
+    [NotNull]
+    [field: SerializeField]
+    private T? Message { get; set; }
+
+    protected override void Execute(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
+        this.NotificationChannel?.Broadcast(animator, this.Message);
+    }
+}

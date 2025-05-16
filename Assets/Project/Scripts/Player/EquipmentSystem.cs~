@@ -1,0 +1,14 @@
+using System.Diagnostics.CodeAnalysis;
+using UnityEngine;
+
+namespace Project.Scripts.Player;
+
+public class EquipmentSystem : MonoBehaviour {
+    [NotNull]
+    [field: SerializeField]
+    private EquipmentSocket? WeaponSocket { get; set; }
+
+    public void Equip(GameObject equipment) {
+        this.WeaponSocket.Attach(equipment);
+    }
+}

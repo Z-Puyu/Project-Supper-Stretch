@@ -8,17 +8,18 @@ namespace Project.Scripts.Player;
 public class PlayerInputInterpreter : MonoBehaviour {
     [NotNull]
     private CharacterMovement? MovementComponent { get; set; }
+    private ComboAttack? AttackComponent { get; set; }
 
     private void Awake() {
         this.MovementComponent = this.GetComponent<CharacterMovement>();
+        this.AttackComponent = this.GetComponent<ComboAttack>();
     }
 
-    public void Move(InputAction.CallbackContext context) {
+    public void OnMove(InputAction.CallbackContext context) {
         switch (context.phase) {
             case InputActionPhase.Performed:
                 Vector2 input = context.ReadValue<Vector2>();
-                Vector3 movement = new Vector3(input.x, 0, input.y);
-                this.MovementComponent.Velocity = movement;
+                this.MovementComponent.Direction = new Vector3(input.x, 0, input.y);
                 break;
             case InputActionPhase.Canceled:
                 this.MovementComponent.StopImmediately();
@@ -26,7 +27,7 @@ public class PlayerInputInterpreter : MonoBehaviour {
         }
     }
     
-    public void LockWalking(InputAction.CallbackContext context) {
+    public void OnLockWalking(InputAction.CallbackContext context) {
         if (!context.started) {
             return;
         }
@@ -35,7 +36,7 @@ public class PlayerInputInterpreter : MonoBehaviour {
         this.MovementComponent.Locked = !this.MovementComponent.Locked;
     }
     
-    public void Run(InputAction.CallbackContext context) {
+    public void OnRun(InputAction.CallbackContext context) {
         if (context.canceled) {
             this.MovementComponent.SwitchMode(CharacterMovement.Mode.Walk);
         } else if (!this.MovementComponent.Locked && context.started) {
@@ -43,7 +44,7 @@ public class PlayerInputInterpreter : MonoBehaviour {
         }
     }
 
-    public void Sprint(InputAction.CallbackContext context) {
+    public void OnSprint(InputAction.CallbackContext context) {
         if (this.MovementComponent.MovementMode == CharacterMovement.Mode.Walk) {
             return;
         }
@@ -52,6 +53,12 @@ public class PlayerInputInterpreter : MonoBehaviour {
             this.MovementComponent.SwitchMode(CharacterMovement.Mode.Sprint);
         } else if (context.canceled) {
             this.MovementComponent.SwitchMode(CharacterMovement.Mode.Run);
+        }
+    }
+    
+    public void OnRightHandAttack(InputAction.CallbackContext context) {
+        if (context.started) {
+            this.AttackComponent?.Commit();
         }
     }
 }
