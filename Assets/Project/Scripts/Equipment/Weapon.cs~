@@ -1,0 +1,20 @@
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.Equipment.Data.Weapons;
+using UnityEngine;
+
+namespace Project.Scripts.Equipment;
+
+[RequireComponent(typeof(Collider))]
+public class Weapon : MonoBehaviour {
+    [NotNull]
+    private Collider? Collider { get; set; }
+
+    private void Awake() {
+        this.Collider = this.GetComponent<Collider>();
+    }
+
+    private void OnTriggerEnter(Collider other) {
+        this.Collider.enabled = false;
+    }
+}

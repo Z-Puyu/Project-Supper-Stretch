@@ -49,7 +49,6 @@
   <ItemGroup>
     <Compile Include="Assets\Project\Scripts\Util\IsExternalInit.cs" />
     <Compile Include="Assets\Project\Scripts\Util\Singleton\Singleton.cs" />
-    <Compile Include="Assets\Project\Scripts\Util\Timer\TickTimer.cs" />
     <None Include="Assets\Project\Scripts\Util\csc.rsp" />
     <None Include="Assets\Project\Scripts\Util\Project.Scripts.Util.asmdef" />
     <Reference Include="UnityEngine">
@@ -821,7 +820,9 @@
       <HintPath>F:\ProjectDungeonRPG\Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup></ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets\Project\Scripts\Util\ChainOfResponsibilities\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

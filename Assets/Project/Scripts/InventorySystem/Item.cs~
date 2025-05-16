@@ -1,0 +1,11 @@
+﻿using UnityEngine;
+
+namespace Project.Scripts.Items;
+
+public class Item : ScriptableObject {
+    [field: SerializeField]
+    private string Name { get; set; } = string.Empty;
+    
+    [field: SerializeField]
+    private GameObject? Model { get; set; }
+}

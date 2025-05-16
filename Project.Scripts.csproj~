@@ -49,12 +49,12 @@
   <ItemGroup>
     <Compile Include="Assets\Project\Scripts\AbilitySystem\Abilities\Ability.cs" />
     <Compile Include="Assets\Project\Scripts\AbilitySystem\Abilities\Effects\AbilityEffect.cs" />
-    <Compile Include="Assets\Project\Scripts\Player\EquipmentSocket.cs" />
+    <Compile Include="Assets\Project\Scripts\Combat\IsExternalInit.cs" />
     <Compile Include="Assets\Project\Scripts\Player\CharacterJump.cs" />
     <Compile Include="Assets\Project\Scripts\Player\CharacterAttack.cs" />
-    <Compile Include="Assets\Project\Scripts\Player\EquipmentSystem.cs" />
     <Compile Include="Assets\Project\Scripts\Test.cs" />
     <Compile Include="Assets\Project\Scripts\Player\CharacterMovement.cs" />
+    <Compile Include="Assets\Project\Scripts\Player\ComboAttack.cs" />
     <Compile Include="Assets\Project\Scripts\Player\InputActions.cs" />
     <Compile Include="Assets\Project\Scripts\Player\PlayerInputInterpretor.cs" />
     <None Include="Assets\Project\Scripts\csc.rsp" />

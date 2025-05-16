@@ -1,0 +1,13 @@
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.InteractionSystem.Detector;
+using UnityEngine;
+
+namespace Project.Scripts.InteractionSystem;
+
+[RequireComponent(typeof(InteractorDetector))]
+public class IteractableObject : MonoBehaviour {
+    [NotNull]
+    [field: SerializeField]
+    private InteractorDetector? Detector { get; set; }
+}

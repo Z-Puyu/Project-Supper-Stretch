@@ -1,0 +1,96 @@
+﻿using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.InteractionSystem.Detector;
+using UnityEngine;
+
+namespace Project.Scripts.InteractionSystem;
+
+[RequireComponent(typeof(InteractorDetector))]
+public abstract class InteractableObject : MonoBehaviour {
+    [NotNull]
+    [field: SerializeField]
+    private InteractorDetector? Detector { get; set; }
+
+    [field: SerializeField]
+    private string Prompt { get; set; } = "Interact";
+    
+    [field: SerializeField]
+    private bool ShouldDestroyAfterInteraction { get; set; }
+    
+    private bool HasInteractorInRange { get; set; }
+
+    private void Start() {
+        this.Detector.OnDetection += this.OnInteractorDetected;
+        this.Detector.OnLostInteractor += this.OnInteractorOutOfRange;
+    }
+    
+    private void OnEnable() {
+        if (this.HasInteractorInRange) {
+            this.OnActivated();
+        }
+    }
+    
+    private void OnDisable() {
+        if (this.HasInteractorInRange) {
+            this.OnDeactivated();
+        }
+    }
+
+    /// <summary>
+    /// Invoked to apply cosmetic effects when an interactor comes into range.
+    /// </summary>
+    protected virtual void OnActivated() { }
+
+    /// <summary>
+    /// Invoked to revert cosmetic effects when an interactor leaves range.
+    /// </summary>
+    protected virtual void OnDeactivated() { }
+
+    private void OnInteractorDetected(Collider interactor) {
+        this.HasInteractorInRange = true;
+        if (!this.enabled) {
+            return;
+        }
+        
+        this.OnActivated();
+        PlayerInteraction? interactionComp = interactor.GetComponent<PlayerInteraction>();
+        if (interactionComp != null) {
+            interactionComp.TargetsInRange.Add(this);
+        }
+    }
+
+    private void OnInteractorOutOfRange(Collider interactor) {
+        this.HasInteractorInRange = false;
+        if (!this.enabled) {
+            return;
+        }
+        
+        this.OnDeactivated();
+        PlayerInteraction? interactionComp = interactor.GetComponent<PlayerInteraction>();
+        if (interactionComp != null) {
+            interactionComp.TargetsInRange.Remove(this);
+        }
+    }
+    
+    /// <summary>
+    /// Invoked to execute effects when an interactor interacts with this object.
+    /// </summary>
+    protected abstract void OnInteraction();
+    
+    /// <summary>
+    /// Invoked to execute some clean-up after an interactor interacts with this object.
+    /// </summary>
+    protected virtual void PostInteraction() {
+        if (this.ShouldDestroyAfterInteraction) {
+            Object.Destroy(this.gameObject);
+        }
+    }
+
+    public void Interact() {
+        this.OnInteraction();
+        this.PostInteraction();
+    }
+    
+    public virtual void ShowPrompt() { }
+    
+    public virtual void HidePrompt() { }
+}
