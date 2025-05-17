@@ -1,0 +1,21 @@
+﻿using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.AttributeSystem;
+using UnityEngine;
+
+namespace Project.Scripts.Combat;
+
+[RequireComponent(typeof(AttributeSet))]
+public class DamageDealer : MonoBehaviour {
+    [NotNull]
+    private AttributeSet? SelfAttributes { get; set; }
+
+    private void Awake() {
+        this.SelfAttributes = this.GetComponent<AttributeSet>();
+    }
+
+    public void Damage(Collider target) {
+        foreach (IDamageable damageable in target.GetComponents<IDamageable>()) {
+            damageable.TakeDamage(this.SelfAttributes[AttributeType.BaseAttack].CurrentValue, this.gameObject);
+        }
+    }
+}

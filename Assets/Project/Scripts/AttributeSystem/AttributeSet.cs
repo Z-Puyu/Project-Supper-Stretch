@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Project.Scripts.AttributeSystem.AttributeTypes;
+using Project.Scripts.AttributeSystem.GameplayEffects;
 using Project.Scripts.AttributeSystem.Modifiers;
 using Project.Scripts.Events;
 using Project.Scripts.Util.Visitor;
@@ -7,21 +11,34 @@ using UnityEngine;
 
 namespace Project.Scripts.AttributeSystem;
 
+[DisallowMultipleComponent]
+[RequireComponent(typeof(GameplayEffectManager))]
 public class AttributeSet : MonoBehaviour, IVisitable<AttributeSet> {
     private Dictionary<AttributeType, Attribute> Attributes { get; init; } = [];
-    public ModifierManager ModifierManager { get; private init; }
-    
-    [field: SerializeField] 
+
+    [NotNull]
+    public ModifierManager? ModifierManager { get; private set; }
+
+    [field: SerializeField]
     private EventChannel<Attribute>? OnAttributeUpdate { get; set; }
 
-    public AttributeSet() {
-        this.ModifierManager = new ModifierManager(this);
+    [NotNull]
+    private GameplayEffectManager? GameplayEffectManager { get; set; }
+
+    private void Awake() {
+        this.ModifierManager = this.GetComponent<ModifierManager>();
+        this.GameplayEffectManager = this.GetComponent<GameplayEffectManager>();
     }
 
     private void Start() {
         this.ModifierManager.OnModifierUpdate += this.Recompute;
     }
-    
+
+    /// <summary>
+    /// Returns the attribute data with the given type. If the attribute set does not contain this attribute,
+    /// return a zero attribute.
+    /// </summary>
+    /// <param name="type">The attribute to query.</param>
     public Attribute this[AttributeType type] => this.Attributes.TryGetValue(type, out Attribute value)
             ? value
             : Attribute.Zero(type);
@@ -34,11 +51,9 @@ public class AttributeSet : MonoBehaviour, IVisitable<AttributeSet> {
         if (!this.Attributes.TryGetValue(attribute, out Attribute data)) {
             data = Attribute.Zero(attribute);
         }
-        
-        (float baseOffset, float baseMultiplier) = this.ModifierManager.AggregateBaseValueModifiers(attribute);
-        (float finalOffset, float finalMultiplier) = this.ModifierManager.AggregateFinalValueModifiers(attribute);
-        float final = ((data.BaseValue + baseOffset) * baseMultiplier + finalOffset) * finalMultiplier;
-        data = data with { CurrentValue = Mathf.CeilToInt(final) };
+
+        float modified = this.ModifierManager.Query(attribute, data.BaseValue);
+        data = data with { CurrentValue = Mathf.CeilToInt(modified) };
         this.PostAttributeUpdate(in data);
     }
 

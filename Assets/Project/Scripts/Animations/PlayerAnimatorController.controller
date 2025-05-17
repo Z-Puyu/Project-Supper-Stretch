@@ -118,6 +118,21 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: Move
+--- !u!114 &-5691328192000186404
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f508c3ccda3342f69de2b6566965a118, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Timing>k__BackingField: 1
+  <NotificationChannel>k__BackingField: {fileID: 11400000, guid: 7181849f27b87bc43b21f987f20fd0cb, type: 2}
+  <Message>k__BackingField: 2
 --- !u!1107 &-5091738443420815734
 AnimatorStateMachine:
   serializedVersion: 6
@@ -165,7 +180,8 @@ AnimatorState:
   m_Transitions:
   - {fileID: 9049224038603459825}
   - {fileID: -4712603724334135599}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: 4784365308243772376}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -313,7 +329,8 @@ AnimatorState:
   m_Transitions:
   - {fileID: 5649301963621329195}
   - {fileID: 4133869361893012675}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -5691328192000186404}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -414,7 +431,8 @@ AnimatorState:
   m_Transitions:
   - {fileID: 9189403749367224873}
   - {fileID: 6235328041309493883}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: 7177562110790257943}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -429,6 +447,21 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
+--- !u!114 &4784365308243772376
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f508c3ccda3342f69de2b6566965a118, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Timing>k__BackingField: 1
+  <NotificationChannel>k__BackingField: {fileID: 11400000, guid: 7181849f27b87bc43b21f987f20fd0cb, type: 2}
+  <Message>k__BackingField: 1
 --- !u!1101 &5649301963621329195
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -523,6 +556,21 @@ BlendTree:
   m_UseAutomaticThresholds: 0
   m_NormalizedBlendValues: 0
   m_BlendType: 0
+--- !u!114 &7177562110790257943
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f508c3ccda3342f69de2b6566965a118, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Timing>k__BackingField: 1
+  <NotificationChannel>k__BackingField: {fileID: 11400000, guid: 7181849f27b87bc43b21f987f20fd0cb, type: 2}
+  <Message>k__BackingField: 3
 --- !u!1101 &8427968871269703291
 AnimatorStateTransition:
   m_ObjectHideFlags: 1

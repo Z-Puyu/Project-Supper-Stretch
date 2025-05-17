@@ -1,4 +1,6 @@
-﻿namespace Project.Scripts.AttributeSystem;
+﻿using Project.Scripts.AttributeSystem.AttributeTypes;
+
+namespace Project.Scripts.AttributeSystem;
 
 public readonly record struct Attribute(
     AttributeType Type,

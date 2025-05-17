@@ -47,23 +47,27 @@
     <Analyzer Include="F:\UnityEditor\6000.1.2f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\AttributeType.cs" />
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\GameplayEffectCommand.cs" />
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\SetByCallerMagnitude.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\ConstantModifier.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\Modifier.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\CustomExecutionGameplayEffect.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\AttributeSet.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\GameplayEffectManager.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\Attribute.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\BackingAttribute.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\ModifierChain.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\SimpleGameplayEffect.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\GameplayEffectInvocationParameter.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\GameplayEffectExecutor.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\GameplayEffect.cs" />
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\ConstantMagnitude.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\AttributeInitialisation.cs" />
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\AttributeBasedMagnitude.cs" />
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\GameplayEffectInstigator.cs" />
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\Magnitude.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\AffectedAttribute.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\AttributeTypes\AttributeType.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\IsExternalInit.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\ModifierManager.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\InstantGameplayEffect.cs" />
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\GameplayEffectExecutionPolicy.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\DynamicallyValuedModifier.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\AttributeTypes\WeaponAttribute.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\AttributeBasedModifier.cs" />
     <None Include="Assets\Project\Scripts\AttributeSystem\csc.rsp" />
     <None Include="Assets\Project\Scripts\AttributeSystem\Project.Scripts.AttributeSystem.asmdef" />
     <Reference Include="UnityEngine">
@@ -847,6 +851,22 @@
     <ProjectReference Include="Project.Scripts.Util.Command.csproj">
       <Project>{20dd5220-8078-cac6-2161-3403ba41741d}</Project>
       <Name>Project.Scripts.Util.Command</Name>
+    </ProjectReference>
+    <ProjectReference Include="Project.Scripts.Util.Builder.csproj">
+      <Project>{4ff13ae2-3b5c-f4a5-6b03-ca3bfb9925a3}</Project>
+      <Name>Project.Scripts.Util.Builder</Name>
+    </ProjectReference>
+    <ProjectReference Include="AYellowpaper.SerializedCollections.csproj">
+      <Project>{56bf9be0-1ff6-11ff-9940-8d60e585b542}</Project>
+      <Name>AYellowpaper.SerializedCollections</Name>
+    </ProjectReference>
+    <ProjectReference Include="Project.Scripts.Util.Linq.csproj">
+      <Project>{86a64c3e-6091-b4f9-c4b5-9550bb90d54e}</Project>
+      <Name>Project.Scripts.Util.Linq</Name>
+    </ProjectReference>
+    <ProjectReference Include="Project.Scripts.Util.Components.csproj">
+      <Project>{afc5d07f-4a01-9aed-9747-c0340a070b99}</Project>
+      <Name>Project.Scripts.Util.Components</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

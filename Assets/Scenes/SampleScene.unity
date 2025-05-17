@@ -967,8 +967,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb99a992a90750940bd1543f06915c86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <WeaponSocket>k__BackingField: {fileID: 1893155032}
-  <TestWeapon>k__BackingField: {fileID: 2359347438564835141, guid: 43be1ee03a5cca84a90f807d6b91fc7b, type: 3}
+  <EquipmentSockets>k__BackingField: []
+  <TestWeapon>k__BackingField: {fileID: 0}
+  <OnEquipped>k__BackingField: {fileID: 0}
+  <OnUnequipped>k__BackingField: {fileID: 0}
 --- !u!114 &947555092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1369,6 +1371,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75c1756fb4ef451fa75221f8838af007, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <Slot>k__BackingField: 0
 --- !u!4 &2011862873 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4372587343206045713, guid: 81bb9eea30387e442899949a80011e55, type: 3}

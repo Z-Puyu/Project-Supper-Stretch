@@ -1,4 +1,5 @@
 ﻿using System;
+using Project.Scripts.AttributeSystem.AttributeTypes;
 
 namespace Project.Scripts.AttributeSystem;
 
