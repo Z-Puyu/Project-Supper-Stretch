@@ -1,115 +1,84 @@
 ﻿using System;
 using System.Collections.Generic;
-using Project.Scripts.AttributeSystem.AttributeTypes;
 using Project.Scripts.Util.Builder;
 using Project.Scripts.Util.Visitor;
 using UnityEngine;
 
 namespace Project.Scripts.AttributeSystem.Modifiers;
 
-[Serializable]
 public abstract class Modifier : IVisitor<ModifierManager> {
-    public enum Type { Base, Current }
-
-    public enum Operation { Offset, Multiplier }
-
-    [field: SerializeField, Header("Modifier Type")] 
-    public AttributeType Target { get; protected set; }
+    [field: SerializeField] 
+    protected ModifierType ValueType { get; set; } = ModifierType.Base;
     
     [field: SerializeField] 
-    public Type ValueType { get; protected set; }
+    protected ModifierOperation OperationType { get; private set; } = ModifierOperation.Offset;
     
-    [field: SerializeField] 
-    public Operation OperationType { get; protected set; }
+    [field: SerializeField, Header("Magnitude")]
+    protected Magnitude? Magnitude { get; set; }
     
-    protected Modifier(AttributeType target, Type valueType, Operation operation) {
-        this.Target = target;
-        this.ValueType = valueType;
-        this.OperationType = operation;
-    }
-
-    protected virtual Modifier BasedOn(AttributeSet? self, AttributeSet target) {
-        return this;
-    }
+    public abstract void Visit(ModifierManager visitable);
     
-    protected virtual Modifier With(IReadOnlyDictionary<string, int> magnitudes) {
-        return this;
-    }
-
-    protected virtual Modifier With(string label, int magnitude) {
-        return this;
-    }
-
-    protected abstract float Evaluate();
-
-    public void Visit(ModifierManager manager) {
-        manager.AddModifier(this);
-    }
-    
-    public static Vector4 operator +(Vector4 vec, Modifier mod) {
-        switch (mod.ValueType) {
-            case Type.Base:
-                switch (mod.OperationType) {
-                    case Operation.Offset:
-                        return new Vector4(vec.x + mod.Evaluate(), vec.y, vec.z, vec.w);
-                    case Operation.Multiplier:
-                        return new Vector4(vec.x, vec.y + mod.Evaluate(), vec.z, vec.w);
-                }
-                break;
-            case Type.Current:
-                switch (mod.OperationType) {
-                    case Operation.Offset:
-                        return new Vector4(vec.x, vec.y, vec.z + mod.Evaluate(), vec.w);
-                    case Operation.Multiplier:
-                        return new Vector4(vec.x, vec.y, vec.z, vec.w + mod.Evaluate());
-                }
-                break;
-        }
-
-        return vec;
-    }
-    
-    public static Vector4 operator -(Vector4 vec, Modifier mod) {
-        switch (mod.ValueType) {
-            case Type.Base:
-                switch (mod.OperationType) {
-                    case Operation.Offset:
-                        return new Vector4(vec.x - mod.Evaluate(), vec.y, vec.z, vec.w);
-                    case Operation.Multiplier:
-                        return new Vector4(vec.x, vec.y - mod.Evaluate(), vec.z, vec.w);
-                }
-                break;
-            case Type.Current:
-                switch (mod.OperationType) {
-                    case Operation.Offset:
-                        return new Vector4(vec.x, vec.y, vec.z - mod.Evaluate(), vec.w);
-                    case Operation.Multiplier:
-                        return new Vector4(vec.x, vec.y, vec.z, vec.w - mod.Evaluate());
-                }
-                break;
-        }
-
-        return vec;
-    }
-
     public sealed class Configurator : FluentBuilder<Modifier> {
         private Configurator(Modifier template) : base(template) { }
         
         public static Configurator Of(Modifier template) => new Configurator(template);
 
-        public Configurator BasedOn(AttributeSet? self, AttributeSet target) {
-            this.Template = this.Template.BasedOn(self, target);
+        public Configurator BasedOn(Attributes.AttributeManagementSystem? self, Attributes.AttributeManagementSystem target) {
+            this.Template.Magnitude = this.Template.Magnitude?.BasedOn(self, target);
             return this;
         }
         
         public Configurator With(string label, int magnitude) {
-            this.Template = this.Template.With(label, magnitude);
+            this.Template.Magnitude = this.Template.Magnitude?.With(label, magnitude);
             return this;
         }
 
         public Configurator AccordingTo(IReadOnlyDictionary<string, int> magnitudes) {
-            this.Template = this.Template.With(magnitudes);
+            this.Template.Magnitude = this.Template.Magnitude?.With(magnitudes);
             return this;
         }
+    }
+}
+
+/// <summary>
+/// Base class for a modifier.
+/// </summary>
+/// <typeparam name="K">The enum type representing the attribute modifiable by the modifier.</typeparam>
+[Serializable]
+public abstract class Modifier<K> : Modifier where K : Enum {
+    [field: SerializeField] 
+    public K Target { get; protected set; }
+    
+    protected virtual float Value => this.Magnitude?.Evaluate() ?? 0;
+    
+    protected Modifier(K target) {
+        this.Target = target;
+    }
+
+    public override void Visit(ModifierManager manager) {
+        manager.AddModifier(this);
+    }
+
+    public virtual Vector4 ToVector4() {
+        switch (this.ValueType) {
+            case ModifierType.Base:
+                switch (this.OperationType) {
+                    case ModifierOperation.Offset:
+                        return new Vector4(this.Value, 0, 0, 0);
+                    case ModifierOperation.Multiplier:
+                        return new Vector4(0, this.Value, 0, 0);
+                }
+                break;
+            case ModifierType.Current:
+                switch (this.OperationType) {
+                    case ModifierOperation.Offset:
+                        return new Vector4(0, 0, this.Value, 0);
+                    case ModifierOperation.Multiplier:
+                        return new Vector4(0, 0, 0, this.Value);
+                }
+                break;
+        }
+
+        return Vector4.zero;
     }
 }

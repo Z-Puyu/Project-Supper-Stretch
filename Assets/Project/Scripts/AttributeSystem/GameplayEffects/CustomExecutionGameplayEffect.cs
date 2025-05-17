@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Project.Scripts.AttributeSystem.AttributeTypes;
@@ -8,27 +9,28 @@ using UnityEngine;
 namespace Project.Scripts.AttributeSystem.GameplayEffects;
 
 public sealed class CustomExecutionGameplayEffect : GameplayEffect {
-    public sealed record class CapturedAttributeData(AttributeSet? Instigator, AttributeSet Target) {
-        private AttributeSet? Instigator { get; init; } = Instigator;
-        private AttributeSet Target { get; init; } = Target;
+    public sealed record class CapturedAttributeData(Attributes.AttributeManagementSystem? Instigator, Attributes.AttributeManagementSystem Target) {
+        private Attributes.AttributeManagementSystem? Instigator { get; init; } = Instigator;
+        private Attributes.AttributeManagementSystem Target { get; init; } = Target;
     
-        public Attribute ReadFromSource(AttributeType attribute) {
-            return this.Instigator?[attribute] ?? Attribute.Zero(attribute);
+        public Attribute ReadFromSource(Enum attribute) {
+            return this.Instigator?.Query(attribute) ?? Attribute.Zero(attribute);
         }
     
-        public Attribute ReadFromTarget(AttributeType attribute) {
-            return this.Target[attribute];
+        public Attribute ReadFromTarget(Enum attribute) {
+            return this.Target.Query(attribute);
         }
     }
     
     [field: SerializeReference, SubclassSelector]
     private List<GameplayEffectExecutor> Executors { get; set; } = [];
     
-    [field: SerializeField]
+    [field: SerializeReference, SubclassSelector]
     private List<AffectedAttribute> AffectedAttributes { get; set; } = [];
 
     public override IEnumerable<Modifier> Invoke(
-        AttributeSet? instigator, AttributeSet target, IReadOnlyDictionary<string, int> references, int chance = 100
+        Attributes.AttributeManagementSystem? instigator, Attributes.AttributeManagementSystem target,
+        IReadOnlyDictionary<string, int> references, int chance = 100
     ) {
         CapturedAttributeData attributes = new CapturedAttributeData(instigator, target);
         IDictionary<string, int> parameters = new Dictionary<string, int>();
@@ -39,23 +41,17 @@ public sealed class CustomExecutionGameplayEffect : GameplayEffect {
                 parameters.Add(attribute.Label, 0);
             }
         }
-
+        
         IReadOnlyDictionary<string, int> readonlyParameters = new ReadOnlyDictionary<string, int>(parameters);
         foreach (GameplayEffectExecutor executor in this.Executors) {
             executor.Execute(attributes, parameters, ref chance);
         }
 
-        return this.AffectedAttributes
-                   .Distinct()
-                   .Select(toModifier);
+        return this.AffectedAttributes.Distinct().Select(toModifier);
 
         Modifier toModifier(AffectedAttribute a) {
-            Modifier m = new DynamicallyValuedModifier(a.Attribute, a.ModifierType, Modifier.Operation.Offset, a.Label);
+            Modifier m = new RuntimeModifier(a.EnumAttributeSetTag, a.EnumAttribute, a.ModifierType, a.Label);
             return Modifier.Configurator.Of(m).AccordingTo(readonlyParameters).Build();
         }
-    }
-
-    public override void Visit(AttributeSet attributes) {
-        
     }
 }

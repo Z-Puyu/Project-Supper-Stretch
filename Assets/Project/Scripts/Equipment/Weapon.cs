@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.AttributeSystem;
+using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.AttributeTypes;
 using Project.Scripts.AttributeSystem.GameplayEffects;
 using Project.Scripts.Combat;

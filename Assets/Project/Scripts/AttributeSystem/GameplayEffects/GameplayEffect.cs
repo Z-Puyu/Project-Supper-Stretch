@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.Modifiers;
 using Project.Scripts.Util.Visitor;
 using UnityEngine;
@@ -9,7 +10,7 @@ namespace Project.Scripts.AttributeSystem.GameplayEffects;
 /// A gameplay effect that can be applied to an <see cref="AttributeSet"/>.
 /// Each gameplay effect asset defines a set of parameters which are used to generate changes in attributes in run-time.
 /// </summary>
-public abstract class GameplayEffect : ScriptableObject, IVisitor<AttributeSet> {
+public abstract class GameplayEffect : ScriptableObject {
     /// <summary>
     /// Invoke the gameplay effect to produce a set of modifiers.
     /// </summary>
@@ -19,8 +20,7 @@ public abstract class GameplayEffect : ScriptableObject, IVisitor<AttributeSet> 
     /// <param name="chance">The chance of the modifiers being applied.</param>
     /// <returns>The modifiers to apply to <paramref name="target"/></returns>
     public abstract IEnumerable<Modifier> Invoke(
-        AttributeSet? instigator, AttributeSet target, IReadOnlyDictionary<string, int> magnitudes, int chance = 100
+        Attributes.AttributeManagementSystem? instigator, Attributes.AttributeManagementSystem target,
+        IReadOnlyDictionary<string, int> magnitudes, int chance = 100
     );
-
-    public abstract void Visit(AttributeSet attributes);
 }

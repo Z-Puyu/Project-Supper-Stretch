@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Project.Scripts.AttributeSystem;
+using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.GameplayEffects;
 using Project.Scripts.Events;
 using UnityEngine;
@@ -39,7 +39,7 @@ public class Health : MonoBehaviour, IDamageable {
         this.LastAttacker = source;
         this.Current = Mathf.Clamp(this.Current - damage, 0, this.Max);
         if (this.DamageEffect != null) {
-            AttributeSet? instigator = source?.GetComponent<AttributeSet>();
+            AttributeManagementSystem? instigator = source?.GetComponent<AttributeManagementSystem>();
             IReadOnlyDictionary<string, int> magnitudes = new Dictionary<string, int> {
                 { this.DamageMagnitudeLabel, damage }
             };
@@ -54,7 +54,7 @@ public class Health : MonoBehaviour, IDamageable {
 
     public void Heal(int amount, GameObject? source = null) {
         this.Current = Mathf.Clamp(this.Current + amount, 0, this.Max);
-        AttributeSet? instigator = source?.GetComponent<AttributeSet>();
+        AttributeManagementSystem? instigator = source?.GetComponent<AttributeManagementSystem>();
         IReadOnlyDictionary<string, int> magnitudes = new Dictionary<string, int> {
             { this.HealingMagnitudeLabel, amount }
         };

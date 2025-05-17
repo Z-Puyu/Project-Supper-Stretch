@@ -8,7 +8,6 @@ using UnityEngine;
 
 namespace Project.Scripts.Equipment;
 
-[RequireComponent(typeof(AttributeSet))]
 public class EquipmentSystem : MonoBehaviour {
     [field: SerializeField]
     private List<EquipmentSocket> EquipmentSockets { get; set; } = [];

@@ -1,14 +1,15 @@
-﻿using Project.Scripts.AttributeSystem.AttributeTypes;
+﻿using System;
+using Project.Scripts.AttributeSystem.AttributeTypes;
 
 namespace Project.Scripts.AttributeSystem;
 
 public readonly record struct Attribute(
-    AttributeType Type,
+    Enum Type,
     int BaseValue,
     int CurrentValue,
-    AttributeType Cap = AttributeType.None
+    Enum? Cap
 ) {
-    public static Attribute Zero(AttributeType type, AttributeType cap = AttributeType.None) {
+    public static Attribute Zero(Enum type, Enum? cap = null) {
         return new Attribute(type, 0, 0, cap);
     }
     

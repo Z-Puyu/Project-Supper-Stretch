@@ -1,0 +1,20 @@
+﻿using System;
+
+namespace Project.Scripts.AttributeSystem.Attributes;
+
+public readonly record struct AttributeKey(Type Type, Enum Value, string Name) {
+    public override string ToString() {
+        return $"{this.Type}.{this.Name}";
+    }
+
+    public E As<E>() where E : Enum {
+        if (Enum.IsDefined(typeof(E), this.Value)) {
+            return (E)this.Value;
+        }
+        
+        throw new InvalidCastException($"Cannot cast {this} to {typeof(E)}");
+    }
+
+    public static implicit operator Enum(AttributeKey key) => key.Value;
+    public static implicit operator string(AttributeKey key) => key.Name;
+}

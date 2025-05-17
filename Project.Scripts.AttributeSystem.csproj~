@@ -47,14 +47,17 @@
     <Analyzer Include="F:\UnityEditor\6000.1.2f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\ConstantModifier.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Attributes\Attribute.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Attributes\EnumKey.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Attributes\AttributeSet.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\AttributeSystem.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\AttributeBasedMagnitude.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\Constant.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\DoubleAttributeBasedMagnitude.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\DynamicMagitude.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\Modifier.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\CustomExecutionGameplayEffect.cs" />
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\AttributeSet.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\GameplayEffectManager.cs" />
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\Attribute.cs" />
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\BackingAttribute.cs" />
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\ModifierChain.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\SimpleGameplayEffect.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\GameplayEffectInvocationParameter.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\GameplayEffectExecutor.cs" />
@@ -65,9 +68,10 @@
     <Compile Include="Assets\Project\Scripts\AttributeSystem\IsExternalInit.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\ModifierManager.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\InstantGameplayEffect.cs" />
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\DynamicallyValuedModifier.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\AttributeTypes\WeaponAttribute.cs" />
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\AttributeBasedModifier.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\ModifierOperation.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\ModifierType.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\TaggedModifier.cs" />
     <None Include="Assets\Project\Scripts\AttributeSystem\csc.rsp" />
     <None Include="Assets\Project\Scripts\AttributeSystem\Project.Scripts.AttributeSystem.asmdef" />
     <Reference Include="UnityEngine">
