@@ -1,30 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace Project.Scripts.AttributeSystem.Modifiers;
+namespace Project.Scripts.AttributeSystem.Modifiers.ModifierMagnitude;
 
-public class AttributeBasedMagnitude<K> : Magnitude where K : Enum {
+[Serializable]
+public class AttributeBasedMagnitude<T, K> : Magnitude where T : Enum where K : Enum {
     private enum Source { Self, Target }
     
     [field: SerializeField]
     private Source BackingAttributeSource { get; set; } = Source.Self;
     
     [field: SerializeField]
+    private T BackingAttributeSetTag { get; set; }
+    
+    [field: SerializeField]
     private K BackingAttribute { get; set; }
     
-    protected AttributeBasedMagnitude(K backingAttribute) {
+    protected AttributeBasedMagnitude(T backingAttributeSetTag, K backingAttribute) {
+        this.BackingAttributeSetTag = backingAttributeSetTag;
         this.BackingAttribute = backingAttribute;
     }
     
     private Attributes.AttributeManagementSystem? BackingAttributeSystem { get; init; }
     
     public override float Evaluate() {
-        return this.BackingAttributeSystem?.Query(this.BackingAttribute).CurrentValue ?? 0;
-    }
-
-    public override float Evaluate(Enum tag) {
-        return this.BackingAttributeSystem?.Query(tag, this.BackingAttribute).CurrentValue ?? 0;
+        return this.BackingAttributeSystem?.Query(this.BackingAttributeSetTag, this.BackingAttribute).CurrentValue ?? 0;
     }
 
     public override Magnitude BasedOn(Attributes.AttributeManagementSystem? self, Attributes.AttributeManagementSystem target) {
@@ -35,6 +35,8 @@ public class AttributeBasedMagnitude<K> : Magnitude where K : Enum {
         };
         return source == null
                 ? this
-                : new AttributeBasedMagnitude<K>(this.BackingAttribute) { BackingAttributeSystem = source };
+                : new AttributeBasedMagnitude<T, K>(this.BackingAttributeSetTag, this.BackingAttribute) {
+                    BackingAttributeSystem = source
+                };
     }
 }

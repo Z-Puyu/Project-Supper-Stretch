@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Project.Scripts.AttributeSystem.Modifiers;
+namespace Project.Scripts.AttributeSystem.Modifiers.ModifierMagnitude;
 
 [Serializable]
 public class DynamicMagnitude : Magnitude {
@@ -17,10 +17,6 @@ public class DynamicMagnitude : Magnitude {
     }
     
     public override float Evaluate() {
-        return this.Value;
-    }
-
-    public override float Evaluate(Enum tag) {
         return this.Value;
     }
 

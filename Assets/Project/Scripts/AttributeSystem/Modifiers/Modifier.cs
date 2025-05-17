@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Project.Scripts.AttributeSystem.Modifiers.ModifierMagnitude;
 using Project.Scripts.Util.Builder;
 using Project.Scripts.Util.Visitor;
 using UnityEngine;
@@ -49,7 +50,7 @@ public abstract class Modifier<K> : Modifier where K : Enum {
     [field: SerializeField] 
     public K Target { get; protected set; }
     
-    protected virtual float Value => this.Magnitude?.Evaluate() ?? 0;
+    private float Value => this.Magnitude?.Evaluate() ?? 0;
     
     protected Modifier(K target) {
         this.Target = target;

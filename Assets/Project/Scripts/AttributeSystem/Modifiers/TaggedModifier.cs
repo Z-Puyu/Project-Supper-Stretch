@@ -17,8 +17,6 @@ public abstract class TaggedModifier<T, K> : Modifier<K> where T : Enum where K 
     [field: SerializeField]
     public T Tag { get; protected set; }
 
-    protected override float Value => this.Magnitude?.Evaluate(this.Tag) ?? 0;
-
     protected TaggedModifier(T tag, K target) : base(target) {
         this.Tag = tag;
     }

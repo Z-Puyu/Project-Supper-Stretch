@@ -1,4 +1,5 @@
 ﻿using System;
+using Project.Scripts.AttributeSystem.Modifiers.ModifierMagnitude;
 
 namespace Project.Scripts.AttributeSystem.Modifiers;
 
