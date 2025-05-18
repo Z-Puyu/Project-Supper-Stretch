@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Project.Scripts.AttributeSystem;
 using Project.Scripts.Equipment.Events;
 using Project.Scripts.Events;
 using UnityEngine;

@@ -51,6 +51,8 @@
     <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\ModifierType.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\Modifier.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\CustomExecutionGameplayEffect.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Attributes\AttributeTypes\WeaponAttribute.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Attributes\WeaponAttributeSet.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\ModifierMagnitude\Magnitude.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\Attributes\Attribute.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\RecurringGameplayEffect.cs" />
@@ -64,14 +66,15 @@
     <Compile Include="Assets\Project\Scripts\AttributeSystem\AttributeInitialisation.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\ModifierOperation.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\AffectedAttribute.cs" />
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\AttributeTypes\AttributeType.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\RuntimeModifier.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\IsExternalInit.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\ModifierManager.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\InstantGameplayEffect.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Attributes\AttributeTypes\AttributeType.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\TaggedModifier.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\ModifierMagnitude\AttributeBasedMagnitude.cs" />
-    <Compile Include="Assets\Project\Scripts\AttributeSystem\AttributeTypes\WeaponAttribute.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\Attributes\PlayerAttributeSet.cs" />
+    <Compile Include="Assets\Project\Scripts\AttributeSystem\GameplayEffects\CapturedAttributeData.cs" />
     <Compile Include="Assets\Project\Scripts\AttributeSystem\Modifiers\ModifierMagnitude\Constant.cs" />
     <None Include="Assets\Project\Scripts\AttributeSystem\csc.rsp" />
     <None Include="Assets\Project\Scripts\AttributeSystem\Project.Scripts.AttributeSystem.asmdef" />

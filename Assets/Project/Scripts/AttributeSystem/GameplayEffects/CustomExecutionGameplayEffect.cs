@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using Project.Scripts.AttributeSystem.Attributes;
-using Project.Scripts.AttributeSystem.AttributeTypes;
 using Project.Scripts.AttributeSystem.Modifiers;
 using UnityEngine;
 

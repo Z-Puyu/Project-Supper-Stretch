@@ -724,6 +724,10 @@ GameObject:
   - component: {fileID: 947555084}
   - component: {fileID: 947555091}
   - component: {fileID: 947555092}
+  - component: {fileID: 947555096}
+  - component: {fileID: 947555095}
+  - component: {fileID: 947555094}
+  - component: {fileID: 947555093}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -861,6 +865,10 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 3e9dd9df-ccad-4c0a-a69c-b5689b7ebc20
     m_ActionName: 'Player/RightHandAttack[/Mouse/leftButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 4d10b673-0676-40c3-9f13-bc7a136e650f
+    m_ActionName: 'Player/Interact[/Keyboard/e]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -986,6 +994,56 @@ MonoBehaviour:
   <AnimationParameterName>k__BackingField: Combo
   <Animator>k__BackingField: {fileID: 391240176}
   <ComboLength>k__BackingField: 3
+--- !u!114 &947555093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 947555083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8b8ea64a7b74db4a2ab7dcbd2fb8399, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &947555094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 947555083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d39f9e35d7044949c99ff2586f98dba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &947555095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 947555083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 519103b1afe74a43b06970813a6a067c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &947555096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 947555083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 883f6b924f52485c996893fe2923ea14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Tag>k__BackingField: Player
+  <OnAttributeUpdate>k__BackingField: {fileID: 0}
 --- !u!1 &957464588 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 81bb9eea30387e442899949a80011e55, type: 3}
