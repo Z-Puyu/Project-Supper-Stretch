@@ -5,18 +5,18 @@ namespace Project.Scripts.AttributeSystem.Modifiers.ModifierMagnitude;
 
 [Serializable]
 public class AttributeBasedMagnitude<T, K> : Magnitude where T : Enum where K : Enum {
-    private enum Source { Self, Target }
+    private enum Source { Instigator, Target }
     
     [field: SerializeField]
-    private Source BackingAttributeSource { get; set; } = Source.Self;
+    private Source BackingAttributeSource { get; set; } = Source.Instigator;
     
     [field: SerializeField]
-    private T BackingAttributeSetTag { get; set; }
+    private string BackingAttributeSetTag { get; set; }
     
     [field: SerializeField]
     private K BackingAttribute { get; set; }
     
-    protected AttributeBasedMagnitude(T backingAttributeSetTag, K backingAttribute) {
+    protected AttributeBasedMagnitude(string backingAttributeSetTag, K backingAttribute) {
         this.BackingAttributeSetTag = backingAttributeSetTag;
         this.BackingAttribute = backingAttribute;
     }
@@ -29,7 +29,7 @@ public class AttributeBasedMagnitude<T, K> : Magnitude where T : Enum where K : 
 
     public override Magnitude BasedOn(Attributes.AttributeManagementSystem? self, Attributes.AttributeManagementSystem target) {
         Attributes.AttributeManagementSystem? source = this.BackingAttributeSource switch {
-            Source.Self => self,
+            Source.Instigator => self,
             Source.Target => target,
             var _ => throw new ArgumentOutOfRangeException(nameof(this.BackingAttributeSource))
         };

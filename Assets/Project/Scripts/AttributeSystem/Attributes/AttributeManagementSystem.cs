@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Project.Scripts.AttributeSystem.Attributes;
 
 public class AttributeManagementSystem : MonoBehaviour {
-    private Dictionary<Enum, AttributeSet> Sets { get; set; } = [];
+    private Dictionary<string, AttributeSet> Sets { get; set; } = [];
     
     private void Awake() {
         foreach (AttributeSet set in this.GetComponentsInChildren<AttributeSet>(true)) {
@@ -19,12 +19,11 @@ public class AttributeManagementSystem : MonoBehaviour {
     /// <summary>
     /// Checks if there is an attribute set with the given tag in the system.
     /// </summary>
-    /// <param name="attributeSetTag">The tag of the attribute set.</param>
+    /// <param name="label">The tag of the attribute set.</param>
     /// <param name="set">The attribute set if found.</param>
-    /// <typeparam name="T">The type of the attribute set tag.</typeparam>
     /// <returns>True if the attribute set was found, false otherwise.</returns>
-    public bool FoundAttributeSet<T>(T attributeSetTag, out AttributeSet set) where T : Enum {
-        return this.Sets.TryGetValue(attributeSetTag, out set);
+    public bool FoundAttributeSet(string label, out AttributeSet set) {
+        return this.Sets.TryGetValue(label, out set);
     }
     
     /// <summary>
@@ -57,13 +56,12 @@ public class AttributeManagementSystem : MonoBehaviour {
     /// <summary>
     /// Searches for an attribute in the system.
     /// </summary>
-    /// <param name="attributeSetTag">The tag of the attribute set to search in.</param>
+    /// <param name="label">The tag of the attribute set to search in.</param>
     /// <param name="key">The attribute to search for.</param>
-    /// <typeparam name="T">The enum type of the attribute set tag.</typeparam>
     /// <typeparam name="K">The enum type of the attribute.</typeparam>
     /// <returns>The attribute with the given key found in the attribute set with the given tag.
     /// If no such attribute is found, return a zero attribute.</returns>
-    public Attribute Query<T, K>(T attributeSetTag, K key) where T : Enum where K : Enum {
-        return this.FoundAttributeSet(attributeSetTag, out AttributeSet set) ? set[key] : Attribute.Zero(key);
+    public Attribute Query<K>(string label, K key) where K : Enum {
+        return this.FoundAttributeSet(label, out AttributeSet set) ? set[key] : Attribute.Zero(key);
     }
 }

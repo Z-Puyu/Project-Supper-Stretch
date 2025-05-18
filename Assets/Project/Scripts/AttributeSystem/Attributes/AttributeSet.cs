@@ -14,8 +14,9 @@ public abstract class AttributeSet : MonoBehaviour {
     public abstract Type AttributeCategory { get; }
     protected Dictionary<Enum, Attribute> Attributes { get; private init; } = [];
     private Dictionary<Enum, Vector4> Modifiers { get; init; } = [];
-    
-    public abstract Enum Tag { get; }
+
+    [field: SerializeField]
+    public string Tag { get; private set; } = string.Empty;
     
     [field: SerializeField]
     private EventChannel<Attribute>? OnAttributeUpdate { get; set; }
@@ -37,6 +38,7 @@ public abstract class AttributeSet : MonoBehaviour {
             return this.Attributes.TryGetValue(key, out attribute);
         }
 
+        Debug.LogWarning($"Expecting attribute type {this.AttributeCategory} but got {typeof(K)}", this);
         attribute = Attribute.Zero(key);
         return false;
     }
@@ -47,6 +49,7 @@ public abstract class AttributeSet : MonoBehaviour {
     /// <param name="attribute">The attribute to recompute.</param>
     private void Recompute<K>(K attribute) where K : Enum {
         if (this.AttributeCategory != typeof(K)) {
+            Debug.LogWarning($"Expecting attribute type {this.AttributeCategory} but got {typeof(K)}", this);
             return;
         }
         
@@ -64,6 +67,7 @@ public abstract class AttributeSet : MonoBehaviour {
     
     public void AddModifier<K>(Modifier<K> modifier) where K : Enum {
         if (this.AttributeCategory != typeof(K)) {
+            Debug.LogWarning($"Expecting modifier targeting {this.AttributeCategory} but got {typeof(K)}", this);
             return;
         }
         
@@ -78,6 +82,7 @@ public abstract class AttributeSet : MonoBehaviour {
     
     public void RemoveModifier<K>(Modifier<K> modifier) where K : Enum {
         if (this.AttributeCategory != typeof(K)) {
+            Debug.LogWarning($"Expecting modifier targeting {this.AttributeCategory} but got {typeof(K)}", this);
             return;
         }
         
@@ -123,19 +128,9 @@ public abstract class AttributeSet : MonoBehaviour {
 /// <summary>
 /// Base class for all attribute sets.
 /// </summary>
-/// <typeparam name="T">The enum type used to tag attribute sets in the same system.</typeparam>
 /// <typeparam name="K">The enum type used to represent attribute types.</typeparam>
-public abstract class AttributeSet<T, K> : AttributeSet where T : Enum where K : Enum {
+public abstract class AttributeSet<K> : AttributeSet where K : Enum {
     public override Type AttributeCategory => typeof(K);
-    
-    [field: SerializeField]
-    private T AttributeSetTag { get; set; }
-    
-    public override Enum Tag => this.AttributeSetTag;
-    
-    protected AttributeSet(T attributeSetTag) {
-        this.AttributeSetTag = attributeSetTag;
-    }
     
     /// <summary>
     /// Returns the attribute data with the given type. If the attribute set does not contain this attribute,

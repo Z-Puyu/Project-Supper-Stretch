@@ -13,7 +13,7 @@ public abstract class GameplayEffectExecutor {
     /// <param name="parameters">The parameters used to generate modifiers.</param>
     /// <param name="chance">The chance of the effect happening.</param>
     public abstract void Execute(
-        CustomExecutionGameplayEffect.CapturedAttributeData attributes, IDictionary<string, int> parameters,
+        CapturedAttributeData attributes, IDictionary<string, int> parameters,
         ref int chance
     );
 }

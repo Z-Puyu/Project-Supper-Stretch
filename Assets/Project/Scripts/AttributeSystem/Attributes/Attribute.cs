@@ -1,7 +1,6 @@
 ﻿using System;
-using Project.Scripts.AttributeSystem.AttributeTypes;
 
-namespace Project.Scripts.AttributeSystem;
+namespace Project.Scripts.AttributeSystem.Attributes;
 
 public readonly record struct Attribute(
     Enum Type,

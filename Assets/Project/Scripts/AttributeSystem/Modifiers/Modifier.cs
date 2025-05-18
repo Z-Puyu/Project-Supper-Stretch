@@ -17,7 +17,32 @@ public abstract class Modifier : IVisitor<ModifierManager> {
     [field: SerializeField, Header("Magnitude")]
     protected Magnitude? Magnitude { get; set; }
     
+    private float Value => this.Magnitude?.Evaluate() ?? 0;
+    
     public abstract void Visit(ModifierManager visitable);
+    
+    public Vector4 ToVector4() {
+        switch (this.ValueType) {
+            case ModifierType.Base:
+                switch (this.OperationType) {
+                    case ModifierOperation.Offset:
+                        return new Vector4(this.Value, 0, 0, 0);
+                    case ModifierOperation.Multiplier:
+                        return new Vector4(0, this.Value, 0, 0);
+                }
+                break;
+            case ModifierType.Current:
+                switch (this.OperationType) {
+                    case ModifierOperation.Offset:
+                        return new Vector4(0, 0, this.Value, 0);
+                    case ModifierOperation.Multiplier:
+                        return new Vector4(0, 0, 0, this.Value);
+                }
+                break;
+        }
+
+        return Vector4.zero;
+    }
     
     public sealed class Configurator : FluentBuilder<Modifier> {
         private Configurator(Modifier template) : base(template) { }
@@ -50,36 +75,11 @@ public abstract class Modifier<K> : Modifier where K : Enum {
     [field: SerializeField] 
     public K Target { get; protected set; }
     
-    private float Value => this.Magnitude?.Evaluate() ?? 0;
-    
     protected Modifier(K target) {
         this.Target = target;
     }
 
     public override void Visit(ModifierManager manager) {
         manager.AddModifier(this);
-    }
-
-    public virtual Vector4 ToVector4() {
-        switch (this.ValueType) {
-            case ModifierType.Base:
-                switch (this.OperationType) {
-                    case ModifierOperation.Offset:
-                        return new Vector4(this.Value, 0, 0, 0);
-                    case ModifierOperation.Multiplier:
-                        return new Vector4(0, this.Value, 0, 0);
-                }
-                break;
-            case ModifierType.Current:
-                switch (this.OperationType) {
-                    case ModifierOperation.Offset:
-                        return new Vector4(0, 0, this.Value, 0);
-                    case ModifierOperation.Multiplier:
-                        return new Vector4(0, 0, 0, this.Value);
-                }
-                break;
-        }
-
-        return Vector4.zero;
     }
 }

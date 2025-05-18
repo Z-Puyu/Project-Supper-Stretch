@@ -1,27 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.AttributeTypes;
 using Project.Scripts.AttributeSystem.Modifiers;
 using UnityEngine;
 
 namespace Project.Scripts.AttributeSystem.GameplayEffects;
 
-public sealed class CustomExecutionGameplayEffect : GameplayEffect {
-    public sealed record class CapturedAttributeData(Attributes.AttributeManagementSystem? Instigator, Attributes.AttributeManagementSystem Target) {
-        private Attributes.AttributeManagementSystem? Instigator { get; init; } = Instigator;
-        private Attributes.AttributeManagementSystem Target { get; init; } = Target;
-    
-        public Attribute ReadFromSource(Enum attribute) {
-            return this.Instigator?.Query(attribute) ?? Attribute.Zero(attribute);
-        }
-    
-        public Attribute ReadFromTarget(Enum attribute) {
-            return this.Target.Query(attribute);
-        }
-    }
-    
+internal abstract class CustomExecutionGameplayEffect : GameplayEffect {
     [field: SerializeReference, SubclassSelector]
     private List<GameplayEffectExecutor> Executors { get; set; } = [];
     
@@ -29,7 +16,7 @@ public sealed class CustomExecutionGameplayEffect : GameplayEffect {
     private List<AffectedAttribute> AffectedAttributes { get; set; } = [];
 
     public override IEnumerable<Modifier> Invoke(
-        Attributes.AttributeManagementSystem? instigator, Attributes.AttributeManagementSystem target,
+        AttributeManagementSystem? instigator, AttributeManagementSystem target,
         IReadOnlyDictionary<string, int> references, int chance = 100
     ) {
         CapturedAttributeData attributes = new CapturedAttributeData(instigator, target);
@@ -50,7 +37,7 @@ public sealed class CustomExecutionGameplayEffect : GameplayEffect {
         return this.AffectedAttributes.Distinct().Select(toModifier);
 
         Modifier toModifier(AffectedAttribute a) {
-            Modifier m = new RuntimeModifier(a.EnumAttributeSetTag, a.EnumAttribute, a.ModifierType, a.Label);
+            Modifier m = new RuntimeModifier(a.AttributeSetTag, a.EnumAttribute, a.ModifierType, a.Label);
             return Modifier.Configurator.Of(m).AccordingTo(readonlyParameters).Build();
         }
     }

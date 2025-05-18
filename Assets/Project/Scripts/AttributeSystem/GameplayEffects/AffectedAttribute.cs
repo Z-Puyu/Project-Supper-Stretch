@@ -8,7 +8,9 @@ namespace Project.Scripts.AttributeSystem.GameplayEffects;
 [Serializable]
 public abstract class AffectedAttribute {
     public abstract Enum EnumAttribute { get; }
-    public abstract Enum EnumAttributeSetTag { get; }
+    
+    [field: SerializeField]
+    public string AttributeSetTag { get; protected set; } = string.Empty;
     
     [field: SerializeField]
     public ModifierType ModifierType { get; private set; }
@@ -18,18 +20,13 @@ public abstract class AffectedAttribute {
 }
 
 [Serializable]
-public abstract class AffectedAttribute<T, K> where T : Enum where K : Enum {
+public abstract class AffectedAttribute<K> : AffectedAttribute where K : Enum {
     [field: SerializeField]
     private K Attribute { get; set; }
 
-    [field: SerializeField]
-    private T AttributeSetTag { get; set; }
-
-    public Enum EnumAttribute => this.Attribute;
-    public Enum EnumAttributeSetTag => this.AttributeSetTag;
+    public override Enum EnumAttribute => this.Attribute;
     
-    public AffectedAttribute(K attribute, T attributeSetTag) {
+    private AffectedAttribute(K attribute) {
         this.Attribute = attribute;
-        this.AttributeSetTag = attributeSetTag;
     }
 }
