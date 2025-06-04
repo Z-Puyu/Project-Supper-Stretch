@@ -14,16 +14,15 @@ public class AdjustFloatParameter : AdjustParameterCommand {
     private float Value { get; set; }
     
     public override void Execute(Animator animator) {
-        base.Execute(animator);
         switch (this.Operator) {
             case Operation.Set:
-                animator.SetFloat(this.ParameterId ?? 0, this.Value);
+                animator.SetFloat(this.ParameterId.Value, this.Value);
                 break;
             case Operation.Add:
-                animator.SetFloat(this.ParameterId ?? 0, animator.GetInteger(this.ParameterId ?? 0) + this.Value);
+                animator.SetFloat(this.ParameterId.Value, animator.GetInteger(this.ParameterId.Value) + this.Value);
                 break;
             case Operation.Multiply:
-                animator.SetFloat(this.ParameterId ?? 0, animator.GetInteger(this.ParameterId ?? 0) * this.Value);
+                animator.SetFloat(this.ParameterId.Value, animator.GetInteger(this.ParameterId.Value) * this.Value);
                 break;
         }
     }

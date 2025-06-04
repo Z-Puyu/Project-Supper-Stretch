@@ -4,15 +4,19 @@ using UnityEngine;
 namespace Project.Scripts.AttributeSystem.Modifiers.ModifierMagnitude;
 
 [Serializable]
-public class Constant : Magnitude {
+public sealed class Constant : Magnitude {
     [field: SerializeField]
-    private int Value { get; set; }
+    private float ConstantValue { get; set; }
     
-    public override float Evaluate() {
-        return this.Value;
+    public override float Value => this.ConstantValue;
+    
+    public Constant() { }
+    
+    public Constant(float constantValue) {
+        this.ConstantValue = constantValue;
     }
 
     public override string ToString() {
-        return $"{this.Value}";
+        return $"{this.ConstantValue}";
     }
 }

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
+using SaintsField.ComponentHeader;
+using SaintsField.Editor.HeaderGUI;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer;
@@ -16,11 +17,7 @@ using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
-#if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
-using UnityEditor.UIElements;
-using UnityEngine.UIElements;
-#endif
+using PlayaFullWidthRichLabelRenderer = SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer.PlayaFullWidthRichLabelRenderer;
 #if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
 using DG.DOTweenEditor;
 #endif
@@ -86,6 +83,57 @@ namespace SaintsField.Editor
                 .ToDictionary(each => each, serializedObject.FindProperty);
             // Debug.Log($"serializedPropertyDict.Count={serializedPropertyDict.Count}");
             return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer, target);
+        }
+
+        public static IEnumerable<ISaintsRenderer> GetClassStructRenderer(SerializedObject serializedObject, object target)
+        {
+            Type objectType = target.GetType();
+            IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetCustomAttributes<IPlayaClassAttribute>(objectType);
+
+            // List<SaintsFieldWithInfo> saintsFieldWithInfos = new List<SaintsFieldWithInfo>(playaClassAttributes.Length);
+            foreach ((IPlayaClassAttribute playaClassAttribute, int index) in playaClassAttributes.WithIndex())
+            {
+                switch (playaClassAttribute)
+                {
+
+                    case PlayaInfoBoxAttribute infoBox:
+                    {
+                        yield return new PlayaInfoBoxRenderer(serializedObject, new SaintsFieldWithInfo
+                        {
+                            PlayaAttributes = new[] { infoBox },
+                            Target = target,
+                            RenderType = SaintsRenderType.ClassStruct,
+                            SerializedProperty = null,
+                            FieldInfo = null,
+                            PropertyInfo = null,
+                            MethodInfo = null,
+                            InherentDepth = -1,
+                            Order = int.MinValue,
+                            MemberId = $"{objectType.Name}-{infoBox}-{index}",
+                        }, infoBox);
+                    }
+                        break;
+                    case PlayaAboveRichLabelAttribute playaAboveRichLabelAttribute:
+                    {
+                        yield return new PlayaFullWidthRichLabelRenderer(serializedObject, new SaintsFieldWithInfo
+                        {
+                            PlayaAttributes = new[] { playaAboveRichLabelAttribute },
+                            Target = target,
+                            RenderType = SaintsRenderType.ClassStruct,
+                            SerializedProperty = null,
+                            FieldInfo = null,
+                            PropertyInfo = null,
+                            MethodInfo = null,
+                            InherentDepth = -1,
+                            Order = int.MinValue,
+                            MemberId = $"{objectType.Name}-{playaAboveRichLabelAttribute}-{index}",
+                        }, playaAboveRichLabelAttribute);
+                    }
+                        break;
+                }
+            }
+
+            // return HelperGetRenderers(serializedPropertyDict, serializedObject, makeRenderer, target);
         }
 
         public static IEnumerable<SaintsFieldWithInfo> HelperGetSaintsFieldWithInfo(
@@ -375,6 +423,45 @@ namespace SaintsField.Editor
             object target)
         {
             IReadOnlyList<SaintsFieldWithInfo> fieldWithInfosSorted = HelperGetSaintsFieldWithInfo(serializedPropertyDict, target).ToArray();
+
+            // let's handle some HeaderGUI here... not a good idea but...
+            bool anyChange = false;
+            // target.GetType()
+
+            AbsComponentHeaderAttribute[] classAttributes = ReflectCache.GetCustomAttributes<AbsComponentHeaderAttribute>(target.GetType());
+            foreach ((AbsComponentHeaderAttribute componentHeaderAttribute, int order) in classAttributes.WithIndex(-classAttributes.Length))
+            {
+                bool added = DrawHeaderGUI.AddAttributeIfNot(
+                    componentHeaderAttribute,
+                    null,
+                    target,
+                    order);
+                if (added)
+                {
+                    anyChange = true;
+                }
+            }
+            foreach ((SaintsFieldWithInfo saintsFieldWithInfo, int index) in fieldWithInfosSorted.WithIndex())
+            {
+                IReadOnlyList<IPlayaAttribute> playaAttributes = saintsFieldWithInfo.PlayaAttributes;
+                foreach (AbsComponentHeaderAttribute componentHeaderAttribute in playaAttributes.OfType<AbsComponentHeaderAttribute>())
+                {
+                    bool added = DrawHeaderGUI.AddAttributeIfNot(
+                        componentHeaderAttribute,
+                        saintsFieldWithInfo.MethodInfo ?? (MemberInfo)saintsFieldWithInfo.FieldInfo ?? saintsFieldWithInfo.PropertyInfo,
+                        target,
+                        index);
+                    if (added)
+                    {
+                        anyChange = true;
+                    }
+                }
+            }
+            if (anyChange)
+            {
+                DrawHeaderGUI.RefreshAddAttributeIfNot(target.GetType());
+            }
+
             IReadOnlyList<RendererGroupInfo> chainedGroups = ChainSaintsFieldWithInfo(fieldWithInfosSorted, serializedObject, makeRenderer);
             // Debug.Log(chainedGroups.Count);
             // ISaintsRenderer[] r = HelperFlattenRendererGroupInfoIntoRenderers(chainedGroups, serializedObject, makeRenderer, target)
@@ -735,6 +822,22 @@ namespace SaintsField.Editor
                         }
                     }
                         break;
+                    case PlayaBelowRichLabelAttribute playaBelowRichLabelAttribute:
+                    {
+                        PlayaFullWidthRichLabelRenderer playaFullWidthRichLabelRenderer = new PlayaFullWidthRichLabelRenderer(serializedObject, fieldWithInfo, playaBelowRichLabelAttribute);
+
+                        SaintsFieldWithRenderer playaFullWidthRichLabelRendererInfo =
+                            new SaintsFieldWithRenderer(playaBelowRichLabelAttribute, playaFullWidthRichLabelRenderer);
+                        if (playaBelowRichLabelAttribute.Below)
+                        {
+                            postRenderer.Add(playaFullWidthRichLabelRendererInfo);
+                        }
+                        else
+                        {
+                            yield return playaFullWidthRichLabelRendererInfo;
+                        }
+                    }
+                        break;
                     case PlayaSeparatorAttribute playaSeparatorAttribute:
                     {
                         PlayaSeparatorRenderer separatorRenderer = new PlayaSeparatorRenderer(serializedObject, fieldWithInfo, playaSeparatorAttribute);
@@ -872,19 +975,19 @@ namespace SaintsField.Editor
             return ori.Count == 0? "": string.Join("/", ori);
         }
 
-        private static IEnumerable<(string parentGroupBy, string subGroupBy)> ChunkGroupBy(string longestGroupGroupBy)
-        {
-            // e.g "a/b/c/d"
-            // first yield: "a/b/c", "a/b/c/d"
-            // then yield: "a/b", "a/b/c"
-            // then yield: "a", "a/b"
-            string[] groupChunk = longestGroupGroupBy.Split('/');
-
-            for (int i = groupChunk.Length - 1; i > 0; i--)
-            {
-                yield return (string.Join("/", groupChunk, 0, i), string.Join("/", groupChunk, 0, i + 1));
-            }
-        }
+        // private static IEnumerable<(string parentGroupBy, string subGroupBy)> ChunkGroupBy(string longestGroupGroupBy)
+        // {
+        //     // e.g "a/b/c/d"
+        //     // first yield: "a/b/c", "a/b/c/d"
+        //     // then yield: "a/b", "a/b/c"
+        //     // then yield: "a", "a/b"
+        //     string[] groupChunk = longestGroupGroupBy.Split('/');
+        //
+        //     for (int i = groupChunk.Length - 1; i > 0; i--)
+        //     {
+        //         yield return (string.Join("/", groupChunk, 0, i), string.Join("/", groupChunk, 0, i + 1));
+        //     }
+        // }
 
         public static IEnumerable<string> GetSerializedProperties(SerializedObject serializedObject)
         {

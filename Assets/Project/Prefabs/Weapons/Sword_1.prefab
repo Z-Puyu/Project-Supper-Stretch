@@ -10,9 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5309902547132295793}
   - component: {fileID: 4359546266383501165}
-  - component: {fileID: 5227925293027834168}
   - component: {fileID: 650691773813046658}
-  - component: {fileID: 8385611345674608336}
+  - component: {fileID: 1397275212683030571}
   m_Layer: 6
   m_Name: Sword_1
   m_TagString: Untagged
@@ -55,22 +54,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 5, z: 5}
-  m_Center: {x: 0, y: 2.75, z: -2}
---- !u!114 &5227925293027834168
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1087666431525149329}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03aafd3859b346598053ad47e4975011, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <Tag>k__BackingField: Weapon
-  <OnAttributeUpdate>k__BackingField: {fileID: 0}
+  m_Size: {x: 1, y: 5, z: 0.3}
+  m_Center: {x: 0, y: 2.75, z: 0}
 --- !u!114 &650691773813046658
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83,7 +68,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72653a29d8614b3f91266dd227f5e35d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &8385611345674608336
+--- !u!114 &1397275212683030571
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,33 +77,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1087666431525149329}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3806e06e261428a9e52137662c870b8, type: 3}
+  m_Script: {fileID: 11500000, guid: 4ab370879e154e90841354866a5b84a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Subscriptions>k__BackingField:
-  - rid: 5937197157162942577
-  references:
-    version: 2
-    RefIds:
-    - rid: 5937197157162942577
-      type: {class: IntEventSubscription, ns: Project.Scripts.Events, asm: Project.Scripts.Events}
-      data:
-        <Channel>k__BackingField: {fileID: 11400000, guid: 7181849f27b87bc43b21f987f20fd0cb, type: 2}
-        <OnEvent>k__BackingField:
-          m_PersistentCalls:
-            m_Calls:
-            - m_Target: {fileID: 4359546266383501165}
-              m_TargetAssemblyTypeName: UnityEngine.Collider, UnityEngine
-              m_MethodName: set_enabled
-              m_Mode: 6
-              m_Arguments:
-                m_ObjectArgument: {fileID: 0}
-                m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-                m_IntArgument: 0
-                m_FloatArgument: 0
-                m_StringArgument: 
-                m_BoolArgument: 1
-              m_CallState: 2
+  <Identifier>k__BackingField: 10512005-743d-4156-b0be-f29b23fc3e6e
 --- !u!1001 &9074993671449929668
 PrefabInstance:
   m_ObjectHideFlags: 0

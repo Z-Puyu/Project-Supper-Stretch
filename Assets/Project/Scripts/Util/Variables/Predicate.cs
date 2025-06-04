@@ -6,9 +6,9 @@ namespace Project.Scripts.Util.Variables;
 
 [Serializable]
 public abstract class Predicate<T> : ITestable {
-    [field: SerializeReference, SubclassSelector] 
+    [field: SerializeReference] 
     public IReadable<T>? Subject { get; set; }
-    [field: SerializeReference, SubclassSelector] 
+    [field: SerializeReference] 
     public IReadable<T>? Object { get; set; }
 
     public abstract bool Holds();

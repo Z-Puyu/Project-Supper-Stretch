@@ -1,5 +1,37 @@
 # Changelog
 
+## 4.12.0 ##
+
+1.  Add `PlayaAboveRichLabel`/`PlayaBelowRichLabel` to draw a rich label above/below a field/method/property (including array/list)
+2.  UI Toolkit: Allow `PlayaAboveRichLabel` & `PlayaInfoBox` be applied to a class/struct definition
+
+## 4.11.0 ##
+
+1.  Add `HeaderLabel` to draw a label in component header
+2.  `Required` now check truly value for `I2.LocalizedString`
+3.  Add customize `Required` message type [#234](https://github.com/TylerTemp/SaintsField/issues/234)
+4.  Add `AddressableSubAssetRequired` to validate `subAsset` in types like `Addressable.AssetReferenceSprite`
+
+## 4.10.0 ##
+
+1.  Add `Component Header` related attributes. Now you can draw buttons, icons etc on the component header. [#154](https://github.com/TylerTemp/SaintsField/issues/154)
+2.  UI Toolkit: `MinMaxSlider` friendly error if been used on wrong type [#232](https://github.com/TylerTemp/SaintsField/issues/232)
+3.  UI Toolkit: `ShowInInspector` now shows an error box if the target attributes raises an error in its getter
+4.  UI Toolkit: `ShowInInspector` now always update the sub-field value display if the target (e.g. a class) has sub-fields/properties
+5.  UI Toolkit: if you have `SaintsEditor` enabled, a bare `[SerializedReference]` will automatically use `ReferencePicker` + `SaintsRow` drawer
+
+## 4.9.0 ##
+
+1.  UI Toolkit: if you have `SaintsEditor` enabled, `enum` will automatically use `AdvancedDropdown` drawer
+2.  UI Toolkit: if you have `SaintsEditor` enabled, `enum` with `[Flags]` will automatically use `FlagsDropdown` drawer
+3.  UI Toolkit: now you can use keyboard (up/down/left/right arrow, return key) to select an `AdvancedDropdown`
+4.  UI Toolkit: fix custom picker when you have search in block view, arrow key gives error if the currently selected item is not in loaded results
+5.  UI Toolkit: fix custom picker show placeholder information when the selected item has not appeared in loading results yet
+6.  UI Toolkit: fix custom picker showing results that does not match the search when you start typing before the loading process finished
+7.  UI Toolkit: fix `AdvancedDropdown` layout issue that an item can overlap a bit with the search box
+8.  UI Toolkit: fix `AdvancedDropdown` didn't show the selected group when you backward a page
+9.  If you use a low version of `.NET` which does not support `B`, `B8` formatting string, `RichLabel` can now property format it like `<field=B/>`, `<field=B16/>`
+
 ## 4.8.0 ##
 
 1.  UI Toolkit: Add `TableHide` to exclude a field/column from `Table` [#225](https://github.com/TylerTemp/SaintsField/issues/225)

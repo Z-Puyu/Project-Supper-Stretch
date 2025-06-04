@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
-using AYellowpaper.SerializedCollections;
+using SaintsField;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Project.Scripts.Animations;
 
 public class PlayerAnimationEventProxy : MonoBehaviour {
-    [field: SerializeField]
-    private SerializedDictionary<string, UnityEvent> EventHandlers { get; set; } = [];
+    [field: SerializeField, SaintsDictionary("Animation Event", "Handler")]
+    private SaintsDictionary<string, UnityEvent> EventHandlers { get; set; } = [];
 
     public void OnAnimationEvent(string @event) {
         if (this.EventHandlers.TryGetValue(@event, out UnityEvent handler)) {

@@ -11,16 +11,15 @@ public class AdjustBoolParameter : AdjustParameterCommand {
     private Operation Operator { get; set; } = Operation.Toggle;
     
     public override void Execute(Animator animator) {
-        base.Execute(animator);
         switch (this.Operator) {
             case Operation.Toggle:
-                animator.SetBool(this.ParameterId ?? 0, !animator.GetBool(this.ParameterId ?? 0));
+                animator.SetBool(this.ParameterId.Value, !animator.GetBool(this.ParameterId.Value));
                 break;
             case Operation.SetTrue:
-                animator.SetBool(this.ParameterId ?? 0, true);
+                animator.SetBool(this.ParameterId.Value, true);
                 break;
             case Operation.SetFalse:
-                animator.SetBool(this.ParameterId ?? 0, false);
+                animator.SetBool(this.ParameterId.Value, false);
                 break;
         }
     }

@@ -6,7 +6,7 @@ namespace Project.Scripts.Util.BooleanLogic;
 
 [Serializable]
 public class Nand : ITestable {
-    [field: SerializeReference, SubclassSelector] 
+    [field: SerializeReference] 
     private List<ITestable> Subconditions { get; set; } = [];
 
     public bool Holds() {

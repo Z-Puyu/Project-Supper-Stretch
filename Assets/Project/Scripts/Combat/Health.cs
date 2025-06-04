@@ -1,76 +1,62 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using Project.Scripts.AttributeSystem.Attributes;
-using Project.Scripts.AttributeSystem.GameplayEffects;
-using Project.Scripts.Events;
+using Project.Scripts.AttributeSystem.Attributes.AttributeTypes;
 using UnityEngine;
 using UnityEngine.Events;
-using Object = UnityEngine.Object;
+using Attribute = Project.Scripts.AttributeSystem.Attributes.Attribute;
 
 namespace Project.Scripts.Combat;
 
-public class Health : MonoBehaviour, IDamageable {
+[DisallowMultipleComponent]
+public class Health : MonoBehaviour {
     [field: SerializeField, Header("Data Setup")]
+    private bool IsAttributeBased { get; set; } = true;
+    
+    [field: SerializeField]
     private int Current { get; set; }
     
     [field: SerializeField]
     private int Max { get; set; }
     
-    [field: SerializeField, Header("Events")]
-    private EventChannel<Object?>? OnDeath { get; set; }
-    
-    [field: SerializeField]
-    private UnityEvent<GameplayEffect, GameplayEffectInvocationParameter>? OnHealthChanged { get; set; }
-    
-    [field: SerializeField, Header("Gameplay Effects")]
-    private GameplayEffect? DamageEffect { get; set; }
+    public event UnityAction<Health> OnDeath = delegate { };
 
-    [field: SerializeField]
-    private string DamageMagnitudeLabel { get; set; } = string.Empty;
-    
-    [field: SerializeField]
-    private GameplayEffect? HealingEffect { get; set; }
-    
-    [field: SerializeField]
-    private string HealingMagnitudeLabel { get; set; } = string.Empty;
-    
-    private GameObject? LastAttacker { get; set; }
-
-    public void TakeDamage(int damage, GameObject? source = null) {
-        this.LastAttacker = source;
-        this.Current = Mathf.Clamp(this.Current - damage, 0, this.Max);
-        if (this.DamageEffect != null) {
-            AttributeManagementSystem? instigator = source?.GetComponent<AttributeManagementSystem>();
-            IReadOnlyDictionary<string, int> magnitudes = new Dictionary<string, int> {
-                { this.DamageMagnitudeLabel, damage }
-            };
-            GameplayEffectInvocationParameter parameter = new GameplayEffectInvocationParameter(instigator, magnitudes);
-            this.OnHealthChanged?.Invoke(this.DamageEffect, parameter);
+    public void Initialise() {
+        if (!this.IsAttributeBased) {
+            return;
         }
         
-        if (this.Current == 0) {
-            this.Die();
+        AttributeSet? attributes = this.GetComponent<AttributeSet>();
+        if (!attributes) {
+            return;
+        }
+        
+        this.UpdateMaxHealth(attributes[CharacterAttribute.MaxHealth].CurrentValue);
+        this.UpdateHealth(attributes[CharacterAttribute.Health].CurrentValue);
+        attributes.OnAttributeChanged += this.OnAttributeChanged;
+    }
+
+    private void UpdateHealth(int health) {
+        this.Current = this.Max >= 0 ? Mathf.Clamp(health, 0, this.Max) : health;
+        if (this.Current <= 0) {
+            this.OnDeath.Invoke(this);
         }
     }
 
-    public void Heal(int amount, GameObject? source = null) {
-        this.Current = Mathf.Clamp(this.Current + amount, 0, this.Max);
-        AttributeManagementSystem? instigator = source?.GetComponent<AttributeManagementSystem>();
-        IReadOnlyDictionary<string, int> magnitudes = new Dictionary<string, int> {
-            { this.HealingMagnitudeLabel, amount }
-        };
-        GameplayEffectInvocationParameter parameter = new GameplayEffectInvocationParameter(instigator, magnitudes);
-        if (this.HealingEffect != null) {
-            this.OnHealthChanged?.Invoke(this.HealingEffect, parameter);
+    private void UpdateMaxHealth(int max) {
+        this.Max = max;
+        if (this.Max < this.Current) {
+            this.UpdateHealth(this.Max);
         }
     }
 
-    public void Die() {
-        this.OnDeath?.Broadcast(this, this.LastAttacker);
-        Object.Destroy(this.gameObject);
-    }
-
-    public void Initialise(int health, int maxHealth) {
-        this.Current = health;
-        this.Max = maxHealth;
+    public void OnAttributeChanged(AttributeSet source, Attribute old, Attribute current) {
+        switch (current.Type) {
+            case CharacterAttribute.Health:
+                this.UpdateHealth(current.CurrentValue);
+                break;
+            case CharacterAttribute.MaxHealth:
+                this.UpdateMaxHealth(current.CurrentValue);
+                break;
+        }
     }
 }

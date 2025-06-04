@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using Project.Scripts.AttributeSystem.Attributes;
 
 namespace Project.Scripts.AttributeSystem.Modifiers.ModifierMagnitude;
 
 [Serializable]
 public abstract class Magnitude {
-    public abstract float Evaluate();
+    public abstract float Value { get; }
 
-    public virtual Magnitude BasedOn(Attributes.AttributeManagementSystem? self, Attributes.AttributeManagementSystem target) {
+    public virtual Magnitude BasedOn(AttributeSet? self, AttributeSet target) {
         return this;
     }
 

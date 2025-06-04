@@ -1,44 +1,85 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Project.Scripts.StateMachine.Variables;
+using Project.Scripts.Util.Components;
+using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.StateMachine;
 
-[Serializable]
-public sealed class CompositeState : State {
-    [field: SerializeReference, SubclassSelector]
-    private List<State> Substates { get; set; } = [];
-
-    [field: SerializeReference]
+public sealed class CompositeState : CompoundState {
+    [field: SerializeField, Dropdown(nameof(this.GetSubstates)), Required]
     public State? InitialSubstate { get; set; }
 
     [field: SerializeField]
+    [field: BelowInfoBox("Toggle on to reset the composite state to its initial substate when entering.")]
     private bool ResetOnEnter { get; set; }
-
-    [field: SerializeField]
-    private List<StateTransition> Transitions { get; set; } = [];
     
     private State? CurrentSubstate { get; set; }
+    private State? LastActiveState { get; set; }
     private bool IsTransitioning { get; set; }
+    
+    private List<StateTransition> Transitions { get; init; } = [];
+    
+    private DropdownList<State> GetSubstates() {
+        DropdownList<State> list = [];
+        foreach (State state in this.GetComponentsFromDirectChildren<State>()) {
+            list.Add(state.Name, state);
+        }
+        
+        return list;
+    }
 
-    public override void Initialise(State? parent = null) {
-        base.Initialise(parent);
-        this.Substates.ForEach(state => state.Initialise(this));
+    public override void OnStart() {
+        base.OnStart();
+        if (!this.InitialSubstate) {
+            if (this.Substates.Count > 0) {
+                this.InitialSubstate = this.Substates[0];
+                Debug.LogWarning($"Composite state {this} has no initial substate. Initialised to the first substate.");
+            }
+        } else if (!this.Substates.Contains(this.InitialSubstate)) {
+            if (this.Substates.Count > 0) {
+                this.InitialSubstate = this.Substates[0];
+                Debug.LogWarning($"""
+                                  The initial state {this.InitialSubstate} of composite state {this} is not a substate. 
+                                  Reverted to the first substate.
+                                  """);
+            }
+        }
+
+        if (!this.InitialSubstate) {
+            Debug.LogWarning($"Could not find any valid state as the initial state for composite state {this}.");
+        }
+        
+        this.Transitions.AddRange(this.GetComponentsFromDirectChildren<StateTransition>());
+    }
+
+    public override void OnReset() {
+        base.OnReset();
+        this.LastActiveState = null;
+        this.CurrentSubstate = this.InitialSubstate;
     }
 
     public override void Enter() {
-        if (this.ResetOnEnter || this.CurrentSubstate is null) {
+        if (this.ResetOnEnter || this.LastActiveState is null) {
             this.CurrentSubstate = this.InitialSubstate;
+        } else {
+            this.CurrentSubstate = this.LastActiveState;
         }
 
         this.CurrentSubstate?.Enter();
     }
 
     public override void Exit() {
+        this.LastActiveState = this.CurrentSubstate;
         this.CurrentSubstate?.Exit();
+        this.CurrentSubstate = null;
     }
 
-    private void TransitionTo(State next) {
+    private void TransitionTo(State? next) {
+        if (next is null) {
+            return;
+        } 
+        
         this.IsTransitioning = true;
         this.CurrentSubstate?.Exit();
         this.CurrentSubstate = next;
@@ -52,18 +93,20 @@ public sealed class CompositeState : State {
         }
 
         if (this.TryTriggerTransition(out StateTransition? transition)) {
-            this.TransitionTo(transition!.To!);
+            this.TransitionTo(transition?.To);
         } else {
             this.CurrentSubstate.OnUpdate();
         }
     }
 
     public override void OnFixedUpdate() {
-        this.CurrentSubstate?.OnFixedUpdate();
+        if (!this.IsTransitioning && this.CurrentSubstate != null) {
+            this.CurrentSubstate.OnFixedUpdate();
+        }
     }
 
     private bool TryTriggerTransition(out StateTransition? transition) {
-        List<StateTransition> transitions = this.Transitions.FindAll(isValidTransition);
+        List<StateTransition> transitions = [];
         if (transitions.Count == 0) {
             transition = null;
             return false;
@@ -73,9 +116,5 @@ public sealed class CompositeState : State {
                 ? transitions[UnityEngine.Random.Range(0, transitions.Count)]
                 : transitions[0];
         return true;
-
-        bool isValidTransition(StateTransition transition) {
-            return transition.IsValid() && transition.From == this.CurrentSubstate;
-        }
     }
 }

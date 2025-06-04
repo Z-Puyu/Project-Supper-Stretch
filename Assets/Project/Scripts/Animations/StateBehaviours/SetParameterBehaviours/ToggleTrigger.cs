@@ -11,13 +11,12 @@ public class ToggleTrigger : AdjustParameterCommand {
     private Operation Operator { get; set; } = Operation.Set;
     
     public override void Execute(Animator animator) {
-        base.Execute(animator);
         switch (this.Operator) {
             case Operation.Set:
-                animator.SetTrigger(this.ParameterId ?? 0);
+                animator.SetTrigger(this.ParameterId.Value);
                 break;
             case Operation.Reset:
-                animator.ResetTrigger(this.ParameterId ?? 0);
+                animator.ResetTrigger(this.ParameterId.Value);
                 break;
         }
     }

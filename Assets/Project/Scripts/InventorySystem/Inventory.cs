@@ -1,69 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Project.Scripts.Events;
-using Project.Scripts.InventorySystem.Items;
+using Project.Scripts.Items;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Project.Scripts.InventorySystem;
 
 public sealed class Inventory : MonoBehaviour {
-    private Dictionary<ItemType, Dictionary<Item, int>> Items { get; init; } = [];
-    
-    [field: SerializeField]
-    private EventChannel<(Item item, int count)>? InventoryChanged { get; set; }
-
-    public void Add(Item item) {
-        if (!this.Items.TryGetValue(item.Type, out Dictionary<Item, int> bucket)) {
-            bucket = new Dictionary<Item, int> { { item, 1 } };
-            this.Items.Add(item.Type, bucket);
-        } else if (!bucket.TryAdd(item, 1)) {
-            bucket[item] += 1;
+    public sealed record class Record(Item Item, int Count) {
+        public override string ToString() {
+            return $"{this.Item.Name} ({this.Count})";
         }
+    }
+    
+    public static event UnityAction<Inventory> OnOpen = delegate { };
+    
+    private Dictionary<Item, int> Items { get; init; } = [];
+    
+    public event UnityAction<Inventory, Record> OnInventoryChanged = delegate { };
+    public event UnityAction<Inventory, Item> OnUseItem = delegate { };
+    
+    public int this[Item item] => this.Items.GetValueOrDefault(item, 0);
+    
+    public KeyValuePair<Item, int> this[int index] => this.Items.ElementAt(index);
+
+    public IEnumerable<KeyValuePair<Item, int>> this[Predicate<Item> predicate] =>
+            this.Items.Where(entry => predicate(entry.Key));
+    
+    public IReadOnlyList<KeyValuePair<Item, int>> AllItems => this.Items.ToList();
+
+    private void Add(Item item, int copies = 1) {
+        if (!this.Items.TryAdd(item, copies)) {
+            this.Items[item] += copies;
+        } 
         
-        this.InventoryChanged?.Broadcast(this, (item, bucket[item]));
+        Debug.Log($"Added {copies} copies of {item} to inventory.");
+        this.OnInventoryChanged.Invoke(this, new Record(item, this.Items[item]));
+    }
+    
+    public void Add(KeyValuePair<Item, int> item) {
+        this.Add(item.Key, item.Value);
     }
 
-    public void Remove(Item item, int copies = 1) {
-        if (!this.Items.TryGetValue(item.Type, out Dictionary<Item, int> bucket)) {
+    private void Remove(Item item, int copies = 1) {
+        if (!this.Items.TryGetValue(item, out int count)) {
             return;
         }
 
-        if (bucket.TryGetValue(item, out int count)) {
-            int remaining = count - copies;
-            if (remaining <= 0) {
-                bucket.Remove(item);
-            } else {
-                bucket[item] = remaining;
-            }
+        int remaining = count - copies;
+        if (remaining <= 0) {
+            this.Items.Remove(item);
+        } else {
+            this.Items[item] = remaining;
+        }
             
-            this.InventoryChanged?.Broadcast(this, (item, Mathf.Max(0, remaining)));
+        this.OnInventoryChanged.Invoke(this, new Record(item, remaining));
+    }
+    
+    public void Use(Item item) {
+        if (!item.Properties.HasFlag(ItemProperty.Usable)) {
+            return;
         }
 
-        if (bucket.Count == 0) {
-            this.Items.Remove(item.Type);
+        this.OnUseItem.Invoke(this, item);
+        if (item.Properties.HasFlag(ItemProperty.Consumable)) {
+            this.Remove(item);
         }
     }
-    
-    public int Query(Item item) {
-        return this.Items.TryGetValue(item.Type, out Dictionary<Item, int> bucket)
-                ? bucket.GetValueOrDefault(item, 0)
-                : 0;
+
+    public void Open() {
+        Inventory.OnOpen.Invoke(this);
     }
-    
-    public int Query(ItemType type) {
-        return this.Items.TryGetValue(type, out Dictionary<Item, int> bucket)
-                ? bucket.Values.Sum()
-                : 0;
-    }
-    
-    public IEnumerable<KeyValuePair<Item, int>> FetchAll(ItemType type) {
-        return this.Items
-                   .Where(entry => type.HasFlag(entry.Key))
-                   .SelectMany(entry => entry.Value);
-    }
-    
-    public IEnumerable<KeyValuePair<Item, int>> FetchAllItems() {
-        return this.Items.Values.SelectMany(each => each);
+
+    public override string ToString() {
+        return $"{this.gameObject}'s Inventory";
     }
 }

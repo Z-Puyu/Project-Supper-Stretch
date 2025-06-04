@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+﻿using SaintsField;
+using UnityEngine;
 
 namespace Project.Scripts.Animations.StateBehaviours;
 
 public class StandingByBehaviour : StateMachineBehaviour {
-    
-    [field: SerializeField]
+    [field: SerializeField, MinValue(0)]
     private float TimeToWait { get; set; }
     
     private float CurrentTime { get; set; }

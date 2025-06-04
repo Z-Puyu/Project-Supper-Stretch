@@ -9,12 +9,12 @@ public class Singleton<T> : MonoBehaviour where T : Component {
     
     public static T Instance {
         get {
-            if (Singleton<T>.instance != null) {
+            if (Singleton<T>.instance) {
                 return Singleton<T>.instance;
             }
 
             Singleton<T>.instance = Object.FindAnyObjectByType<T>();
-            if (Singleton<T>.instance != null) {
+            if (Singleton<T>.instance) {
                 return Singleton<T>.instance;
             }
 
@@ -25,19 +25,19 @@ public class Singleton<T> : MonoBehaviour where T : Component {
         }
     }
     
-    public static bool Exists => Singleton<T>.instance != null;
+    public static bool Exists => Singleton<T>.instance;
 
     [field: SerializeField]
     private bool ShouldNotDestroyOnLoad { get; set; } = true;
 
-    private void Awake() {
+    protected virtual void Awake() {
         if (!Application.isPlaying) {
             return;
         }
 
         if (this.ShouldNotDestroyOnLoad) {
             this.transform.SetParent(null);
-            if (Singleton<T>.instance == null) {
+            if (!Singleton<T>.instance) {
                 Singleton<T>.instance = this as T;
                 Object.DontDestroyOnLoad(this.gameObject);
             } else if (this != Singleton<T>.instance) {

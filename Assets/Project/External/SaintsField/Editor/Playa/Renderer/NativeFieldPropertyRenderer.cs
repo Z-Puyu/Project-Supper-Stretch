@@ -4,6 +4,7 @@ using UnityEditor;
 using System.Linq;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer
 {
@@ -24,14 +25,27 @@ namespace SaintsField.Editor.Playa.Renderer
         {
         }
 
-        private static object GetValue(SaintsFieldWithInfo fieldWithInfo)
+        private static (string error, object value) GetValue(SaintsFieldWithInfo fieldWithInfo)
         {
             if (fieldWithInfo.FieldInfo != null)
-                return fieldWithInfo.FieldInfo.GetValue(fieldWithInfo.Target);
+            {
+                return ("", fieldWithInfo.FieldInfo.GetValue(fieldWithInfo.Target));
+            }
 
-            return fieldWithInfo.PropertyInfo.CanRead
-                ? fieldWithInfo.PropertyInfo.GetValue(fieldWithInfo.Target)
-                : null;
+            if (fieldWithInfo.PropertyInfo.CanRead)
+            {
+                try
+                {
+                    return ("", fieldWithInfo.PropertyInfo.GetValue(fieldWithInfo.Target));
+                }
+                catch (Exception e)
+                {
+                    string message = e.InnerException?.Message ?? e.Message;
+                    return (message, null);
+                }
+            }
+
+            return ($"Can not get value", null);
         }
 
         private static string GetName(SaintsFieldWithInfo fieldWithInfo) =>

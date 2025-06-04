@@ -14,16 +14,15 @@ public class AdjustIntParameter : AdjustParameterCommand {
     private int Value { get; set; }
     
     public override void Execute(Animator animator) {
-        base.Execute(animator);
         switch (this.Operator) {
             case Operation.Set:
-                animator.SetInteger(this.ParameterId ?? 0, this.Value);
+                animator.SetInteger(this.ParameterId.Value, this.Value);
                 break;
             case Operation.Add:
-                animator.SetInteger(this.ParameterId ?? 0, animator.GetInteger(this.ParameterId ?? 0) + this.Value);
+                animator.SetInteger(this.ParameterId.Value, animator.GetInteger(this.ParameterId.Value) + this.Value);
                 break;
             case Operation.Multiply:
-                animator.SetInteger(this.ParameterId ?? 0, animator.GetInteger(this.ParameterId ?? 0) * this.Value);
+                animator.SetInteger(this.ParameterId.Value, animator.GetInteger(this.ParameterId.Value) * this.Value);
                 break;
         }
     }

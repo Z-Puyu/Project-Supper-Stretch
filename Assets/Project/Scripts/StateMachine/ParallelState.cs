@@ -1,32 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Project.Scripts.StateMachine;
 
-[Serializable]
-public sealed class ParallelState : State {
-    [field: SerializeField]
-    private List<CompositeState> StateComponents { get; set; } = [];
-
-    public override void Initialise(State? parent = null) {
-        base.Initialise(parent);
-        this.StateComponents.ForEach(state => state.Initialise(this));
-    }
-
+[CreateAssetMenu(fileName = "Parallel State", menuName = "Hierarchical State Machine/Parallel State")]
+public sealed class ParallelState : CompoundState {
     public override void Enter() {
-        this.StateComponents.ForEach(state => state.Enter());
+        this.Substates.ForEach(state => state.Enter());
     }
 
     public override void Exit() {
-        this.StateComponents.ForEach(state => state.Exit());
+        this.Substates.ForEach(state => state.Exit());
     }
     
     public override void OnUpdate() {
-        this.StateComponents.ForEach(state => state.OnUpdate());
+        this.Substates.ForEach(state => state.OnUpdate());
     }
     
     public override void OnFixedUpdate() {
-        this.StateComponents.ForEach(state => state.OnFixedUpdate());
+        this.Substates.ForEach(state => state.OnFixedUpdate());
     }
 }

@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 408f9f789474469ba6666096f229f705, type: 3}
+  m_Name: OnHealedEffect
+  m_EditorClassIdentifier: 
+  <Execution>k__BackingField:
+    rid: 5937197452021727366
+  references:
+    version: 2
+    RefIds:
+    - rid: 5937197452021727366
+      type: {class: ModifierExecution, ns: Project.Scripts.AttributeSystem.GameplayEffects.Executions, asm: Project.Scripts.AttributeSystem}
+      data:
+        <Modifiers>k__BackingField:
+        - rid: 5937197452021727367
+    - rid: 5937197452021727367
+      type: {class: CharacterModifier, ns: Project.Scripts.AttributeSystem.Modifiers.Runtime, asm: Project.Scripts.AttributeSystem}
+      data:
+        <TargetAttributeSet>k__BackingField: 
+        <ValueType>k__BackingField: 0
+        <OperationType>k__BackingField: 0
+        <Magnitude>k__BackingField:
+          rid: 5937197452021727368
+        <Target>k__BackingField: 0
+    - rid: 5937197452021727368
+      type: {class: Constant, ns: Project.Scripts.AttributeSystem.Modifiers.ModifierMagnitude, asm: Project.Scripts.AttributeSystem}
+      data:
+        <ConstantValue>k__BackingField: 0

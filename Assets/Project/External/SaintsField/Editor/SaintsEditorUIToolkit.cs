@@ -1,12 +1,10 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
+using SaintsField.Editor.HeaderGUI;
 using SaintsField.Editor.Playa;
-using SaintsField.Editor.Playa.Renderer.BaseRenderer;
-using SaintsField.Playa;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 
@@ -23,12 +21,21 @@ namespace SaintsField.Editor
             _saintsEditorIMGUI = false;
             // Debug.Log("CreateInspectorGUI");
 
-            if (target == null)
+            if (!target)
             {
                 return new HelpBox("The target object is null. Check for missing scripts.", HelpBoxMessageType.Error);
             }
 
             VisualElement root = new VisualElement();
+
+            foreach (ISaintsRenderer saintsRenderer in GetClassStructRenderer(serializedObject, target))
+            {
+                VisualElement ve = saintsRenderer.CreateVisualElement();
+                if(ve != null)
+                {
+                    root.Add(ve);
+                }
+            }
 
             MonoScript monoScript = GetMonoScript(target);
             if(monoScript)
@@ -71,6 +78,9 @@ namespace SaintsField.Editor
             root.RegisterCallback<AttachToPanelEvent>(_ => AddInstance(this));
             root.RegisterCallback<DetachFromPanelEvent>(_ => RemoveInstance(this));
 #endif
+
+            root.schedule.Execute(DrawHeaderGUI.HelperUpdate).Every(1);
+
             return root;
         }
     }

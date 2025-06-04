@@ -1,22 +1,23 @@
 ﻿using System.Collections.Generic;
+using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.Animations.StateBehaviours.SetParameterBehaviours;
 
 public class AdjustParametersBehaviour : StateMachineBehaviour {
-    [field: SerializeReference, SubclassSelector]
+    [field: SerializeReference, ReferencePicker]
     private List<AdjustParameterCommand> OnEnter { get; set; } = [];
     
-    [field: SerializeReference, SubclassSelector]
+    [field: SerializeReference, ReferencePicker]
     private List<AdjustParameterCommand> OnUpdate { get; set; } = [];
     
-    [field: SerializeReference, SubclassSelector]
+    [field: SerializeReference, ReferencePicker]
     private List<AdjustParameterCommand> OnExit { get; set; } = [];
     
-    [field: SerializeReference, SubclassSelector]
+    [field: SerializeReference, ReferencePicker]
     private List<AdjustParameterCommand> OnMove { get; set; } = [];
     
-    [field: SerializeReference, SubclassSelector]
+    [field: SerializeReference, ReferencePicker]
     private List<AdjustParameterCommand> OnIK { get; set; } = [];
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state

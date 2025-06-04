@@ -1,14 +1,14 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Project.Scripts.InteractionSystem.Detector;
+using Project.Scripts.ObjectDetection;
 using UnityEngine;
 
 namespace Project.Scripts.InteractionSystem;
 
-[RequireComponent(typeof(InteractorDetector))]
+[RequireComponent(typeof(DetectionZone))]
 public abstract class InteractableObject : MonoBehaviour {
     [NotNull]
     [field: SerializeField]
-    private InteractorDetector? Detector { get; set; }
+    private DetectionZone? Detector { get; set; }
 
     [field: SerializeField]
     private string Prompt { get; set; } = "Interact";
@@ -20,7 +20,7 @@ public abstract class InteractableObject : MonoBehaviour {
 
     private void Start() {
         this.Detector.OnDetection += this.OnInteractorDetected;
-        this.Detector.OnLostInteractor += this.OnInteractorOutOfRange;
+        this.Detector.OnLostSight += this.OnInteractorOutOfRange;
     }
     
     private void OnEnable() {

@@ -5,7 +5,7 @@ namespace Project.Scripts.Animations.StateBehaviours;
 
 public abstract class AnimatorStateBehaviour : StateMachineBehaviour {
     [Flags]
-    public enum ExecutionTiming {
+    private enum ExecutionTiming {
         OnEnter = 1,
         OnUpdate = 1 << 1,
         OnExit = 1 << 2,

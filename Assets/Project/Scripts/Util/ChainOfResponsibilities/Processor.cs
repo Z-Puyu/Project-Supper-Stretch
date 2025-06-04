@@ -4,27 +4,20 @@ using UnityEngine;
 
 namespace Project.Scripts.Util.ChainOfResponsibilities;
 
-public abstract class Processor<T> {
+public abstract class Processor<T> : IProcessor<T> {
     private static Sentinel SentinelProcessor { get; } = new Sentinel();
     
-    private Processor<T> Root { get; set; }
+    private Processor<T> Root { get; init; }
     private Processor<T> Next { get; set; }
+    private bool WillTerminateIfProcessed { get; set; }
 
-    private Processor() {
+    protected Processor() {
         this.Root = this;
         this.Next = this;
     }
-
-    protected virtual (ProcessorStatus status, T data) Preprocess(T input) {
-        return (ProcessorStatus.Healthy, input);
-    }
     
-    protected virtual (ProcessorStatus status, T data) InProcess(T data) {
+    protected virtual (ProcessorStatus status, T data) RunProcess(T data) {
         return (ProcessorStatus.Healthy, data);
-    }
-    
-    protected virtual (ProcessorStatus status, T data, bool done) Postprocess(T output) {
-        return (ProcessorStatus.Healthy, output, false);
     }
     
     protected virtual void PreLogWarning(T data) { }
@@ -48,7 +41,7 @@ public abstract class Processor<T> {
         throw new ArgumentException($"Processed data {data} triggered a fatal error");
     }
     
-    private void Access(ProcessorStatus status, T data) {
+    private void Assess(ProcessorStatus status, T data) {
         switch (status) {
             case ProcessorStatus.Warning:
                 this.OnWarning(data);
@@ -62,19 +55,23 @@ public abstract class Processor<T> {
         }
     }
     
-    public virtual T Process(T input) {
-        (ProcessorStatus status, T data) = this.Preprocess(input);
-        this.Access(status, data);
-        (status, data) = this.InProcess(data);
-        this.Access(status, data);
-        (status, data, bool done) = this.Postprocess(data);
-        this.Access(status, data);
-        return done ? data : this.Next.Process(data);
+    public void Process(T input) {
+        (ProcessorStatus status, T data) = this.RunProcess(input);
+        this.Assess(status, data);
+        if (status == ProcessorStatus.Completed && this.WillTerminateIfProcessed) {
+            return;
+        }
+        
+        this.Next.Process(input);
     }
 
     private sealed class Sentinel : Processor<T> {
-        public override T Process(T input) {
-            return input;
+        public Sentinel() {
+            this.WillTerminateIfProcessed = true;
+        }
+        
+        protected override (ProcessorStatus status, T data) RunProcess(T data) {
+            return (ProcessorStatus.Completed, data);
         }
     }
 
@@ -86,6 +83,12 @@ public abstract class Processor<T> {
         }
         
         public Builder Then<P>() where P : Processor<T>, new() {
+            this.Template = this.Template.Next = new P { Root = this.Template.Root };
+            return this;
+        }
+
+        public Builder IfNotDoneThen<P>() where P : Processor<T>, new() {
+            this.Template.WillTerminateIfProcessed = true;
             this.Template = this.Template.Next = new P { Root = this.Template.Root };
             return this;
         }
