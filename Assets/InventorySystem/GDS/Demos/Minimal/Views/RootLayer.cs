@@ -1,4 +1,3 @@
-using UnityEngine;
 using UnityEngine.UIElements;
 using GDS.Core;
 using GDS.Core.Views;

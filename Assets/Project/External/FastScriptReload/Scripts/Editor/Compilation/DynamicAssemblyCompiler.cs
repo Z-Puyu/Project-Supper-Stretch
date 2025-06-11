@@ -3,10 +3,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using FastScriptReload.Runtime;
 using ImmersiveVRTools.Runtime.Common;
 using ImmersiveVrToolsCommon.Runtime.Logging;
-using Debug = UnityEngine.Debug;
 
 namespace FastScriptReload.Editor.Compilation
 {

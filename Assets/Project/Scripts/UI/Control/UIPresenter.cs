@@ -1,6 +1,6 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.UI.Components;
+using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.UI.Control;
@@ -21,11 +21,13 @@ public abstract class UIPresenter : MonoBehaviour {
 
 public abstract class UIPresenter<U, T> : UIPresenter where U : UIElement {
     [NotNull]
+    [field: SerializeField, Required]
     protected U? View { get; private set; }
     
+    [field: SerializeField]
     protected T? Model { get; set; }
 
-    private void Awake() {
+    protected virtual void Awake() {
         this.View = this.GetComponent<U>();
     }
 }

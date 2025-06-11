@@ -1,10 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.UI.Components.Styles;
 using Project.Scripts.UI.Components.Styles.Themes;
-using SaintsField;
-using SaintsField.Playa;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,14 +9,14 @@ namespace Project.Scripts.UI.Components;
 
 [RequireComponent(typeof(VerticalLayoutGroup))]
 public class View : UIComponent<ViewStyle> {
-    private enum Section { Header, Body, Footer }
+    protected enum Section { Header, Body, Footer }
     
     [NotNull] 
     private VerticalLayoutGroup? VerticalLayoutGroup { get; set; }
 
     private List<Image> Sections { get; set; } = [];
     
-    private Image this[Section section] => this.Sections[(int)section];
+    protected Image this[Section section] => this.Sections[(int)section];
 
     protected override void Setup() {
         this.VerticalLayoutGroup = this.GetComponent<VerticalLayoutGroup>();

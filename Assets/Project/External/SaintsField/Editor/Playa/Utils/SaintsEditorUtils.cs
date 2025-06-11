@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SaintsField.Condition;
 using SaintsField.Editor.Utils;
-using UnityEngine;
 
 namespace SaintsField.Editor.Playa.Utils
 {

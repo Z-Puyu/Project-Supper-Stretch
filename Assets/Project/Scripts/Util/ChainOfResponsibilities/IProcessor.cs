@@ -1,7 +1,4 @@
-﻿using System;
-using UnityEngine;
-
-namespace Project.Scripts.Util.ChainOfResponsibilities;
+﻿namespace Project.Scripts.Util.ChainOfResponsibilities;
 
 public interface IProcessor<in T> {
     public abstract void Process(T input);

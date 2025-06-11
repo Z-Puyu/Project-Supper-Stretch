@@ -10,7 +10,6 @@ using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.DropdownDrawer
 {

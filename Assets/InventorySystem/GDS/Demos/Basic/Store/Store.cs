@@ -5,7 +5,6 @@ using GDS.Core.Events;
 using GDS.Basic.Events;
 using static GDS.Core.LogUtil;
 using static GDS.Core.InventoryFactory;
-using static GDS.Core.InventoryExtensions;
 using static GDS.Basic.Factory;
 
 namespace GDS.Basic {

@@ -6,7 +6,6 @@ using SaintsField.DropdownBase;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using UnityEditor;
-using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 {

@@ -5,7 +5,6 @@ using SaintsField.Utils;
 #if UNITY_EDITOR
 using SaintsField.SaintsXPathParser;
 #endif
-using UnityEngine;
 
 namespace SaintsField
 {

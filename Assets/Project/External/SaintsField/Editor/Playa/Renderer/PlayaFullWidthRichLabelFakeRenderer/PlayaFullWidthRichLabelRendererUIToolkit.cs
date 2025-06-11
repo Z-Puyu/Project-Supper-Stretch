@@ -1,11 +1,9 @@
 #if UNITY_2021_3_OR_NEWER
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer.PlayaFullWidthRichLabelFakeRenderer

@@ -1,6 +1,4 @@
-﻿using System;
-using Project.Scripts.Common;
-using Project.Scripts.InventorySystem;
+﻿using Project.Scripts.Common;
 using Project.Scripts.Player;
 using UnityEngine;
 using UnityEngine.Events;
@@ -20,6 +18,7 @@ public class PlayerInputInterpreter : MonoBehaviour {
     public event UnityAction OnWalk = delegate { };
     public event UnityAction OnCommitRightHandAttack = delegate { };
     public event UnityAction OnOpenInventory = delegate { };
+    public event UnityAction OnInteract = delegate { };
 
     private void SetupPlayerInput() {
         this.InputActions!.Player.OpenInventory.performed += _ => this.OnOpenInventory.Invoke();
@@ -31,6 +30,7 @@ public class PlayerInputInterpreter : MonoBehaviour {
         this.InputActions.Player.Sprint.performed += _ => this.OnSprint.Invoke();
         this.InputActions.Player.Sprint.canceled += _ => this.OnRun.Invoke();
         this.InputActions.Player.RightHandAttack.performed += _ => this.OnCommitRightHandAttack.Invoke();
+        this.InputActions.Player.Interact.performed += _ => this.OnInteract.Invoke();
     }
 
     private void SetupUIInput() {

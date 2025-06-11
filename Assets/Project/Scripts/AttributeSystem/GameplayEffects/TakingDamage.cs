@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.Attributes.AttributeTypes;
-using Project.Scripts.AttributeSystem.GameplayEffects.Executions;
 using Project.Scripts.AttributeSystem.GameplayEffects.Executions.Custom;
 using Project.Scripts.AttributeSystem.Modifiers;
-using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.AttributeSystem.GameplayEffects;
@@ -17,8 +15,10 @@ public class TakingDamage : GameplayEffect<WeaponDamageExecutionArgs> {
             return [];
         }
 
+        Debug.Log($"{args.Target.gameObject.name} attacked by {args.Instigator.gameObject.name}");
         AttributeSet weapon = args.Instigator;
         float damage = weapon[WeaponAttribute.Damage].CurrentValue;
+        Debug.Log($"{args.Target.gameObject.name} takes {damage} base damage");
         for (WeaponAttribute a = WeaponAttribute.FireDamage; a <= WeaponAttribute.DarkDamage; a += 1) {
             float multiplier = 0;
             if (AttributeContexts.ElementalWeaknessAttributes.TryGetValue(a, out CharacterAttribute weakness)) {

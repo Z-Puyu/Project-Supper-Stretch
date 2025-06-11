@@ -3,7 +3,6 @@ using GDS.Core;
 using GDS.Core.Events;
 using static GDS.Core.LogUtil;
 using static GDS.Core.InventoryFactory;
-using static GDS.Core.InventoryExtensions;
 
 namespace GDS.Minimal {
 

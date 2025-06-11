@@ -1,10 +1,8 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using static GDS.Core.InventoryFactory;
 using UnityEngine;
-using GDS.Core.Events;
 
 // This file contains extension methods related to inventories (bags), slots and items
 namespace GDS.Core {

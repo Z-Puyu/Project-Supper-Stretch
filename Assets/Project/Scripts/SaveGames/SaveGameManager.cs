@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Project.Scripts.Util.DataPersistence;
 using Project.Scripts.Util.Linq;
 using Project.Scripts.Util.Singleton;

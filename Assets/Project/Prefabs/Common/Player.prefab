@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 1435015714907449600}
   - component: {fileID: 2278156987090967175}
   - component: {fileID: 6036747248633223422}
-  - component: {fileID: 8786925813075957712}
   - component: {fileID: 2210012562826344936}
   - component: {fileID: 425940145986890503}
   - component: {fileID: 5098047279325025848}
-  - component: {fileID: 5976032984611698404}
   - component: {fileID: 8394069440088768591}
+  - component: {fileID: 2313543438244376022}
+  - component: {fileID: 8387964159153934367}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -77,20 +77,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f0eda4650db49f19d397294e70174c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &8786925813075957712
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2112626442620293118}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb99a992a90750940bd1543f06915c86, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <EquipmentSockets>k__BackingField: []
-  <TestWeapon>k__BackingField: {fileID: 0}
 --- !u!114 &2210012562826344936
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,18 +123,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Identifier>k__BackingField: 86513919-c740-4858-9486-f0055c870190
---- !u!114 &5976032984611698404
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2112626442620293118}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90e9f8317ba5479baa4c5d0447be5a54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &8394069440088768591
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,7 +135,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21167f7683754bf183c3313f1b99d560, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <NewPlayerPreset>k__BackingField: {fileID: 11400000, guid: 49d140d1b14c4506bb86e0b0ea93c8f3, type: 2}
+  <CharacterData>k__BackingField: {fileID: 11400000, guid: 49d140d1b14c4506bb86e0b0ea93c8f3, type: 2}
+--- !u!114 &2313543438244376022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2112626442620293118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 842be24b40a04dd0b1c921605ae8f460, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <InteractionRange>k__BackingField: 3
+  <InteractionAngularRange>k__BackingField: 15
+--- !u!114 &8387964159153934367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2112626442620293118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37b40eb6f2384c16bbc73863391bfeea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <IsAttributeBased>k__BackingField: 1
+  <Current>k__BackingField: 0
+  <Max>k__BackingField: 0
 --- !u!1 &8822058405393676753
 GameObject:
   m_ObjectHideFlags: 0

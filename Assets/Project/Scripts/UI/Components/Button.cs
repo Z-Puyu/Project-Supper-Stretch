@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.UI.Components.Styles;
 using Project.Scripts.UI.Components.Styles.Themes;
 using UnityEngine;
@@ -22,8 +21,8 @@ public class Button : UIComponent<ButtonStyle> {
     }
 
     protected override void Setup() {
-        this.ButtonSprite = this.GetComponentInChildren<Image>(includeInactive: true);
-        this.ButtonElement = this.GetComponentInChildren<UnityEngine.UI.Button>(includeInactive: true);
+        this.ButtonSprite = this.GetComponentInChildren<Image>();
+        this.ButtonElement = this.GetComponentInChildren<UnityEngine.UI.Button>();
         this.ButtonElement.onClick.AddListener(this.OnClicked);
     }
 

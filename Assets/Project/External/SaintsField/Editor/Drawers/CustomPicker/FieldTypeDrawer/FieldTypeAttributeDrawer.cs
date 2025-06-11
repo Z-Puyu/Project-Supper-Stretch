@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Utils;
 using SaintsField.Editor.Utils.SaintsObjectPickerWindow;
 using UnityEditor;
 using UnityEngine;

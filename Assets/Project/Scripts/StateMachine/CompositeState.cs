@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Project.Scripts.StateMachine.Variables;
 using Project.Scripts.Util.Components;
 using SaintsField;
 using UnityEngine;

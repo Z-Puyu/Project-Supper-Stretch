@@ -1,5 +1,4 @@
 using SaintsField.Playa;
-using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.NA.Issue318
 {

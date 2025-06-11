@@ -1,13 +1,18 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.ObjectDetection;
+using Project.Scripts.Util.Components;
+using SaintsField;
 using UnityEngine;
+using UnityEngine.Events;
+using Object = UnityEngine.Object;
 
 namespace Project.Scripts.InteractionSystem;
 
-[RequireComponent(typeof(DetectionZone))]
-public abstract class InteractableObject : MonoBehaviour {
+public class InteractableObject : MonoBehaviour {
+    public static event UnityAction<InteractableObject> OnDestroyed = delegate { };
+    
     [NotNull]
-    [field: SerializeField]
+    [field: SerializeField, Required]
     private DetectionZone? Detector { get; set; }
 
     [field: SerializeField]
@@ -16,7 +21,33 @@ public abstract class InteractableObject : MonoBehaviour {
     [field: SerializeField]
     private bool ShouldDestroyAfterInteraction { get; set; }
     
+    [NotNull]
+    [field: SerializeField, Required]
+    private GameObject? PromptWidget { get; set; }
+    
     private bool HasInteractorInRange { get; set; }
+    
+    /// <summary>
+    /// Invoked when the interactor enters the detection zone.
+    /// </summary>
+    public event UnityAction OnApproached = delegate { };
+    
+    /// <summary>
+    /// Invoked when the interactor leaves the detection zone.
+    /// </summary>
+    public event UnityAction OnLeft = delegate { };
+    
+    /// <summary>
+    /// Invoked when the interactor looks at the object.
+    /// </summary>
+    public event UnityAction<string> OnActivated = delegate { };
+    
+    /// <summary>
+    /// Invoked when the interactor looks away from the object.
+    /// </summary>
+    public event UnityAction<string> OnDeactivated = delegate { };
+    
+    public event UnityAction<Interactor> OnInteraction = delegate { };
 
     private void Start() {
         this.Detector.OnDetection += this.OnInteractorDetected;
@@ -25,64 +56,65 @@ public abstract class InteractableObject : MonoBehaviour {
     
     private void OnEnable() {
         if (this.HasInteractorInRange) {
-            this.OnActivated();
+            this.OnApproached.Invoke();
         }
     }
     
     private void OnDisable() {
         if (this.HasInteractorInRange) {
-            this.OnDeactivated();
+            this.OnLeft.Invoke();
         }
     }
 
-    /// <summary>
-    /// Invoked to apply cosmetic effects when an interactor comes into range.
-    /// </summary>
-    protected virtual void OnActivated() { }
-
-    /// <summary>
-    /// Invoked to revert cosmetic effects when an interactor leaves range.
-    /// </summary>
-    protected virtual void OnDeactivated() { }
-
-    private void OnInteractorDetected(Collider interactor) {
+    private void OnInteractorDetected(Collider actor) {
+        Debug.Log($"Interactor detected: {actor.name}");
+        if (!actor.HasComponent(out Interactor interactor)) {
+            return;
+        }
+        
         this.HasInteractorInRange = true;
-        if (!this.enabled) {
-            return;
-        }
-        
-        this.OnActivated();
-        PlayerInteraction? interactionComp = interactor.GetComponent<PlayerInteraction>();
-        if (interactionComp != null) {
-            interactionComp.TargetsInRange.Add(this);
-        }
+        this.OnApproached.Invoke();
+        interactor.Add(this);
     }
 
-    private void OnInteractorOutOfRange(Collider interactor) {
-        this.HasInteractorInRange = false;
-        if (!this.enabled) {
+    private void OnInteractorOutOfRange(Collider actor) {
+        Debug.Log($"Interactor lost: {actor.name}");
+        if (!actor.HasComponent(out Interactor interactor)) {
             return;
         }
         
-        this.OnDeactivated();
-        PlayerInteraction? interactionComp = interactor.GetComponent<PlayerInteraction>();
-        if (interactionComp != null) {
-            interactionComp.TargetsInRange.Remove(this);
-        }
+        this.Deactivate();
+        this.HasInteractorInRange = false;
+        this.OnLeft.Invoke();
+        interactor.Remove(this);
     }
     
-    /// <summary>
-    /// Invoked to execute effects when an interactor interacts with this object.
-    /// </summary>
-    protected abstract void OnInteraction();
-    public void Interact() {
-        this.OnInteraction();
-        if (this.ShouldDestroyAfterInteraction) {
-            Object.Destroy(this.gameObject);
+    public void Interact(Interactor interactor) {
+        Debug.Log($"Interacting with: {this.name}");
+        this.OnInteraction.Invoke(interactor);
+        if (!this.ShouldDestroyAfterInteraction) {
+            return;
         }
+
+        InteractableObject.OnDestroyed.Invoke(this);
+        Object.Destroy(this.gameObject);
     }
-    
-    public virtual void ShowPrompt() { }
-    
-    public virtual void HidePrompt() { }
+
+    public void Activate() {
+        if (this.PromptWidget.activeInHierarchy) {
+            return;
+        }
+        
+        this.PromptWidget.SetActive(true);
+        this.OnActivated.Invoke(this.Prompt);
+    }
+
+    public void Deactivate() {
+        if (!this.PromptWidget.activeInHierarchy) {
+            return;
+        }
+        
+        this.PromptWidget.SetActive(false);
+        this.OnDeactivated.Invoke(this.Prompt);
+    }
 }

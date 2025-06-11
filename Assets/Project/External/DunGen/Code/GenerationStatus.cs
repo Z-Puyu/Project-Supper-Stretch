@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DunGen
+﻿namespace DunGen
 {
 	public delegate void GenerationStatusDelegate(DungeonGenerator generator, GenerationStatus status);
 	public delegate void DungeonGenerationCompleteDelegate(DungeonGenerator generator);

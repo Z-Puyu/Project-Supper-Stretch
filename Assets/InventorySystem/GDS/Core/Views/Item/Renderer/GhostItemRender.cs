@@ -1,6 +1,4 @@
 using System;
-using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace GDS.Core.Views {
     public class GhostItemRender<T> : Component<Item> where T : Component<Item> {

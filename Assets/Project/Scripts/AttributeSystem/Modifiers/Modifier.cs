@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Text;
 using Project.Scripts.AttributeSystem.Attributes;
-using Project.Scripts.AttributeSystem.Modifiers.ModifierMagnitude;
 using Project.Scripts.Util.Builder;
 using Project.Scripts.Util.Visitor;
-using SaintsField;
 using UnityEngine;
-using Attribute = Codice.Client.BaseCommands.Attribute;
 
 namespace Project.Scripts.AttributeSystem.Modifiers;
 

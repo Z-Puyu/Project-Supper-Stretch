@@ -1,11 +1,13 @@
-﻿using System;
+﻿namespace Project.Scripts.Items;
 
-namespace Project.Scripts.Items;
-
-[Flags]
-public enum ItemProperty {
-    None = 0,
-    Usable = 1,
-    Consumable = 2,
-    Equipable = 4
+public enum ItemType {
+    Coin,
+    Food,
+    Drink,
+    FoodIngredient,
+    Spice,
+    FoodAdditive,
+    Equipment,
+    Potion,
+    Miscellaneous
 }

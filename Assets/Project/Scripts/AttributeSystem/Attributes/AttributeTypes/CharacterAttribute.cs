@@ -4,7 +4,7 @@ public enum CharacterAttribute {
     Health,
     MaxHealth,
     Sanity,
-    MaxSanity,
+    Satiation,
     FireResistance,
     LightningResistance,
     IceResistance,

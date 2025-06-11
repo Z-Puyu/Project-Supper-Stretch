@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Project.Scripts.UI.Components;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace Project.Scripts.UI.Control;
 
+[RequireComponent(typeof(Image))]
 public class UIPage : MonoBehaviour {
     public static event UnityAction OnActivated = delegate { };
     public static event UnityAction OnDeactivated = delegate { };
@@ -16,7 +17,7 @@ public class UIPage : MonoBehaviour {
     public IEnumerable<UIPresenter> UIComponents => this.Presenters.Values;
 
     private void Awake() {
-        foreach (UIPresenter presenter in this.GetComponentsInChildren<UIPresenter>(includeInactive: true)) {
+        foreach (UIPresenter presenter in this.GetComponentsInChildren<UIPresenter>()) {
             this.Presenters.Add(presenter.GetType(), presenter);
         }
     }

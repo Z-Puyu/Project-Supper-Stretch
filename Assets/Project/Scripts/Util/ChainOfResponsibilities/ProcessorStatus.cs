@@ -2,6 +2,7 @@
 
 public enum ProcessorStatus {
     Completed,
+    Failure,
     Healthy,
     Warning,
     Error,

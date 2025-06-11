@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Project.Scripts.Common;
-using Project.Scripts.Util.Singleton;
 using UnityEngine;
 
 namespace Project.Scripts.UI.Control;
@@ -11,7 +10,7 @@ public class UIBook : MonoBehaviour {
     private Stack<UIPage> History { get; init; } = [];
 
     private void Start() {
-        foreach (UIPage page in this.GetComponentsInChildren<UIPage>(includeInactive: true)) {
+        foreach (UIPage page in this.GetComponentsInChildren<UIPage>()) {
             this.AddNewPage(page);
         }
     }

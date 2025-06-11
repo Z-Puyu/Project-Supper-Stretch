@@ -33,7 +33,7 @@ public class EquipmentSocket : MonoBehaviour, IComparable<EquipmentSocket> {
         this.Equipment = null;
     }
 
-    public bool Fits(Equipment equipment) {
+    public bool Fits(Item equipment) {
         return equipment.Slot.HasFlag(this.Slot);
     }
 

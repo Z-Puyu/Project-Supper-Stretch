@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Project.Scripts.InventorySystem;
 using Project.Scripts.Items;
 using Project.Scripts.UI.Components;
@@ -9,22 +8,17 @@ using UnityEngine;
 namespace Project.Scripts.UI.InventoryUI;
 
 [RequireComponent(typeof(ListContainer))]
-public class InventoryPresenter : ListPresenter<ItemEntry, Inventory> {
+public class InventoryPresenter : ListPresenter<KeyValuePair<Item, int>, Inventory> {
     public override void Present(object data) {
-        if (data is not Inventory inventory) {
-            Debug.LogWarning($"Invalid data {data} passed to InventoryPresenter.");
-            return;
-        }
-
-        if (this.Model != inventory) {
+        if (data is Inventory inventory) {
             if (this.Model) {
-                this.Model.OnInventoryChanged -= this.OnContentChanged;   
+                this.Model.OnInventoryChanged -= this.OnContentChanged;
             }
-            
-            inventory.OnInventoryChanged += this.OnContentChanged;    
+
+            inventory.OnInventoryChanged += this.OnContentChanged;
+            this.Model = inventory;
         }
         
-        this.Model = inventory;
         this.Present();
     }
 
@@ -32,32 +26,19 @@ public class InventoryPresenter : ListPresenter<ItemEntry, Inventory> {
         if (!this.Model) {
             Debug.LogWarning("Trying to update inventory view when inventory is null.");
             return;
-        } 
-        
+        }
+
         this.Clear();
-        foreach ((Item item, int count) in this.Model.AllItems) {
-            ItemEntry entry = this.Pool.Get();
-            entry.OnClick += () => this.Model.Use(item);
-            this.View.AddEntry(entry);
-            this.OnItemEntryChangedCallbacks[item] = entry.Display;
-            this.OnInvalidateItemCallbacks[item] = () => this.View.RemoveEntry(entry);
-            entry.Display((item, count));
+        foreach (KeyValuePair<Item, int> record in this.Model.SortBy(item => item.Name)) {
+            this.AddEntry(record);
         }
     }
 
-    protected override void OnContentChanged(Inventory source, object data) {
-        if (this.Model != source || data is not Inventory.Record record) {
-            return;
-        }
+    protected override bool IsValidData(KeyValuePair<Item, int> data) {
+        return data.Value > 0;
+    }
 
-        switch (record.Count) {
-            case > 0 when this.OnItemEntryChangedCallbacks.TryGetValue(record.Item, out Action<object> onChange):
-                onChange.Invoke(record);
-                return;
-            case <= 0 when this.OnInvalidateItemCallbacks.Remove(record.Item, out Action onInvalidate):
-                this.OnItemEntryChangedCallbacks.Remove(record.Item);
-                onInvalidate.Invoke();
-                return;
-        }
+    protected override object KeyOf(KeyValuePair<Item, int> data) {
+        return data.Key;
     }
 }

@@ -69,7 +69,7 @@ public class PlayerMovement : CharacterMovement {
         if (dir.magnitude == 0) {
             return;
         }
-        
+
         Quaternion target = Quaternion.LookRotation(dir with { y = 0 });
         this.CharacterTransform.rotation = Quaternion.Slerp(this.CharacterTransform.rotation, target, this.TurnSpeed);
     }
@@ -90,7 +90,7 @@ public class PlayerMovement : CharacterMovement {
         float t = 1 - this.Acceleration;
         Vector3 target = this.Direction * ((int)this.MovementMode * this.Speed);
         this.Velocity = Vector3.SmoothDamp(this.Velocity, target, ref this.damping, t);
-        this.Animator.SetFloat(this.AnimatorParameterForSpeed, this.Velocity.magnitude);
+        this.Animator.SetFloat(this.AnimatorParameterForSpeed, this.Velocity.magnitude / this.Speed);
         if (this.Velocity.magnitude == 0) {
             return;
         }

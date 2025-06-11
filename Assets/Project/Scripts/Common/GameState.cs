@@ -1,5 +1,4 @@
 ﻿using Project.Scripts.Util.Singleton;
-using UnityEngine;
 
 namespace Project.Scripts.Common;
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
@@ -8,6 +7,16 @@ using Object = UnityEngine.Object;
 namespace Project.Scripts.Util.Components;
 
 public static class ComponentExtensions {
+    public static bool HasComponent<T>(this GameObject obj, out T comp) where T : Component {
+        comp = obj.GetComponent<T>();
+        return comp;
+    }
+    
+    public static bool HasComponent<T>(this Component obj, out T comp) where T : Component {
+        comp = obj.GetComponent<T>();
+        return comp;
+    }
+    
     public static T AddUniqueComponent<T>(this GameObject obj) where T : Component {
         foreach (T component in obj.GetComponents<T>()) {
             Object.Destroy(component);

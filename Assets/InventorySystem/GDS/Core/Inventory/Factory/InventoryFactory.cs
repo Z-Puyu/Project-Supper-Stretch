@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+
 namespace GDS.Core {
     /// <summary>
     /// Contains factory methods for creating all types of bags and slots

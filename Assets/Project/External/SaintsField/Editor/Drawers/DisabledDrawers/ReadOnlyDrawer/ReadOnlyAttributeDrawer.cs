@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using SaintsField.Editor.Core;
-using SaintsField.Editor.Utils;
-using SaintsField.Interfaces;
+﻿using SaintsField.Editor.Core;
 using UnityEditor;
-using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.DisabledDrawers.ReadOnlyDrawer
 {

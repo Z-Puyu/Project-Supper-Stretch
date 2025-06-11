@@ -1,8 +1,6 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.ObjectDetection;
 using SaintsField;
-using SaintsField.Playa;
 using UnityEngine;
 
 namespace Project.Scripts.Characters.CharacterControl;

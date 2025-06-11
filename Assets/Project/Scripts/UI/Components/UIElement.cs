@@ -1,5 +1,4 @@
-﻿using System;
-using Project.Scripts.UI.Components.Styles.Themes;
+﻿using Project.Scripts.UI.Components.Styles.Themes;
 using SaintsField.Playa;
 using UnityEngine;
 
@@ -35,7 +34,7 @@ public abstract class UIElement : MonoBehaviour {
         this.Configure();
     }
 
-    protected void ConfigureChildElements() {
+    private void ConfigureChildElements() {
         UIElement[] components = this.GetComponentsInChildren<UIElement>();
         for (int i = components.Length - 1; i >= 0; i -= 1) {
             if (components[i].Theme == this.Theme) {
@@ -48,7 +47,7 @@ public abstract class UIElement : MonoBehaviour {
         }
     }
 
-    public virtual void Display(object data) { }
+    public virtual void Display(object? data) { }
     
     public virtual void Clear() { }
     

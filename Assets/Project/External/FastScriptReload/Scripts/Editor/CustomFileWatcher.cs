@@ -5,7 +5,6 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using FastScriptReload.Editor;
-using System;
 using System.Threading;
 
 [InitializeOnLoad]

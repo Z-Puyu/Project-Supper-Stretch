@@ -1,5 +1,4 @@
 ﻿using System;
-using Project.Scripts.Items.Equipments;
 
 namespace Project.Scripts.Items;
 

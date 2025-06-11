@@ -14,17 +14,21 @@ public class Text : UIComponent<TextStyle> {
     private UIStyleUsage TextUsage { get; set; } = UIStyleUsage.Primary;
 
     protected override void Setup() {
-        this.TextBox = this.GetComponentInChildren<TextMeshProUGUI>(includeInactive: true);
+        this.TextBox = this.GetComponentInChildren<TextMeshProUGUI>();
     }
 
     protected override void ApplyStyle(TextStyle style) {
         this.TextBox.font = style.Font;
-        this.TextBox.fontSize = style.Size;
+        this.TextBox.fontSize = style.Size * style.Scale;
+        if (style.OverrideColour) {
+            this.TextBox.color = style.Colour;
+        }
     }
 
     protected override void RevertStyle() {
         this.TextBox.font = null;
-        this.TextBox.fontSize = 11;  
+        this.TextBox.fontSize = 11;
+        this.TextBox.color = Color.black; 
     }
 
     protected override void ApplyTheme(Theme theme) {

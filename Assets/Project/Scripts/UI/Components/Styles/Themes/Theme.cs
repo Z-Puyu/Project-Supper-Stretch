@@ -59,4 +59,13 @@ public class Theme : ScriptableObject {
             var _ => this.PrimaryTextColour
         };
     }
+    
+    public Color SpriteColour(UIStyleUsage usage) {
+        return usage switch {
+            UIStyleUsage.Highlight => this.HighlightColour,
+            UIStyleUsage.PositiveIndication => this.PositiveIndicatorColour,
+            UIStyleUsage.NegativeIndication => this.NegativeIndicatorColour,
+            var _ => Color.white
+        };
+    }
 }

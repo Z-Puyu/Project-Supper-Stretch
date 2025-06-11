@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
 using Project.Scripts.UI.Components.Styles;
-using Project.Scripts.UI.Components.Styles.Themes;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Project.Scripts.UI.Components;
 

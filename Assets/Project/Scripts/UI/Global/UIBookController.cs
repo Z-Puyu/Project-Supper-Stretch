@@ -1,6 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common;
 using Project.Scripts.InventorySystem;
+using Project.Scripts.InventorySystem.LootContainers;
+using Project.Scripts.Items;
 using Project.Scripts.UI.Control;
 using Project.Scripts.UI.InventoryUI;
 using UnityEngine;
@@ -19,5 +22,6 @@ public class UIBookController : MonoBehaviour {
     private void Start() {
         GameEvents.UI.OnGoBack += this.Book.PreviousPage;
         Inventory.OnOpen += this.Book.Open<InventoryPresenter>;
+        LootContainer.OnOpen += this.Book.Open<LootContainerPresenter>;
     }
 }

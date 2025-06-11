@@ -11,7 +11,6 @@ using ImmersiveVRTools.Runtime.Common;
 using ImmersiveVRTools.Runtime.Common.Extensions;
 using ImmersiveVrToolsCommon.Runtime.Logging;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace FastScriptReload.Runtime
 {

@@ -1,11 +1,7 @@
 using UnityEngine;
 using UnityEditor;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
-using UnityEditorInternal;
 //to do TextColor
 //EditorStyles.label.normal.textColor 
 

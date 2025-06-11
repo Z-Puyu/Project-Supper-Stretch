@@ -5,11 +5,10 @@ using UnityEngine;
 namespace Project.Scripts.Util.ChainOfResponsibilities;
 
 public abstract class Processor<T> : IProcessor<T> {
-    private static Sentinel SentinelProcessor { get; } = new Sentinel();
-    
     private Processor<T> Root { get; init; }
     private Processor<T> Next { get; set; }
     private bool WillTerminateIfProcessed { get; set; }
+    private bool IsLastInPipeline { get; set; }
 
     protected Processor() {
         this.Root = this;
@@ -58,21 +57,15 @@ public abstract class Processor<T> : IProcessor<T> {
     public void Process(T input) {
         (ProcessorStatus status, T data) = this.RunProcess(input);
         this.Assess(status, data);
-        if (status == ProcessorStatus.Completed && this.WillTerminateIfProcessed) {
+        if (this.IsLastInPipeline) {
+            return;
+        }
+        
+        if (status is ProcessorStatus.Failure or ProcessorStatus.Completed && this.WillTerminateIfProcessed) {
             return;
         }
         
         this.Next.Process(input);
-    }
-
-    private sealed class Sentinel : Processor<T> {
-        public Sentinel() {
-            this.WillTerminateIfProcessed = true;
-        }
-        
-        protected override (ProcessorStatus status, T data) RunProcess(T data) {
-            return (ProcessorStatus.Completed, data);
-        }
     }
 
     public sealed class Builder : FluentBuilder<Processor<T>> {
@@ -94,7 +87,7 @@ public abstract class Processor<T> : IProcessor<T> {
         }
 
         public override Processor<T> Build() {
-            this.Template.Next = Processor<T>.SentinelProcessor;
+            this.Template.IsLastInPipeline = true;
             return this.Template.Root;
         }
     }

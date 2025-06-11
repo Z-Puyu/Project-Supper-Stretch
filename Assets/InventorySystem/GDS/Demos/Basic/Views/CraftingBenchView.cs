@@ -3,7 +3,6 @@ using System.Linq;
 using UnityEngine.UIElements;
 using GDS.Core;
 using GDS.Basic.Views;
-using UnityEngine;
 
 namespace GDS.Basic {
     public class CraftingBenchView : VisualElement {

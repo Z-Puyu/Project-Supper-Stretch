@@ -1,6 +1,5 @@
 using System.Linq;
 using GDS.Core;
-using UnityEngine;
 
 namespace GDS.Basic {
     public class CharacterSheet {

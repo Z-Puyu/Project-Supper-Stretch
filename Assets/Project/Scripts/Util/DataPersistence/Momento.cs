@@ -1,7 +1,4 @@
-﻿using System;
-using UnityEngine;
-
-namespace Project.Scripts.Util.DataPersistence;
+﻿namespace Project.Scripts.Util.DataPersistence;
 
 public abstract class Momento {
     public string Id { get; private init; }
