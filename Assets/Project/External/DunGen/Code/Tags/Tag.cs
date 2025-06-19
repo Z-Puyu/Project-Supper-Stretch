@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DunGen.Tags
+namespace DunGen.Project.External.DunGen.Code.Tags
 {
 	[Serializable]
 	public sealed class Tag : IEqualityComparer<Tag>
 	{
 		public int ID
 		{
-			get { return id; }
+			get { return this.id; }
 			set
 			{
-				id = value;
+				this.id = value;
 			}
 		}
 		public string Name
 		{
-			get { return DunGenSettings.Instance.TagManager.TryGetNameFromID(id); }
-			set { DunGenSettings.Instance.TagManager.TryRenameTag(id, value); }
+			get { return DunGenSettings.Instance.TagManager.TryGetNameFromID(this.id); }
+			set { DunGenSettings.Instance.TagManager.TryRenameTag(this.id, value); }
 		}
 
 
@@ -34,7 +34,7 @@ namespace DunGen.Tags
 
 		public Tag(string name)
 		{
-			DunGenSettings.Instance.TagManager.TagExists(name, out id);
+			DunGenSettings.Instance.TagManager.TagExists(name, out this.id);
 		}
 
 		public override bool Equals(object obj)
@@ -47,24 +47,24 @@ namespace DunGen.Tags
 			if (other == null)
 				return false;
 			else
-				return Equals(this, other);
+				return this.Equals(this, other);
 		}
 
 		public override int GetHashCode()
 		{
-			return id;
+			return this.id;
 		}
 
 		public override string ToString()
 		{
-			return string.Format("[{0}] {1}", id, DunGenSettings.Instance.TagManager.TryGetNameFromID(id));
+			return string.Format("[{0}] {1}", this.id, DunGenSettings.Instance.TagManager.TryGetNameFromID(this.id));
 		}
 
 		#region IEqualityComparer<Tag>
 
 		public int GetHashCode(Tag tag)
 		{
-			return id;
+			return this.id;
 		}
 
 		public bool Equals(Tag x, Tag y)
@@ -83,9 +83,9 @@ namespace DunGen.Tags
 
 		public static bool operator ==(Tag a, Tag b)
 		{
-			if (ReferenceEquals(a, null) && ReferenceEquals(b, null))
+			if (object.ReferenceEquals(a, null) && object.ReferenceEquals(b, null))
 				return true;
-			else if (ReferenceEquals(a, null) || ReferenceEquals(b, null))
+			else if (object.ReferenceEquals(a, null) || object.ReferenceEquals(b, null))
 				return false;
 
 			return a.id == b.id;

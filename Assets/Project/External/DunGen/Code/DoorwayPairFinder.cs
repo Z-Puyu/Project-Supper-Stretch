@@ -1,10 +1,10 @@
-﻿using DunGen.Graph;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
 using UnityEngine;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	#region Helper Types
 
@@ -21,13 +21,13 @@ namespace DunGen
 
 		public DoorwayPair(TileProxy previousTile, DoorwayProxy previousDoorway, TileProxy nextTemplate, DoorwayProxy nextDoorway, TileSet nextTileSet, float tileWeight, float doorwayWeight)
 		{
-			PreviousTile = previousTile;
-			PreviousDoorway = previousDoorway;
-			NextTemplate = nextTemplate;
-			NextDoorway = nextDoorway;
-			NextTileSet = nextTileSet;
-			TileWeight = tileWeight;
-			DoorwayWeight = doorwayWeight;
+			this.PreviousTile = previousTile;
+			this.PreviousDoorway = previousDoorway;
+			this.NextTemplate = nextTemplate;
+			this.NextDoorway = nextDoorway;
+			this.NextTileSet = nextTileSet;
+			this.TileWeight = tileWeight;
+			this.DoorwayWeight = doorwayWeight;
 		}
 	}
 
@@ -38,14 +38,34 @@ namespace DunGen
 
 	public sealed class DoorwayPairFinder
 	{
-		public static List<TileConnectionRule> CustomConnectionRules = new List<TileConnectionRule>();
+		#region Statics
+
+		public static readonly List<TileConnectionRule> CustomConnectionRules = new List<TileConnectionRule>();
+
+		[RuntimeInitializeOnLoadMethod]
+		private static void ResetStatics()
+		{
+			DoorwayPairFinder.CustomConnectionRules.Clear();
+		}
+
+		private static int CompareConnectionRules(TileConnectionRule a, TileConnectionRule b)
+		{
+			return b.Priority.CompareTo(a.Priority);
+		}
+
+		public static void SortCustomConnectionRules()
+		{
+			DoorwayPairFinder.CustomConnectionRules.Sort(DoorwayPairFinder.CompareConnectionRules);
+		}
+
+		#endregion
 
 		public RandomStream RandomStream;
 		public List<GameObjectChance> TileWeights;
 		public TileProxy PreviousTile;
 		public bool IsOnMainPath;
 		public float NormalizedDepth;
-		public DungeonArchetype Archetype;
+		public TilePlacementParameters PlacementParameters;
 		public bool? AllowRotation;
 		public Vector3 UpVector;
 		public TileMatchDelegate IsTileAllowedPredicate;
@@ -60,70 +80,82 @@ namespace DunGen
 
 		public Queue<DoorwayPair> GetDoorwayPairs(int? maxCount)
 		{
-			tileOrder = CalculateOrderedListOfTiles();
+			this.tileOrder = this.CalculateOrderedListOfTiles();
 
-			// Calculate straightening proprties
-			shouldStraightenNextConnection = CalculateShouldStraightenNextConnection();
+			// Calculate straightening properties
+			this.shouldStraightenNextConnection = this.CalculateShouldStraightenNextConnection();
 
-			if (shouldStraightenNextConnection)
-				currentPathDirection = CalculateCurrentPathDirection();
+			if(this.shouldStraightenNextConnection)
+				this.currentPathDirection = this.CalculateCurrentPathDirection();
 
-			if (currentPathDirection == null)
-				shouldStraightenNextConnection = false;
+			if (this.currentPathDirection == null)
+				this.shouldStraightenNextConnection = false;
 
 			List<DoorwayPair> potentialPairs;
 
-			if (PreviousTile == null)
-				potentialPairs = GetPotentialDoorwayPairsForFirstTile().ToList();
+			if (this.PreviousTile == null)
+				potentialPairs = this.GetPotentialDoorwayPairsForFirstTile().ToList();
 			else
-				potentialPairs = GetPotentialDoorwayPairsForNonFirstTile().ToList();
+				potentialPairs = this.GetPotentialDoorwayPairsForNonFirstTile().ToList();
 
 			int count = potentialPairs.Count;
 
 			if (maxCount.HasValue)
 				count = Math.Min(count, maxCount.Value);
 
-			Queue<DoorwayPair> pairs = new Queue<DoorwayPair>(count);
-			foreach (var pair in OrderDoorwayPairs(potentialPairs, count))
-				pairs.Enqueue(pair);
+			Queue<DoorwayPair> pairs = new Queue<DoorwayPair>(
+				this.OrderDoorwayPairs(potentialPairs)
+				    .Take(count));
 
 			return pairs;
 		}
 
 		private bool CalculateShouldStraightenNextConnection()
 		{
-			// We can't straighten the path if we don't have an archetype
-			if (Archetype == null)
+			PathStraighteningSettings straighteningSettings = null;
+
+			if (this.PlacementParameters.Archetype != null)
+				straighteningSettings = this.PlacementParameters.Archetype.StraighteningSettings;
+			else if (this.PlacementParameters.Node != null)
+			{
+				straighteningSettings = this.PlacementParameters.Node.StraighteningSettings;
+
+				// Until branch paths are supported on nodes, we should just set these manually
+				// to avoid any potential situation where they were somehow set incorrectly
+				straighteningSettings.CanStraightenMainPath = true;
+				straighteningSettings.CanStraightenBranchPaths = false;
+			}
+
+			// Exit early if we have no settings to work with
+			if (straighteningSettings == null)
 				return false;
 
-			// Hard-coded for 2.17.5 to match expected behavior
-			// Will be pulled from Archetype settings starting in 2.18
-			bool allowStraightenMainPath = true;
-			bool allowStraightenBranchPaths = false;
+			// Apply any overrides to the global settings
+			straighteningSettings = PathStraighteningSettings.GetFinalValues(straighteningSettings, this.DungeonFlow.GlobalStraighteningSettings);
 
 			// Ignore main path based on user settings
-			if (IsOnMainPath && !allowStraightenMainPath)
+			if (this.IsOnMainPath && !straighteningSettings.CanStraightenMainPath)
 				return false;
 
 			// Ignore branch paths based on user settings
-			if (!IsOnMainPath && !allowStraightenBranchPaths)
+			if (!this.IsOnMainPath && !straighteningSettings.CanStraightenBranchPaths)
 				return false;
 
 			// Random chance to straighten the connection
-			return RandomStream.NextDouble() < Archetype.StraightenChance;
+			return this.RandomStream.NextDouble() < straighteningSettings.StraightenChance;
 		}
 
 		private Vector3? CalculateCurrentPathDirection()
 		{
-			if (PreviousTile == null || !shouldStraightenNextConnection)
+			if (this.PreviousTile == null || !this.shouldStraightenNextConnection)
 				return null;
 
-			if (IsOnMainPath)
+			if(this.IsOnMainPath)
 			{
-				float pathDepth = PreviousTile.Placement.PathDepth;
+				float pathDepth = this.PreviousTile.Placement.PathDepth;
 
 				// Find the doorway we entered through and return its forward direction
-				foreach (var doorway in PreviousTile.UsedDoorways)
+				foreach (var doorway in this.PreviousTile.UsedDoorways)
 				{
 					var connectedTile = doorway.ConnectedDoorway.TileProxy;
 
@@ -135,13 +167,13 @@ namespace DunGen
 			else
 			{
 				// We can't calculate a path direction for the first tile in a branch
-				if (PreviousTile.Placement.IsOnMainPath)
+				if (this.PreviousTile.Placement.IsOnMainPath)
 					return null;
 
-				float branchDepth = PreviousTile.Placement.BranchDepth;
+				float branchDepth = this.PreviousTile.Placement.BranchDepth;
 
 				// Find the doorway we entered through and return its forward direction
-				foreach (var doorway in PreviousTile.UsedDoorways)
+				foreach (var doorway in this.PreviousTile.UsedDoorways)
 				{
 					var connectedTile = doorway.ConnectedDoorway.TileProxy;
 
@@ -154,56 +186,45 @@ namespace DunGen
 			return null;
 		}
 
-		private int CompareDoorwaysTileWeight(DoorwayPair x, DoorwayPair y)
+		private IEnumerable<DoorwayPair> OrderDoorwayPairs(List<DoorwayPair> potentialPairs)
 		{
-			// Reversed to sort with highest TileWeight value first
-			return y.TileWeight.CompareTo(x.TileWeight);
-		}
-
-		private IEnumerable<DoorwayPair> OrderDoorwayPairs(List<DoorwayPair> potentialPairs, int count)
-		{
-			potentialPairs.Sort(CompareDoorwaysTileWeight);
-
-			// Then order by DoorwayWeight. LINQ ThenByDescending doesn't work on AoT platforms, so we have to order the set manually..
-			for (int j = 0; j < potentialPairs.Count - 1; j++)
+			potentialPairs.Sort((a, b) =>
 			{
-				for (int i = 0; i < potentialPairs.Count - 1; i++)
-				{
-					if (potentialPairs[i].TileWeight == potentialPairs[i + 1].TileWeight && potentialPairs[i].DoorwayWeight < potentialPairs[i + 1].DoorwayWeight)
-					{
-						var temp = potentialPairs[i];
+				// First compare TileWeight (descending)
+				int tileWeightComparison = b.TileWeight.CompareTo(a.TileWeight);
 
-						potentialPairs[i] = potentialPairs[i + 1];
-						potentialPairs[i + 1] = temp;
-					}
-				}
-			}
+				// If TileWeights are equal, compare DoorwayWeight (descending)
+				if (tileWeightComparison == 0)
+					return b.DoorwayWeight.CompareTo(a.DoorwayWeight);
 
-			return potentialPairs.Take(count);
+				return tileWeightComparison;
+			});
+
+			return potentialPairs;
 		}
 
 		private List<GameObjectChance> CalculateOrderedListOfTiles()
 		{
-			List<GameObjectChance> tiles = new List<GameObjectChance>(TileWeights.Count);
+			List<GameObjectChance> tiles = new List<GameObjectChance>(this.TileWeights.Count);
 
 			GameObjectChanceTable table = new GameObjectChanceTable();
-			table.Weights.AddRange(TileWeights);
+			table.Weights.AddRange(this.TileWeights);
 
-			while (table.Weights.Any(x => x.Value != null && x.GetWeight(IsOnMainPath, NormalizedDepth) > 0.0f))
-				tiles.Add(table.GetRandom(RandomStream, IsOnMainPath, NormalizedDepth, null, true, true));
+			while (table.Weights.Any(x => x.Value != null && x.GetWeight(this.IsOnMainPath, this.NormalizedDepth) > 0.0f))
+				tiles.Add(table.GetRandom(this.RandomStream, this.IsOnMainPath, this.NormalizedDepth, null, true, true));
 
 			return tiles;
 		}
 
 		private IEnumerable<DoorwayPair> GetPotentialDoorwayPairsForNonFirstTile()
 		{
-			foreach (var previousDoor in PreviousTile.UnusedDoorways)
+			foreach (var previousDoor in this.PreviousTile.UnusedDoorways)
 			{
 				if (previousDoor.IsDisabled)
 					continue;
 
-				var validExits = PreviousTile.UnusedDoorways.Intersect(PreviousTile.Exits);
-				var unusedDoorways = PreviousTile.UnusedDoorways.ToArray();
+				var validExits = this.PreviousTile.UnusedDoorways.Intersect(this.PreviousTile.Exits);
+				var unusedDoorways = this.PreviousTile.UnusedDoorways.ToArray();
 
 				bool requiresSpecificExit = validExits.Any();
 
@@ -211,16 +232,16 @@ namespace DunGen
 				if (requiresSpecificExit && !validExits.Contains(previousDoor))
 					continue;
 
-				foreach (var tileWeight in TileWeights)
+				foreach (var tileWeight in this.TileWeights)
 				{
 					// This tile wasn't even considered a possibility in the tile ordering phase, skip it
-					if (!tileOrder.Contains(tileWeight))
+					if (!this.tileOrder.Contains(tileWeight))
 						continue;
 
-					var nextTile = GetTileTemplateDelegate(tileWeight.Value);
-					float weight = tileOrder.Count - tileOrder.IndexOf(tileWeight);
+					var nextTile = this.GetTileTemplateDelegate(tileWeight.Value);
+					float weight = this.tileOrder.Count - this.tileOrder.IndexOf(tileWeight);
 
-					if (IsTileAllowedPredicate != null && !IsTileAllowedPredicate(PreviousTile, nextTile, ref weight))
+					if (this.IsTileAllowedPredicate != null && !this.IsTileAllowedPredicate(this.PreviousTile, nextTile, ref weight))
 						continue;
 
 					foreach (var nextDoor in nextTile.Doorways)
@@ -237,8 +258,8 @@ namespace DunGen
 
 						float doorwayWeight = 0f;
 
-						if (IsValidDoorwayPairing(previousDoor, nextDoor, PreviousTile, nextTile, ref doorwayWeight))
-							yield return new DoorwayPair(PreviousTile, previousDoor, nextTile, nextDoor, tileWeight.TileSet, weight, doorwayWeight);
+						if (this.IsValidDoorwayPairing(previousDoor, nextDoor, this.PreviousTile, nextTile, ref doorwayWeight))
+							yield return new DoorwayPair(this.PreviousTile, previousDoor, nextTile, nextDoor, tileWeight.TileSet, weight, doorwayWeight);
 					}
 				}
 			}
@@ -246,22 +267,22 @@ namespace DunGen
 
 		private IEnumerable<DoorwayPair> GetPotentialDoorwayPairsForFirstTile()
 		{
-			foreach (var tileWeight in TileWeights)
+			foreach (var tileWeight in this.TileWeights)
 			{
 				// This tile wasn't even considered a possibility in the tile ordering phase, skip it
-				if (!tileOrder.Contains(tileWeight))
+				if (!this.tileOrder.Contains(tileWeight))
 					continue;
 
-				var nextTile = GetTileTemplateDelegate(tileWeight.Value);
-				float weight = tileWeight.GetWeight(IsOnMainPath, NormalizedDepth) * (float)RandomStream.NextDouble();
+				var nextTile = this.GetTileTemplateDelegate(tileWeight.Value);
+				float weight = tileWeight.GetWeight(this.IsOnMainPath, this.NormalizedDepth) * (float)this.RandomStream.NextDouble();
 
-				if (IsTileAllowedPredicate != null && !IsTileAllowedPredicate(PreviousTile, nextTile, ref weight))
+				if (this.IsTileAllowedPredicate != null && !this.IsTileAllowedPredicate(this.PreviousTile, nextTile, ref weight))
 					continue;
 
 				foreach (var nextDoorway in nextTile.Doorways)
 				{
-					var proposedConnection = new ProposedConnection(DungeonProxy, null, nextTile, null, nextDoorway);
-					float doorwayWeight = CalculateConnectionWeight(proposedConnection);
+					var proposedConnection = new ProposedConnection(this.DungeonProxy, null, nextTile, null, nextDoorway);
+					float doorwayWeight = this.CalculateConnectionWeight(proposedConnection);
 
 					yield return new DoorwayPair(null, null, nextTile, nextDoorway, tileWeight.TileSet, weight, doorwayWeight);
 				}
@@ -270,24 +291,24 @@ namespace DunGen
 
 		private bool IsValidDoorwayPairing(DoorwayProxy previousDoorway, DoorwayProxy nextDoorway, TileProxy previousTile, TileProxy nextTile, ref float weight)
 		{
-			var proposedConnection = new ProposedConnection(DungeonProxy, previousTile, nextTile, previousDoorway, nextDoorway);
+			var proposedConnection = new ProposedConnection(this.DungeonProxy, previousTile, nextTile, previousDoorway, nextDoorway);
 
 			// Enforce connection rules
-			if (!DungeonFlow.CanDoorwaysConnect(proposedConnection))
+			if (!this.DungeonFlow.CanDoorwaysConnect(proposedConnection))
 				return false;
 
 			// Enforce facing-direction
 			Vector3? forcedDirection = null;
 
 			// If AllowRotation has been set to false, or if the tile to be placed disallows rotation, we must force a connection from the correct direction
-			bool disallowRotation = (AllowRotation.HasValue && !AllowRotation.Value) || (nextTile != null && !nextTile.PrefabTile.AllowRotation);
+			bool disallowRotation = (this.AllowRotation.HasValue && !this.AllowRotation.Value) || (nextTile != null && !nextTile.PrefabTile.AllowRotation);
 
 			// Always enforce facing direction for vertical doorways
 			const float angleEpsilon = 1.0f;
-			if (Vector3.Angle(previousDoorway.Forward, UpVector) < angleEpsilon)
-				forcedDirection = -UpVector;
-			else if (Vector3.Angle(previousDoorway.Forward, -UpVector) < angleEpsilon)
-				forcedDirection = UpVector;
+			if (Vector3.Angle(previousDoorway.Forward, this.UpVector) < angleEpsilon)
+				forcedDirection = -this.UpVector;
+			else if (Vector3.Angle(previousDoorway.Forward, -this.UpVector) < angleEpsilon)
+				forcedDirection = this.UpVector;
 			else if (disallowRotation)
 				forcedDirection = -previousDoorway.Forward;
 
@@ -300,24 +321,24 @@ namespace DunGen
 					return false;
 			}
 
-			weight = CalculateConnectionWeight(proposedConnection);
+			weight = this.CalculateConnectionWeight(proposedConnection);
 			return weight > 0.0f;
 		}
 
 		private float CalculateConnectionWeight(ProposedConnection connection)
 		{
 			// Assign a random weight initially
-			float weight = (float)RandomStream.NextDouble();
+			float weight = (float)this.RandomStream.NextDouble();
 
-			bool straighten = shouldStraightenNextConnection &&
-				currentPathDirection != null &&
+			bool straighten = this.shouldStraightenNextConnection &&
+				this.currentPathDirection != null &&
 				connection.PreviousDoorway != null;
 
 			// Heavily weight towards doorways that keep the dungeon flowing in the same direction
 			if (straighten)
 			{
 				// Compare exit doorway direction to the current path direction
-				float dot = Vector3.Dot(currentPathDirection.Value, connection.PreviousDoorway.Forward);
+				float dot = Vector3.Dot(this.currentPathDirection.Value, connection.PreviousDoorway.Forward);
 
 				// If we're heading in the wrong direction, return a weight of 0
 				if (dot < 0.99f)

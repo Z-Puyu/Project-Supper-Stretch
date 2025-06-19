@@ -1,16 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	/// <summary>
 	/// A description of the layout of a dungeon
 	/// </summary>
 	[Serializable]
 	[CreateAssetMenu(fileName = "New Archetype", menuName = "DunGen/Dungeon Archetype", order = 700)]
-	public sealed class DungeonArchetype : ScriptableObject
+	public sealed class DungeonArchetype : ScriptableObject, ISerializationCallbackReceiver
 	{
+		#region Legacy Properties
+
+		[Obsolete("StraightenChance is deprecated. Use StraighteningSettings instead")]
+		public float StraightenChance = 0.0f;
+
+		#endregion
+
+		public static int CurrentFileVersion = 1;
+
 		/// <summary>
 		/// A collection of tile sets from which rooms will be selected to fill the dungeon
 		/// </summary>
@@ -42,19 +52,22 @@ namespace DunGen
 		/// <summary>
 		/// The chance that this archetype will produce a straight section for the main path
 		/// </summary>
-		public float StraightenChance = 0.0f;
+		public PathStraighteningSettings StraighteningSettings = new PathStraighteningSettings();
 		/// <summary>
 		/// Should DunGen attempt to prevent this archetype from appearing more than once throughout the dungeon layout?
 		/// </summary>
 		public bool Unique = false;
 
+		[SerializeField]
+		private int fileVersion = 0;
+
 
 		public bool GetHasValidBranchStartTiles()
 		{
-			if (BranchStartTileSets.Count == 0)
+			if (this.BranchStartTileSets.Count == 0)
 				return false;
 
-			foreach (var tileSet in BranchStartTileSets)
+			foreach (var tileSet in this.BranchStartTileSets)
 				if (tileSet.TileWeights.Weights.Count > 0)
 					return true;
 
@@ -63,15 +76,61 @@ namespace DunGen
 
 		public bool GetHasValidBranchCapTiles()
 		{
-			if (BranchCapTileSets.Count == 0)
+			if (this.BranchCapTileSets.Count == 0)
 				return false;
 
-			foreach (var tileSet in BranchCapTileSets)
+			foreach (var tileSet in this.BranchCapTileSets)
 				if (tileSet.TileWeights.Weights.Count > 0)
 					return true;
 
 			return false;
 		}
+
+		#region ISerializationCallbackReceiver Implementation
+
+		public void OnBeforeSerialize()
+		{
+		}
+
+		public void OnAfterDeserialize()
+		{
+			if (this == null)
+				return;
+
+			bool isDirty = false;
+
+			// Upgrade to StraighteningSettings
+			if (this.fileVersion < 1)
+			{
+				if (this.StraighteningSettings == null)
+					this.StraighteningSettings = new PathStraighteningSettings();
+
+#pragma warning disable 0618
+				if (this.StraightenChance > 0.0f)
+				{
+					this.StraighteningSettings.StraightenChance = Mathf.Clamp01(this.StraightenChance);
+					this.StraighteningSettings.OverrideStraightenChance = true;
+				}
+#pragma warning restore 0618
+
+				this.fileVersion = 1;
+				isDirty = true;
+			}
+
+#if UNITY_EDITOR
+			// Schedule to mark dirty & save
+			if (isDirty)
+			{
+				UnityEditor.EditorApplication.delayCall += () =>
+				{
+					UnityEditor.EditorUtility.SetDirty(this);
+					UnityEditor.AssetDatabase.SaveAssetIfDirty(this);
+				};
+			}
+#endif
+		}
+
+		#endregion
 	}
 
 	public enum BranchCapType : byte

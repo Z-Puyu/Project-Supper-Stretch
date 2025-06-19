@@ -1,9 +1,11 @@
-﻿using DunGen.Graph;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using DunGen.Project.External.DunGen.Code;
+using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
+using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 
-namespace DunGen.Editor.Validation.Rules
+namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Validation.Rules
 {
 	sealed class DoorwayRule : IValidationRule
 	{
@@ -17,8 +19,8 @@ namespace DunGen.Editor.Validation.Rules
 
 			public DoorwayInfo(Doorway doorway, GameObject tilePrefab)
 			{
-				Doorway = doorway;
-				TilePrefab = tilePrefab;
+				this.Doorway = doorway;
+				this.TilePrefab = tilePrefab;
 			}
 		}
 
@@ -38,10 +40,10 @@ namespace DunGen.Editor.Validation.Rules
 			foreach (var tile in tiles)
 				tileDoorways[tile] = tile.GetComponentsInChildren<Doorway>(true);
 
-			CheckDoorwayCount(flow, validator);
-			CheckDoorwayUpVectors(flow, validator, tileDoorways);
-			CheckDoorwayForwardVectorsAndPositionAlongBounds(flow, validator, tileDoorways);
-			CheckDoorwaySockets(flow, validator, tileDoorways);
+			this.CheckDoorwayCount(flow, validator);
+			this.CheckDoorwayUpVectors(flow, validator, tileDoorways);
+			this.CheckDoorwayForwardVectorsAndPositionAlongBounds(flow, validator, tileDoorways);
+			this.CheckDoorwaySockets(flow, validator, tileDoorways);
 		}
 
 		private void CheckDoorwayCount(DungeonFlow flow, DungeonValidator validator)
@@ -81,7 +83,7 @@ namespace DunGen.Editor.Validation.Rules
 					List<DoorwayInfo> doorwaySet = null;
 
 					foreach(var existingPair in doorwaysByUpVector)
-						if(Vector3.Angle(upVector, existingPair.Key) <= AngleThreshold)
+						if(Vector3.Angle(upVector, existingPair.Key) <= DoorwayRule.AngleThreshold)
 							doorwaySet = existingPair.Value;
 
 					if(doorwaySet == null)
@@ -116,17 +118,21 @@ namespace DunGen.Editor.Validation.Rules
 		{
 			foreach(var pair in tileDoorways)
 			{
-				var tile = pair.Key;
-				var bounds = UnityUtil.CalculateObjectBounds(tile, true, false);
+				var tilePrefab = pair.Key;
+				var tileComponent = tilePrefab.GetComponent<Tile>();
 
-				foreach(var doorway in pair.Value)
+				// If there's no tile component, we can't validate the doorways
+				if (tileComponent == null)
+					continue;
+
+				foreach (var doorway in pair.Value)
 				{
 					doorway.ValidateTransform(out _, out bool isAxisAligned, out bool isEdgePositioned);
 
 					if (!isAxisAligned)
-						validator.AddError("Doorway '{0}' in tile '{1}' has an invalid rotation. the forward vector is not axis-aligned", tile, doorway.name, tile.name);
+						validator.AddError("Doorway '{0}' in tile '{1}' has an invalid rotation. the forward vector is not axis-aligned", tilePrefab, doorway.name, tilePrefab.name);
 					else if (!isEdgePositioned)
-						validator.AddWarning("Doorway '{0}' in tile '{1}' is not positioned at the edge of the tile's bounding box. This could also indicate that the doorway is facing the wrong way - a doorway should be rotated such that its local z-axis is facing away from the tile", tile, doorway.name, tile.name);
+						validator.AddWarning("Doorway '{0}' in tile '{1}' is not positioned at the edge of the tile's bounding box. This could also indicate that the doorway is facing the wrong way - a doorway should be rotated such that its local z-axis is facing away from the tile", tilePrefab, doorway.name, tilePrefab.name);
 				}
 			}
 		}

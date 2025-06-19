@@ -1,8 +1,9 @@
-﻿using DunGen.Tags;
+﻿using DunGen.Project.External.DunGen.Code;
+using DunGen.Project.External.DunGen.Code.Tags;
 using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Windows
+namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 {
 	public class TagEditorWindow : EditorWindow
 	{
@@ -16,12 +17,12 @@ namespace DunGen.Editor.Windows
 
 			public Styles()
 			{
-				Header = new GUIStyle(EditorStyles.boldLabel)
+				this.Header = new GUIStyle(EditorStyles.boldLabel)
 				{
 					alignment = TextAnchor.LowerCenter
 				};
 
-				DeleteButton = new GUIStyle("IconButton")
+				this.DeleteButton = new GUIStyle("IconButton")
 				{
 					alignment = TextAnchor.MiddleCenter
 				};
@@ -34,8 +35,8 @@ namespace DunGen.Editor.Windows
 
 		public bool ShowTagIDs
 		{
-			get { return EditorPrefs.GetBool(ShowTagIDsPrefKey, false); }
-			set { EditorPrefs.SetBool(ShowTagIDsPrefKey, value); }
+			get { return EditorPrefs.GetBool(TagEditorWindow.ShowTagIDsPrefKey, false); }
+			set { EditorPrefs.SetBool(TagEditorWindow.ShowTagIDsPrefKey, value); }
 		}
 
 		private TagManager tagManager;
@@ -49,40 +50,40 @@ namespace DunGen.Editor.Windows
 
 		private void OnEnable()
 		{
-			tagManager = DunGenSettings.Instance.TagManager;
-			minSize = new Vector2(250, 250);
-			maxSize = new Vector2(600, 3000);
+			this.tagManager = DunGenSettings.Instance.TagManager;
+			this.minSize = new Vector2(250, 250);
+			this.maxSize = new Vector2(600, 3000);
 
-			editTagID = -1;
-			tagToDelete = -1;
-			hasTagIDChanged = false;
+			this.editTagID = -1;
+			this.tagToDelete = -1;
+			this.hasTagIDChanged = false;
 		}
 
 		private void OnGUI()
 		{
-			if (styles == null)
-				styles = new Styles();
+			if (this.styles == null)
+				this.styles = new Styles();
 
 			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField(string.Format("-- Tags ({0}) --", tagManager.TagCount), styles.Header);
-			ShowTagIDs = EditorGUILayout.Toggle(new GUIContent("Show IDs"), ShowTagIDs);
+			EditorGUILayout.LabelField(string.Format("-- Tags ({0}) --", this.tagManager.TagCount), this.styles.Header);
+			this.ShowTagIDs = EditorGUILayout.Toggle(new GUIContent("Show IDs"), this.ShowTagIDs);
 			EditorGUILayout.EndHorizontal();
 
-			scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+			this.scrollPosition = EditorGUILayout.BeginScrollView(this.scrollPosition);
 
-			var tags = tagManager.GetTagIDs();
+			var tags = this.tagManager.GetTagIDs();
 
 			for (int i = 0; i < tags.Length; i++)
-				DrawTag(tags[i], i);
+				this.DrawTag(tags[i], i);
 
 			EditorGUILayout.EndScrollView();
 
-			if(tagToDelete >= 0)
+			if(this.tagToDelete >= 0)
 			{
-				tagManager.RemoveTag(tagToDelete);
-				tagToDelete = -1;
+				this.tagManager.RemoveTag(this.tagToDelete);
+				this.tagToDelete = -1;
 
-				ProcessChanges();
+				this.ProcessChanges();
 			}
 
 			EditorGUILayout.Space();
@@ -90,12 +91,12 @@ namespace DunGen.Editor.Windows
 
 			if (GUILayout.Button(new GUIContent("+ Add Tag")))
 			{
-				int newTagID = tagManager.AddTag("New Tag");
+				int newTagID = this.tagManager.AddTag("New Tag");
 
 				if (newTagID >= 0)
 				{
-					SetEditTagID(newTagID);
-					ProcessChanges();
+					this.SetEditTagID(newTagID);
+					this.ProcessChanges();
 				}
 			}
 		}
@@ -103,7 +104,7 @@ namespace DunGen.Editor.Windows
 		private void DrawTag(int tagId, int index)
 		{
 			var evt = Event.current;
-			string tagName = tagManager.TryGetNameFromID(tagId);
+			string tagName = this.tagManager.TryGetNameFromID(tagId);
 
 			Color previousBackgroundColour = GUI.backgroundColor;
 
@@ -111,37 +112,37 @@ namespace DunGen.Editor.Windows
 			EditorGUILayout.BeginHorizontal("box");
 			GUI.backgroundColor = previousBackgroundColour;
 
-			if (editTagID == tagId)
+			if (this.editTagID == tagId)
 			{
 				string inputName = "Tag " + tagId.ToString();
 				bool wasEnterPressed = evt.type == EventType.KeyDown && (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter);
 
 				GUI.SetNextControlName(inputName);
-				newName = EditorGUILayout.TextField(newName);
+				this.newName = EditorGUILayout.TextField(this.newName);
 
 				var rect = GUILayoutUtility.GetLastRect();
 				bool hasClickedOut = evt.type == EventType.MouseDown && !rect.Contains(evt.mousePosition);
 
 
-				if (hasTagIDChanged)
+				if (this.hasTagIDChanged)
 				{
 					EditorGUI.FocusTextInControl(inputName);
-					hasTagIDChanged = false;
+					this.hasTagIDChanged = false;
 				}
 
 				if (wasEnterPressed || hasClickedOut)
 				{
-					tagManager.TryRenameTag(tagId, newName);
+					this.tagManager.TryRenameTag(tagId, this.newName);
 
-					SetEditTagID(-1);
-					ProcessChanges();
+					this.SetEditTagID(-1);
+					this.ProcessChanges();
 				}
 			}
 			else
 			{
 				string labelText;
 
-				if (ShowTagIDs)
+				if (this.ShowTagIDs)
 					labelText = string.Format("[{0}] {1}", tagId, tagName);
 				else
 					labelText = tagName;
@@ -154,20 +155,20 @@ namespace DunGen.Editor.Windows
 				{
 					if (rect.Contains(evt.mousePosition))
 					{
-						SetEditTagID(tagId);
-						Repaint();
+						this.SetEditTagID(tagId);
+						this.Repaint();
 					}
 				}
 			}
 
 			// Delete
 			const float deleteButtonSize = 20;
-			if (GUILayout.Button(EditorGUIUtility.IconContent("TreeEditor.Trash"), styles.DeleteButton, GUILayout.Width(deleteButtonSize), GUILayout.Height(deleteButtonSize)))
+			if (GUILayout.Button(EditorGUIUtility.IconContent("TreeEditor.Trash"), this.styles.DeleteButton, GUILayout.Width(deleteButtonSize), GUILayout.Height(deleteButtonSize)))
 			{
 				if (EditorUtility.DisplayDialog("Delete Tag?", "Are you sure you want to delete this tag?", "Delete", "Cancel"))
 				{
-					tagToDelete = tagId;
-					SetEditTagID(-1);
+					this.tagToDelete = tagId;
+					this.SetEditTagID(-1);
 				}
 			}
 
@@ -176,15 +177,15 @@ namespace DunGen.Editor.Windows
 
 		private void SetEditTagID(int id)
 		{
-			editTagID = id;
-			hasTagIDChanged = true;
-			newName = tagManager.TryGetNameFromID(id);
+			this.editTagID = id;
+			this.hasTagIDChanged = true;
+			this.newName = this.tagManager.TryGetNameFromID(id);
 		}
 
 		private void ProcessChanges()
 		{
 			EditorUtility.SetDirty(DunGenSettings.Instance);
-			Repaint();
+			this.Repaint();
 		}
 
 		#region Static Methods
@@ -192,7 +193,7 @@ namespace DunGen.Editor.Windows
 		[MenuItem("Window/DunGen/Tags")]
 		public static TagEditorWindow Open()
 		{
-			var window = GetWindow<TagEditorWindow>(true, "DunGen Tags", true);
+			var window = EditorWindow.GetWindow<TagEditorWindow>(true, "DunGen Tags", true);
 			window.Show();
 
 			return window;

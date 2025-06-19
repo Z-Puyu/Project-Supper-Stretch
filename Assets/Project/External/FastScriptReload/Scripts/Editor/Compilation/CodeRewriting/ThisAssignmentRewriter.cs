@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace FastScriptReload.Editor.Compilation.CodeRewriting
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting
 {
     class ThisAssignmentRewriter: ThisRewriterBase {
         public ThisAssignmentRewriter(bool writeRewriteReasonAsComment, bool visitIntoStructuredTrivia = false) 
@@ -12,7 +12,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
         public override SyntaxNode VisitThisExpression(ThisExpressionSyntax node)
         {
             if (node.Parent is AssignmentExpressionSyntax) {
-                return CreateCastedThisExpression(node);
+                return this.CreateCastedThisExpression(node);
             }
 
             return base.VisitThisExpression(node);

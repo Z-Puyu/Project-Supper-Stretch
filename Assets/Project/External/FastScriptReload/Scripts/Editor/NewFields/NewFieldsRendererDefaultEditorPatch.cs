@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using FastScriptReload.Editor.Compilation.CodeRewriting;
-using FastScriptReload.Runtime;
-using FastScriptReload.Scripts.Runtime;
 using HarmonyLib;
 using ImmersiveVRTools.Editor.Common.Utilities;
+using Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting;
+using Project.External.FastScriptReload.Scripts.Runtime;
 using UnityEditor;
 using UnityEngine;
 
-namespace FastScriptReload.Editor.NewFields
+namespace Project.External.FastScriptReload.Scripts.Editor.NewFields
 {
     [InitializeOnLoad]
     public class NewFieldsRendererDefaultEditorPatch
@@ -21,11 +20,11 @@ namespace FastScriptReload.Editor.NewFields
             {
                 var harmony = new Harmony(nameof(NewFieldsRendererDefaultEditorPatch));
             
-                var renderAdditionalFieldsOnOptimizedGuiPostfix = AccessTools.Method(typeof(NewFieldsRendererDefaultEditorPatch), nameof(OnOptimizedInspectorGUI));
+                var renderAdditionalFieldsOnOptimizedGuiPostfix = AccessTools.Method(typeof(NewFieldsRendererDefaultEditorPatch), nameof(NewFieldsRendererDefaultEditorPatch.OnOptimizedInspectorGUI));
                 var noCustomEditorOriginalRenderingMethdod =  AccessTools.Method("UnityEditor.GenericInspector:OnOptimizedInspectorGUI");
                 harmony.Patch(noCustomEditorOriginalRenderingMethdod, postfix: new HarmonyMethod(renderAdditionalFieldsOnOptimizedGuiPostfix));
             
-                var renderAdditionalFieldsDrawDefaultInspectorPostfix = AccessTools.Method(typeof(NewFieldsRendererDefaultEditorPatch), nameof(DrawDefaultInspector));
+                var renderAdditionalFieldsDrawDefaultInspectorPostfix = AccessTools.Method(typeof(NewFieldsRendererDefaultEditorPatch), nameof(NewFieldsRendererDefaultEditorPatch.DrawDefaultInspector));
                 var customEditorRenderingMethod = AccessTools.Method("UnityEditor.Editor:DrawDefaultInspector");
                 harmony.Patch(customEditorRenderingMethod, postfix: new HarmonyMethod(renderAdditionalFieldsDrawDefaultInspectorPostfix)); 
 
@@ -47,12 +46,12 @@ namespace FastScriptReload.Editor.NewFields
 
         private static void OnOptimizedInspectorGUI(Rect contentRect, UnityEditor.Editor __instance)
         {
-            RenderNewlyAddedFields(__instance);
+            NewFieldsRendererDefaultEditorPatch.RenderNewlyAddedFields(__instance);
         }
         
         private static void DrawDefaultInspector(UnityEditor.Editor __instance)
         {
-            RenderNewlyAddedFields(__instance);
+            NewFieldsRendererDefaultEditorPatch.RenderNewlyAddedFields(__instance);
         }
 
         private static void RenderNewlyAddedFields(UnityEditor.Editor __instance)
@@ -72,7 +71,7 @@ namespace FastScriptReload.Editor.NewFields
 
                     try
                     {
-                        _cachedKeys.AddRange(addedFieldValues.Keys); //otherwise collection changed exception can happen
+                        NewFieldsRendererDefaultEditorPatch._cachedKeys.AddRange(addedFieldValues.Keys); //otherwise collection changed exception can happen
 
                         var newFieldNameToGetTypeFn = CreateNewFieldInitMethodRewriter.ResolveNewFieldsToTypeFn(
                             AssemblyChangesLoader.Instance.GetRedirectedType(__instance.target.GetType())
@@ -81,7 +80,7 @@ namespace FastScriptReload.Editor.NewFields
                         if(newFieldNameToGetTypeFn.Count == 0)
                             return;
                         
-                        foreach (var addedFieldValueKey in _cachedKeys)
+                        foreach (var addedFieldValueKey in NewFieldsRendererDefaultEditorPatch._cachedKeys)
                         {
                             var newFieldType = (Type)newFieldNameToGetTypeFn[addedFieldValueKey]();
 
@@ -131,7 +130,7 @@ namespace FastScriptReload.Editor.NewFields
                     }
                     finally
                     {
-                        _cachedKeys.Clear();
+                        NewFieldsRendererDefaultEditorPatch._cachedKeys.Clear();
                     }
                 }
             }

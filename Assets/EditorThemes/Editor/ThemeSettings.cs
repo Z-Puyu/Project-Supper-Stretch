@@ -1,12 +1,12 @@
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
+using UnityEditor;
+using UnityEngine;
 
 //to do TextColor
 //EditorStyles.label.normal.textColor 
 
-namespace ThemesPlugin
+namespace EditorThemes.Editor
 {
 
     public class ThemeSettings : EditorWindow
@@ -70,13 +70,13 @@ namespace ThemesPlugin
                 }
             }
             
-            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+            this.scrollPosition = EditorGUILayout.BeginScrollView(this.scrollPosition);
             
             EditorGUILayout.LabelField("");
             EditorGUILayout.LabelField("Dark & Light Themes:");
             foreach (CustomTheme ct in BothThemes)
             {
-                DisplayGUIThemeItem(ct);
+                this.DisplayGUIThemeItem(ct);
             }
 
 
@@ -84,13 +84,13 @@ namespace ThemesPlugin
             EditorGUILayout.LabelField("Dark Themes:");
             foreach(CustomTheme ct in DarkThemes)
             {
-                DisplayGUIThemeItem(ct);
+                this.DisplayGUIThemeItem(ct);
             }
             EditorGUILayout.LabelField("");
             EditorGUILayout.LabelField("Light Themes:");
             foreach (CustomTheme ct in LightThemes)
             {
-                DisplayGUIThemeItem(ct);
+                this.DisplayGUIThemeItem(ct);
             }
 
             EditorGUILayout.EndScrollView();

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DoubleL
+namespace Project.External.DoubleL.Demo
 {
     public class DemoCameraController : MonoBehaviour
     {
@@ -15,38 +15,38 @@ namespace DoubleL
 
             public void SetFromTransform(Transform t)
             {
-                pitch = t.eulerAngles.x;
-                yaw = t.eulerAngles.y;
-                roll = t.eulerAngles.z;
-                x = t.position.x;
-                y = t.position.y;
-                z = t.position.z;
+                this.pitch = t.eulerAngles.x;
+                this.yaw = t.eulerAngles.y;
+                this.roll = t.eulerAngles.z;
+                this.x = t.position.x;
+                this.y = t.position.y;
+                this.z = t.position.z;
             }
 
             public void Translate(Vector3 translation)
             {
-                Vector3 rotatedTranslation = Quaternion.Euler(pitch, yaw, roll) * translation;
+                Vector3 rotatedTranslation = Quaternion.Euler(this.pitch, this.yaw, this.roll) * translation;
 
-                x += rotatedTranslation.x;
-                y += rotatedTranslation.y;
-                z += rotatedTranslation.z;
+                this.x += rotatedTranslation.x;
+                this.y += rotatedTranslation.y;
+                this.z += rotatedTranslation.z;
             }
 
             public void LerpTowards(CameraState target, float positionLerpPct, float rotationLerpPct)
             {
-                yaw = Mathf.Lerp(yaw, target.yaw, rotationLerpPct);
-                pitch = Mathf.Lerp(pitch, target.pitch, rotationLerpPct);
-                roll = Mathf.Lerp(roll, target.roll, rotationLerpPct);
+                this.yaw = Mathf.Lerp(this.yaw, target.yaw, rotationLerpPct);
+                this.pitch = Mathf.Lerp(this.pitch, target.pitch, rotationLerpPct);
+                this.roll = Mathf.Lerp(this.roll, target.roll, rotationLerpPct);
 
-                x = Mathf.Lerp(x, target.x, positionLerpPct);
-                y = Mathf.Lerp(y, target.y, positionLerpPct);
-                z = Mathf.Lerp(z, target.z, positionLerpPct);
+                this.x = Mathf.Lerp(this.x, target.x, positionLerpPct);
+                this.y = Mathf.Lerp(this.y, target.y, positionLerpPct);
+                this.z = Mathf.Lerp(this.z, target.z, positionLerpPct);
             }
 
             public void UpdateTransform(Transform t)
             {
-                t.eulerAngles = new Vector3(pitch, yaw, roll);
-                t.position = new Vector3(x, y, z);
+                t.eulerAngles = new Vector3(this.pitch, this.yaw, this.roll);
+                t.position = new Vector3(this.x, this.y, this.z);
             }
         }
 
@@ -67,8 +67,8 @@ namespace DoubleL
 
         void OnEnable()
         {
-            m_TargetCameraState.SetFromTransform(transform);
-            m_InterpolatingCameraState.SetFromTransform(transform);
+            this.m_TargetCameraState.SetFromTransform(this.transform);
+            this.m_InterpolatingCameraState.SetFromTransform(this.transform);
         }
 
         Vector3 GetInputTranslationDirection()
@@ -124,31 +124,31 @@ namespace DoubleL
             
             if (Input.GetMouseButton(1))
             {
-                var mouseMovement = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y") * (invertY ? 1 : -1));
+                var mouseMovement = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y") * (this.invertY ? 1 : -1));
 
-                var mouseSensitivityFactor = mouseSensitivityCurve.Evaluate(mouseMovement.magnitude);
+                var mouseSensitivityFactor = this.mouseSensitivityCurve.Evaluate(mouseMovement.magnitude);
 
-                m_TargetCameraState.yaw += mouseMovement.x * mouseSensitivityFactor;
-                m_TargetCameraState.pitch += mouseMovement.y * mouseSensitivityFactor;
+                this.m_TargetCameraState.yaw += mouseMovement.x * mouseSensitivityFactor;
+                this.m_TargetCameraState.pitch += mouseMovement.y * mouseSensitivityFactor;
             }
             
-            var translation = GetInputTranslationDirection() * Time.deltaTime;
+            var translation = this.GetInputTranslationDirection() * Time.deltaTime;
                         
             if (Input.GetKey(KeyCode.LeftShift))
             {
                 translation *= 10.0f;
             }
 
-            boost += Input.mouseScrollDelta.y * 0.2f;
-            translation *= Mathf.Pow(2.0f, boost);
+            this.boost += Input.mouseScrollDelta.y * 0.2f;
+            translation *= Mathf.Pow(2.0f, this.boost);
 
-            m_TargetCameraState.Translate(translation);
+            this.m_TargetCameraState.Translate(translation);
 
-            var positionLerpPct = 1f - Mathf.Exp((Mathf.Log(1f - 0.99f) / positionLerpTime) * Time.deltaTime);
-            var rotationLerpPct = 1f - Mathf.Exp((Mathf.Log(1f - 0.99f) / rotationLerpTime) * Time.deltaTime);
-            m_InterpolatingCameraState.LerpTowards(m_TargetCameraState, positionLerpPct, rotationLerpPct);
+            var positionLerpPct = 1f - Mathf.Exp((Mathf.Log(1f - 0.99f) / this.positionLerpTime) * Time.deltaTime);
+            var rotationLerpPct = 1f - Mathf.Exp((Mathf.Log(1f - 0.99f) / this.rotationLerpTime) * Time.deltaTime);
+            this.m_InterpolatingCameraState.LerpTowards(this.m_TargetCameraState, positionLerpPct, rotationLerpPct);
 
-            m_InterpolatingCameraState.UpdateTransform(transform);
+            this.m_InterpolatingCameraState.UpdateTransform(this.transform);
         }
     }
 }

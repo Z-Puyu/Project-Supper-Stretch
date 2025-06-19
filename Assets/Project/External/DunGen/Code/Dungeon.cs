@@ -1,35 +1,64 @@
-﻿using DunGen.Graph;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
+using DunGen.Project.External.DunGen.Code.Generation;
+using DunGen.Project.External.DunGen.Code.Graph;
+using DunGen.Project.External.DunGen.Code.Tags;
+using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
+	public delegate void DungeonTileInstantiatedDelegate(Dungeon dungeon, Tile newTile, int currentTileCount, int totalTileCount);
+
 	public class Dungeon : MonoBehaviour
 	{
+		public static event DungeonTileInstantiatedDelegate TileInstantiated;
+
+		#region Nestes Types
+
+		public sealed class Branch
+		{
+			public int Index { get; }
+			public ReadOnlyCollection<Tile> Tiles { get; }
+
+			public Branch(int index, List<Tile> tiles)
+			{
+				this.Index = index;
+				this.Tiles = new ReadOnlyCollection<Tile>(tiles);
+			}
+		}
+
+		#endregion
+
 		/// <summary>
 		/// World-space bounding box of the entire dungeon
 		/// </summary>
 		public Bounds Bounds { get; protected set; }
+
 		/// <summary>
 		/// The dungeon flow asset used to generate this dungeon
 		/// </summary>
 		public DungeonFlow DungeonFlow
 		{
-			get => dungeonFlow;
-			set => dungeonFlow = value;
+			get => this.dungeonFlow;
+			set => this.dungeonFlow = value;
 		}
+
 		/// <summary>
 		/// Should we render debug information about the dungeon
 		/// </summary>
 		public bool DebugRender = false;
 
-		public ReadOnlyCollection<Tile> AllTiles { get; private set; }
-		public ReadOnlyCollection<Tile> MainPathTiles { get; private set; }
-		public ReadOnlyCollection<Tile> BranchPathTiles { get; private set; }
-		public ReadOnlyCollection<GameObject> Doors { get; private set; }
-		public ReadOnlyCollection<DoorwayConnection> Connections { get; private set; }
+		public ReadOnlyCollection<Tile> AllTiles { get; }
+		public ReadOnlyCollection<Tile> MainPathTiles { get; }
+		public ReadOnlyCollection<Tile> BranchPathTiles { get; }
+		public ReadOnlyCollection<GameObject> Doors { get; }
+		public ReadOnlyCollection<DoorwayConnection> Connections { get; }
+		public ReadOnlyCollection<Branch> Branches { get; }
 		public DungeonGraph ConnectionGraph { get; private set; }
 
 		[SerializeField]
@@ -46,15 +75,18 @@ namespace DunGen
 		private List<DoorwayConnection> connections = new List<DoorwayConnection>();
 		[SerializeField]
 		private Tile attachmentTile;
+		[SerializeField]
+		private List<Branch> branches = new List<Branch>();
 
 
 		public Dungeon()
 		{
-			AllTiles = new ReadOnlyCollection<Tile>(allTiles);
-			MainPathTiles = new ReadOnlyCollection<Tile>(mainPathTiles);
-			BranchPathTiles = new ReadOnlyCollection<Tile>(branchPathTiles);
-			Doors = new ReadOnlyCollection<GameObject>(doors);
-			Connections = new ReadOnlyCollection<DoorwayConnection>(connections);
+			this.AllTiles = new ReadOnlyCollection<Tile>(this.allTiles);
+			this.MainPathTiles = new ReadOnlyCollection<Tile>(this.mainPathTiles);
+			this.BranchPathTiles = new ReadOnlyCollection<Tile>(this.branchPathTiles);
+			this.Doors = new ReadOnlyCollection<GameObject>(this.doors);
+			this.Connections = new ReadOnlyCollection<DoorwayConnection>(this.connections);
+			this.Branches = new ReadOnlyCollection<Branch>(this.branches);
 		}
 
 		private void Start()
@@ -62,70 +94,100 @@ namespace DunGen
 			// If there are already tiles and the connection graph isn't initialised yet,
 			// this script is likely already present in the scene (from generating the dungeon in-editor).
 			// We just need to finalise the dungeon info from data we already have available
-			if(allTiles.Count > 0 && ConnectionGraph == null)
-				FinaliseDungeonInfo();
+			if (this.allTiles.Count > 0 && this.ConnectionGraph == null)
+				this.FinaliseDungeonInfo();
 		}
+
+		public IEnumerable<Tile> FindTilesWithTag(Tag tag) => this.allTiles.Where(t => t.Tags.HasTag(tag));
+
+		public IEnumerable<Tile> FindTilesWithAnyTag(params Tag[] tags) => this.allTiles.Where(t => t.Tags.HasAnyTag(tags));
+
+		public IEnumerable<Tile> FindTilesWithAllTags(params Tag[] tags) => this.allTiles.Where(t => t.Tags.HasAllTags(tags));
 
 		internal void AddAdditionalDoor(Door door)
 		{
 			if (door != null)
-				doors.Add(door.gameObject);
+				this.doors.Add(door.gameObject);
 		}
 
 		internal void PreGenerateDungeon(DungeonGenerator dungeonGenerator)
 		{
-			DungeonFlow = dungeonGenerator.DungeonFlow;
+			this.DungeonFlow = dungeonGenerator.DungeonFlow;
 		}
 
 		internal void PostGenerateDungeon(DungeonGenerator dungeonGenerator)
 		{
-			FinaliseDungeonInfo();
+			this.FinaliseDungeonInfo();
 		}
 
 		private void FinaliseDungeonInfo()
 		{
 			var additionalTiles = new List<Tile>();
 
-			if (attachmentTile != null)
-				additionalTiles.Add(attachmentTile);
+			if (this.attachmentTile != null)
+				additionalTiles.Add(this.attachmentTile);
 
-			ConnectionGraph = new DungeonGraph(this, additionalTiles);
-			Bounds = UnityUtil.CombineBounds(allTiles.Select(x => x.Placement.Bounds).ToArray());
+			this.ConnectionGraph = new DungeonGraph(this, additionalTiles);
+			this.Bounds = UnityUtil.CombineBounds(this.allTiles.Select(x => x.Placement.Bounds).ToArray());
+			this.GatherBranches();
 		}
 
-		public void Clear()
+		/// <summary>
+		/// Gathers all branches into lists for easy access
+		/// </summary>
+		private void GatherBranches()
 		{
-			// Destroy all tiles
-			foreach (var tile in allTiles)
+			var branchTiles = new Dictionary<int, List<Tile>>();
+
+			// Gather branch tiles
+			foreach (var branchTile in this.branchPathTiles)
 			{
-				// Clean up any door prefabs first
-				foreach (var doorway in tile.UsedDoorways)
+				int branchIndex = branchTile.Placement.BranchId;
+
+				if(!branchTiles.TryGetValue(branchIndex, out var branchTileList))
 				{
-					if (doorway.UsedDoorPrefabInstance != null)
-						UnityUtil.Destroy(doorway.UsedDoorPrefabInstance);
+					branchTileList = new List<Tile>();
+					branchTiles[branchIndex] = branchTileList;
 				}
 
-				UnityUtil.Destroy(tile.gameObject);
+				branchTileList.Add(branchTile);
 			}
 
-			// Destroy anything else attached to this dungeon
-			for (int i = 0; i < transform.childCount; i++)
+			// Create branch objects
+			foreach (var kvp in branchTiles)
 			{
-				GameObject child = transform.GetChild(i).gameObject;
+				int index = kvp.Key;
+				var tiles = kvp.Value;
+
+				this.branches.Add(new Branch(index, tiles));
+			}
+		}
+
+		public void Clear(Action<Tile> destroyTileDelegate)
+		{
+			// Destroy all tiles
+			foreach (var tile in this.allTiles)
+				destroyTileDelegate(tile);
+
+			// Destroy anything else attached to this dungeon
+			for (int i = 0; i < this.transform.childCount; i++)
+			{
+				GameObject child = this.transform.GetChild(i).gameObject;
 				UnityUtil.Destroy(child);
 			}
 
-			allTiles.Clear();
-			mainPathTiles.Clear();
-			branchPathTiles.Clear();
-			doors.Clear();
-			connections.Clear();
-			attachmentTile = null;
+			this.allTiles.Clear();
+			this.mainPathTiles.Clear();
+			this.branchPathTiles.Clear();
+			this.doors.Clear();
+			this.connections.Clear();
+			this.branches.Clear();
+			this.attachmentTile = null;
 		}
 
 		public Doorway GetConnectedDoorway(Doorway doorway)
 		{
-			foreach (var conn in connections)
+			foreach (var conn in this.connections)
 				if (conn.A == doorway)
 					return conn.B;
 				else if (conn.B == doorway)
@@ -134,9 +196,12 @@ namespace DunGen
 			return null;
 		}
 
-		public void FromProxy(DungeonProxy proxyDungeon, DungeonGenerator generator)
+		public IEnumerator FromProxy(DungeonProxy proxyDungeon,
+			DungeonGenerator generator,
+			TileInstanceSource tileInstanceSource,
+			Func<bool> shouldSkipFrame)
 		{
-			Clear();
+			this.Clear(tileInstanceSource.DespawnTile);
 
 			var proxyToTileMap = new Dictionary<TileProxy, Tile>();
 
@@ -146,25 +211,23 @@ namespace DunGen
 			{
 				// We need to manually inject the dummy TileProxy used to connect to a Tile in the previous dungeon
 				var attachmentProxy = generator.AttachmentSettings.TileProxy;
-				attachmentTile = generator.AttachmentSettings.GetAttachmentTile();
-				proxyToTileMap[attachmentProxy] = attachmentTile;
+				this.attachmentTile = generator.AttachmentSettings.GetAttachmentTile();
+				proxyToTileMap[attachmentProxy] = this.attachmentTile;
 
 				// We also need to manually process the doorway in the other dungeon
 				var usedDoorwayProxy = attachmentProxy.UsedDoorways.First();
-				var usedDoorway = attachmentTile.AllDoorways[usedDoorwayProxy.Index];
+				var usedDoorway = this.attachmentTile.AllDoorways[usedDoorwayProxy.Index];
 
 				usedDoorway.ProcessDoorwayObjects(true, generator.RandomStream);
 
-				attachmentTile.UsedDoorways.Add(usedDoorway);
-				attachmentTile.UnusedDoorways.Remove(usedDoorway);
+				this.attachmentTile.UsedDoorways.Add(usedDoorway);
+				this.attachmentTile.UnusedDoorways.Remove(usedDoorway);
 			}
 
 			foreach (var tileProxy in proxyDungeon.AllTiles)
 			{
 				// Instantiate & re-position tile
-				var tileObj = GameObject.Instantiate(tileProxy.Prefab, generator.Root.transform);
-				tileObj.transform.localPosition = tileProxy.Placement.Position;
-				tileObj.transform.localRotation = tileProxy.Placement.Rotation;
+				var tileObj = tileInstanceSource.SpawnTile(tileProxy.PrefabTile, tileProxy.Placement.Position, tileProxy.Placement.Rotation);
 
 				// Add tile to lists
 				var tile = tileObj.GetComponent<Tile>();
@@ -172,15 +235,15 @@ namespace DunGen
 				tile.Placement = new TilePlacementData(tileProxy.Placement);
 				tile.Prefab = tileProxy.Prefab;
 				proxyToTileMap[tileProxy] = tile;
-				allTiles.Add(tile);
+				this.allTiles.Add(tile);
 
 				// Now that the tile is actually attached to the root object, we need to update our transform to match
 				tile.Placement.SetPositionAndRotation(tileObj.transform.position, tileObj.transform.rotation);
 
 				if (tile.Placement.IsOnMainPath)
-					mainPathTiles.Add(tile);
+					this.mainPathTiles.Add(tile);
 				else
-					branchPathTiles.Add(tile);
+					this.branchPathTiles.Add(tile);
 
 				// Place trigger volume
 				if (generator.PlaceTileTriggers)
@@ -194,6 +257,9 @@ namespace DunGen
 
 				foreach (var doorway in allDoorways)
 				{
+					if (tile.AllDoorways.Contains(doorway))
+						continue;
+
 					doorway.Tile = tile;
 					doorway.placedByGenerator = true;
 					doorway.HideConditionalObjects = false;
@@ -216,10 +282,16 @@ namespace DunGen
 
 					doorway.ProcessDoorwayObjects(false, generator.RandomStream);
 				}
+
+				// Let the user know a new tile has been instantiated
+				Dungeon.TileInstantiated?.Invoke(this, tile, this.allTiles.Count, proxyDungeon.AllTiles.Count);
+
+				if (shouldSkipFrame != null && shouldSkipFrame())
+					yield return null;
 			}
 
 			// Add doorway connections
-			foreach(var proxyConn in proxyDungeon.Connections)
+			foreach (var proxyConn in proxyDungeon.Connections)
 			{
 				var tileA = proxyToTileMap[proxyConn.A.TileProxy];
 				var tileB = proxyToTileMap[proxyConn.B.TileProxy];
@@ -231,9 +303,9 @@ namespace DunGen
 				doorB.ConnectedDoorway = doorA;
 
 				var conn = new DoorwayConnection(doorA, doorB);
-				connections.Add(conn);
+				this.connections.Add(conn);
 
-				SpawnDoorPrefab(doorA, doorB, generator.RandomStream);
+				this.SpawnDoorPrefab(doorA, doorB, generator.RandomStream);
 			}
 		}
 
@@ -273,12 +345,14 @@ namespace DunGen
 			if (doorPrefab != null)
 			{
 				GameObject door = Instantiate(doorPrefab, chosenDoor.transform);
-				door.transform.localPosition = Vector3.zero;
+				door.transform.localPosition = chosenDoor.DoorPrefabPositionOffset;
 
-				if (!chosenDoor.AvoidRotatingDoorPrefab)
-					door.transform.localRotation = Quaternion.identity;
+				if (chosenDoor.AvoidRotatingDoorPrefab)
+					door.transform.rotation = Quaternion.Euler(chosenDoor.DoorPrefabRotationOffset);
+				else
+					door.transform.localRotation = Quaternion.Euler(chosenDoor.DoorPrefabRotationOffset);
 
-				doors.Add(door);
+				this.doors.Add(door);
 
 				DungeonUtil.AddAndSetupDoorComponent(this, door, chosenDoor);
 
@@ -289,8 +363,8 @@ namespace DunGen
 
 		public void OnDrawGizmos()
 		{
-			if (DebugRender)
-				DebugDraw();
+			if (this.DebugRender)
+				this.DebugDraw();
 		}
 
 		public void DebugDraw()
@@ -301,7 +375,7 @@ namespace DunGen
 			Color branchPathEndColour = new Color(0.5f, 0, 0.5f);
 			float boundsBoxOpacity = 0.75f;
 
-			foreach (var tile in allTiles)
+			foreach (var tile in this.allTiles)
 			{
 				Bounds bounds = tile.Placement.Bounds;
 				bounds.size = bounds.size * 1.01f;
@@ -314,7 +388,6 @@ namespace DunGen
 				Gizmos.color = tileColour;
 
 				Gizmos.DrawCube(bounds.center, bounds.size);
-
 			}
 		}
 	}

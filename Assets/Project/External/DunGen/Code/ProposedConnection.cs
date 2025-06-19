@@ -1,4 +1,4 @@
-﻿namespace DunGen
+﻿namespace DunGen.Project.External.DunGen.Code
 {
 	public readonly struct ProposedConnection
 	{
@@ -11,11 +11,11 @@
 
 		public ProposedConnection(DungeonProxy proxyDungeon, TileProxy previousTile, TileProxy nextTile, DoorwayProxy previousDoorway, DoorwayProxy nextDoorway)
 		{
-			ProxyDungeon = proxyDungeon;
-			PreviousTile = previousTile;
-			NextTile = nextTile;
-			PreviousDoorway = previousDoorway;
-			NextDoorway = nextDoorway;
+			this.ProxyDungeon = proxyDungeon;
+			this.PreviousTile = previousTile;
+			this.NextTile = nextTile;
+			this.PreviousDoorway = previousDoorway;
+			this.NextDoorway = nextDoorway;
 		}
 	}
 }

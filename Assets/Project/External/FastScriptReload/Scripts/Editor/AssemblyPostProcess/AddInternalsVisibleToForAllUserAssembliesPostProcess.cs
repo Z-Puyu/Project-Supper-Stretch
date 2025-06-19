@@ -4,7 +4,7 @@ using Mono.Cecil;
 using UnityEditor;
 using UnityEngine;
 
-namespace FastScriptReload.Editor.AssemblyPostProcess
+namespace Project.External.FastScriptReload.Scripts.Editor.AssemblyPostProcess
 {
     [InitializeOnLoad]
     public static class AddInternalsVisibleToForAllUserAssembliesPostProcess 
@@ -13,13 +13,13 @@ namespace FastScriptReload.Editor.AssemblyPostProcess
 
         static AddInternalsVisibleToForAllUserAssembliesPostProcess()
         {
-            AdjustedAssemblyRoot = new DirectoryInfo(Path.Combine(Application.dataPath, "..", "Temp", "Fast Script Reload", "AdjustedDlls"));
+            AddInternalsVisibleToForAllUserAssembliesPostProcess.AdjustedAssemblyRoot = new DirectoryInfo(Path.Combine(Application.dataPath, "..", "Temp", "Fast Script Reload", "AdjustedDlls"));
         }
         
         public static string CreateAssemblyWithInternalsContentsVisibleTo(Assembly changedAssembly, string visibleToAssemblyName)
         {
-            if(!AdjustedAssemblyRoot.Exists)
-                    AdjustedAssemblyRoot.Create();
+            if(!AddInternalsVisibleToForAllUserAssembliesPostProcess.AdjustedAssemblyRoot.Exists)
+                    AddInternalsVisibleToForAllUserAssembliesPostProcess.AdjustedAssemblyRoot.Create();
 
             using (var assembly = AssemblyDefinition.ReadAssembly(changedAssembly.Location, new ReaderParameters { ReadWrite = false }))
             {
@@ -36,7 +36,7 @@ namespace FastScriptReload.Editor.AssemblyPostProcess
 
                 assembly.CustomAttributes.Add(attribute);
                 
-                var newAssemblyPath = new FileInfo(Path.Combine(AdjustedAssemblyRoot.FullName, assembly.Name.Name) + ".dll").FullName;
+                var newAssemblyPath = new FileInfo(Path.Combine(AddInternalsVisibleToForAllUserAssembliesPostProcess.AdjustedAssemblyRoot.FullName, assembly.Name.Name) + ".dll").FullName;
                 assembly.Write(newAssemblyPath);
 
                 return newAssemblyPath;

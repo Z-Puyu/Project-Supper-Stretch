@@ -1,6 +1,7 @@
-﻿using UnityEditor;
+﻿using DunGen.Project.External.DunGen.Code;
+using UnityEditor;
 
-namespace DunGen.Editor
+namespace DunGen.Editor.Project.External.DunGen.Code.Editor
 {
 	public sealed class CreateDunGenSettings : AssetPostprocessor
 	{

@@ -1,10 +1,12 @@
-using UnityEngine;
+using System;
+using System.Linq;
+using DunGen.Editor.Project.External.DunGen.Code.Editor.Utility;
+using DunGen.Project.External.DunGen.Code;
 using UnityEditor;
 using UnityEditorInternal;
-using System.Linq;
-using System;
+using UnityEngine;
 
-namespace DunGen.Editor
+namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 {
 	[CustomEditor(typeof(Doorway))]
 	[CanEditMultipleObjects]
@@ -20,6 +22,8 @@ namespace DunGen.Editor
 		private static readonly GUIContent doorPrefabLabel = new GUIContent("Random Prefab Weights", "When this doorway is in use (connected), a single prefab will be spawned from this list (and the connected doorway) at random");
 		private static readonly GUIContent blockerPrefabLabel = new GUIContent("Random Prefab Weights", "When this doorway is NOT in use (unconnected), a single prefab will be spawned from this list (and the connected doorway) at random");
 		private static readonly GUIContent avoidRotationLabel = new GUIContent("Avoid Rotation?", "If checked, the placed prefab will NOT be oriented to match the doorway");
+		private static readonly GUIContent prefabPositionOffsetLabel = new GUIContent("Position Offset", "An optional position offset to apply when spawning this prefab, relative to the doorway's transform");
+		private static readonly GUIContent prefabRotationOffsetLabel = new GUIContent("Rotation Offset", "An optional rotation offset to apply when spawning this prefab, reltative to the doorway's transform");
 		private static readonly GUIContent connectorsLabel = new GUIContent("Connectors", "In-scene objects and prefabs used when the doorway is in use (connected)");
 		private static readonly GUIContent blockersLabel = new GUIContent("Blockers", "In-scene objects and prefabs used when the doorway is not in use (not connected)");
 		private static readonly GUIContent tagsLabel = new GUIContent("Tags", "A collection of tags that can be used in code to define custom connection logic (see DoorwayPairFinder.CustomConnectionRules)");
@@ -30,7 +34,11 @@ namespace DunGen.Editor
 		private SerializedProperty hideConditionalObjectsProp;
 		private SerializedProperty priorityProp;
 		private SerializedProperty avoidDoorPrefabRotationProp;
+		private SerializedProperty doorPrefabPositionOffsetProp;
+		private SerializedProperty doorPrefabRotationOffsetProp;
 		private SerializedProperty avoidBlockerPrefabRotationProp;
+		private SerializedProperty blockerPrefabPositionOffsetProp;
+		private SerializedProperty blockerPrefabRotationOffsetProp;
 		private SerializedProperty tagsProp;
 		private ReorderableList connectorSceneObjectsList;
 		private ReorderableList blockerSceneObjectsList;
@@ -40,31 +48,35 @@ namespace DunGen.Editor
 
 		private void OnEnable()
 		{
-			socketProp = serializedObject.FindProperty("socket");
-			hideConditionalObjectsProp = serializedObject.FindProperty("hideConditionalObjects");
-			priorityProp = serializedObject.FindProperty("DoorPrefabPriority");
-			avoidDoorPrefabRotationProp = serializedObject.FindProperty("AvoidRotatingDoorPrefab");
-			avoidBlockerPrefabRotationProp = serializedObject.FindProperty("AvoidRotatingBlockerPrefab");
-			tagsProp = serializedObject.FindProperty("Tags");
+			this.socketProp = this.serializedObject.FindProperty("socket");
+			this.hideConditionalObjectsProp = this.serializedObject.FindProperty("hideConditionalObjects");
+			this.priorityProp = this.serializedObject.FindProperty(nameof(Doorway.DoorPrefabPriority));
+			this.avoidDoorPrefabRotationProp = this.serializedObject.FindProperty(nameof(Doorway.AvoidRotatingDoorPrefab));
+			this.doorPrefabPositionOffsetProp = this.serializedObject.FindProperty(nameof(Doorway.DoorPrefabPositionOffset));
+			this.doorPrefabRotationOffsetProp = this.serializedObject.FindProperty(nameof(Doorway.DoorPrefabRotationOffset));
+			this.avoidBlockerPrefabRotationProp = this.serializedObject.FindProperty(nameof(Doorway.AvoidRotatingBlockerPrefab));
+			this.blockerPrefabPositionOffsetProp = this.serializedObject.FindProperty(nameof(Doorway.BlockerPrefabPositionOffset));
+			this.blockerPrefabRotationOffsetProp = this.serializedObject.FindProperty(nameof(Doorway.BlockerPrefabRotationOffset));
+			this.tagsProp = this.serializedObject.FindProperty(nameof(Doorway.Tags));
 
 
-			connectorSceneObjectsList = new ReorderableList(serializedObject, serializedObject.FindProperty("ConnectorSceneObjects"), true, true, true, true);
-			connectorSceneObjectsList.drawElementCallback = (rect, index, isActive, isFocused) => DrawGameObject(connectorSceneObjectsList, rect, index, true);
-			connectorSceneObjectsList.drawHeaderCallback = (rect) => EditorGUI.LabelField(rect, connectorSceneObjectsLabel);
+			this.connectorSceneObjectsList = new ReorderableList(this.serializedObject, this.serializedObject.FindProperty(nameof(Doorway.ConnectorSceneObjects)), true, true, true, true);
+			this.connectorSceneObjectsList.drawElementCallback = (rect, index, isActive, isFocused) => this.DrawGameObject(this.connectorSceneObjectsList, rect, index, true);
+			this.connectorSceneObjectsList.drawHeaderCallback = (rect) => EditorGUI.LabelField(rect, DoorwayInspector.connectorSceneObjectsLabel);
 
-			blockerSceneObjectsList = new ReorderableList(serializedObject, serializedObject.FindProperty("BlockerSceneObjects"), true, true, true, true);
-			blockerSceneObjectsList.drawElementCallback = (rect, index, isActive, isFocused) => DrawGameObject(blockerSceneObjectsList, rect, index, true);
-			blockerSceneObjectsList.drawHeaderCallback = (rect) => EditorGUI.LabelField(rect, blockerSceneObjectsLabel);
+			this.blockerSceneObjectsList = new ReorderableList(this.serializedObject, this.serializedObject.FindProperty(nameof(Doorway.BlockerSceneObjects)), true, true, true, true);
+			this.blockerSceneObjectsList.drawElementCallback = (rect, index, isActive, isFocused) => this.DrawGameObject(this.blockerSceneObjectsList, rect, index, true);
+			this.blockerSceneObjectsList.drawHeaderCallback = (rect) => EditorGUI.LabelField(rect, DoorwayInspector.blockerSceneObjectsLabel);
 
-			connectorPrefabsList = new ReorderableList(serializedObject, serializedObject.FindProperty("ConnectorPrefabWeights"), true, true, true, true);
-			connectorPrefabsList.drawElementCallback = (rect, index, isActive, isFocused) => DrawGameObjectWeight(connectorPrefabsList, rect, index, false);
-			connectorPrefabsList.drawHeaderCallback = (rect) => EditorGUI.LabelField(rect, doorPrefabLabel);
-			connectorPrefabsList.onAddCallback = OnAddGameObjectChance;
+			this.connectorPrefabsList = new ReorderableList(this.serializedObject, this.serializedObject.FindProperty(nameof(Doorway.ConnectorPrefabWeights)), true, true, true, true);
+			this.connectorPrefabsList.drawElementCallback = (rect, index, isActive, isFocused) => this.DrawGameObjectWeight(this.connectorPrefabsList, rect, index, false);
+			this.connectorPrefabsList.drawHeaderCallback = (rect) => EditorGUI.LabelField(rect, DoorwayInspector.doorPrefabLabel);
+			this.connectorPrefabsList.onAddCallback = this.OnAddGameObjectChance;
 			
-			blockerPrefabsList = new ReorderableList(serializedObject, serializedObject.FindProperty("BlockerPrefabWeights"), true, true, true, true);
-			blockerPrefabsList.drawElementCallback = (rect, index, isActive, isFocused) => DrawGameObjectWeight(blockerPrefabsList, rect, index, false);
-			blockerPrefabsList.drawHeaderCallback = (rect) => EditorGUI.LabelField(rect, blockerPrefabLabel);
-			blockerPrefabsList.onAddCallback = OnAddGameObjectChance;
+			this.blockerPrefabsList = new ReorderableList(this.serializedObject, this.serializedObject.FindProperty(nameof(Doorway.BlockerPrefabWeights)), true, true, true, true);
+			this.blockerPrefabsList.drawElementCallback = (rect, index, isActive, isFocused) => this.DrawGameObjectWeight(this.blockerPrefabsList, rect, index, false);
+			this.blockerPrefabsList.drawHeaderCallback = (rect) => EditorGUI.LabelField(rect, DoorwayInspector.blockerPrefabLabel);
+			this.blockerPrefabsList.onAddCallback = this.OnAddGameObjectChance;
 		}
 
 		private void OnAddGameObjectChance(ReorderableList list)
@@ -74,7 +86,7 @@ namespace DunGen.Editor
 			int newIndex = list.serializedProperty.arraySize - 1;
 			var newElement = list.serializedProperty.GetArrayElementAtIndex(newIndex);
 
-			newElement.FindPropertyRelative("Weight").floatValue = 1f;
+			newElement.FindPropertyRelative(nameof(GameObjectWeight.Weight)).floatValue = 1f;
 		}
 
 		private void DrawGameObject(ReorderableList list, Rect rect, int index, bool requireSceneObject)
@@ -113,8 +125,8 @@ namespace DunGen.Editor
 			EditorGUI.BeginChangeCheck();
 
 			var element = list.serializedProperty.GetArrayElementAtIndex(index);
-			var gameObjectProperty = element.FindPropertyRelative("GameObject");
-			var weightProperty = element.FindPropertyRelative("Weight");
+			var gameObjectProperty = element.FindPropertyRelative(nameof(GameObjectWeight.GameObject));
+			var weightProperty = element.FindPropertyRelative(nameof(GameObjectWeight.Weight));
 
 			var newObject = EditorGUI.ObjectField(gameObjectRect, gameObjectProperty.objectReferenceValue, typeof(GameObject), requireSceneObject);
 			bool isValidEntry = true;
@@ -133,20 +145,20 @@ namespace DunGen.Editor
 
 		public override void OnInspectorGUI()
 		{
-			var doorways = targets.OfType<Doorway>();
-			serializedObject.Update();
+			var doorways = this.targets.OfType<Doorway>();
+			this.serializedObject.Update();
 
-			if (socketProp.objectReferenceValue == null)
-				socketProp.objectReferenceValue = DunGenSettings.Instance.DefaultSocket;
+			if (this.socketProp.objectReferenceValue == null)
+				this.socketProp.objectReferenceValue = DunGenSettings.Instance.DefaultSocket;
 
-			EditorGUILayout.PropertyField(socketProp, socketGroupLabel);
+			EditorGUILayout.PropertyField(this.socketProp, DoorwayInspector.socketGroupLabel);
 
 			EditorGUI.BeginChangeCheck();
-			EditorGUILayout.PropertyField(hideConditionalObjectsProp, hideConditionalObjectsLabel);
+			EditorGUILayout.PropertyField(this.hideConditionalObjectsProp, DoorwayInspector.hideConditionalObjectsLabel);
 			if (EditorGUI.EndChangeCheck())
 			{
 				foreach(var d in doorways)
-					d.HideConditionalObjects = hideConditionalObjectsProp.boolValue;
+					d.HideConditionalObjects = this.hideConditionalObjectsProp.boolValue;
 			}
 
 			EditorGUILayout.Space();
@@ -157,27 +169,30 @@ namespace DunGen.Editor
 			// Connectors
 			EditorGUILayout.BeginVertical("box");
 
-			priorityProp.isExpanded = EditorGUILayout.Foldout(priorityProp.isExpanded, connectorsLabel, true);
-			if (priorityProp.isExpanded)
+			this.priorityProp.isExpanded = EditorGUILayout.Foldout(this.priorityProp.isExpanded, DoorwayInspector.connectorsLabel, true);
+			if (this.priorityProp.isExpanded)
 			{
-				EditorGUILayout.PropertyField(priorityProp, priorityLabel);
-				EditorGUILayout.PropertyField(avoidDoorPrefabRotationProp, avoidRotationLabel);
+				EditorGUILayout.PropertyField(this.priorityProp, DoorwayInspector.priorityLabel);
+				EditorGUILayout.PropertyField(this.avoidDoorPrefabRotationProp, DoorwayInspector.avoidRotationLabel);
+
+				EditorGUILayout.PropertyField(this.doorPrefabPositionOffsetProp, DoorwayInspector.prefabPositionOffsetLabel);
+				EditorGUILayout.PropertyField(this.doorPrefabRotationOffsetProp, DoorwayInspector.prefabRotationOffsetLabel);
 
 				EditorGUILayout.Space();
 
 				EditorGUILayout.BeginVertical(); // We create a group here so the whole list is a drag and drop target
-				connectorPrefabsList.DoLayoutList();
+				this.connectorPrefabsList.DoLayoutList();
 				EditorGUILayout.EndVertical();
 
-				HandlePropDragAndDrop(GUILayoutUtility.GetLastRect(), false, true, (doorway, obj) => doorway.ConnectorPrefabWeights.Add(new GameObjectWeight(obj)));
+				this.HandlePropDragAndDrop(GUILayoutUtility.GetLastRect(), false, true, (doorway, obj) => doorway.ConnectorPrefabWeights.Add(new GameObjectWeight(obj)));
 
 				EditorGUILayout.Space();
 
 				EditorGUILayout.BeginVertical(); // We create a group here so the whole list is a drag and drop target
-				connectorSceneObjectsList.DoLayoutList();
+				this.connectorSceneObjectsList.DoLayoutList();
 				EditorGUILayout.EndVertical();
 
-				HandlePropDragAndDrop(GUILayoutUtility.GetLastRect(), true, false, (doorway, obj) => doorway.ConnectorSceneObjects.Add(obj));
+				this.HandlePropDragAndDrop(GUILayoutUtility.GetLastRect(), true, false, (doorway, obj) => doorway.ConnectorSceneObjects.Add(obj));
 			}
 
 			EditorGUILayout.EndVertical();
@@ -185,35 +200,38 @@ namespace DunGen.Editor
 			// Blockers
 			EditorGUILayout.BeginVertical("box");
 
-			avoidBlockerPrefabRotationProp.isExpanded = EditorGUILayout.Foldout(avoidBlockerPrefabRotationProp.isExpanded, blockersLabel, true);
-			if (avoidBlockerPrefabRotationProp.isExpanded)
+			this.avoidBlockerPrefabRotationProp.isExpanded = EditorGUILayout.Foldout(this.avoidBlockerPrefabRotationProp.isExpanded, DoorwayInspector.blockersLabel, true);
+			if (this.avoidBlockerPrefabRotationProp.isExpanded)
 			{
-				EditorGUILayout.PropertyField(avoidBlockerPrefabRotationProp, avoidRotationLabel);
+				EditorGUILayout.PropertyField(this.avoidBlockerPrefabRotationProp, DoorwayInspector.avoidRotationLabel);
+
+				EditorGUILayout.PropertyField(this.blockerPrefabPositionOffsetProp, DoorwayInspector.prefabPositionOffsetLabel);
+				EditorGUILayout.PropertyField(this.blockerPrefabRotationOffsetProp, DoorwayInspector.prefabRotationOffsetLabel);
 
 				EditorGUILayout.Space();
 
 				EditorGUILayout.BeginVertical(); // We create a group here so the whole list is a drag and drop target
-				blockerPrefabsList.DoLayoutList();
+				this.blockerPrefabsList.DoLayoutList();
 				EditorGUILayout.EndVertical();
 
-				HandlePropDragAndDrop(GUILayoutUtility.GetLastRect(), false, true, (doorway, obj) => doorway.BlockerPrefabWeights.Add(new GameObjectWeight(obj)));
+				this.HandlePropDragAndDrop(GUILayoutUtility.GetLastRect(), false, true, (doorway, obj) => doorway.BlockerPrefabWeights.Add(new GameObjectWeight(obj)));
 
 
 				EditorGUILayout.Space();
 
 				EditorGUILayout.BeginVertical(); // We create a group here so the whole list is a drag and drop target
-				blockerSceneObjectsList.DoLayoutList();
+				this.blockerSceneObjectsList.DoLayoutList();
 				EditorGUILayout.EndVertical();
 
-				HandlePropDragAndDrop(GUILayoutUtility.GetLastRect(), true, false, (doorway, obj) => doorway.BlockerSceneObjects.Add(obj));
+				this.HandlePropDragAndDrop(GUILayoutUtility.GetLastRect(), true, false, (doorway, obj) => doorway.BlockerSceneObjects.Add(obj));
 			}
 
 			EditorGUILayout.EndVertical();
 			EditorGUI.indentLevel--;
 
-			EditorGUILayout.PropertyField(tagsProp, tagsLabel);
+			EditorGUILayout.PropertyField(this.tagsProp, DoorwayInspector.tagsLabel);
 
-			serializedObject.ApplyModifiedProperties();
+			this.serializedObject.ApplyModifiedProperties();
 
 
 
@@ -251,7 +269,7 @@ namespace DunGen.Editor
 		private void HandlePropDragAndDrop(Rect dragTargetRect, bool allowSceneObjects, bool allowAssetObjects, Action<Doorway, GameObject> addGameObject)
 		{
 			var evt = Event.current;
-			var doorways = targets.OfType<Doorway>();
+			var doorways = this.targets.OfType<Doorway>();
 
 			if (evt.type == EventType.DragUpdated || evt.type == EventType.DragPerform)
 			{

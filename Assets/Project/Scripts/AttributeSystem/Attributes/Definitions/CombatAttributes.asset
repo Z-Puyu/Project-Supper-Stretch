@@ -1,0 +1,125 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef7f45ecd88948f4ae10e9e974de65b7, type: 3}
+  m_Name: CombatAttributes
+  m_EditorClassIdentifier: 
+  <RootAttribute>k__BackingField:
+    <Key>k__BackingField:
+      <FullName>k__BackingField: CombatAttribute
+      <Name>k__BackingField: CombatAttribute
+    <Name>k__BackingField: CombatAttribute
+    <HowToClamp>k__BackingField: 0
+    <Cap>k__BackingField:
+      <FullName>k__BackingField: 
+      <Name>k__BackingField: 
+    <MaxValue>k__BackingField: 0
+    <Synonyms>k__BackingField: []
+    <Antonyms>k__BackingField: []
+    <SubAttributes>k__BackingField:
+    - <Key>k__BackingField:
+        <FullName>k__BackingField: CombatAttribute.BaseDamage
+        <Name>k__BackingField: BaseDamage
+      <Name>k__BackingField: BaseDamage
+      <HowToClamp>k__BackingField: 0
+      <Cap>k__BackingField:
+        <FullName>k__BackingField: 
+        <Name>k__BackingField: 
+      <MaxValue>k__BackingField: 0
+      <Synonyms>k__BackingField:
+      - <FullName>k__BackingField: CharacterAttribute.Damage
+        <Name>k__BackingField: Damage
+      <Antonyms>k__BackingField: []
+      <SubAttributes>k__BackingField: []
+    - <Key>k__BackingField:
+        <FullName>k__BackingField: CombatAttribute.ElementalDamage
+        <Name>k__BackingField: ElementalDamage
+      <Name>k__BackingField: ElementalDamage
+      <HowToClamp>k__BackingField: 0
+      <Cap>k__BackingField:
+        <FullName>k__BackingField: 
+        <Name>k__BackingField: 
+      <MaxValue>k__BackingField: 0
+      <Synonyms>k__BackingField: []
+      <Antonyms>k__BackingField: []
+      <SubAttributes>k__BackingField:
+      - <Key>k__BackingField:
+          <FullName>k__BackingField: CombatAttribute.ElementalDamage.Fire
+          <Name>k__BackingField: Fire
+        <Name>k__BackingField: Fire
+        <HowToClamp>k__BackingField: 0
+        <Cap>k__BackingField:
+          <FullName>k__BackingField: 
+          <Name>k__BackingField: 
+        <MaxValue>k__BackingField: 0
+        <Synonyms>k__BackingField: []
+        <Antonyms>k__BackingField: []
+        <SubAttributes>k__BackingField: []
+      - <Key>k__BackingField:
+          <FullName>k__BackingField: CombatAttribute.ElementalDamage.Ice
+          <Name>k__BackingField: Ice
+        <Name>k__BackingField: Ice
+        <HowToClamp>k__BackingField: 0
+        <Cap>k__BackingField:
+          <FullName>k__BackingField: 
+          <Name>k__BackingField: 
+        <MaxValue>k__BackingField: 0
+        <Synonyms>k__BackingField: []
+        <Antonyms>k__BackingField: []
+        <SubAttributes>k__BackingField: []
+      - <Key>k__BackingField:
+          <FullName>k__BackingField: CombatAttribute.ElementalDamage.Lightning
+          <Name>k__BackingField: Lightning
+        <Name>k__BackingField: Lightning
+        <HowToClamp>k__BackingField: 0
+        <Cap>k__BackingField:
+          <FullName>k__BackingField: 
+          <Name>k__BackingField: 
+        <MaxValue>k__BackingField: 0
+        <Synonyms>k__BackingField: []
+        <Antonyms>k__BackingField: []
+        <SubAttributes>k__BackingField: []
+      - <Key>k__BackingField:
+          <FullName>k__BackingField: CombatAttribute.ElementalDamage.Poison
+          <Name>k__BackingField: Poison
+        <Name>k__BackingField: Poison
+        <HowToClamp>k__BackingField: 0
+        <Cap>k__BackingField:
+          <FullName>k__BackingField: 
+          <Name>k__BackingField: 
+        <MaxValue>k__BackingField: 0
+        <Synonyms>k__BackingField: []
+        <Antonyms>k__BackingField: []
+        <SubAttributes>k__BackingField: []
+      - <Key>k__BackingField:
+          <FullName>k__BackingField: CombatAttribute.ElementalDamage.Divine
+          <Name>k__BackingField: Divine
+        <Name>k__BackingField: Divine
+        <HowToClamp>k__BackingField: 0
+        <Cap>k__BackingField:
+          <FullName>k__BackingField: 
+          <Name>k__BackingField: 
+        <MaxValue>k__BackingField: 0
+        <Synonyms>k__BackingField: []
+        <Antonyms>k__BackingField: []
+        <SubAttributes>k__BackingField: []
+      - <Key>k__BackingField:
+          <FullName>k__BackingField: CombatAttribute.ElementalDamage.Dark
+          <Name>k__BackingField: Dark
+        <Name>k__BackingField: Dark
+        <HowToClamp>k__BackingField: 0
+        <Cap>k__BackingField:
+          <FullName>k__BackingField: 
+          <Name>k__BackingField: 
+        <MaxValue>k__BackingField: 0
+        <Synonyms>k__BackingField: []
+        <Antonyms>k__BackingField: []
+        <SubAttributes>k__BackingField: []

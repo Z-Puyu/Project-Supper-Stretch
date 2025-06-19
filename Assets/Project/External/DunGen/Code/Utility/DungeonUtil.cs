@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code.Utility
 {
 	public static class DungeonUtil
 	{

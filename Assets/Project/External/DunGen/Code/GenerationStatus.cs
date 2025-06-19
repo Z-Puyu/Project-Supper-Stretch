@@ -1,7 +1,7 @@
-﻿namespace DunGen
+﻿namespace DunGen.Project.External.DunGen.Code
 {
 	public delegate void GenerationStatusDelegate(DungeonGenerator generator, GenerationStatus status);
-	public delegate void DungeonGenerationCompleteDelegate(DungeonGenerator generator);
+	public delegate void DungeonGenerationDelegate(DungeonGenerator generator);
 
 	public enum GenerationStatus
 	{

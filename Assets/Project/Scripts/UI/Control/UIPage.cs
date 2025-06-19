@@ -1,25 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.Common.UI;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Project.Scripts.UI.Control;
 
-[RequireComponent(typeof(Image))]
+[DisallowMultipleComponent, RequireComponent(typeof(Image))]
 public class UIPage : MonoBehaviour {
     public static event UnityAction OnActivated = delegate { };
     public static event UnityAction OnDeactivated = delegate { };
     
-    private Dictionary<Type, UIPresenter> Presenters { get; init; } = [];
+    [NotNull] public IPresenter? MainPresenter { get; private set; }
     public bool IsOpen { get; private set; }
     public bool IsClosed => !this.IsOpen;
-    public IEnumerable<UIPresenter> UIComponents => this.Presenters.Values;
 
     private void Awake() {
-        foreach (UIPresenter presenter in this.GetComponentsInChildren<UIPresenter>()) {
-            this.Presenters.Add(presenter.GetType(), presenter);
-        }
+        this.MainPresenter = this.GetComponentInChildren<IPresenter>();
     }
 
     public void Open() {
@@ -36,11 +33,15 @@ public class UIPage : MonoBehaviour {
         UIPage.OnDeactivated.Invoke();
     }
 
-    public void Refresh<U>(object? data = null) where U : UIPresenter {
+    /*public void Refresh(object? data = null) {
         if (data is null) {
-            this.Presenters[typeof(U)].Present();
+            this.MainPresenter.Refresh();
         } else {
-            this.Presenters[typeof(U)].Present(data);
+            this.MainPresenter.Present(data);
         }
+    }*/
+
+    public void Refresh(IPresentable data) {
+        this.MainPresenter.Present(data);   
     }
 }

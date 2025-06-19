@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	/**
 	 * Lots of code rewriting since Unity doesn't support serializing generics
@@ -35,16 +34,16 @@ namespace DunGen
 
 		public GameObjectChance(GameObject value, float mainPathWeight, float branchPathWeight, TileSet tileSet)
 		{
-			Value = value;
-			MainPathWeight = mainPathWeight;
-			BranchPathWeight = branchPathWeight;
-			TileSet = tileSet;
+			this.Value = value;
+			this.MainPathWeight = mainPathWeight;
+			this.BranchPathWeight = branchPathWeight;
+			this.TileSet = tileSet;
 		}
 
 		public float GetWeight(bool isOnMainPath, float normalizedDepth)
 		{
-			float weight = (isOnMainPath) ? MainPathWeight : BranchPathWeight;
-			weight *= DepthWeightScale.Evaluate(normalizedDepth);
+			float weight = (isOnMainPath) ? this.MainPathWeight : this.BranchPathWeight;
+			weight *= this.DepthWeightScale.Evaluate(normalizedDepth);
 
 			return weight;
 		}
@@ -65,7 +64,7 @@ namespace DunGen
 		{
 			GameObjectChanceTable newTable = new GameObjectChanceTable();
 
-			foreach (var w in Weights)
+			foreach (var w in this.Weights)
 				newTable.Weights.Add(new GameObjectChance(w.Value, w.MainPathWeight, w.BranchPathWeight, w.TileSet) { DepthWeightScale = w.DepthWeightScale });
 
 			return newTable;
@@ -78,7 +77,7 @@ namespace DunGen
 		{
 			bool hasValidEntries = false;
 
-			foreach (var entry in Weights)
+			foreach (var entry in this.Weights)
 			{
 				if (entry.Value != null)
 				{
@@ -106,7 +105,7 @@ namespace DunGen
 
 			bool hasValidEntries = false;
 
-			foreach (var entry in Weights)
+			foreach (var entry in this.Weights)
 			{
 				if (entry.Value != null)
 				{
@@ -130,7 +129,7 @@ namespace DunGen
 		/// <returns>True if the GameObject is included in the chance table</returns>
 		public bool ContainsGameObject(GameObject obj)
 		{
-			foreach (var weight in Weights)
+			foreach (var weight in this.Weights)
 				if (weight.Value == obj)
 					return true;
 
@@ -147,7 +146,7 @@ namespace DunGen
 		public GameObjectChance GetRandom(RandomStream random, bool isOnMainPath, float normalizedDepth, GameObject previouslyChosen, bool allowImmediateRepeats, bool removeFromTable = false, bool allowNullSelection = false)
 		{
 			float totalWeight = 0;
-			foreach (var w in Weights)
+			foreach (var w in this.Weights)
 			{
 				if (w == null)
 					continue;
@@ -163,7 +162,7 @@ namespace DunGen
 
 			float randomNumber = (float)(random.NextDouble() * totalWeight);
 
-			foreach (var w in Weights)
+			foreach (var w in this.Weights)
 			{
 				if (w == null)
 					continue;
@@ -171,7 +170,7 @@ namespace DunGen
 				if (!allowNullSelection && w.Value == null)
 					continue;
 
-				if (w.Value == previouslyChosen && Weights.Count > 1 && !allowImmediateRepeats)
+				if (w.Value == previouslyChosen && this.Weights.Count > 1 && !allowImmediateRepeats)
 					continue;
 
 				float weight = w.GetWeight(isOnMainPath, normalizedDepth);
@@ -179,7 +178,7 @@ namespace DunGen
 				if (randomNumber < weight)
 				{
 					if(removeFromTable)
-						Weights.Remove(w);
+						this.Weights.Remove(w);
 
 					return w;
 				}

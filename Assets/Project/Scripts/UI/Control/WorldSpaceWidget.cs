@@ -1,12 +1,14 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.Characters.Enemies;
+using Project.Scripts.GameManagement;
+using Project.Scripts.Util.Linq;
+using Project.Scripts.Util.Singleton;
 using UnityEngine;
 
 namespace Project.Scripts.UI.Control;
 
+[DisallowMultipleComponent]
 public class WorldSpaceWidget : MonoBehaviour {
-    [NotNull]
-    private Transform? CameraTransform { get; set; }
-    
     [NotNull]
     [field: SerializeField]
     private Canvas? Widget { get; set; }
@@ -22,10 +24,8 @@ public class WorldSpaceWidget : MonoBehaviour {
 
     protected void Start() {
         if (!this.Widget.worldCamera) {
-            this.Widget.worldCamera = Camera.main;
+            this.Widget.worldCamera = Singleton<GameInstance>.Instance.Eyes.GetComponent<Camera>();
         }
-        
-        this.CameraTransform = this.Widget.worldCamera!.transform;
     }
 
     private void Update() {
@@ -33,7 +33,7 @@ public class WorldSpaceWidget : MonoBehaviour {
             return;
         }
         
-        this.transform.LookAt(this.CameraTransform);
+        this.transform.LookAt(Singleton<GameInstance>.Instance.Eyes);
         this.transform.Rotate(0, 180, 0);
     }
 }

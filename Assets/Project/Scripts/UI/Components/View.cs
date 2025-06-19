@@ -1,47 +1,42 @@
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using Project.Scripts.UI.Components.Styles;
-using Project.Scripts.UI.Components.Styles.Themes;
+using Flexalon.Runtime.Layouts;
+using Project.Scripts.UI.Styles;
+using Project.Scripts.UI.Styles.Themes;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Project.Scripts.UI.Components;
 
-[RequireComponent(typeof(VerticalLayoutGroup))]
-public class View : UIComponent<ViewStyle> {
+public class View : Container<ViewStyle> {
     protected enum Section { Header, Body, Footer }
     
-    [NotNull] 
-    private VerticalLayoutGroup? VerticalLayoutGroup { get; set; }
-
-    private List<Image> Sections { get; set; } = [];
+    [field: SerializeField] private List<Image> Sections { get; set; } = [];
     
     protected Image this[Section section] => this.Sections[(int)section];
 
-    protected override void Setup() {
-        this.VerticalLayoutGroup = this.GetComponent<VerticalLayoutGroup>();
-        foreach (Transform child in this.transform) {
-            this.Sections.Add(child.GetComponent<Image>());
-        }
-    }
-
     protected override void ApplyStyle(ViewStyle style) {
-        this.VerticalLayoutGroup.padding = style.Padding;
-        this.VerticalLayoutGroup.spacing = style.Spacing;
+        base.ApplyStyle(style);
+        this.LayoutRegion.GapType = FlexalonFlexibleLayout.GapOptions.Fixed;
+        this.LayoutRegion.Gap = style.Spacing;
     }
 
     protected override void RevertStyle() {
-        this.VerticalLayoutGroup.padding = null;
-        this.VerticalLayoutGroup.spacing = 0;  
+        base.RevertStyle();
+        this.LayoutRegion.GapType = FlexalonFlexibleLayout.GapOptions.Fixed;
+        this.LayoutRegion.Gap = 0;
     }
 
+    protected override void Setup() { }
+
     protected override void ApplyTheme(Theme theme) {
+        base.ApplyTheme(theme);
         this[Section.Header].color = theme.BackgroundColour(UIStyleUsage.Secondary);
         this[Section.Body].color = theme.BackgroundColour(UIStyleUsage.Primary);
         this[Section.Footer].color = theme.BackgroundColour(UIStyleUsage.Secondary);
     }
     
     protected override void RevertTheme() {
+        base.RevertTheme();
         this[Section.Header].color = Color.white;
         this[Section.Body].color = Color.white;
         this[Section.Footer].color = Color.white;

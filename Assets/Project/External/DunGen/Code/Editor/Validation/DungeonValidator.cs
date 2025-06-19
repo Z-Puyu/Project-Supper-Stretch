@@ -1,11 +1,11 @@
-﻿using DunGen.Graph;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
 using UnityEngine;
 
-namespace DunGen.Editor.Validation
+namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Validation
 {
 	public sealed class DungeonValidator
 	{
@@ -29,10 +29,10 @@ namespace DunGen.Editor.Validation
 
 			public Message(MessageType messageType, string text, UnityEngine.Object context = null)
 			{
-				Type = messageType;
-				Text = text;
-				Context = context;
-				Count = 1;
+				this.Type = messageType;
+				this.Text = text;
+				this.Context = context;
+				this.Count = 1;
 			}
 		}
 
@@ -48,57 +48,57 @@ namespace DunGen.Editor.Validation
 							.Where(t => typeof(IValidationRule).IsAssignableFrom(t) && !t.IsAbstract);
 
 			foreach (var type in ruleTypes)
-				rules.Add((IValidationRule)Activator.CreateInstance(type));
+				this.rules.Add((IValidationRule)Activator.CreateInstance(type));
 		}
 
 		public bool Validate(DungeonFlow dungeonFlow)
 		{
-			messages.Clear();
+			this.messages.Clear();
 
-			foreach (var rule in rules)
+			foreach (var rule in this.rules)
 				rule.Validate(dungeonFlow, this);
 
-			PrintMessages(dungeonFlow);
-			return !messages.Any(m => m.Type == MessageType.Error);
+			this.PrintMessages(dungeonFlow);
+			return !this.messages.Any(m => m.Type == MessageType.Error);
 		}
 
 		#region AddMessage Helpers
 
 		public void AddWarning(string format, params object[] args)
 		{
-			AddMessage(MessageType.Warning, string.Format(format, args));
+			this.AddMessage(MessageType.Warning, string.Format(format, args));
 		}
 
 		public void AddWarning(string format, UnityEngine.Object context, params object[] args)
 		{
-			AddMessage(MessageType.Warning, string.Format(format, args), context);
+			this.AddMessage(MessageType.Warning, string.Format(format, args), context);
 		}
 
 		public void AddWarning(string text, UnityEngine.Object context = null)
 		{
-			AddMessage(MessageType.Warning, text, context);
+			this.AddMessage(MessageType.Warning, text, context);
 		}
 
 		public void AddError(string format, params object[] args)
 		{
-			AddMessage(MessageType.Error, string.Format(format, args));
+			this.AddMessage(MessageType.Error, string.Format(format, args));
 		}
 
 		public void AddError(string format, UnityEngine.Object context = null, params object[] args)
 		{
-			AddMessage(MessageType.Error, string.Format(format, args), context);
+			this.AddMessage(MessageType.Error, string.Format(format, args), context);
 		}
 
 		public void AddError(string text, UnityEngine.Object context = null)
 		{
-			AddMessage(MessageType.Error, text, context);
+			this.AddMessage(MessageType.Error, text, context);
 		}
 
 		#endregion
 
 		private void AddMessage(MessageType type, string text, UnityEngine.Object context = null)
 		{
-			foreach (var message in messages)
+			foreach (var message in this.messages)
 			{
 				if (message.Type == type &&
 					message.Text == text &&
@@ -109,12 +109,12 @@ namespace DunGen.Editor.Validation
 				}
 			}
 
-			messages.Add(new Message(type, text, context));
+			this.messages.Add(new Message(type, text, context));
 		}
 
 		private void PrintMessages(UnityEngine.Object defaultContext)
 		{
-			var orderedMessages = messages.OrderByDescending(m => m.Type);
+			var orderedMessages = this.messages.OrderByDescending(m => m.Type);
 
 			if (orderedMessages.Any())
 			{

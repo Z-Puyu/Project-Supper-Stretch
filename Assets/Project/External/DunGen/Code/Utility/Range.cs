@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code.Utility
 {
 	/**
      * A series of classes for getting a random value between a given range
@@ -16,21 +16,21 @@ namespace DunGen
 		public IntRange() { }
 		public IntRange(int min, int max)
 		{
-			Min = min;
-			Max = max;
+			this.Min = min;
+			this.Max = max;
 		}
 
 		public int GetRandom(RandomStream random)
 		{
-			if (Min > Max)
-				Max = Min;
+			if (this.Min > this.Max)
+				this.Max = this.Min;
 
-			return random.Next(Min, Max + 1);
+			return random.Next(this.Min, this.Max + 1);
 		}
 
 		public override string ToString()
 		{
-			return Min + " - " + Max;
+			return this.Min + " - " + this.Max;
 		}
 	}
 
@@ -44,21 +44,21 @@ namespace DunGen
 		public FloatRange() { }
 		public FloatRange(float min, float max)
 		{
-			Min = min;
-			Max = max;
+			this.Min = min;
+			this.Max = max;
 		}
 
 		public float GetRandom(RandomStream random)
 		{
-			if (Min > Max)
+			if (this.Min > this.Max)
 			{
-				float temp = Min;
-				Min = Max;
-				Max = temp;
+				float temp = this.Min;
+				this.Min = this.Max;
+				this.Max = temp;
 			}
 
-			float range = Max - Min;
-			return Min + ((float)random.NextDouble() * range);
+			float range = this.Max - this.Min;
+			return this.Min + ((float)random.NextDouble() * range);
 		}
 	}
 }

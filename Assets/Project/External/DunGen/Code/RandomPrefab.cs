@@ -1,43 +1,73 @@
 ﻿using System.Collections.Generic;
+using DunGen.Project.External.DunGen.Code.Pooling;
 using UnityEngine;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	[AddComponentMenu("DunGen/Random Props/Random Prefab")]
-	public class RandomPrefab : RandomProp
+	public class RandomPrefab : RandomProp, ITileSpawnEventReceiver
 	{
 		[AcceptGameObjectTypes(GameObjectFilter.Asset)]
 		public GameObjectChanceTable Props = new GameObjectChanceTable();
 		public bool ZeroPosition = true;
 		public bool ZeroRotation = true;
 
+		private GameObject propInstance;
+
+
+		private void ClearExistingInstances()
+		{
+			if (this.propInstance == null)
+				return;
+
+			Object.DestroyImmediate(this.propInstance);
+			this.propInstance = null;
+		}
 
 		public override void Process(RandomStream randomStream, Tile tile, ref List<GameObject> spawnedObjects)
 		{
-			if (Props.Weights.Count <= 0)
+			this.ClearExistingInstances();
+
+			if (this.Props.Weights.Count <= 0)
 				return;
 
-			var chosenEntry = Props.GetRandom(randomStream, tile.Placement.IsOnMainPath, tile.Placement.NormalizedDepth, null, true, true, true);
+			var chosenEntry = this.Props.GetRandom(randomStream,
+				tile.Placement.IsOnMainPath,
+				tile.Placement.NormalizedDepth,
+				previouslyChosen: null,
+				allowImmediateRepeats: true,
+				removeFromTable: false,
+				allowNullSelection: true);
 
 			if (chosenEntry == null || chosenEntry.Value == null)
 				return;
 
 			var prefab = chosenEntry.Value;
 
-			GameObject newProp = Instantiate(prefab);
-			newProp.transform.parent = transform;
+			this.propInstance = Object.Instantiate(prefab);
+			this.propInstance.transform.parent = this.transform;
 
-			spawnedObjects.Add(newProp);
+			spawnedObjects.Add(this.propInstance);
 
-			if (ZeroPosition)
-				newProp.transform.localPosition = Vector3.zero;
+			if (this.ZeroPosition)
+				this.propInstance.transform.localPosition = Vector3.zero;
 			else
-				newProp.transform.localPosition = prefab.transform.localPosition;
+				this.propInstance.transform.localPosition = prefab.transform.localPosition;
 
-			if (ZeroRotation)
-				newProp.transform.localRotation = Quaternion.identity;
+			if (this.ZeroRotation)
+				this.propInstance.transform.localRotation = Quaternion.identity;
 			else
-				newProp.transform.localRotation = prefab.transform.localRotation;
+				this.propInstance.transform.localRotation = prefab.transform.localRotation;
 		}
+
+		//
+		// Begin ITileSpawnEventReceiver implementation
+
+		public void OnTileSpawned(Tile tile) { }
+
+		public void OnTileDespawned(Tile tile) => this.ClearExistingInstances();
+
+		// End ITileSpawnEventReceiver implementation
+		//
 	}
 }

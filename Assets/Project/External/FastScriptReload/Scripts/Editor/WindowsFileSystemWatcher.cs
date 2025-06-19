@@ -1,6 +1,5 @@
 ﻿#if UNITY_2021_1_OR_NEWER
 
-using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,8 +8,9 @@ using System.IO.Enumeration;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Win32.SafeHandles;
 
-namespace FastScriptReload.Editor
+namespace Project.External.FastScriptReload.Scripts.Editor
 {
     /// <summary>
     /// This is a Windows only file watcher, for use in Unity/Mono.
@@ -130,7 +130,7 @@ namespace FastScriptReload.Editor
                 {
                     if (this.disposed) throw new ObjectDisposedException(nameof(WindowsFileSystemWatcher));
                     if (this.currentHandle != null) return;
-                    this.currentHandle = CreateDirectoryHandle(this.Path);
+                    this.currentHandle = WindowsFileSystemWatcher.CreateDirectoryHandle(this.Path);
                     this.monitorTask = Task.Factory.StartNew(() => this.Monitor(this.currentHandle), TaskCreationOptions.LongRunning);
                 }
                 else
@@ -159,7 +159,7 @@ namespace FastScriptReload.Editor
             const int FILE_FLAG_BACKUP_SEMANTICS = 0x02000000;
 
             // There might be a way to do this without the OS call?
-            var directoryHandle = CreateFile(
+            var directoryHandle = WindowsFileSystemWatcher.CreateFile(
                 lpFileName: directory,
                 dwDesiredAccess: FILE_LIST_DIRECTORY,
                 dwShareMode: FILE_SHARE_READ | FILE_SHARE_DELETE | FILE_SHARE_WRITE,
@@ -199,7 +199,7 @@ namespace FastScriptReload.Editor
 
                     try
                     {
-                        ok = ReadDirectoryChangesW(
+                        ok = WindowsFileSystemWatcher.ReadDirectoryChangesW(
                             hDirectory: handle,
                             lpBuffer: new HandleRef(buffer, (IntPtr)bufferPointer),
                             nBufferLength: buffer.Length,
@@ -336,7 +336,7 @@ namespace FastScriptReload.Editor
             public unsafe void Dispose()
             {
                 this.closed = true;
-                if (!(this.Handle.IsClosed)) CancelIoEx(this.Handle, null);
+                if (!(this.Handle.IsClosed)) WindowsFileSystemWatcher.CancelIoEx(this.Handle, null);
                 this.Handle.Dispose();
                 GC.SuppressFinalize(this);
             }

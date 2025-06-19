@@ -2,13 +2,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
-
-#if RENDER_PIPELINE
 using UnityEngine.Rendering;
-#endif
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	[AddComponentMenu("DunGen/Culling/Adjacent Room Culling (Multi-Camera)")]
 	public class BasicRoomCullingCamera : MonoBehaviour
@@ -23,8 +21,8 @@ namespace DunGen
 
 			public RendererData(Renderer renderer, bool enabled)
 			{
-				Renderer = renderer;
-				Enabled = enabled;
+				this.Renderer = renderer;
+				this.Enabled = enabled;
 			}
 		}
 
@@ -36,8 +34,8 @@ namespace DunGen
 
 			public LightData(Light light, bool enabled)
 			{
-				Light = light;
-				Enabled = enabled;
+				this.Light = light;
+				this.Enabled = enabled;
 			}
 		}
 
@@ -49,8 +47,8 @@ namespace DunGen
 
 			public ReflectionProbeData(ReflectionProbe probe, bool enabled)
 			{
-				Probe = probe;
-				Enabled = enabled;
+				this.Probe = probe;
+				this.Enabled = enabled;
 			}
 		}
 
@@ -104,18 +102,18 @@ namespace DunGen
 
 			if (runtimeDungeon != null)
 			{
-				generator = runtimeDungeon.Generator;
-				generator.OnGenerationStatusChanged += OnDungeonGenerationStatusChanged;
+				this.generator = runtimeDungeon.Generator;
+				this.generator.OnGenerationStatusChanged += this.OnDungeonGenerationStatusChanged;
 
-				if (generator.Status == GenerationStatus.Complete)
-					SetDungeon(generator.CurrentDungeon);
+				if (this.generator.Status == GenerationStatus.Complete)
+					this.SetDungeon(this.generator.CurrentDungeon);
 			}
 		}
 
 		protected virtual void OnDestroy()
 		{
-			if (generator != null)
-				generator.OnGenerationStatusChanged -= OnDungeonGenerationStatusChanged;
+			if (this.generator != null)
+				this.generator.OnGenerationStatusChanged -= this.OnDungeonGenerationStatusChanged;
 		}
 
 		protected virtual void OnEnable()
@@ -123,67 +121,67 @@ namespace DunGen
 #if RENDER_PIPELINE
 			if (RenderPipelineManager.currentPipeline != null)
 			{
-				RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
-				RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+				RenderPipelineManager.beginCameraRendering += this.OnBeginCameraRendering;
+				RenderPipelineManager.endCameraRendering += this.OnEndCameraRendering;
 
 				return;
 			}
 #endif
 
-			Camera.onPreCull += EnableCulling;
-			Camera.onPostRender += DisableCulling;
+			Camera.onPreCull += this.EnableCulling;
+			Camera.onPostRender += this.DisableCulling;
 		}
 
 		protected virtual void OnDisable()
 		{
 #if RENDER_PIPELINE
-			RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
-			RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
+			RenderPipelineManager.beginCameraRendering -= this.OnBeginCameraRendering;
+			RenderPipelineManager.endCameraRendering -= this.OnEndCameraRendering;
 #endif
 
-			Camera.onPreCull -= EnableCulling;
-			Camera.onPostRender -= DisableCulling;
+			Camera.onPreCull -= this.EnableCulling;
+			Camera.onPostRender -= this.DisableCulling;
 		}
 
 #if RENDER_PIPELINE
 		private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
 		{
-			EnableCulling(camera);
+			this.EnableCulling(camera);
 		}
 
 		private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
 		{
-			DisableCulling(camera);
+			this.DisableCulling(camera);
 		}
 #endif
 
 		protected virtual void OnDungeonGenerationStatusChanged(DungeonGenerator generator, GenerationStatus status)
 		{
 			if (status == GenerationStatus.Complete)
-				SetDungeon(generator.CurrentDungeon);
+				this.SetDungeon(generator.CurrentDungeon);
 			else if (status == GenerationStatus.Failed)
-				ClearDungeon();
+				this.ClearDungeon();
 		}
 
 		protected virtual void EnableCulling(Camera camera)
 		{
-			SetCullingEnabled(camera, true);
+			this.SetCullingEnabled(camera, true);
 		}
 
 		protected virtual void DisableCulling(Camera camera)
 		{
-			SetCullingEnabled(camera, false);
+			this.SetCullingEnabled(camera, false);
 		}
 
 		protected void SetCullingEnabled(Camera camera, bool enabled)
 		{
-			if (!IsReady || camera == null)
+			if (!this.IsReady || camera == null)
 				return;
 
-			bool cullThisCameras = camera.gameObject == gameObject;
+			bool cullThisCameras = camera.gameObject == this.gameObject;
 
 #if UNITY_EDITOR
-			if (CullInEditor)
+			if (this.CullInEditor)
 			{
 				var sceneCameras = UnityEditor.SceneView.GetAllSceneCameras();
 
@@ -193,43 +191,43 @@ namespace DunGen
 #endif
 
 			if (cullThisCameras)
-				SetIsCulling(enabled);
+				this.SetIsCulling(enabled);
 		}
 
 		protected virtual void LateUpdate()
 		{
-			if (!IsReady)
+			if (!this.IsReady)
 				return;
 
-			Transform target = (TargetOverride != null) ? TargetOverride : transform;
-			bool hasPositionChanged = currentTile == null || !currentTile.Bounds.Contains(target.position);
+			Transform target = (this.TargetOverride != null) ? this.TargetOverride : this.transform;
+			bool hasPositionChanged = this.currentTile == null || !this.currentTile.Bounds.Contains(target.position);
 
 			if (hasPositionChanged)
 			{
 				// Update current tile
-				foreach (var tile in allTiles)
+				foreach (var tile in this.allTiles)
 				{
 					if (tile == null)
 						continue;
 
 					if (tile.Bounds.Contains(target.position))
 					{
-						currentTile = tile;
+						this.currentTile = tile;
 						break;
 					}
 				}
 
-				isDirty = true;
+				this.isDirty = true;
 			}
 
-			if (isDirty)
+			if (this.isDirty)
 			{
-				UpdateCulling();
+				this.UpdateCulling();
 
 				// Update the list of renderers for tiles about to be culled
-				foreach (var tile in allTiles)
-					if (!visibleTiles.Contains(tile))
-						UpdateRendererList(tile);
+				foreach (var tile in this.allTiles)
+					if (!this.visibleTiles.Contains(tile))
+						this.UpdateRendererList(tile);
 			}
 		}
 
@@ -238,8 +236,8 @@ namespace DunGen
 			// Renderers
 			List<RendererData> renderers;
 
-			if (!rendererVisibilities.TryGetValue(tile, out renderers))
-				rendererVisibilities[tile] = renderers = new List<RendererData>();
+			if (!this.rendererVisibilities.TryGetValue(tile, out renderers))
+				this.rendererVisibilities[tile] = renderers = new List<RendererData>();
 			else
 				renderers.Clear();
 
@@ -248,12 +246,12 @@ namespace DunGen
 
 
 			// Lights
-			if (CullLights)
+			if (this.CullLights)
 			{
 				List<LightData> lights;
 
-				if (!lightVisibilities.TryGetValue(tile, out lights))
-					lightVisibilities[tile] = lights = new List<LightData>();
+				if (!this.lightVisibilities.TryGetValue(tile, out lights))
+					this.lightVisibilities[tile] = lights = new List<LightData>();
 				else
 					lights.Clear();
 
@@ -264,8 +262,8 @@ namespace DunGen
 			// Reflection Probes
 			List<ReflectionProbeData> probes;
 
-			if (!reflectionProbeVisibilities.TryGetValue(tile, out probes))
-				reflectionProbeVisibilities[tile] = probes = new List<ReflectionProbeData>();
+			if (!this.reflectionProbeVisibilities.TryGetValue(tile, out probes))
+				this.reflectionProbeVisibilities[tile] = probes = new List<ReflectionProbeData>();
 			else
 				probes.Clear();
 
@@ -277,26 +275,26 @@ namespace DunGen
 		{
 			this.isCulling = isCulling;
 
-			for (int i = 0; i < allTiles.Count; i++)
+			for (int i = 0; i < this.allTiles.Count; i++)
 			{
-				var tile = allTiles[i];
+				var tile = this.allTiles[i];
 
-				if (visibleTiles.Contains(tile))
+				if (this.visibleTiles.Contains(tile))
 					continue;
 
 				// Renderers
 				List<RendererData> rendererData;
-				if (rendererVisibilities.TryGetValue(tile, out rendererData))
+				if (this.rendererVisibilities.TryGetValue(tile, out rendererData))
 				{
 					foreach (var r in rendererData) // Removed null check on r.Renderer because it was expensive. Shouldn't be necessary
 						r.Renderer.enabled = (isCulling) ? false : r.Enabled;
 				}
 
 				// Lights
-				if (CullLights)
+				if (this.CullLights)
 				{
 					List<LightData> lightData;
-					if (lightVisibilities.TryGetValue(tile, out lightData))
+					if (this.lightVisibilities.TryGetValue(tile, out lightData))
 					{
 						foreach (var l in lightData)
 							l.Light.enabled = (isCulling) ? false : l.Enabled;
@@ -305,19 +303,19 @@ namespace DunGen
 
 				// Reflection Probes
 				List<ReflectionProbeData> probeData;
-				if (reflectionProbeVisibilities.TryGetValue(tile, out probeData))
+				if (this.reflectionProbeVisibilities.TryGetValue(tile, out probeData))
 				{
 					foreach (var p in probeData)
 						p.Probe.enabled = (isCulling) ? false : p.Enabled;
 				}
 			}
 
-			foreach (var door in allDoors)
+			foreach (var door in this.allDoors)
 			{
-				bool isVisible = visibleTiles.Contains(door.DoorwayA.Tile) || visibleTiles.Contains(door.DoorwayB.Tile);
+				bool isVisible = this.visibleTiles.Contains(door.DoorwayA.Tile) || this.visibleTiles.Contains(door.DoorwayB.Tile);
 
 				List<RendererData> rendererData;
-				if (doorRendererVisibilities.TryGetValue(door, out rendererData))
+				if (this.doorRendererVisibilities.TryGetValue(door, out rendererData))
 				{
 					foreach (var r in rendererData)
 						r.Renderer.enabled = (isCulling) ? isVisible : r.Enabled;
@@ -327,22 +325,22 @@ namespace DunGen
 
 		protected void UpdateCulling()
 		{
-			isDirty = false;
-			visibleTiles.Clear();
+			this.isDirty = false;
+			this.visibleTiles.Clear();
 
-			if (currentTile != null)
-				visibleTiles.Add(currentTile);
+			if (this.currentTile != null)
+				this.visibleTiles.Add(this.currentTile);
 
 			int processTileStart = 0;
 
 			// Add neighbours down to RoomDepth (0 = just tiles containing characters, 1 = plus adjacent tiles, etc)
-			for (int i = 0; i < AdjacentTileDepth; i++)
+			for (int i = 0; i < this.AdjacentTileDepth; i++)
 			{
-				int processTileEnd = visibleTiles.Count;
+				int processTileEnd = this.visibleTiles.Count;
 
 				for (int t = processTileStart; t < processTileEnd; t++)
 				{
-					var tile = visibleTiles[t];
+					var tile = this.visibleTiles[t];
 
 					// Get all connections to adjacent tiles
 					foreach (var doorway in tile.UsedDoorways)
@@ -350,11 +348,11 @@ namespace DunGen
 						var adjacentTile = doorway.ConnectedDoorway.Tile;
 
 						// Skip the tile if it's already visible
-						if (visibleTiles.Contains(adjacentTile))
+						if (this.visibleTiles.Contains(adjacentTile))
 							continue;
 
 						// No need to add adjacent rooms to the visible list when the door between them is closed
-						if (CullBehindClosedDoors)
+						if (this.CullBehindClosedDoors)
 						{
 							var door = doorway.DoorComponent;
 
@@ -362,7 +360,7 @@ namespace DunGen
 								continue;
 						}
 
-						visibleTiles.Add(adjacentTile);
+						this.visibleTiles.Add(adjacentTile);
 					}
 				}
 
@@ -372,31 +370,31 @@ namespace DunGen
 
 		public void SetDungeon(Dungeon dungeon)
 		{
-			if (IsReady)
-				ClearDungeon();
+			if (this.IsReady)
+				this.ClearDungeon();
 
 			if (dungeon == null)
 				return;
 
-			allTiles = new List<Tile>(dungeon.AllTiles);
-			allDoors = new List<Door>(GetAllDoorsInDungeon(dungeon));
-			visibleTiles = new List<Tile>(allTiles.Count);
+			this.allTiles = new List<Tile>(dungeon.AllTiles);
+			this.allDoors = new List<Door>(this.GetAllDoorsInDungeon(dungeon));
+			this.visibleTiles = new List<Tile>(this.allTiles.Count);
 
-			doorRendererVisibilities.Clear();
+			this.doorRendererVisibilities.Clear();
 
-			foreach (var door in allDoors)
+			foreach (var door in this.allDoors)
 			{
 				var renderers = new List<RendererData>();
-				doorRendererVisibilities[door] = renderers;
+				this.doorRendererVisibilities[door] = renderers;
 
 				foreach (var renderer in door.GetComponentsInChildren<Renderer>(true))
 					renderers.Add(new RendererData(renderer, renderer.enabled));
 
-				door.OnDoorStateChanged += OnDoorStateChanged;
+				door.OnDoorStateChanged += this.OnDoorStateChanged;
 			}
 
-			IsReady = true;
-			isDirty = true;
+			this.IsReady = true;
+			this.isDirty = true;
 		}
 
 		protected IEnumerable<Door> GetAllDoorsInDungeon(Dungeon dungeon)
@@ -415,15 +413,15 @@ namespace DunGen
 
 		protected virtual void ClearDungeon()
 		{
-			foreach (var door in allDoors)
-				door.OnDoorStateChanged -= OnDoorStateChanged;
+			foreach (var door in this.allDoors)
+				door.OnDoorStateChanged -= this.OnDoorStateChanged;
 
-			IsReady = false;
+			this.IsReady = false;
 		}
 
 		protected virtual void OnDoorStateChanged(Door door, bool isOpen)
 		{
-			isDirty = true;
+			this.isDirty = true;
 		}
 	}
 }

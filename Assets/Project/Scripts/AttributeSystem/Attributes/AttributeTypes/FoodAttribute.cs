@@ -17,4 +17,6 @@ public enum FoodAttribute {
     PoisonWeakness = CharacterAttribute.PoisonWeakness,          
     DivineWeakness = CharacterAttribute.DivineWeakness,          
     DarkWeakness = CharacterAttribute.DarkWeakness,              
+    CookingLabourCost,
+    CookingTime
 }

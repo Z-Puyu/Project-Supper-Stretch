@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
     [Flags]
 	public enum NodeLockPlacement

@@ -4,7 +4,7 @@ using System.Dynamic;
 using UnityEngine;
 using Object = System.Object;
 
-namespace FastScriptReload.Scripts.Runtime
+namespace Project.External.FastScriptReload.Scripts.Runtime
 {
     public static class TemporaryNewFieldValues
     {
@@ -24,19 +24,19 @@ namespace FastScriptReload.Scripts.Runtime
         
         public static void RegisterNewFields(Type existingType, Dictionary<string, GetNewFieldInitialValue> fieldNameToGenerateDefaultValueFn, Dictionary<string, GetNewFieldType> fieldNameToGetTypeFn)
         {
-            _existingObjectTypeToFieldNameToCreateDetaultValueFn[existingType] = fieldNameToGenerateDefaultValueFn;
-            _existingObjectTypeToFieldNameToType[existingType] = fieldNameToGetTypeFn;
+            TemporaryNewFieldValues._existingObjectTypeToFieldNameToCreateDetaultValueFn[existingType] = fieldNameToGenerateDefaultValueFn;
+            TemporaryNewFieldValues._existingObjectTypeToFieldNameToType[existingType] = fieldNameToGetTypeFn;
         }
         
         public static dynamic ResolvePatchedObject<TCreatedType>(object original)
         {
-            if (!_existingObjectToFiledNameValueMap.TryGetValue(original, out var existingExpandoToObjectTypePair))
+            if (!TemporaryNewFieldValues._existingObjectToFiledNameValueMap.TryGetValue(original, out var existingExpandoToObjectTypePair))
             {
                 var patchedObject = new ExpandoObject();
                 var expandoForType = new ExpandoForType { ForType = typeof(TCreatedType), Object = patchedObject };
-                
-                InitializeAdditionalFieldValues<TCreatedType>(original, patchedObject);
-                _existingObjectToFiledNameValueMap[original] = expandoForType;
+
+                TemporaryNewFieldValues.InitializeAdditionalFieldValues<TCreatedType>(original, patchedObject);
+                TemporaryNewFieldValues._existingObjectToFiledNameValueMap[original] = expandoForType;
 
                 return patchedObject;
             }
@@ -44,7 +44,7 @@ namespace FastScriptReload.Scripts.Runtime
             {
                 if (existingExpandoToObjectTypePair.ForType != typeof(TCreatedType))
                 {
-                    InitializeAdditionalFieldValues<TCreatedType>(original, existingExpandoToObjectTypePair.Object);
+                    TemporaryNewFieldValues.InitializeAdditionalFieldValues<TCreatedType>(original, existingExpandoToObjectTypePair.Object);
                     existingExpandoToObjectTypePair.ForType = typeof(TCreatedType);
                 }
 
@@ -54,7 +54,7 @@ namespace FastScriptReload.Scripts.Runtime
         
         public static bool TryGetDynamicallyAddedFieldValues(object forObject, out IDictionary<string, object> addedFieldValues)
         {
-            if (_existingObjectToFiledNameValueMap.TryGetValue(forObject, out var expandoForType))
+            if (TemporaryNewFieldValues._existingObjectToFiledNameValueMap.TryGetValue(forObject, out var expandoForType))
             {
                 addedFieldValues = expandoForType.Object;
                 return true;
@@ -68,7 +68,7 @@ namespace FastScriptReload.Scripts.Runtime
         {
             var originalType = original.GetType(); //TODO: PERF: resolve via TOriginal, not getType
             var patchedObjectAsDict = patchedObject as IDictionary<string, Object>;
-            foreach (var fieldNameToGenerateDefaultValueFn in _existingObjectTypeToFieldNameToCreateDetaultValueFn[originalType])
+            foreach (var fieldNameToGenerateDefaultValueFn in TemporaryNewFieldValues._existingObjectTypeToFieldNameToCreateDetaultValueFn[originalType])
             {
                 if (!patchedObjectAsDict.ContainsKey(fieldNameToGenerateDefaultValueFn.Key))
                 {
@@ -76,8 +76,8 @@ namespace FastScriptReload.Scripts.Runtime
 
                     if (patchedObjectAsDict[fieldNameToGenerateDefaultValueFn.Key] == null)
                     {
-                       var fieldType = _existingObjectTypeToFieldNameToType[originalType][fieldNameToGenerateDefaultValueFn.Key](typeof(TCreatedType));
-                       if (ReferenceTypeToCreateDefaultValueFn.TryGetValue(fieldType, out var createValueFn))
+                       var fieldType = TemporaryNewFieldValues._existingObjectTypeToFieldNameToType[originalType][fieldNameToGenerateDefaultValueFn.Key](typeof(TCreatedType));
+                       if (TemporaryNewFieldValues.ReferenceTypeToCreateDefaultValueFn.TryGetValue(fieldType, out var createValueFn))
                        {
                            patchedObjectAsDict[fieldNameToGenerateDefaultValueFn.Key] = createValueFn();
                        }

@@ -1,9 +1,9 @@
-﻿using FastScriptReload.Runtime;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Project.External.FastScriptReload.Scripts.Runtime;
 
-namespace FastScriptReload.Editor.Compilation.CodeRewriting
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting
 {
 	class RecordeRewriter : FastScriptReloadCodeRewriterBase
     {
@@ -15,7 +15,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
         
         public override SyntaxNode VisitRecordDeclaration(RecordDeclarationSyntax node)
         {
-	        return AdjustRecordName(node, node.Identifier);
+	        return this.AdjustRecordName(node, node.Identifier);
         }
 
         private SyntaxNode AdjustRecordName(RecordDeclarationSyntax node, SyntaxToken nodeIdentifier)
@@ -27,9 +27,9 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 		        typeName += AssemblyChangesLoader.ClassnamePatchedPostfix;
 	        }
 
-	        return AddRewriteCommentIfNeeded(
+	        return this.AddRewriteCommentIfNeeded(
 		        node.ReplaceToken(nodeIdentifier, SyntaxFactory.Identifier(typeName)), 
-		        $"{nameof(RecordeRewriter)}:{nameof(AdjustRecordName)}"
+		        $"{nameof(RecordeRewriter)}:{nameof(this.AdjustRecordName)}"
 		    );
         }
     }

@@ -42,8 +42,8 @@ namespace SaintsField.Editor.Playa.Renderer
             if (methodBind == MethodBind.ButtonOnClick)
             {
                 UnityEngine.UI.Button uiButton = eventTarget is null
-                    ? TryFindButton(fieldWithInfo.Target)
-                    : GetButton(eventTarget, fieldWithInfo.Target);
+                    ? TryFindButton(fieldWithInfo.Targets[0])
+                    : GetButton(eventTarget, fieldWithInfo.Targets[0]);
 
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
                 Debug.Log($"find button `{uiButton}`");
@@ -71,7 +71,7 @@ namespace SaintsField.Editor.Playa.Renderer
                     attrNames.Add(eventTarget);
                 }
 
-                object target = fieldWithInfo.Target;
+                object target = fieldWithInfo.Targets[0];
 
                 unityEventContainerObject = _serializedObject.targetObject;
 
@@ -130,7 +130,7 @@ namespace SaintsField.Editor.Playa.Renderer
             {
                 UnityEngine.Object persistentTarget = unityEventBase.GetPersistentTarget(eventIndex);
                 string persistentMethodName = unityEventBase.GetPersistentMethodName(eventIndex);
-                if (ReferenceEquals(persistentTarget, fieldWithInfo.Target) && persistentMethodName == fieldWithInfo.MethodInfo.Name)
+                if (ReferenceEquals(persistentTarget, fieldWithInfo.Targets[0]) && persistentMethodName == fieldWithInfo.MethodInfo.Name)
                 {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_METHOD_RENDERER
                     Debug.Log($"`{persistentMethodName}` already added to `{unityEventBase}`");
@@ -153,7 +153,7 @@ namespace SaintsField.Editor.Playa.Renderer
                 UnityEventTools.AddVoidPersistentListener(
                     unityEventBase,
                     (UnityAction)Delegate.CreateDelegate(typeof(UnityAction),
-                        fieldWithInfo.Target, fieldWithInfo.MethodInfo));
+                        fieldWithInfo.Targets[0], fieldWithInfo.MethodInfo));
                 EditorUtility.SetDirty(unityEventContainerObject);
                 SaintsPropertyDrawer.EnqueueSceneViewNotification($"Bind callback `{fieldWithInfo.MethodInfo.Name}` to `{unityEventContainerObject}.{eventDisplayName}`");
                 return;
@@ -161,7 +161,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
             if (playaMethodBindAttribute.IsCallback)
             {
-                (string error, object foundValue) = Util.GetOfNoParams<object>(fieldWithInfo.Target, (string)value, null);
+                (string error, object foundValue) = Util.GetOfNoParams<object>(fieldWithInfo.Targets[0], (string)value, null);
 
                 if (error != "")
                 {
@@ -170,7 +170,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 value = foundValue;
             }
-            Util.BindEventWithValue(unityEventBase, fieldWithInfo.MethodInfo, invokeRequiredTypes.ToArray(), fieldWithInfo.Target, value);
+            Util.BindEventWithValue(unityEventBase, fieldWithInfo.MethodInfo, invokeRequiredTypes.ToArray(), fieldWithInfo.Targets[0], value);
             SaintsPropertyDrawer.EnqueueSceneViewNotification($"Bind callback `{fieldWithInfo.MethodInfo.Name}` to `{unityEventContainerObject}.{eventDisplayName}`({value})");
             EditorUtility.SetDirty(unityEventContainerObject);
         }
@@ -224,6 +224,17 @@ namespace SaintsField.Editor.Playa.Renderer
         public override void OnDestroy()
         {
             OnDestroyIMGUI();
+        }
+
+#if UNITY_2021_3_OR_NEWER
+        private readonly UnityEvent<string> _onSearchFieldUIToolkit = new UnityEvent<string>();
+#endif
+
+        public override void OnSearchField(string searchString)
+        {
+#if UNITY_2021_3_OR_NEWER
+            _onSearchFieldUIToolkit.Invoke(searchString);
+#endif
         }
 
         public override string ToString()

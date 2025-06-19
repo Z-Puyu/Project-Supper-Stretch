@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Project.Scripts.AttributeSystem.Attributes;
-using Project.Scripts.AttributeSystem.GameplayEffects.Executions;
+using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.AttributeSystem.Modifiers;
-using Project.Scripts.Util.Linq;
-using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.AttributeSystem.GameplayEffects;
@@ -13,53 +10,25 @@ namespace Project.Scripts.AttributeSystem.GameplayEffects;
 /// A gameplay effect that can be applied to an <see cref="AttributeSet"/>.
 /// Each gameplay effect asset defines a set of parameters which are used to generate changes in attributes in run-time.
 /// </summary>
-[Serializable]
-public abstract class GameplayEffect<T> : IGameplayEffect where T : GameplayEffectExecutionArgs {
-    [field: SerializeField, Required]
-    private string Name { get; set; } = string.Empty;
-    
-    private bool HasNeverExecuted { get; set; } = true;
-    
-    public string Key => this.Name == string.Empty ? this.GetType().Name : this.Name;
-    
-    protected virtual void OnFirstExecution(T args) { }
-    
-    protected abstract IEnumerable<Modifier> Run(T args);
+[CreateAssetMenu(fileName = "GameplayEffect", menuName = "Attribute System/Gameplay Effect")]
+public class GameplayEffect : ScriptableObject {
+    [field: SerializeReference] private EffectExecution Executor { get; set; } = new ModifierEffectExecution();
+    [field: SerializeField] public List<AttributeDefinition> ApplicableTargets { get; private set; } = [];
 
-    private GameplayEffectExecutionResult Attempt(T args) {
-        bool isSuccess = args.Chance switch {
-            >= 100 => true,
-            <= 0 => false,
-            var _ => UnityEngine.Random.Range(0, 100) < args.Chance
-        };
-        if (!isSuccess) {
-            return GameplayEffectExecutionResult.Failure;
-        }
-
-        this.Run(args).ForEach(args.Target.Accept);
-        return GameplayEffectExecutionResult.Success;
-    }
-    
     /// <summary>
     /// Invoke the gameplay effect to produce a set of modifiers.
     /// </summary>
+    /// <param name="target">The target of the gameplay effect.</param>
     /// <param name="args">The arguments used to invoke the gameplay effect.</param>
+    /// <param name="outcome">The modifiers produced by the gameplay effect.</param>
     /// <returns>The result of the gameplay effect invocation.</returns>
-    public GameplayEffectExecutionResult Execute(GameplayEffectExecutionArgs args) {
-        if (args is not T t) {
-            return GameplayEffectExecutionResult.Error;
-        }
-        
-        if (!this.HasNeverExecuted) {
-            return this.Attempt(t);
-        }
-
-        this.OnFirstExecution(t);
-        this.HasNeverExecuted = false;
-        return this.Attempt(t);
+    public GameplayEffectExecutionResult Execute(
+        AttributeSet target, GameplayEffectExecutionArgs args, out IEnumerable<Modifier> outcome
+    ) {
+        return this.Executor.Execute(target, args, out outcome);
     }
 
-    public override string ToString() {
-        return this.Key;       
+    public bool ApplicableTo(AttributeSet target) {
+        return this.ApplicableTargets.Contains(target.AttributeDefinition);
     }
 }

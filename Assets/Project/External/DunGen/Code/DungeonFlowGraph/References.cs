@@ -1,12 +1,12 @@
 ﻿using System;
 using UnityEngine;
 
-namespace DunGen.Graph
+namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 {
     [Serializable]
     public abstract class FlowGraphObjectReference
     {
-        public DungeonFlow Flow { get { return flow; } }
+        public DungeonFlow Flow { get { return this.flow; } }
 
         [SerializeField]
         protected DungeonFlow flow;
@@ -19,8 +19,8 @@ namespace DunGen.Graph
     {
         public GraphNode Node
         {
-            get { return flow.Nodes[index]; }
-            set { index = flow.Nodes.IndexOf(value); }
+            get { return this.flow.Nodes[this.index]; }
+            set { this.index = this.flow.Nodes.IndexOf(value); }
         }
 
         public FlowNodeReference(DungeonFlow flowGraph, GraphNode node)
@@ -28,8 +28,8 @@ namespace DunGen.Graph
             Debug.Assert(flowGraph != null);
             Debug.Assert(node != null);
 
-            flow = flowGraph;
-            Node = node;
+            this.flow = flowGraph;
+            this.Node = node;
         }
     }
 
@@ -38,8 +38,8 @@ namespace DunGen.Graph
     {
         public GraphLine Line
         {
-            get { return flow.Lines[index]; }
-            set { index = flow.Lines.IndexOf(value); }
+            get { return this.flow.Lines[this.index]; }
+            set { this.index = this.flow.Lines.IndexOf(value); }
         }
 
         public FlowLineReference(DungeonFlow flowGraph, GraphLine line)
@@ -47,8 +47,8 @@ namespace DunGen.Graph
             Debug.Assert(flowGraph != null);
             Debug.Assert(line != null);
 
-            flow = flowGraph;
-            Line = line;
+            this.flow = flowGraph;
+            this.Line = line;
         }
     }
 }

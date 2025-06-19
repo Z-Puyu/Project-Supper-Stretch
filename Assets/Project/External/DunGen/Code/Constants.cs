@@ -1,4 +1,4 @@
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	public static class Constants
 	{

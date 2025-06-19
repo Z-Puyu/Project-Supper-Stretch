@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	[Serializable]
 	public class Door : MonoBehaviour
@@ -21,14 +21,14 @@ namespace DunGen
 
 		public bool DontCullBehind
 		{
-			get { return dontCullBehind; }
+			get { return this.dontCullBehind; }
 			set
 			{
-				if (dontCullBehind == value)
+				if (this.dontCullBehind == value)
 					return;
 
-				dontCullBehind = value;
-				SetDoorState(isOpen);
+				this.dontCullBehind = value;
+				this.SetDoorState(this.isOpen);
 			}
 		}
 
@@ -36,21 +36,21 @@ namespace DunGen
 		{
 			get
 			{
-				if (DontCullBehind)
+				if (this.DontCullBehind)
 					return false;
 
-				return !isOpen;
+				return !this.isOpen;
 			}
 		}
 		public virtual bool IsOpen
 		{
-			get { return isOpen; }
+			get { return this.isOpen; }
 			set
 			{
-				if (isOpen == value)
+				if (this.isOpen == value)
 					return;
 
-				SetDoorState(value);
+				this.SetDoorState(value);
 			}
 		}
 
@@ -60,20 +60,20 @@ namespace DunGen
 		[SerializeField]
 		private bool dontCullBehind;
 		[SerializeField]
-		private bool isOpen;
+		private bool isOpen = true;
 
 
 		private void OnDestroy()
 		{
-			OnDoorStateChanged = null;
+			this.OnDoorStateChanged = null;
 		}
 
 		public void SetDoorState(bool isOpen)
 		{
 			this.isOpen = isOpen;
 
-			if (OnDoorStateChanged != null)
-				OnDoorStateChanged(this, isOpen);
+			if (this.OnDoorStateChanged != null)
+				this.OnDoorStateChanged(this, isOpen);
 		}
 	}
 }

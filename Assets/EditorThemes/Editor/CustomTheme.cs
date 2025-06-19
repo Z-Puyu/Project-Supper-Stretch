@@ -1,10 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
-
-namespace ThemesPlugin
+namespace EditorThemes.Editor
 {   
     [System.Serializable]
     public class CustomTheme

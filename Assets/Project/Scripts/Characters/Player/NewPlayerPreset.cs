@@ -1,6 +1,6 @@
 ﻿using Project.Scripts.Characters.CharacterControl;
-using Project.Scripts.Items;
 using SaintsField;
+using Project.Scripts.Items;
 using UnityEngine;
 
 namespace Project.Scripts.Characters.Player;

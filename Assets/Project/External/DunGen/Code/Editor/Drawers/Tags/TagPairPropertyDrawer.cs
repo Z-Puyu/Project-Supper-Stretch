@@ -1,8 +1,8 @@
-﻿using DunGen.Tags;
+﻿using DunGen.Project.External.DunGen.Code.Tags;
 using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Drawers.Tags
+namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers.Tags
 {
 	[CustomPropertyDrawer(typeof(TagPair))]
 	public class TagPairPropertyDrawer : PropertyDrawer
@@ -12,9 +12,9 @@ namespace DunGen.Editor.Drawers.Tags
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			if (centeredTextStyle == null)
+			if (TagPairPropertyDrawer.centeredTextStyle == null)
 			{
-				centeredTextStyle = new GUIStyle(EditorStyles.boldLabel)
+				TagPairPropertyDrawer.centeredTextStyle = new GUIStyle(EditorStyles.boldLabel)
 				{
 					alignment = TextAnchor.MiddleCenter
 				};
@@ -33,7 +33,7 @@ namespace DunGen.Editor.Drawers.Tags
 			Rect tagBRect = new Rect(separatorRect.xMax, rect.y, tagWidth, rect.height);
 
 			EditorGUI.PropertyField(tagARect, property.FindPropertyRelative("TagA"), GUIContent.none);
-			EditorGUI.LabelField(separatorRect, new GUIContent("+"), centeredTextStyle);
+			EditorGUI.LabelField(separatorRect, new GUIContent("+"), TagPairPropertyDrawer.centeredTextStyle);
 			EditorGUI.PropertyField(tagBRect, property.FindPropertyRelative("TagB"), GUIContent.none);
 
 			EditorGUI.EndProperty();

@@ -1,45 +1,63 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Characters.CharacterControl;
-using Project.Scripts.Combat;
-using Project.Scripts.Common;
-using Project.Scripts.InteractionSystem;
+using Project.Scripts.Characters.CharacterControl.Combat;
+using Project.Scripts.Characters.Enemies;
+using Project.Scripts.Interaction;
 using Project.Scripts.Items;
+using Project.Scripts.Items.Equipments;
 using UnityEngine;
 
 namespace Project.Scripts.Characters.Player;
 
-[RequireComponent(typeof(Interactor))]
+[RequireComponent(typeof(Interactor), typeof(EquipmentSystem), typeof(ExperienceSystem))]
+[RequireComponent(typeof(PlayerInputInterpreter))]
 public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
-    [NotNull]
-    private ComboAttack? ComboAttack { get; set; }
-    
-    [NotNull]
-    private Interactor? Interactor { get; set; }
+    [NotNull] private Interactor? Interactor { get; set; }
+    [NotNull] private EquipmentSystem? EquipmentSystem { get; set; }
+    [NotNull] private ExperienceSystem? ExperienceSystem { get; set; }
+    [NotNull] private PlayerInputInterpreter? InputInterpreter { get; set; }
+    [NotNull] [field: SerializeField] private PlayerMovement? Movement { get; set; }
+
+    #region Debug
+
+    [field: SerializeField] private bool IsInvincible { get; set; }
+
+    #endregion
 
     protected override void Awake() {
         base.Awake();
-        this.ComboAttack = this.GetComponent<ComboAttack>();
         this.Interactor = this.GetComponent<Interactor>();
-    }
-    
-    protected void Start() {
-        this.Initialise();
+        this.EquipmentSystem = this.GetComponent<EquipmentSystem>();
+        this.ExperienceSystem = this.GetComponent<ExperienceSystem>();
     }
 
     public override void Initialise() {
         base.Initialise();
         this.InitialiseInventory();
         this.InitialiseInput();
+        this.EquipmentSystem.OnEquip += this.ComboAttack.RegisterWeapon;
+        this.EquipmentSystem.OnUnequip += this.ComboAttack.ForgetWeapon;
+        GameCharacter<Enemy>.OnDeath += this.OnFindDeadEnemy;
+    }
+
+    private void OnFindDeadEnemy(Enemy corpse, GameObject? killer) {
+        if (killer == this.gameObject) {
+            this.ExperienceSystem.AddExperience(corpse.Experience);
+        }
     }
 
     private void InitialiseInput() {
-        GameEvents.OnNotification += this.OnNotification;
-        PlayerInputInterpreter input = this.GetComponent<PlayerInputInterpreter>();
-        
-        input.OnCommitRightHandAttack += this.ComboAttack.Commit;
-        input.OnOpenInventory += this.Inventory.Open;
-        input.OnInteract += this.Interactor.Interact;
+        this.InputInterpreter = this.GetComponent<PlayerInputInterpreter>();
+        this.InputInterpreter.OnMove += this.Movement.MoveTowards;
+        this.InputInterpreter.OnWalk += () => this.Movement.SwitchMode(PlayerMovement.Mode.Walk);
+        this.InputInterpreter.OnRun += () => this.Movement.SwitchMode(PlayerMovement.Mode.Run);
+        this.InputInterpreter.OnSprint += () => this.Movement.SwitchMode(PlayerMovement.Mode.Sprint);
+        this.InputInterpreter.OnStop += this.Movement.StopImmediately;
+        this.InputInterpreter.OnToggleWalkingLock += () => this.Movement.Locked = !this.Movement.Locked;
+        this.InputInterpreter.OnCommitRightHandAttack += this.ComboAttack.CommitNextStage;
+        this.InputInterpreter.OnOpenInventory += this.Inventory.Open;
+        this.InputInterpreter.OnInteract += this.Interactor.Interact;
     }
 
     private void InitialiseInventory() {
@@ -48,14 +66,17 @@ public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
         }
     }
 
-    private void OnNotification(GameNotification msg) {
-        switch (msg) {
-            case GameNotification.ComboJustStarted:
-                this.ComboAttack.StartCombo();
-                break;
-            case GameNotification.ComboHasEnded:
-                this.ComboAttack.EndCombo();
-                break;
+    protected override void DyingFrom(GameObject? source) {
+        if (this.IsInvincible) {
+            Debug.Log($"{this.gameObject.name} is invincible (DEBUG MODE)");
+            return;
         }
+        
+        this.InputInterpreter.enabled = false;
+        this.Movement.enabled = false;
+        this.Interactor.enabled = false;
+        this.EquipmentSystem.enabled = false;
+        this.ExperienceSystem.enabled = false;
+        base.DyingFrom(source);
     }
 }

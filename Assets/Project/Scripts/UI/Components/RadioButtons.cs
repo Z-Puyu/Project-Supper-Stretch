@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Project.Scripts.UI.Components.Styles;
-using Project.Scripts.UI.Components.Styles.Themes;
+using Project.Scripts.UI.Styles;
+using Project.Scripts.UI.Styles.Themes;
 using UnityEngine.Events;
 using UnityEngine.UI;
 

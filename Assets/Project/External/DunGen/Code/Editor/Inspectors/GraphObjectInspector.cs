@@ -1,33 +1,41 @@
 ﻿using System.Collections.Generic;
+using DunGen.Editor.Project.External.DunGen.Code.Editor.Utility;
+using DunGen.Project.External.DunGen.Code;
+using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
 using UnityEditor;
-using DunGen.Graph;
 using UnityEngine;
 
-namespace DunGen.Editor.Inspectors
+namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 {
 	[CustomEditor(typeof(GraphObjectObserver))]
 	public sealed class GraphObjectInspector : UnityEditor.Editor
 	{
 		public override void OnInspectorGUI()
 		{
-			var data = target as GraphObjectObserver;
+			var data = this.target as GraphObjectObserver;
 
 			if (data == null)
 				return;
 
-			if (data.Node != null)
-				DrawNodeGUI(data.Node);
+			this.serializedObject.Update();
+
+			if (data.Node != null && data.Node.TileSets != null)
+				this.DrawNodeGUI(data.Node);
 			else if (data.Line != null)
-				DrawLineGUI(data.Line);
+				this.DrawLineGUI(data.Line);
 
 			if (GUI.changed)
 				EditorUtility.SetDirty(data.Flow);
+
+			this.serializedObject.ApplyModifiedProperties();
 		}
 
 		private void DrawNodeGUI(GraphNode node)
 		{
-			var data = target as GraphObjectObserver;
+			var data = this.target as GraphObjectObserver;
 			node.Graph = data.Flow;
+
+			var nodeProp = this.serializedObject.FindProperty("node");
 
 			if (string.IsNullOrEmpty(node.Label))
 				EditorGUILayout.LabelField("Node", EditorStyles.boldLabel);
@@ -35,32 +43,41 @@ namespace DunGen.Editor.Inspectors
 				EditorGUILayout.LabelField("Node: " + node.Label, EditorStyles.boldLabel);
 
 			if (node.NodeType == NodeType.Normal)
-			{
 				node.Label = EditorGUILayout.TextField("Label", node.Label);
-				//node.Position = Mathf.Clamp(EditorGUILayout.FloatField("Position", node.Position), 0, 1);
-			}
 
-			EditorUtil.DrawObjectList<TileSet>("Tile Sets", node.TileSets, GameObjectSelectionTypes.Prefab, target);
+			EditorUtil.DrawObjectList<TileSet>("Tile Sets", node.TileSets, GameObjectSelectionTypes.Prefab, this.target);
+
+			EditorGUILayout.Space();
+
+			// Straightening Section
+			EditorGUILayout.BeginVertical("box");
+			{
+				var straightenSettingsProp = nodeProp.FindPropertyRelative(nameof(GraphNode.StraighteningSettings));
+
+				EditorGUILayout.LabelField(new GUIContent("Path Straightening"), EditorStyles.boldLabel);
+				EditorUtil.DrawStraightenSettingsWithOverrides(straightenSettingsProp, false);
+			}
+			EditorGUILayout.EndVertical();
 
 			if (data.Flow.KeyManager == null)
 				return;
 
 			EditorGUILayout.Space();
-			DrawKeys(node.Graph.KeyManager, node.Keys, node.Locks, true);
+			this.DrawKeys(node.Graph.KeyManager, node.Keys, node.Locks, true);
 
 			node.LockPlacement = (NodeLockPlacement)EditorGUILayout.EnumFlagsField("Lock Placement", node.LockPlacement);
 		}
 
 		private void DrawLineGUI(GraphLine line)
 		{
-			var data = target as GraphObjectObserver;
+			var data = this.target as GraphObjectObserver;
 			line.Graph = data.Flow;
 
 			EditorGUILayout.LabelField("Line Segment", EditorStyles.boldLabel);
-			EditorUtil.DrawObjectList<DungeonArchetype>("Dungeon Archetypes", line.DungeonArchetypes, GameObjectSelectionTypes.Prefab, target);
+			EditorUtil.DrawObjectList<DungeonArchetype>("Dungeon Archetypes", line.DungeonArchetypes, GameObjectSelectionTypes.Prefab, this.target);
 
 			EditorGUILayout.Space();
-			DrawKeys(line.Graph.KeyManager, line.Keys, line.Locks, false);
+			this.DrawKeys(line.Graph.KeyManager, line.Keys, line.Locks, false);
 		}
 
 		private void DrawKeys(KeyManager manager, List<KeyLockPlacement> keyIDs, List<KeyLockPlacement> lockIDs, bool isNode)
@@ -68,9 +85,9 @@ namespace DunGen.Editor.Inspectors
 			if (manager == null)
 				return;
 
-			if(manager == null)
+			if (manager == null)
 				EditorGUILayout.HelpBox("Key Manager not set in Dungeon Flow", MessageType.Info);
-			else if(manager.Keys.Count == 0)
+			else if (manager.Keys.Count == 0)
 				EditorGUILayout.HelpBox("Key Manager has no keys", MessageType.Info);
 			else
 			{

@@ -1,8 +1,10 @@
 ﻿using System.Linq;
 using System.Text;
+using DunGen.Project.External.DunGen.Code;
+using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 
-namespace DunGen.Demo
+namespace Project.External.DunGen.Samples.Basic.Scripts
 {
 	[RequireComponent(typeof(CharacterController))]
 	public class PlayerController : MonoBehaviour
@@ -16,8 +18,8 @@ namespace DunGen.Demo
 		public float MoveSpeed = 10;
 		public float TurnSpeed = 90;
 
-		public bool IsControlling { get { return isControlling; } }
-		public Camera ActiveCamera { get { return isControlling ? playerCamera : overheadCamera; } }
+		public bool IsControlling { get { return this.isControlling; } }
+		public Camera ActiveCamera { get { return this.isControlling ? this.playerCamera : this.overheadCamera; } }
 
 		protected CharacterController movementController;
 		protected Camera playerCamera;
@@ -31,22 +33,22 @@ namespace DunGen.Demo
 
 		protected virtual void Start()
 		{
-			movementController = GetComponent<CharacterController>();
-			playerCamera = GetComponentInChildren<Camera>();
-			gen = UnityUtil.FindObjectByType<Generator>();
-			overheadCamera = GameObject.Find("Overhead Camera").GetComponent<Camera>();
+			this.movementController = this.GetComponent<CharacterController>();
+			this.playerCamera = this.GetComponentInChildren<Camera>();
+			this.gen = UnityUtil.FindObjectByType<Generator>();
+			this.overheadCamera = GameObject.Find("Overhead Camera").GetComponent<Camera>();
 
-			isControlling = true;
-			ToggleControl();
+			this.isControlling = true;
+			this.ToggleControl();
 
-			gen.DungeonGenerator.Generator.OnGenerationStatusChanged += OnGenerationStatusChanged;
-			gen.GetAdditionalText = GetAdditionalScreenText;
+			this.gen.DungeonGenerator.Generator.OnGenerationStatusChanged += this.OnGenerationStatusChanged;
+			this.gen.GetAdditionalText = this.GetAdditionalScreenText;
 		}
 
 		protected virtual void OnDestroy()
 		{
-			gen.DungeonGenerator.Generator.OnGenerationStatusChanged -= OnGenerationStatusChanged;
-			gen.GetAdditionalText = null;
+			this.gen.DungeonGenerator.Generator.OnGenerationStatusChanged -= this.OnGenerationStatusChanged;
+			this.gen.GetAdditionalText = null;
 		}
 
 		private void GetAdditionalScreenText(StringBuilder infoText)
@@ -58,53 +60,53 @@ namespace DunGen.Demo
 		{
 			if (status == GenerationStatus.Complete)
 			{
-				FrameDungeonWithCamera();
-				transform.position = new Vector3(0, 1, 7); // Hard-coded spawn position
-				velocity = Vector3.zero;
+				this.FrameDungeonWithCamera();
+				this.transform.position = new Vector3(0, 1, 7); // Hard-coded spawn position
+				this.velocity = Vector3.zero;
 			}
 		}
 
 		protected virtual void Update()
 		{
 			if (Input.GetKeyDown(KeyCode.C))
-				ToggleControl();
+				this.ToggleControl();
 
 			// Repeatedly frame the dungeon while the generation process is running
-			var generator = gen.DungeonGenerator.Generator;
+			var generator = this.gen.DungeonGenerator.Generator;
 			if (generator.IsGenerating && generator.GenerateAsynchronously && generator.PauseBetweenRooms > 0f)
-				FrameDungeonWithCamera();
+				this.FrameDungeonWithCamera();
 
-			if (isControlling)
+			if (this.isControlling)
 			{
 				Vector3 direction = Vector3.zero;
-				direction += transform.forward * Input.GetAxisRaw("Vertical");
-				direction += transform.right * Input.GetAxisRaw("Horizontal");
+				direction += this.transform.forward * Input.GetAxisRaw("Vertical");
+				direction += this.transform.right * Input.GetAxisRaw("Horizontal");
 
 				direction.Normalize();
 
-				if (movementController.isGrounded)
-					velocity = Vector3.zero;
+				if (this.movementController.isGrounded)
+					this.velocity = Vector3.zero;
 				else
-					velocity += -transform.up * (9.81f * 10) * Time.deltaTime; // Gravity
+					this.velocity += -this.transform.up * (9.81f * 10) * Time.deltaTime; // Gravity
 
-				direction += velocity * Time.deltaTime;
-				movementController.Move(direction * Time.deltaTime * MoveSpeed);
+				direction += this.velocity * Time.deltaTime;
+				this.movementController.Move(direction * Time.deltaTime * this.MoveSpeed);
 
 				// Camera Look
-				yaw += Input.GetAxisRaw("Mouse X") * LookSensitivity;
-				pitch += Input.GetAxisRaw("Mouse Y") * LookSensitivity;
+				this.yaw += Input.GetAxisRaw("Mouse X") * this.LookSensitivity;
+				this.pitch += Input.GetAxisRaw("Mouse Y") * this.LookSensitivity;
 
-				yaw = ClampAngle(yaw, MinYaw, MaxYaw);
-				pitch = ClampAngle(pitch, MinPitch, MaxPitch);
+				this.yaw = this.ClampAngle(this.yaw, this.MinYaw, this.MaxYaw);
+				this.pitch = this.ClampAngle(this.pitch, this.MinPitch, this.MaxPitch);
 
-				transform.rotation = Quaternion.AngleAxis(yaw, Vector3.up);
-				playerCamera.transform.localRotation = Quaternion.AngleAxis(pitch, -Vector3.right);
+				this.transform.rotation = Quaternion.AngleAxis(this.yaw, Vector3.up);
+				this.playerCamera.transform.localRotation = Quaternion.AngleAxis(this.pitch, -Vector3.right);
 			}
 		}
 
 		protected float ClampAngle(float angle)
 		{
-			return ClampAngle(angle, 0, 360);
+			return this.ClampAngle(angle, 0, 360);
 		}
 
 		protected float ClampAngle(float angle, float min, float max)
@@ -119,18 +121,18 @@ namespace DunGen.Demo
 
 		protected void ToggleControl()
 		{
-			isControlling = !isControlling;
+			this.isControlling = !this.isControlling;
 
-			overheadCamera.gameObject.SetActive(!isControlling);
-			playerCamera.gameObject.SetActive(isControlling);
+			this.overheadCamera.gameObject.SetActive(!this.isControlling);
+			this.playerCamera.gameObject.SetActive(this.isControlling);
 
-			overheadCamera.transform.position = new Vector3(transform.position.x, overheadCamera.transform.position.y, transform.position.z);
+			this.overheadCamera.transform.position = new Vector3(this.transform.position.x, this.overheadCamera.transform.position.y, this.transform.position.z);
 
-			Cursor.lockState = (isControlling) ? CursorLockMode.Locked : CursorLockMode.None;
-			Cursor.visible = !isControlling;
+			Cursor.lockState = (this.isControlling) ? CursorLockMode.Locked : CursorLockMode.None;
+			Cursor.visible = !this.isControlling;
 
-			if (!isControlling)
-				FrameDungeonWithCamera();
+			if (!this.isControlling)
+				this.FrameDungeonWithCamera();
 		}
 
 		protected void FrameDungeonWithCamera()
@@ -139,7 +141,7 @@ namespace DunGen.Demo
 				.Select(x => x.gameObject)
 				.ToArray();
 
-			FrameObjectsWithCamera(allDungeons);
+			this.FrameObjectsWithCamera(allDungeons);
 		}
 
 		protected void FrameObjectsWithCamera(params GameObject[] gameObjects)
@@ -168,13 +170,13 @@ namespace DunGen.Demo
 
 			float radius = Mathf.Max(bounds.size.x, bounds.size.z);
 
-			float distance = radius / Mathf.Sin(overheadCamera.fieldOfView / 2);
+			float distance = radius / Mathf.Sin(this.overheadCamera.fieldOfView / 2);
 			distance = Mathf.Abs(distance);
 
 			Vector3 position = new Vector3(bounds.center.x, bounds.center.y, bounds.center.z);
-			position += gen.DungeonGenerator.Generator.UpVector * distance;
+			position += this.gen.DungeonGenerator.Generator.UpVector * distance;
 
-			overheadCamera.transform.position = position;
+			this.overheadCamera.transform.position = position;
 		}
 	}
 }

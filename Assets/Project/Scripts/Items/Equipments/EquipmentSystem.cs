@@ -11,8 +11,8 @@ public class EquipmentSystem : MonoBehaviour {
     private Dictionary<Item, EquipmentSocket> EquipmentLookup { get; init; } = [];
     private List<EquipmentSocket> EquipmentSockets { get; set; } = [];
     
-    public event UnityAction<Item> OnEquip = delegate { };
-    public event UnityAction<Item> OnUnequip = delegate { };
+    public event UnityAction<GameObject?> OnEquip = delegate { };
+    public event UnityAction<GameObject?> OnUnequip = delegate { };
 
     private void Awake() {
         this.GetComponentsInChildren(this.EquipmentSockets);
@@ -46,18 +46,6 @@ public class EquipmentSystem : MonoBehaviour {
         return true;
     }
 
-    public bool Has(Item equipment) {
-        return this.EquipmentLookup.ContainsKey(equipment);
-    }
-
-    public void Toggle(Item equipment) {
-        if (this.Has(equipment)) {
-            this.Unequip(equipment);
-        } else {
-            this.Equip(equipment);
-        }
-    }
-
     public void Equip(Item equipment) {
         if (!this.FindSlot(equipment, out EquipmentSocket socket)) {
             socket.Detach();
@@ -66,13 +54,13 @@ public class EquipmentSystem : MonoBehaviour {
         Debug.Log($"{this.gameObject} equips {equipment} to {socket}");
         socket.Attach(equipment.Model);
         this.EquipmentLookup[equipment] = socket;
-        this.OnEquip.Invoke(equipment);
+        this.OnEquip.Invoke(equipment.Model);
     }
 
     public void Unequip(Item equipment) {
         Debug.Log($"{this.gameObject} unequips {equipment} from {this.EquipmentLookup[equipment]}");
         this.EquipmentLookup[equipment].Detach();
         this.EquipmentLookup.Remove(equipment);
-        this.OnUnequip.Invoke(equipment);
+        this.OnUnequip.Invoke(equipment.Model);
     }
 }

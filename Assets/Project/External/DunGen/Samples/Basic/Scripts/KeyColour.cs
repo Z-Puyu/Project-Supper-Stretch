@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using DunGen.Project.External.DunGen.Code;
+using UnityEngine;
 
-namespace DunGen.Demo
+namespace Project.External.DunGen.Samples.Basic.Scripts
 {
 	public class KeyColour : MonoBehaviour, IKeyLock
 	{
@@ -10,30 +11,37 @@ namespace DunGen.Demo
 		[SerializeField]
 		private KeyManager keyManager;
 
+		private MaterialPropertyBlock propertyBlock;
+
 
 		public void OnKeyAssigned(Key key, KeyManager manager)
 		{
-			keyID = key.ID;
-			keyManager = manager;
+			this.keyID = key.ID;
+			this.keyManager = manager;
 
-			SetColour(key.Colour);
+			this.SetColour(key.Colour);
 		}
 
 		private void Start()
 		{
-			if (keyManager == null)
+			if (this.keyManager == null)
 				return;
 
-			var key = keyManager.GetKeyByID(keyID);
-			SetColour(key.Colour);
+			var key = this.keyManager.GetKeyByID(this.keyID);
+			this.SetColour(key.Colour);
 		}
 
 		private void SetColour(Color colour)
 		{
 			if (Application.isPlaying)
 			{
-				foreach (var r in GetComponentsInChildren<Renderer>())
-					r.material.color = colour;
+				if(this.propertyBlock == null)
+					this.propertyBlock = new MaterialPropertyBlock();
+
+				this.propertyBlock.SetColor("_Color", colour);
+
+				foreach (var r in this.GetComponentsInChildren<Renderer>())
+					r.SetPropertyBlock(this.propertyBlock);
 			}
 		}
 	}

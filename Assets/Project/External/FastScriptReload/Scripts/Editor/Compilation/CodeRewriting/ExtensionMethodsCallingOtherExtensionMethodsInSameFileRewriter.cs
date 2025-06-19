@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace FastScriptReload.Editor.Compilation.CodeRewriting
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting
 {
     // When calling other extension methods from same file compilation would fail with 'The call is ambiguous between the following methods or properties' 
     class ExtensionMethodsCallingOtherExtensionMethodsInSameFileRewriter : FastScriptReloadCodeRewriterBase
@@ -20,7 +20,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
         {
             var classDeclaredMethodNameToThisArgName = new Dictionary<string, string>();
-            _typeNameToDeclaredMethodNameToThisArgName[node.Identifier.Text] = classDeclaredMethodNameToThisArgName;
+            this._typeNameToDeclaredMethodNameToThisArgName[node.Identifier.Text] = classDeclaredMethodNameToThisArgName;
             
             foreach (var methodDeclaration in node.Members
                          .Where(n => n.Kind() == SyntaxKind.MethodDeclaration)
@@ -45,7 +45,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
                 var methodName = memberAccess.Name.Identifier.Text;
                 var instanceArgName = memberAccess.Expression;
                 var className = node.Ancestors().OfType<ClassDeclarationSyntax>().First().Identifier.Text;
-                if (_typeNameToDeclaredMethodNameToThisArgName.TryGetValue(className, out var declaredMethodNameToThisArgName)
+                if (this._typeNameToDeclaredMethodNameToThisArgName.TryGetValue(className, out var declaredMethodNameToThisArgName)
                     && declaredMethodNameToThisArgName.TryGetValue(methodName, out var definedInstanceArgName))
                 {
                     if (instanceArgName.ToString() == definedInstanceArgName)
@@ -60,7 +60,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
                                 )
                             ).NormalizeWhitespace();
                         
-                        return AddRewriteCommentIfNeeded(
+                        return this.AddRewriteCommentIfNeeded(
                             newInvocation, 
                             $"{nameof(ExtensionMethodsCallingOtherExtensionMethodsInSameFileRewriter)}:Replaced extension method call with static call"
                         );

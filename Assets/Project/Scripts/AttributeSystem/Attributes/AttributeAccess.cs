@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using SaintsField;
 using UnityEngine;
 
@@ -10,6 +11,10 @@ public class AttributeAccess : MonoBehaviour, IAttributeReader {
     [field: SerializeField]
     [field: InfoBox("If unassigned, the component will fetch the closest one in its parents.")]
     private AttributeSet? Source { get; set; }
+    
+    public AdvancedDropdownList<AttributeKey> AllAccessibleAttributes => !this.Source 
+            ? this.GetComponentInParent<AttributeSet>().AllAccessibleAttributes
+            : this.Source.AllAccessibleAttributes;
 
     private void Awake() {
         if (this.Source) {
@@ -22,21 +27,21 @@ public class AttributeAccess : MonoBehaviour, IAttributeReader {
         }
     }
 
-    public Attribute Read(Enum attribute) {
-        return this.Source[attribute];
+    public Attribute Read(string attribute) {
+        return this.Source.Read(attribute);
     }
     
-    public int ReadCurrent(Enum attribute) {
-        return this.Source[attribute].CurrentValue;
+    public int ReadCurrent(string attribute) {
+        return this.Source.ReadCurrent(attribute);
     }
     
-    public int ReadBase(Enum attribute) {
-        return this.Source[attribute].BaseValue;
+    public int ReadBase(string attribute) {
+        return this.Source.ReadBase(attribute);
     }
     
-    public int ReadMax(Enum attribute) {
+    public int ReadMax(string attribute) {
         Attribute value = this.Read(attribute);
-        if (value.Cap is null) {
+        if (value.Cap == string.Empty) {
             return value.HardLimit >= 0 ? value.HardLimit : int.MaxValue;
         }
         

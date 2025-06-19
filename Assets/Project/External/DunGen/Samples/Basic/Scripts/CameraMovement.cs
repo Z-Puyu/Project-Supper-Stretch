@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using DunGen.Project.External.DunGen.Code;
+using DunGen.Project.External.DunGen.Code.Utility;
+using UnityEngine;
 
-namespace DunGen.Demo
+namespace Project.External.DunGen.Samples.Basic.Scripts
 {
 	public class CameraMovement : MonoBehaviour
 	{
@@ -12,26 +14,26 @@ namespace DunGen.Demo
 			var runtimeDungeon = UnityUtil.FindObjectByType<RuntimeDungeon>();
 
 			if (runtimeDungeon != null)
-				transform.forward = -runtimeDungeon.Generator.UpVector;
+				this.transform.forward = -runtimeDungeon.Generator.UpVector;
 		}
 
 		private void Update()
 		{
 			Vector3 direction = Vector3.zero;
 
-			direction += transform.up * Input.GetAxisRaw("Vertical");
-			direction += transform.right * Input.GetAxisRaw("Horizontal");
+			direction += this.transform.up * Input.GetAxisRaw("Vertical");
+			direction += this.transform.right * Input.GetAxisRaw("Horizontal");
 
 			direction.Normalize();
 
-			Vector3 offset = direction * MovementSpeed * Time.deltaTime;
+			Vector3 offset = direction * this.MovementSpeed * Time.deltaTime;
 			if (Input.GetKey(KeyCode.LeftShift))
 				offset *= 2;
 
 			float zoom = Input.GetAxisRaw("Mouse ScrollWheel");
-			offset += transform.forward * zoom * Time.deltaTime * MovementSpeed * 100;
+			offset += this.transform.forward * zoom * Time.deltaTime * this.MovementSpeed * 100;
 
-			transform.position += offset;
+			this.transform.position += offset;
 		}
 	}
 }

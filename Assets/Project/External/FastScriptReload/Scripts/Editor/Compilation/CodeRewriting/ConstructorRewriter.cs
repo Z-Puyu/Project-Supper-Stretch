@@ -1,10 +1,10 @@
 ﻿using System.Linq;
-using FastScriptReload.Runtime;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Project.External.FastScriptReload.Scripts.Runtime;
 
-namespace FastScriptReload.Editor.Compilation.CodeRewriting
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting
 {
 	class ConstructorRewriter : FastScriptReloadCodeRewriterBase
         {
@@ -13,22 +13,22 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 	        public ConstructorRewriter(bool adjustCtorOnlyForNonNestedTypes, bool writeRewriteReasonAsComment)
 				: base(writeRewriteReasonAsComment)
 	        {
-		        _adjustCtorOnlyForNonNestedTypes = adjustCtorOnlyForNonNestedTypes;
+		        this._adjustCtorOnlyForNonNestedTypes = adjustCtorOnlyForNonNestedTypes;
 	        }
 	        
 	        public override SyntaxNode VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
 	        {
-		        if (_adjustCtorOnlyForNonNestedTypes)
+		        if (this._adjustCtorOnlyForNonNestedTypes)
 		        {
 			        var typeNestedLevel = node.Ancestors().Count(a => a is TypeDeclarationSyntax);
 			        if (typeNestedLevel == 1)
 			        {
-				        return AdjustCtorOrDestructorNameForTypeAdjustment(node, node.Identifier);
+				        return this.AdjustCtorOrDestructorNameForTypeAdjustment(node, node.Identifier);
 			        }
 		        }
 		        else
 		        {
-			        return AdjustCtorOrDestructorNameForTypeAdjustment(node, node.Identifier);
+			        return this.AdjustCtorOrDestructorNameForTypeAdjustment(node, node.Identifier);
 		        }
 
 		        return base.VisitConstructorDeclaration(node);
@@ -36,17 +36,17 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 
 	        public override SyntaxNode VisitDestructorDeclaration(DestructorDeclarationSyntax node)
 	        {
-		        if (_adjustCtorOnlyForNonNestedTypes)
+		        if (this._adjustCtorOnlyForNonNestedTypes)
 		        {
 			        var typeNestedLevel = node.Ancestors().Count(a => a is TypeDeclarationSyntax);
 			        if (typeNestedLevel == 1)
 			        {
-				        return AdjustCtorOrDestructorNameForTypeAdjustment(node, node.Identifier);
+				        return this.AdjustCtorOrDestructorNameForTypeAdjustment(node, node.Identifier);
 			        }
 		        }
 		        else
 		        {
-			        return AdjustCtorOrDestructorNameForTypeAdjustment(node, node.Identifier);
+			        return this.AdjustCtorOrDestructorNameForTypeAdjustment(node, node.Identifier);
 		        }
 		        
 		        return base.VisitDestructorDeclaration(node);
@@ -75,9 +75,9 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 			        typeName += AssemblyChangesLoader.ClassnamePatchedPostfix;
 		        }
 
-		        return AddRewriteCommentIfNeeded(
+		        return this.AddRewriteCommentIfNeeded(
 			        node.ReplaceToken(nodeIdentifier, SyntaxFactory.Identifier(typeName)), 
-			        $"{nameof(ConstructorRewriter)}:{nameof(AdjustCtorOrDestructorNameForTypeAdjustment)}"
+			        $"{nameof(ConstructorRewriter)}:{nameof(this.AdjustCtorOrDestructorNameForTypeAdjustment)}"
 			    );
 	        }
         }

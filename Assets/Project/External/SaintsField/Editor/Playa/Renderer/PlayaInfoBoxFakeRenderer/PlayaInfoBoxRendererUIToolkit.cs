@@ -87,7 +87,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
         private static (string error, bool show) UpdateInfoBoxShow(HelpBox helpBox,
             InfoBoxUserData infoBoxUserData)
         {
-            (string showError, object showResult) = Util.GetOfNoParams<object>(infoBoxUserData.FieldWithInfo.Target,
+            (string showError, object showResult) = Util.GetOfNoParams<object>(infoBoxUserData.FieldWithInfo.Targets[0],
                 infoBoxUserData.InfoBoxAttribute.ShowCallback, null);
             if (showError != "")
             {
@@ -185,7 +185,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             if (infoBoxUserData.FieldWithInfo.RenderType == SaintsRenderType.ClassStruct)
             {
                 member = null;
-                useLabel = ObjectNames.NicifyVariableName(infoBoxUserData.FieldWithInfo.Target.GetType().Name);
+                useLabel = ObjectNames.NicifyVariableName(infoBoxUserData.FieldWithInfo.Targets[0].GetType().Name);
             }
             else
             {
@@ -195,7 +195,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
 
             label.Clear();
             foreach (VisualElement richTextElement in infoBoxUserData.RichTextDrawer.DrawChunksUIToolKit(
-                         RichTextDrawer.ParseRichXml(xmlContent, useLabel, infoBoxUserData.FieldWithInfo.SerializedProperty, member, infoBoxUserData.FieldWithInfo.Target))
+                         RichTextDrawer.ParseRichXml(xmlContent, useLabel, infoBoxUserData.FieldWithInfo.SerializedProperty, member, infoBoxUserData.FieldWithInfo.Targets[0]))
                      )
             {
 

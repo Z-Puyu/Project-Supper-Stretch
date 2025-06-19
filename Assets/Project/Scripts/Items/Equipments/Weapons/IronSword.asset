@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ed4bfbad18b40e7b42737dbd1a6f467, type: 3}
+  m_Name: IronSword
+  m_EditorClassIdentifier: 
+  <Type>k__BackingField: 6
+  <Slot>k__BackingField: 1
+  <Name>k__BackingField: Iron Sword
+  <Model>k__BackingField: {fileID: 7728824248015367572, guid: bdeba134202d3b54d98a5832cc15d663, type: 3}
+  <Properties>k__BackingField:
+  - rid: 1548064347122565217
+  <Worth>k__BackingField: 30
+  references:
+    version: 2
+    RefIds:
+    - rid: 1548064347122565217
+      type: {class: WeaponProperties, ns: Project.Scripts.Items.Equipments.Weapons, asm: Project.Scripts.Items}
+      data:
+        <WeaponAttributes>k__BackingField:
+        - <AttributeType>k__BackingField: 0
+          <Value>k__BackingField: 10
+          <ModifierType>k__BackingField: 0
+          <ModifierOperation>k__BackingField: 0

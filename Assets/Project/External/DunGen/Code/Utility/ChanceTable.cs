@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code.Utility
 {
     #region Helper Class
 
@@ -30,8 +30,8 @@ namespace DunGen
 
         public Chance(T value, float weight)
         {
-            Value = value;
-            Weight = weight;
+            this.Value = value;
+            this.Weight = weight;
         }
     }
 
@@ -57,7 +57,7 @@ namespace DunGen
         /// <param name="weight">Its weight, representing the chance this value has of being picked, relative to the others in the table</param>
         public void Add(T value, float weight)
         {
-            Weights.Add(new Chance<T>(value, weight));
+            this.Weights.Add(new Chance<T>(value, weight));
         }
 
         /// <summary>
@@ -66,10 +66,10 @@ namespace DunGen
         /// <param name="value">The value to remove</param>
         public void Remove(T value)
         {
-            for (int i = 0; i < Weights.Count; i++)
+            for (int i = 0; i < this.Weights.Count; i++)
             {
-                if (Weights[i].Value.Equals(value))
-                    Weights.RemoveAt(i);
+                if (this.Weights[i].Value.Equals(value))
+                    this.Weights.RemoveAt(i);
             }
         }
 
@@ -80,10 +80,10 @@ namespace DunGen
         /// <returns>A random value</returns>
         public T GetRandom(RandomStream random)
         {
-            float totalWeight = Weights.Select(x => x.Weight).Sum();
+            float totalWeight = this.Weights.Select(x => x.Weight).Sum();
             float randomNumber = (float)(random.NextDouble() * totalWeight);
 
-            foreach(var w in Weights)
+            foreach(var w in this.Weights)
             {
                 if (randomNumber < w.Weight)
                     return w.Value;

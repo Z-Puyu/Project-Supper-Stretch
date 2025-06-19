@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a81018c6cc3489c8493ec94033d338d, type: 3}
+  m_Name: New Player Preset
+  m_EditorClassIdentifier: 
+  <Attributes>k__BackingField:
+  - <Key>k__BackingField:
+      <FullName>k__BackingField: CharacterAttribute.Health
+      <Name>k__BackingField: Health
+    <Value>k__BackingField: 100
+  - <Key>k__BackingField:
+      <FullName>k__BackingField: CharacterAttribute.Sanity
+      <Name>k__BackingField: Sanity
+    <Value>k__BackingField: 100
+  - <Key>k__BackingField:
+      <FullName>k__BackingField: CharacterAttribute.Satiation
+      <Name>k__BackingField: Satiation
+    <Value>k__BackingField: 100
+  <StartingInventory>k__BackingField:
+    _keys: []
+    _values: 
+    _saintsKeys:
+    - value: {fileID: 11400000, guid: f6676e9afba236a4787de355af9b7a5c, type: 2}
+    _saintsValues:
+    - value: 1

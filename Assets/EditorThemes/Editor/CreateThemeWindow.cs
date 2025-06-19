@@ -1,11 +1,11 @@
-using UnityEngine;
-using UnityEditor;
 using System.IO;
+using UnityEditor;
+using UnityEngine;
 
 //to do TextColor
 //EditorStyles.label.normal.textColor 
 
-namespace ThemesPlugin 
+namespace EditorThemes.Editor 
 {
     public class CreateThemeWindow : EditorWindow
     {
@@ -32,14 +32,14 @@ namespace ThemesPlugin
             EditorGUILayout.LabelField("");
 
 
-            Name = EditorGUILayout.TextField(Name, GUILayout.Width(200));
+            this.Name = EditorGUILayout.TextField(this.Name, GUILayout.Width(200));
 
             EditorGUILayout.LabelField("");
             EditorGUILayout.LabelField("Preset:");
 
-            unityTheme = (UnityTheme)EditorGUILayout.EnumPopup(unityTheme, GUILayout.Width(100));
+            this.unityTheme = (UnityTheme)EditorGUILayout.EnumPopup(this.unityTheme, GUILayout.Width(100));
             string Description = "";
-            switch (unityTheme)
+            switch (this.unityTheme)
             {
                 case UnityTheme.FullDark:
                     Description = "Everything you need for a Dark Theme";
@@ -79,7 +79,7 @@ namespace ThemesPlugin
 
             if (create)
             {
-                string Path = Application.dataPath + "/EditorThemes/Editor/StyleSheets/Extensions/CustomThemes/" + Name + ".json";
+                string Path = Application.dataPath + "/EditorThemes/Editor/StyleSheets/Extensions/CustomThemes/" + this.Name + ".json";
                 if (File.Exists(Path))
                 {
                     if( EditorUtility.DisplayDialog("This Theme already exsists", "Do you want to overide the old Theme?", "Yes",  "Cancel") == false)
@@ -90,7 +90,7 @@ namespace ThemesPlugin
 
                 CustomTheme t = new CustomTheme();
                 string PresetName = "";
-                switch (unityTheme)
+                switch (this.unityTheme)
                 {
                     case UnityTheme.FullDark:
                         PresetName = "FullDark";
@@ -109,7 +109,7 @@ namespace ThemesPlugin
                         break;
                 }
 
-                t = FetchTheme(PresetName,Name);
+                t = this.FetchTheme(PresetName,this.Name);
 
 
 

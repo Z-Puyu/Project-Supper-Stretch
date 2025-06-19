@@ -1,8 +1,10 @@
 ﻿using System.Linq;
+using DunGen.Editor.Project.External.DunGen.Code.Editor.Utility;
+using DunGen.Project.External.DunGen.Code;
 using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Drawers
+namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers
 {
 	[CustomPropertyDrawer(typeof(GameObjectChance))]
 	sealed class GameObjectChanceDrawer : PropertyDrawer
@@ -30,17 +32,17 @@ namespace DunGen.Editor.Drawers
 
 			float height = EditorGUIUtility.singleLineHeight;
 			height *= (mainPathWeightProperty.isExpanded) ? 5 : 2;
-			height += Padding * 2;
+			height += GameObjectChanceDrawer.Padding * 2;
 
 			return height;
 		}
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			var filter = FilterOverride ?? GameObjectFilter.All;
-			var attribute = fieldInfo.GetCustomAttributes(typeof(AcceptGameObjectTypesAttribute), true)
-									 .Cast<AcceptGameObjectTypesAttribute>()
-									 .FirstOrDefault();
+			var filter = GameObjectChanceDrawer.FilterOverride ?? GameObjectFilter.All;
+			var attribute = this.fieldInfo.GetCustomAttributes(typeof(AcceptGameObjectTypesAttribute), true)
+			                    .Cast<AcceptGameObjectTypesAttribute>()
+			                    .FirstOrDefault();
 
 			if (attribute != null)
 				filter = attribute.Filter;
@@ -60,22 +62,22 @@ namespace DunGen.Editor.Drawers
 			position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 			GUI.Box(position, GUIContent.none);
 
-			var controlRect = new Rect(position.x + Padding, position.y + Padding, position.width - (Padding * 2), EditorGUIUtility.singleLineHeight);
+			var controlRect = new Rect(position.x + GameObjectChanceDrawer.Padding, position.y + GameObjectChanceDrawer.Padding, position.width - (GameObjectChanceDrawer.Padding * 2), EditorGUIUtility.singleLineHeight);
 
 			EditorUtil.ObjectField(controlRect, valueProperty, GUIContent.none, typeof(GameObject), allowSceneObjects, allowAssets);
-			MoveRectToNextLine(ref controlRect);
+			this.MoveRectToNextLine(ref controlRect);
 
 			float foldoutOffset = EditorStyles.foldout.padding.left;
 			var foldoutRect = new Rect(controlRect.x + foldoutOffset, controlRect.y, controlRect.width - foldoutOffset, controlRect.height);
 			mainPathWeightProperty.isExpanded = EditorGUI.Foldout(foldoutRect, mainPathWeightProperty.isExpanded, "Weights", true);
-			MoveRectToNextLine(ref controlRect);
+			this.MoveRectToNextLine(ref controlRect);
 
 			if (mainPathWeightProperty.isExpanded)
 			{
 				EditorGUI.PropertyField(controlRect, mainPathWeightProperty, Label.MainPathWeight);
-				MoveRectToNextLine(ref controlRect);
+				this.MoveRectToNextLine(ref controlRect);
 				EditorGUI.PropertyField(controlRect, branchPathWeightProperty, Label.BranchPathWeight);
-				MoveRectToNextLine(ref controlRect);
+				this.MoveRectToNextLine(ref controlRect);
 
 				EditorGUI.CurveField(controlRect, depthWeightScaleProperty, Color.white, new Rect(0, 0, 1, 1), Label.DepthWeightScale);
 			}

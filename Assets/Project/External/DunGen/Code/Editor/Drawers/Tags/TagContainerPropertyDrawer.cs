@@ -1,10 +1,10 @@
-﻿using DunGen.Tags;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using DunGen.Project.External.DunGen.Code.Tags;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace DunGen.Editor.Drawers.Tags
+namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers.Tags
 {
 	[CustomPropertyDrawer(typeof(TagContainer))]
 	public class TagContainerPropertyDrawer : PropertyDrawer
@@ -16,11 +16,11 @@ namespace DunGen.Editor.Drawers.Tags
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			currentLabel = label;
-			currentProperty = property;
+			this.currentLabel = label;
+			this.currentProperty = property;
 
 			EditorGUI.BeginProperty(position, label, property);
-			GetOrCreateReorderableList(property).DoLayoutList();
+			this.GetOrCreateReorderableList(property).DoLayoutList();
 			EditorGUI.EndProperty();
 		}
 
@@ -28,27 +28,27 @@ namespace DunGen.Editor.Drawers.Tags
 		{
 			ReorderableList list;
 
-			if (lists.TryGetValue(property.propertyPath, out list))
+			if (this.lists.TryGetValue(property.propertyPath, out list))
 				return list;
 
 			list = new ReorderableList(property.serializedObject, property.FindPropertyRelative("Tags"))
 			{
-				drawHeaderCallback = DrawListHeader,
-				drawElementCallback = DrawListElement,
+				drawHeaderCallback = this.DrawListHeader,
+				drawElementCallback = this.DrawListElement,
 			};
 
-			lists[property.propertyPath] = list;
+			this.lists[property.propertyPath] = list;
 			return list;
 		}
 
 		private void DrawListHeader(Rect rect)
 		{
-			EditorGUI.LabelField(rect, currentLabel);
+			EditorGUI.LabelField(rect, this.currentLabel);
 		}
 
 		private void DrawListElement(Rect rect, int index, bool isActive, bool isFocused)
 		{
-			EditorGUI.PropertyField(rect, currentProperty.FindPropertyRelative("Tags").GetArrayElementAtIndex(index), GUIContent.none);
+			EditorGUI.PropertyField(rect, this.currentProperty.FindPropertyRelative("Tags").GetArrayElementAtIndex(index), GUIContent.none);
 		}
 	}
 }

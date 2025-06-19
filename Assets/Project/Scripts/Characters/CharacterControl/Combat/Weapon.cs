@@ -1,52 +1,40 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using SaintsField;
 using Project.Scripts.AttributeSystem.Attributes;
-using Project.Scripts.AttributeSystem.Attributes.AttributeTypes;
+using Project.Scripts.AttributeSystem.Attributes.Definitions;
+using Project.Scripts.Util.Linq;
 using UnityEngine;
 
-namespace Project.Scripts.Combat;
+namespace Project.Scripts.Characters.CharacterControl.Combat;
 
-[RequireComponent(typeof(BoxCollider), typeof(AttributeAccess))]
+[DisallowMultipleComponent]
 public class Weapon : MonoBehaviour, IDamageDealer {
-    [NotNull]
-    private BoxCollider? HitBox { get; set; }
+    private AdvancedDropdownList<AttributeKey> AllAccessibleAttributes =>
+            this.GetComponent<IAttributeReader>().AllAccessibleAttributes;
     
-    [NotNull]
-    private ComboAttack? ComboAttack { get; set; }
+    [NotNull] 
+    [field: SerializeField, Required] 
+    private HitBox? HitBox { get; set; }
     
-    [NotNull]
-    private IAttributeReader? AttributeReader { get; set; }
+    [field: SerializeField, AdvancedDropdown(nameof(this.AllAccessibleAttributes))]
+    private AttributeKey BaseDamageAttribute { get; set; }
+    
+    [NotNull] private IAttributeReader? AttributeReader { get; set; }
 
     private void Awake() {
-        this.HitBox = this.GetComponent<BoxCollider>();
-        this.ComboAttack = this.GetComponentInParent<ComboAttack>();
         this.AttributeReader = this.GetComponent<IAttributeReader>();
     }
-
-    private void OnEnable() {
-        this.ComboAttack.OnComboStarted += this.Activate;
+    
+    private void Start() {
+        this.HitBox.OnHit += this.Damage;
     }
 
-    private void OnDisable() {
-        this.ComboAttack.OnComboStarted -= this.Activate;
-    }
-
-    private void Activate() {
-        this.HitBox.enabled = true;
-    }
-
-    private void OnTriggerEnter(Collider other) {
-        IDamageable[] targets = other.GetComponents<IDamageable>();
-        if (targets.Length == 0) {
-            return;
-        }
-        
-        this.HitBox.enabled = false;
-        foreach (IDamageable target in other.GetComponents<IDamageable>()) {
-            this.Damage(target);
-        }
+    public void Damage(IEnumerable<IDamageable> targets) {
+        targets.ForEach(this.Damage);
     }
 
     public void Damage(IDamageable target) {
-        target.TakeDamage(this.AttributeReader.ReadCurrent(WeaponAttribute.Damage), this.gameObject);
+        target.TakeDamage(this.AttributeReader.ReadCurrent(this.BaseDamageAttribute.FullName), this.gameObject);
     }
 }

@@ -1,56 +1,117 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+using SaintsField;
 using Project.Scripts.AttributeSystem.Attributes;
-using Project.Scripts.AttributeSystem.Attributes.AttributeTypes;
-using Project.Scripts.AttributeSystem.GameplayEffects;
-using Project.Scripts.AttributeSystem.GameplayEffects.Executions.Custom;
-using Project.Scripts.AttributeSystem.Modifiers;
 using Project.Scripts.Characters.CharacterControl.Combat;
-using Project.Scripts.InventorySystem;
-using Project.Scripts.Items;
-using Project.Scripts.Items.Equipments;
+using Project.Scripts.Common;
+using Project.Scripts.Items.InventorySystem;
 using Project.Scripts.Util.Linq;
+using SaintsField.Playa;
 using UnityEngine;
+using UnityEngine.Events;
 using Object = UnityEngine.Object;
 
 namespace Project.Scripts.Characters.CharacterControl;
 
 [DisallowMultipleComponent, RequireComponent(typeof(AttributeSet), typeof(Health))]
-public abstract class GameCharacter : MonoBehaviour;
-
-public abstract class GameCharacter<C> : GameCharacter, IConsumer where C : CharacterData {
-    [field: SerializeField] protected C? CharacterData { get; set; }
+[RequireComponent(typeof(Inventory), typeof(ComboAttack))]
+public abstract class GameCharacter : MonoBehaviour {
+    private List<CharacterJoint> Joints { get; set; } = [];
+    private List<Rigidbody> RagdollParts { get; set; } = [];
+    private List<Collider> RagdollColliders { get; set; } = [];
+    [field: SerializeField, Required] private GameObject? CharacterModel { get; set; }
+    [field: SerializeField, Required] protected Animator? Animator { get; private set; }
+    
+    [field: SerializeField, HideIf(nameof(this.Animator), null)]
+    [field: AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Trigger)]
+    private int AnimatorParameterForDeathEvent { get; set; }
+    
+    [field: SerializeField] private List<GameObject> DestroyOnDeath { get; set; } = [];
+    [field: SerializeField] private List<GameObject> EnableAfterDeath { get; set; } = [];
+    [NotNull] protected Inventory? Inventory { get; private set; }
+    [NotNull] protected ComboAttack? ComboAttack { get; private set; }
     [NotNull] protected Health? Health { get; private set; }
     [NotNull] protected AttributeSet? AttributeSet { get; private set; }
-    [NotNull] protected Inventory? Inventory { get; private set; }
-    [NotNull] protected EquipmentSystem? EquipmentSystem { get; private set; }
-    [NotNull] protected CharacterMovement? Movement { get; private set; }
 
     protected virtual void Awake() {
+        this.ComboAttack = this.GetComponent<ComboAttack>();
+        this.Inventory = this.GetComponent<Inventory>();
         this.AttributeSet = this.GetComponent<AttributeSet>();
         this.Health = this.GetComponent<Health>();
-        this.Movement = this.gameObject.GetComponent<CharacterMovement>();
-        
-        this.Inventory = this.gameObject.AddComponent<Inventory>();
-        this.EquipmentSystem = this.gameObject.AddComponent<EquipmentSystem>();
+        if (!this.CharacterModel) {
+            return;
+        }
+
+        CharacterJoint[] joints = this.CharacterModel.GetComponentsInChildren<CharacterJoint>();
+        int l = joints.Length;
+        joints.ForEach(register);
+        return;
+
+        void register(CharacterJoint joint) {
+            this.RagdollParts.Add(joint.GetComponent<Rigidbody>());
+            this.RagdollColliders.Add(joint.GetComponent<Collider>());
+        }
     }
+
+    protected virtual void Start() {
+        this.RagdollParts.ForEach(body => body.isKinematic = true);
+        this.RagdollColliders.ForEach(c => c.enabled = false);
+    }
+
+    protected virtual void DyingFrom(GameObject? source) {
+        if (!this.Animator) {
+            this.Animator = this.GetComponentInChildren<Animator>();
+        }
+
+        if (!this.Animator) {
+            return;
+        }
+
+        Debug.Log($"{this.gameObject.name} killed by {(source ? source.name : "unknown source")}");
+        this.Animator.SetTrigger(this.AnimatorParameterForDeathEvent);
+        this.GetComponents<MonoBehaviour>().ForEach(component => component.enabled = false);
+        this.DestroyOnDeath.ForEach(Object.Destroy);
+        this.EnableAfterDeath.ForEach(obj => obj.SetActive(true));
+        // Object.Destroy(this.gameObject);
+    }
+
+    public void Die() {
+        this.RagdollParts.ForEach(body => body.isKinematic = false);
+        this.RagdollColliders.ForEach(c => c.enabled = true);
+        if (this.Animator) {
+            this.Animator.enabled = false;
+        }
+        
+        Debug.Log($"{this.gameObject.name} is actually dead");
+    }
+}
+
+public abstract class GameCharacter<C> : GameCharacter where C : CharacterData {
+    public static event UnityAction<C, GameObject?> OnDeath = delegate { }; 
+    
+    [NotNull] 
+    [field: SerializeField, Required] 
+    protected C? CharacterData { get; set; }
+    
+    [field: SerializeField] private List<GameObject> EnableAfterInitialisation { get; set; } = [];
+    private bool IsInitialised { get; set; }
 
     public virtual void Initialise() {
+        if (this.IsInitialised) {
+            throw new InvalidOperationException($"Trying to initialise {this.gameObject.name} twice");
+        }
+        
+        this.IsInitialised = true;
         this.InitialiseAttributes();
         this.InitialiseHealth();
+        this.EnableAfterInitialisation.ForEach(obj => obj.SetActive(true));
+        this.transform.SetParent(null);
     }
-
+    
     private void InitialiseHealth() {
         this.Health.Initialise();
-        this.Health.TakingDamageAction = damaged;
-        this.Health.OnDeath += _ => Object.Destroy(this.gameObject);
-        return;
-        
-        void damaged(AttributeSet instigator) {
-            GameplayEffectFactory.CreateInstant<TakingDamage>()
-                                 .Execute(new WeaponDamageExecutionArgs(this.AttributeSet, instigator));
-        }
+        this.Health.OnDeath += this.DyingFrom;
     }
 
     private void InitialiseAttributes() {
@@ -58,44 +119,20 @@ public abstract class GameCharacter<C> : GameCharacter, IConsumer where C : Char
             return;
         }
         
-        foreach (CharacterAttributeData data in this.CharacterData.Attributes) {
-            if (data.IsCappedByValue) {
-                this.AttributeSet.Init(data.AttributeType, data.Value, maxValue: data.MaxValue);
-            } else if (data.IsCappedByAttribute) {
-                this.AttributeSet.Init(data.Cap, data.Value);
-                this.AttributeSet.Init(data.AttributeType, data.Value, cap: data.Cap);
-            } else {
-                this.AttributeSet.Init(data.AttributeType, data.Value);
-            }
-        }
+        this.AttributeSet.Initialise(this.CharacterData.Attributes);
     }
 
-    public void Consume(in Inventory from, in Item item, int count = 1) {
-        switch (item.Type) {
-            case ItemType.Drink or ItemType.Food or ItemType.FoodIngredient or ItemType.Potion:
-                for (int i = 0; i < count; i += 1) {
-                    item.Properties.SelectMany(onApply).ForEach(this.AttributeSet.AddModifier);
-                    from.Remove(item);
-                }
-                
-                break;
-            case ItemType.Equipment:
-                if (this.EquipmentSystem.Has(item)) {
-                    this.EquipmentSystem.Unequip(item);
-                    item.Properties.SelectMany(onRevoke).ForEach(this.AttributeSet.AddModifier);
-                } else {
-                    this.EquipmentSystem.Equip(item);
-                    item.Properties.SelectMany(onApply).ForEach(this.AttributeSet.AddModifier);
-                }
-
-                break;
-            default:
-                Debug.Log($"Cannot use {item.Type} item {item.Name}.");
-                break;
-        }
-
-        return;
-        IEnumerable<Modifier> onApply(IItemProperties props) => props.ApplyOn(this.AttributeSet);
-        IEnumerable<Modifier> onRevoke(IItemProperties props) => props.RevokeFrom(this.AttributeSet);
+    protected override void DyingFrom(GameObject? source) {
+        GameCharacter<C>.OnDeath.Invoke(this.CharacterData, source);
+        base.DyingFrom(source);
     }
+    
+    #region Debug
+
+    [Button("Debug: Kill")]
+    private void DebugKill() {
+        this.DyingFrom(null);
+    }
+    
+    #endregion
 }

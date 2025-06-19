@@ -1,7 +1,7 @@
 ﻿using ImmersiveVrToolsCommon.Runtime.Logging;
 using UnityEngine;
 
-namespace FastScriptReload.Runtime
+namespace Project.External.FastScriptReload.Scripts.Runtime
 {
 #if UNITY_EDITOR
     [UnityEditor.InitializeOnLoad]
@@ -10,7 +10,7 @@ namespace FastScriptReload.Runtime
     {
         static LoggerScopedInitializer()
         {
-            Init();
+            LoggerScopedInitializer.Init();
         }
         
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]

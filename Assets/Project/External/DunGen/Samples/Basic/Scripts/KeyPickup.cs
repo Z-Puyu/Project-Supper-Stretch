@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using DunGen.Project.External.DunGen.Code;
+using UnityEngine;
 
-namespace DunGen.Demo
+namespace Project.External.DunGen.Samples.Basic.Scripts
 {
 	public class KeyPickup : MonoBehaviour, IKeyLock
 	{
-		public Key Key { get { return keyManager.GetKeyByID(keyID); } }
+		public Key Key { get { return this.keyManager.GetKeyByID(this.keyID); } }
 
 		[HideInInspector]
 		[SerializeField]
@@ -17,7 +18,7 @@ namespace DunGen.Demo
 
 		public void OnKeyAssigned(Key key, KeyManager keyManager)
 		{
-			keyID = key.ID;
+			this.keyID = key.ID;
 			this.keyManager = keyManager;
 		}
 
@@ -28,9 +29,9 @@ namespace DunGen.Demo
 			if (inventory == null)
 				return;
 
-			ScreenText.Log("Picked up {0} key", Key.Name);
-			inventory.AddKey(keyID);
-			UnityUtil.Destroy(gameObject);
+			ScreenText.Log("Picked up {0} key", this.Key.Name);
+			inventory.AddKey(this.keyID);
+			Object.Destroy(this.gameObject);
 		}
 	}
 }

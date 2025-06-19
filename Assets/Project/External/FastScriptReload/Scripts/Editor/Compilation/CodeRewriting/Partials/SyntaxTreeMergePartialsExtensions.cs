@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace FastScriptReload.Editor.Compilation.CodeRewriting
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting.Partials
 {
     public static class SyntaxTreeMergePartialsExtensions
     {

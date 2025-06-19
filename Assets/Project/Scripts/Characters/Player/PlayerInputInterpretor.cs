@@ -51,6 +51,7 @@ public class PlayerInputInterpreter : MonoBehaviour {
     }
 
     private void ToUIMode() {
+        Debug.Log("To UI mode");
         this.InputActions!.Player.Disable();
         this.InputActions.UI.Enable();
     }

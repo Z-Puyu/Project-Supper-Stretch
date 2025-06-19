@@ -1,19 +1,28 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using SaintsField;
 using Project.Scripts.Characters.CharacterControl;
 using Project.Scripts.Util.Components;
-using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.Characters.Player;
 
-[RequireComponent(typeof(CharacterController))]
-public class PlayerMovement : CharacterMovement {
+[DisallowMultipleComponent, RequireComponent(typeof(Animator))]
+public class PlayerMovement : MonoBehaviour {
+    public enum Mode { Walk = 1, Run = 2, Sprint = 3 }
+
+    
     private Vector3 damping = Vector3.zero;
     private Vector3 direction = Vector3.zero;
 
-    [NotNull]
-    private CharacterController? Controller { get; set; }
+    [NotNull] [field: SerializeField] private CharacterController? Controller { get; set; }
+    [NotNull] [field: SerializeField] protected Animator? Animator { get; private set; }
     
+    [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Float)]
+    protected int AnimatorParameterForSpeed { get; private set; }
+    
+    protected bool IsPaused { get; private set; }
+    private Mode MovementMode { get; set; } = Mode.Walk;
     private Transform? CameraTransform { get; set; }
     private Vector3 Velocity { get; set; } = Vector3.zero;
     private float FallingSpeed { get; set; }
@@ -34,34 +43,31 @@ public class PlayerMovement : CharacterMovement {
     }
     
     private void Awake() {
-        this.Controller = this.GetComponent<CharacterController>();
-        this.CameraTransform = Camera.main.IfPresent(cam => cam.transform, @default: this.CharacterTransform);
+        this.CameraTransform = Camera.main.IfPresent(cam => cam.transform, @default: this.transform);
     }
 
     private void Start() {
-        PlayerInputInterpreter input = this.GetComponent<PlayerInputInterpreter>();
-        input.OnMove += this.MoveTowards;
-        input.OnWalk += () => this.SwitchMode(Mode.Walk);
-        input.OnRun += () => this.SwitchMode(Mode.Run);
-        input.OnSprint += () => this.SwitchMode(Mode.Sprint);
-        input.OnStop += this.StopImmediately;
-        input.OnToggleWalkingLock += () => this.Locked = !this.Locked;
+        this.Animator.applyRootMotion = true;
     }
 
-    public override void StopImmediately() {
+    public void StopImmediately() {
         this.Direction = Vector3.zero; // This will stop both movement and rotation :O
     }
     
-    public override void SwitchMode(Mode mode) {
+    public virtual void SwitchMode(Mode mode) {
         if (this.Locked || this.MovementMode == mode) {
             return;
         }
         
-        base.SwitchMode(mode);
+        if (this.MovementMode == Mode.Walk && mode == Mode.Sprint) {
+            return;
+        }
+        
+        this.MovementMode = mode;
         this.damping = Vector3.zero;
     }
     
-    public override void MoveTowards(Vector3 location) {
+    public void MoveTowards(Vector3 location) {
         this.Direction = location;
     }
     
@@ -71,14 +77,14 @@ public class PlayerMovement : CharacterMovement {
         }
 
         Quaternion target = Quaternion.LookRotation(dir with { y = 0 });
-        this.CharacterTransform.rotation = Quaternion.Slerp(this.CharacterTransform.rotation, target, this.TurnSpeed);
+        this.transform.rotation = Quaternion.Slerp(this.transform.rotation, target, this.TurnSpeed);
     }
 
-    private void Fall(float t) {
+    private void Fall() {
         if (this.Controller.isGrounded) {
             this.FallingSpeed = 0;
         } else {
-            this.FallingSpeed += Physics.gravity.y * t;
+            this.FallingSpeed += Physics.gravity.y;
         }
     }
 
@@ -88,15 +94,18 @@ public class PlayerMovement : CharacterMovement {
         }
         
         float t = 1 - this.Acceleration;
-        Vector3 target = this.Direction * ((int)this.MovementMode * this.Speed);
+        Vector3 target = this.Direction * (int)this.MovementMode;
         this.Velocity = Vector3.SmoothDamp(this.Velocity, target, ref this.damping, t);
-        this.Animator.SetFloat(this.AnimatorParameterForSpeed, this.Velocity.magnitude / this.Speed);
+        this.Animator.SetFloat(this.AnimatorParameterForSpeed, this.Velocity.magnitude);
         if (this.Velocity.magnitude == 0) {
             return;
         }
         
         this.TurnTowards(this.Direction);
-        this.Fall(Time.deltaTime);
-        this.Controller.Move(this.Velocity with { y = this.FallingSpeed } * Time.deltaTime);
+        this.Fall();
+    }
+
+    private void OnAnimatorMove() {
+        this.Controller.Move(this.Animator.deltaPosition with { y = this.FallingSpeed * Time.deltaTime });
     }
 }

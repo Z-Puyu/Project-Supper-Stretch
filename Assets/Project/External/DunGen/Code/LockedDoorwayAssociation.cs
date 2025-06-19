@@ -1,6 +1,6 @@
 using System;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	[Serializable]
 	public sealed class LockedDoorwayAssociation

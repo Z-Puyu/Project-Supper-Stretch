@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-namespace DunGen.Demo
+namespace Project.External.DunGen.Samples.Basic.Scripts
 {
 	public class PlayerInventory : MonoBehaviour
 	{
@@ -10,17 +10,17 @@ namespace DunGen.Demo
 
 		public bool HasKey(int keyID)
 		{
-			return keys.Contains(keyID);
+			return this.keys.Contains(keyID);
 		}
 
 		public void AddKey(int keyID)
 		{
-			keys.Add(keyID);
+			this.keys.Add(keyID);
 		}
 
 		public void RemoveKey(int keyID)
 		{
-			keys.Remove(keyID);
+			this.keys.Remove(keyID);
 		}
 	}
 }

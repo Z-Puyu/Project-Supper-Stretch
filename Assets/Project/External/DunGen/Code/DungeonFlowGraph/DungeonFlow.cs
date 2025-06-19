@@ -1,11 +1,12 @@
-﻿using DunGen.Tags;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DunGen.Project.External.DunGen.Code.Tags;
+using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace DunGen.Graph
+namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 {
 	/// <summary>
 	/// A graph representing the flow of a dungeon
@@ -27,14 +28,14 @@ namespace DunGen.Graph
 
 			public GlobalPropSettings()
 			{
-				ID = 0;
-				Count = new IntRange(0, 1);
+				this.ID = 0;
+				this.Count = new IntRange(0, 1);
 			}
 
 			public GlobalPropSettings(int id, IntRange count)
 			{
-				ID = id;
-				Count = count;
+				this.ID = id;
+				this.Count = count;
 			}
 		}
 
@@ -135,6 +136,10 @@ namespace DunGen.Graph
 		/// A list of tags used to decide if a tile at the end of a branch should be deleted
 		/// </summary>
 		public List<Tag> BranchPruneTags = new List<Tag>();
+		/// <summary>
+		/// Global settings for straightening the dungeon path. Can be overridden in Archetypes and on Nodes in the flow graph
+		/// </summary>
+		public PathStraighteningSettings GlobalStraighteningSettings = new PathStraighteningSettings();
 
 		public List<GraphNode> Nodes = new List<GraphNode>();
 		public List<GraphLine> Lines = new List<GraphLine>();
@@ -164,11 +169,11 @@ namespace DunGen.Graph
 			normalizedDepth = Mathf.Clamp(normalizedDepth, 0, 1);
 
 			if (normalizedDepth == 0)
-				return Lines[0];
+				return this.Lines[0];
 			else if (normalizedDepth == 1)
-				return Lines[Lines.Count - 1];
+				return this.Lines[this.Lines.Count - 1];
 
-			foreach (var line in Lines)
+			foreach (var line in this.Lines)
 				if (normalizedDepth >= line.Position && normalizedDepth < line.Position + line.Length)
 					return line;
 
@@ -178,17 +183,17 @@ namespace DunGen.Graph
 
 		public DungeonArchetype[] GetUsedArchetypes()
 		{
-			return Lines.SelectMany(x => x.DungeonArchetypes).ToArray();
+			return this.Lines.SelectMany(x => x.DungeonArchetypes).ToArray();
 		}
 
 		public TileSet[] GetUsedTileSets()
 		{
 			List<TileSet> tileSets = new List<TileSet>();
 
-			foreach (var node in Nodes)
+			foreach (var node in this.Nodes)
 				tileSets.AddRange(node.TileSets);
 
-			foreach(var line in Lines)
+			foreach(var line in this.Lines)
 				foreach (var archetype in line.DungeonArchetypes)
 				{
 					tileSets.AddRange(archetype.TileSets);
@@ -200,38 +205,38 @@ namespace DunGen.Graph
 
 		public bool ShouldPruneTileWithTags(TagContainer tileTags)
 		{
-			switch (BranchTagPruneMode)
+			switch (this.BranchTagPruneMode)
 			{
 				case BranchPruneMode.AnyTagPresent:
-					return tileTags.HasAnyTag(BranchPruneTags.ToArray());
+					return tileTags.HasAnyTag(this.BranchPruneTags.ToArray());
 
 				case BranchPruneMode.AllTagsMissing:
-					return !tileTags.HasAnyTag(BranchPruneTags.ToArray());
+					return !tileTags.HasAnyTag(this.BranchPruneTags.ToArray());
 
 				default:
-					throw new NotImplementedException(string.Format("BranchPruneMode {0} is not implemented", BranchTagPruneMode));
+					throw new NotImplementedException(string.Format("BranchPruneMode {0} is not implemented", this.BranchTagPruneMode));
 			}
 		}
 
 		public void OnBeforeSerialize()
 		{
-			currentFileVersion = FileVersion;
+			this.currentFileVersion = DungeonFlow.FileVersion;
 		}
 
 		public void OnAfterDeserialize()
 		{
 			// Convert to new format for Global Props
-			if(currentFileVersion < 1)
+			if(this.currentFileVersion < 1)
 			{
-				for (int i = 0; i < globalPropGroupID_obsolete.Count; i++)
+				for (int i = 0; i < this.globalPropGroupID_obsolete.Count; i++)
 				{
-					int id = globalPropGroupID_obsolete[i];
-					var count = globalPropRanges_obsolete[i];
-					GlobalProps.Add(new GlobalPropSettings(id, count));
+					int id = this.globalPropGroupID_obsolete[i];
+					var count = this.globalPropRanges_obsolete[i];
+					this.GlobalProps.Add(new GlobalPropSettings(id, count));
 				}
 
-				globalPropGroupID_obsolete.Clear();
-				globalPropRanges_obsolete.Clear();
+				this.globalPropGroupID_obsolete.Clear();
+				this.globalPropRanges_obsolete.Clear();
 			}
 		}
 
@@ -244,29 +249,25 @@ namespace DunGen.Graph
 		/// <returns>True if the tiles are allowed to connect</returns>
 		public bool CanTilesConnect(Tile tileA, Tile tileB)
 		{
-			if (tileA == null || tileB == null)
-				return false;
-
-			if (TileConnectionTags.Count == 0)
+			if (this.TileConnectionTags.Count == 0)
 				return true;
 
-
-			switch (TileTagConnectionMode)
+			switch (this.TileTagConnectionMode)
 			{
 				case TagConnectionMode.Accept:
-					return HasMatchingTagPair(tileA, tileB);
+					return this.HasMatchingTagPair(tileA, tileB);
 
 				case TagConnectionMode.Reject:
-					return !HasMatchingTagPair(tileA, tileB);
+					return !this.HasMatchingTagPair(tileA, tileB);
 
 				default:
-					throw new NotImplementedException(string.Format("{0}.{1} is not implemented", typeof(TagConnectionMode).Name, TileTagConnectionMode));
+					throw new NotImplementedException(string.Format("{0}.{1} is not implemented", typeof(TagConnectionMode).Name, this.TileTagConnectionMode));
 			}
 		}
 
 		public bool CanDoorwaysConnect(ProposedConnection connection)
 		{
-			foreach (var rule in DoorwayPairFinder.CustomConnectionRules.OrderByDescending(r => r.Priority))
+			foreach (var rule in DoorwayPairFinder.CustomConnectionRules)
 			{
 				TileConnectionRule.ConnectionResult result = TileConnectionRule.ConnectionResult.Passthrough;
 
@@ -284,12 +285,12 @@ namespace DunGen.Graph
 			}
 
 			// No custom rules handled this connection, use default behaviour
-			return DoorwaySocket.CanSocketsConnect(connection.PreviousDoorway.DoorwayComponent.Socket, connection.NextDoorway.DoorwayComponent.Socket) && CanTilesConnect(connection.PreviousTile.PrefabTile, connection.NextTile.PrefabTile);
+			return DoorwaySocket.CanSocketsConnect(connection.PreviousDoorway.DoorwayComponent.Socket, connection.NextDoorway.DoorwayComponent.Socket) && this.CanTilesConnect(connection.PreviousTile.PrefabTile, connection.NextTile.PrefabTile);
 		}
 
 		private bool HasMatchingTagPair(Tile tileA, Tile tileB)
 		{
-			foreach(var tagPair in TileConnectionTags)
+			foreach(var tagPair in this.TileConnectionTags)
 			{
 				if ((tileA.Tags.HasTag(tagPair.TagA) && tileB.Tags.HasTag(tagPair.TagB)) ||
 					(tileB.Tags.HasTag(tagPair.TagA) && tileA.Tags.HasTag(tagPair.TagB)))

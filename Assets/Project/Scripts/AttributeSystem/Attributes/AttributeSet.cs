@@ -1,45 +1,32 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text;
-using Project.Scripts.AttributeSystem.Modifiers;
-using Project.Scripts.Util.DataPersistence;
-using Project.Scripts.Util.Visitor;
 using SaintsField;
+using Project.Scripts.AttributeSystem.Attributes.AttributeTypes;
+using Project.Scripts.AttributeSystem.Attributes.Definitions;
+using Project.Scripts.AttributeSystem.GameplayEffects;
+using Project.Scripts.AttributeSystem.Modifiers;
+using Project.Scripts.Util.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Project.Scripts.AttributeSystem.Attributes;
 
 [DisallowMultipleComponent]
-public class AttributeSet : MonoBehaviour, IEnumerable<Attribute>, IAttributeReader, IPersistent, IVisitable<AttributeSet> {
+public class AttributeSet : MonoBehaviour, IEnumerable<Attribute>, IAttributeReader {
+    private bool IsInitialised { get; set; }
     public Guid Id { get; private set; }
-    private Dictionary<Enum, Attribute> Attributes { get; init; } = [];
-    private Dictionary<Enum, Vector4> Modifiers { get; init; } = [];
+    [field: SerializeField, ReadOnly] public string Identifier { get; set; }
+    [NotNull] [field: SerializeField] public AttributeDefinition? AttributeDefinition { get; private set; }
+    private Dictionary<string, Attribute> Attributes { get; init; } = [];
+    private Dictionary<AttributeKey, Vector4> Modifiers { get; init; } = [];
 
-    [field: SerializeField, ReadOnly]
-    public string Identifier { get; set; }
+    public AdvancedDropdownList<AttributeKey> AllAccessibleAttributes => this.AttributeDefinition.FetchLeaves();
 
-    public event UnityAction<AttributeSet, Attribute, Attribute> OnAttributeChanged = delegate { };
-
-    /// <summary>
-    /// Returns the attribute data with the given type. If the attribute set does not contain this attribute,
-    /// try to compute it from the modifiers.
-    /// </summary>
-    /// <param name="key">The attribute to query.</param>
-    public Attribute this[Enum key] {
-        get {
-            Debug.Log($"Querying for {key}, current attributes: {this}");
-            if (this.Attributes.TryGetValue(key, out Attribute val)) {
-                return val;
-            }
-
-            val = Attribute.Zero(key);
-            this.Attributes.Add(key, val);
-            return val;
-        }
-    }
+    public event UnityAction<AttributeChange> OnAttributeChanged = delegate { };
 
     private AttributeSet() {
         this.Id = Guid.NewGuid();
@@ -50,47 +37,159 @@ public class AttributeSet : MonoBehaviour, IEnumerable<Attribute>, IAttributeRea
         this.Id = Guid.Parse(this.Identifier);
     }
 
-    public void Init(Enum attribute, int value, Enum? cap = null, int maxValue = -1) {
-        if (maxValue >= 0) {
-            this.Attributes.Add(attribute, new Attribute(attribute, value, maxValue));
-        } else if (cap is not null) {
-            this.Attributes.Add(attribute, new Attribute(attribute, value, cap));
-        } else {
-            this.Attributes.Add(attribute, new Attribute(attribute, value));
+    public void Initialise(IEnumerable<AttributeInitialisationData> initial) {
+        if (this.IsInitialised) {
+            throw new InvalidOperationException($"Trying to initialise {this.gameObject.name} twice");
         }
+        
+        this.IsInitialised = true;
+        initial.ForEach(init);
+        this.AttributeDefinition.PreorderTraverse(forEach: setZeroIfAbsent);
+        return;
 
-        Debug.Log($"Initialised attribute {attribute} = {value} on {this.gameObject}");
+        void setZeroIfAbsent(AttributeTag attribute) {
+            if (attribute.SubAttributes.Count > 0 || this.Attributes.ContainsKey(attribute.Key.FullName)) {
+                return;
+            }
+
+            this.Attributes.Add(attribute.Key.FullName, attribute.Zero);
+        }
+                
+        
+        void init(AttributeInitialisationData data) {
+            if (!this.AttributeDefinition.Contains(data.Key, out AttributeTag? a) || a is null) {
+                throw new ArgumentException($"Attribute {data.Key} is undefined in attribute set of {this.gameObject.name}");
+            }
+            
+            Attribute zero = a.Zero;
+            if (zero.Cap != string.Empty) {
+                if (!this.AttributeDefinition.Contains(zero.Cap, out AttributeTag? cap)) {
+                    throw new ArgumentException($"{data.Key} requires an attribute of type {cap?.Key.FullName}");
+                }
+                
+                if (!this.Attributes.ContainsKey(cap!.Key.FullName)) {
+                    this.Attributes.Add(cap.Key.FullName, new Attribute(cap.Key.FullName, data.Value, data.Value));   
+                }
+
+                int value = Mathf.Clamp(data.Value, 0, this.ReadCurrent(cap.Key.FullName));
+                this.Attributes.Add(data.Key.FullName, zero with { BaseValue = value, CurrentValue = value });
+            } else {
+                this.Attributes.Add(data.Key.FullName, zero with { BaseValue = data.Value, CurrentValue = data.Value });
+            }
+        }
     }
 
     /// <summary>
     /// Update the current value of the attribute. Called after every modifier change.
     /// </summary>
     /// <param name="attribute">The attribute to recompute.</param>
-    private void Recompute(Enum attribute) {
-        if (!this.Attributes.TryGetValue(attribute, out Attribute data)) {
-            Debug.Log($"Create zero attribute for {attribute}");
-            data = Attribute.Zero(attribute);
+    private void Recompute(string attribute) {
+        AttributeKey key = attribute;
+        int value = this.ReadBase(attribute);
+        if (this.Modifiers.TryGetValue(key, out Vector4 m)) {
+            value = Mathf.CeilToInt(((value + m.x) * (1 + m.y / 100) + m.z) * (1 + m.w / 100));
         }
-
-        if (this.Modifiers.TryGetValue(attribute, out Vector4 m)) {
-            Debug.Log($"Modifier for {attribute}: {m}");
-            float modified = ((data.BaseValue + m.x) * (1 + m.y / 100) + m.z) * (1 + m.w / 100);
-            data = data with { CurrentValue = Mathf.CeilToInt(modified) };
-        }
-
-        Debug.Log($"Recomputed {attribute} = {data}");
-        this.UpdateAttribute(in data);
+        
+        this.UpdateAttribute(key, value);
     }
 
-    public void AddModifier(Modifier modifier) {
-        Debug.Log($"{modifier} to {this.gameObject}");
-        if (!this.Modifiers.ContainsKey(modifier.Target)) {
-            this.Modifiers.Add(modifier.Target, modifier.ToVector4());
-        } else {
-            this.Modifiers[modifier.Target] += modifier.ToVector4();
+    private void UpdateAttribute(AttributeKey key, int value) {
+        if (!this.AttributeDefinition.Contains(key, out AttributeTag? attribute)) {
+            throw new ArgumentException($"{key} is undefined in {this.gameObject.name}. Check spelling.");    
+        }
+        
+        write(key);
+        foreach (AttributeKey k in attribute!.SameSetSynonyms) {
+            write(k);
         }
 
-        this.Recompute(modifier.Target);
+        return;
+        
+        void write(AttributeKey k) {
+            Attribute old = this.Read(k.FullName);
+            Attribute updated = old with { CurrentValue = Mathf.Clamp(value, 0, this.ReadMax(k.FullName)) };
+            this.Attributes[k.FullName] = updated;
+            this.PostAttributeUpdate(updated);
+            this.OnAttributeChanged.Invoke(new AttributeChange(k, old.BaseValue, updated.BaseValue,
+                old.CurrentValue, updated.CurrentValue));
+        }
+    }
+
+    private void AddModifier(Modifier modifier) {
+        if (!this.AttributeDefinition.Contains(modifier.Target, out AttributeTag? @as)) {
+            throw new ArgumentException($"{modifier.Target} is undefined in {this.gameObject.name}. Check spelling.");
+            return;
+        }
+
+        if (@as!.SubAttributes.Count > 0) {
+            @as.SubAttributes.ForEach(a => this.AddModifier(modifier with { Target = a.Key }));
+        }
+
+        AttributeKey key = modifier.Target;
+        foreach (AttributeTag attribute in this.AttributeDefinition.CollectIf(isNonzeroAntonym)) {
+            modifier = -modifier with { Target = attribute.Key };
+            break;
+        }
+
+        if (!this.Modifiers.TryAdd(modifier.Target, modifier)) {
+            this.Modifiers[modifier.Target] += modifier;
+        }
+
+        this.Recompute(modifier.Target.FullName);
+
+        return;
+        bool isNonzeroAntonym(AttributeTag a) => a.Antonyms.Contains(key) && this.ReadCurrent(a.Key.FullName) != 0;
+    }
+
+    public void AddEffect(
+        GameplayEffect effect, GameObject instigator, GameplayEffectExecutionArgs? args = null,
+        Action<GameObject>? onComplete = null, Action<GameObject>? onSuccess = null, Action<GameObject>? onFail = null
+    ) {
+        if (!instigator.TryGetComponent(out IAttributeReader source)) {
+            this.AddEffect(effect, args, onComplete, onSuccess, onFail);
+        } else {
+            this.AddEffect(effect, source, args, onComplete, onSuccess, onFail);
+        }
+    }
+
+    public void AddEffect(
+        GameplayEffect effect, IAttributeReader instigator, GameplayEffectExecutionArgs? args = null,
+        Action<GameObject>? onComplete = null, Action<GameObject>? onSuccess = null, Action<GameObject>? onFail = null
+    ) {
+        args ??= GameplayEffectExecutionArgs.Builder.From(instigator).Build();
+        switch (effect.Execute(this, args, out IEnumerable<Modifier> outcome)) {
+            case GameplayEffectExecutionResult.Success:
+                outcome.ForEach(this.AddModifier);
+                onComplete?.Invoke(this.gameObject);
+                onSuccess?.Invoke(this.gameObject);
+                break;
+            case GameplayEffectExecutionResult.Failure:
+                onComplete?.Invoke(this.gameObject);
+                onFail?.Invoke(this.gameObject);
+                break;
+            case GameplayEffectExecutionResult.Error:
+                throw new ArgumentException($"Error executing gameplay effect {effect}");
+        }
+    }
+
+    public void AddEffect(
+        GameplayEffect effect, GameplayEffectExecutionArgs? args = null, Action<GameObject>? onComplete = null,
+        Action<GameObject>? onSuccess = null, Action<GameObject>? onFail = null
+    ) {
+        args ??= GameplayEffectExecutionArgs.Empty;
+        switch (effect.Execute(this, args, out IEnumerable<Modifier> outcome)) {
+            case GameplayEffectExecutionResult.Success:
+                outcome.ForEach(this.AddModifier);
+                onComplete?.Invoke(this.gameObject);
+                onSuccess?.Invoke(this.gameObject);
+                break;
+            case GameplayEffectExecutionResult.Failure:
+                onComplete?.Invoke(this.gameObject);
+                onFail?.Invoke(this.gameObject);
+                break;
+            case GameplayEffectExecutionResult.Error:
+                throw new ArgumentException($"Error executing gameplay effect {effect}");
+        }
     }
 
     /// <summary>
@@ -101,56 +200,38 @@ public class AttributeSet : MonoBehaviour, IEnumerable<Attribute>, IAttributeRea
     protected virtual void PreAttributeUpdate(Attribute newData) { }
 
     /// <summary>
-    /// Finalise an attribute update. This is the only place where an attribute is updated.
-    /// </summary>
-    /// <param name="newData">The new attribute data.</param>
-    private void UpdateAttribute(in Attribute newData) {
-        Attribute old = this[newData.Type];
-        Attribute updated = newData;
-        this.PreAttributeUpdate(newData);
-        if (newData.Cap is not null) {
-            int max = this[newData.Cap].CurrentValue;
-            updated = newData with { CurrentValue = Mathf.Clamp(newData.CurrentValue, 0, max) };
-        } else if (newData.HardLimit >= 0) {
-            updated = newData with { CurrentValue = Mathf.Clamp(newData.CurrentValue, 0, newData.HardLimit) };
-        }
-
-        Debug.Log($"Pre-update: {this} ({this.Attributes.Count} attributes)");
-        this.Attributes[updated.Type] = updated;
-        this.PostAttributeUpdate(updated);
-        this.OnAttributeChanged.Invoke(this, old, updated);
-        Debug.Log($"Post-update: {this} ({this.Attributes.Count} attributes)");
-    }
-
-    /// <summary>
     /// Perform any actions after an attribute has been updated.
     /// </summary>
     /// <param name="updated">The updated attribute data. It is the current attribute data.</param>
     protected virtual void PostAttributeUpdate(Attribute updated) { }
 
-    public Attribute Read(Enum attribute) {
-        return this[attribute];
-    }
-
-    public int ReadCurrent(Enum attribute) {
-        return this[attribute].CurrentValue;
-    }
-
-    public int ReadBase(Enum attribute) {
-        return this[attribute].BaseValue;
-    }
-
-    public int ReadMax(Enum attribute) {
-        Attribute value = this[attribute];
-        if (value.Cap is null) {
-            return value.HardLimit >= 0 ? value.HardLimit : int.MaxValue;
+    public Attribute Read(string attribute) {
+        if (!this.AttributeDefinition.Contains(attribute, out AttributeTag? @as)) {
+            throw new KeyNotFoundException($"{attribute} is undefined in {this.gameObject.name}. Check spelling.");
         }
 
-        return this[value.Cap].CurrentValue;
+        if (@as!.SubAttributes.Count > 0) {
+            throw new ArgumentException($"{attribute} is a composite attribute.");
+        }
+        
+        return this.Attributes[@as.Key.FullName];
     }
 
-    public void Accept(IVisitor<AttributeSet> visitor) {
-        visitor.Visit(this);
+    public int ReadCurrent(string attribute) {
+        return this.Read(attribute).CurrentValue;
+    }
+
+    public int ReadBase(string attribute) {
+        return this.Read(attribute).BaseValue;
+    }
+
+    public int ReadMax(string attribute) {
+        Attribute value = this.Read(attribute);
+        if (value.Cap != string.Empty) {
+            return this.ReadCurrent(value.Cap);
+        }
+        
+        return value.HardLimit >= 0 ? value.HardLimit : int.MaxValue;
     }
 
     public IEnumerator<Attribute> GetEnumerator() {
@@ -165,54 +246,5 @@ public class AttributeSet : MonoBehaviour, IEnumerable<Attribute>, IAttributeRea
 
     IEnumerator IEnumerable.GetEnumerator() {
         return this.GetEnumerator();
-    }
-
-    public Momento Save() {
-        ReadOnlyDictionary<Enum, Attribute> attributes = new ReadOnlyDictionary<Enum, Attribute>(this.Attributes);
-        ReadOnlyDictionary<Enum, Vector4> modifiers = new ReadOnlyDictionary<Enum, Vector4>(this.Modifiers);
-        return new SaveData(this.Id, attributes, modifiers);
-    }
-
-    public void Load(Momento momento) {
-        if (momento is not SaveData save) {
-            return;
-        }
-
-        this.Attributes.Clear();
-        this.Modifiers.Clear();
-        /*foreach (KeyValuePair<Enum, Attribute> attribute in save.Attributes) {
-            this.Attributes.Add(attribute.Key, attribute.Value);
-        }
-
-        foreach (KeyValuePair<Enum, Vector4> modifier in save.Modifiers) {
-            this.Modifiers.Add(modifier.Key, modifier.Value);
-        }*/
-
-        foreach (Enum attribute in this.Attributes.Keys) {
-            this.Recompute(attribute);
-        }
-    }
-
-    [Serializable]
-    private sealed class SaveData : Momento {
-        [field: SerializeField]
-        private List<Attribute> SavedAttributes { get; set; }
-
-        [field: SerializeField]
-        private List<string> ModifiedAttributes { get; set; }
-
-        [field: SerializeField]
-        private List<Vector4> Modifiers { get; set; }
-
-        public IReadOnlyList<Attribute> Attributes => this.SavedAttributes;
-        // public IReadOnlyDictionary<Enum, Vector4> 
-
-        public SaveData(
-            Guid id, ReadOnlyDictionary<Enum, Attribute> attributes,
-            ReadOnlyDictionary<Enum, Vector4> modifiers
-        ) : base(id.ToString()) {
-            // this.Attributes = [..attributes];
-            // this.Modifiers = modifiers;
-        }
     }
 }

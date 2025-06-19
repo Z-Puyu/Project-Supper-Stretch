@@ -1,7 +1,8 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using DunGen.Project.External.DunGen.Code;
+using UnityEngine;
 
-namespace DunGen.Demo
+namespace Project.External.DunGen.Samples.Basic.Scripts
 {
 	public class DemoTileInjector : MonoBehaviour
 	{
@@ -14,12 +15,12 @@ namespace DunGen.Demo
 
 		private void Awake()
 		{
-			RuntimeDungeon.Generator.TileInjectionMethods += InjectTiles;
+			this.RuntimeDungeon.Generator.TileInjectionMethods += this.InjectTiles;
 		}
 
 		private void InjectTiles(RandomStream randomStream, ref List<InjectedTile> tilesToInject)
 		{
-			tilesToInject.Add(new InjectedTile(TileSet, IsOnMainPath, NormalizedPathDepth, NormalizedBranchDepth));
+			tilesToInject.Add(new InjectedTile(this.TileSet, this.IsOnMainPath, this.NormalizedPathDepth, this.NormalizedBranchDepth));
 		}
 	}
 }

@@ -332,7 +332,6 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-#if UNITY_2021_3_OR_NEWER //&& !SAINTSFIELD_UI_TOOLKIT_DISABLE
         public static VisualElement CreateOrUpdateFieldProperty(
             SerializedProperty property,
             IReadOnlyList<PropertyAttribute> allAttributes,
@@ -384,7 +383,7 @@ namespace SaintsField.Editor.Utils
                 {
                     (Attribute attrOrNull, Type drawerType) =
                         SaintsPropertyDrawer.GetFallbackDrawerType(fieldInfo,
-                            property);
+                            property, allAttributes);
                     // Debug.Log($"{FieldWithInfo.SerializedProperty.propertyPath}: {drawerType}");
                     useAttribute = attrOrNull;
                     useDrawerType = drawerType;
@@ -637,11 +636,12 @@ namespace SaintsField.Editor.Utils
                                         element.Add(result);
                                     }
                                 },
-                                // onAdd = thisListView =>
-                                // {
-                                //     property.arraySize += 1;
-                                //     property.serializedObject.ApplyModifiedProperties();
-                                // },
+                                unbindItem = (element, _) =>
+                                {
+                                    element.Clear();
+                                    // Debug.Log(element);
+                                    // Debug.Log(i);
+                                },
                             };
                             Toggle listViewToggle = listView.Q<Toggle>();
                             if (listViewToggle != null && listViewToggle.style.marginLeft != -12)
@@ -703,6 +703,12 @@ namespace SaintsField.Editor.Utils
                         listView.viewDataKey = str;
                         listView.name = str;
 
+                        if (listView.itemsSource?.Count != property.arraySize)
+                        {
+                            listView.itemsSource = Enumerable.Range(0, property.arraySize)
+                                .Select(property.GetArrayElementAtIndex).ToArray();
+                        }
+
                         // this is internal too...
                         // listView.SetProperty((PropertyName) PropertyField.listViewBoundFieldProperty, (object) this);
                         // Toggle toggle = listView.Q<Toggle>((string) null, Foldout.toggleUssClassName);
@@ -720,7 +726,7 @@ namespace SaintsField.Editor.Utils
                         return null;
                     }
 
-                    if (propertyType == SerializedPropertyType.ManagedReference)
+                    if (propertyType == SerializedPropertyType.ManagedReference && allAttributes.All(each => each is not ReferencePickerAttribute))
                     {
                         ReferencePickerAttribute referencePickerAttribute = new ReferencePickerAttribute();
                         ReferencePickerAttributeDrawer referencePickerAttributeDrawer = (ReferencePickerAttributeDrawer) SaintsPropertyDrawer.MakePropertyDrawer(typeof(ReferencePickerAttributeDrawer), fieldInfo, referencePickerAttribute, label);
@@ -732,11 +738,9 @@ namespace SaintsField.Editor.Utils
                         referencePickerAttributeDrawer.InHorizontalLayout = inHorizontalLayout;
                         return referencePickerAttributeDrawer.CreatePropertyGUI(property);
                     }
-                    else
-                    {
-                        return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, inHorizontalLayout,
-                            null, makeRenderer, doTweenPlayRecorder, parent);
-                    }
+
+                    return SaintsRowAttributeDrawer.CreateElement(property, label, fieldInfo, inHorizontalLayout,
+                        null, makeRenderer, doTweenPlayRecorder, parent);
                 }
                     // throw new ArgumentOutOfRangeException(nameof(propertyType), propertyType, "Should Not Put it here");
                 case SerializedPropertyType.Integer:
@@ -1055,11 +1059,20 @@ namespace SaintsField.Editor.Utils
                     toggle.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
                     if (inHorizontalLayout)
                     {
-                        // element.style.flexDirection = FlexDirection.RowReverse;
+                        // Debug.Log($"inHorizontalLayout{property.propertyPath}");
+                        toggle.style.flexDirection = FlexDirection.RowReverse;
                         Label toggleLabel = toggle.Q<Label>();
+                        VisualElement toggleInput = toggle.Q<VisualElement>(className: Toggle.inputUssClassName);
                         if(toggleLabel != null)
                         {
-                            toggleLabel.style.minWidth = 0;
+                            // toggleLabel.style.minWidth = 0;
+                            toggleLabel.style.flexGrow = 1;
+                        }
+
+                        // Debug.Log(toggleInput);
+                        if (toggleInput != null)
+                        {
+                            toggleInput.style.flexGrow = 0;
                         }
                     }
                     else
@@ -1949,7 +1962,7 @@ namespace SaintsField.Editor.Utils
                     return null;
             }
         }
-#endif
+
 
         public static void AddContextualMenuManipulator(VisualElement ele, SerializedProperty property, Action onValueChangedCallback)
         {
@@ -1999,6 +2012,101 @@ namespace SaintsField.Editor.Utils
 
                 // AlignLabel = typeof(BaseField<string>).GetMethod("AlignLabel", BindingFlags.NonPublic | BindingFlags.Instance);
             }
+        }
+
+        // private static bool _fallbackUnbindReflectionFailed;
+        // private static Type _serializedObjectBindingContextType;
+        // private static MethodInfo _serializedObjectBindingContextFindMethod;
+
+        /// <summary>
+        /// Remove property track from the element (Unbind)
+        /// Thanks to [@Zallist](https://github.com/Zallist) in [#239](https://github.com/TylerTemp/SaintsField/issues/239)
+        /// </summary>
+        // ReSharper disable once UnusedParameter.Global
+        public static void Unbind(VisualElement element, SerializedObject serializedObject)
+        {
+#if UNITY_2021_3_OR_NEWER
+            element.Unbind();
+// not working atm, comment out
+// #else
+//             if (_fallbackUnbindReflectionFailed)
+//             {
+// #if SAINTSFIELD_DEBUG
+//                 Debug.Log("Unbind skip: already failed");
+// #endif
+//                 return;
+//             }
+//
+//             // get internal binder type
+//             _serializedObjectBindingContextType ??= Type.GetType("UnityEditor.UIElements.Bindings.SerializedObjectBindingContext, UnityEditor.UIElementsModule", throwOnError: false);
+//
+//             if (_serializedObjectBindingContextType == null)
+//             {
+// #if SAINTSFIELD_DEBUG
+//                 Debug.LogWarning("Unbind skip: failed to find SerializedObjectBindingContext type");
+// #endif
+//                 _fallbackUnbindReflectionFailed = true;
+//                 return;
+//             }
+//
+//             // get the find method
+//             _serializedObjectBindingContextFindMethod ??= _serializedObjectBindingContextType.GetMethod("FindBindingContext", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+//
+//             if (_serializedObjectBindingContextFindMethod == null)
+//             {
+// #if SAINTSFIELD_DEBUG
+//                 Debug.LogWarning("Unbind skip: failed to find FindBindingContext method in SerializedObjectBindingContext");
+// #endif
+//                 _fallbackUnbindReflectionFailed = true;
+//                 return;
+//             }
+//
+//             // get curveField context (if possible)
+//             object elementContext = _serializedObjectBindingContextFindMethod.Invoke(null, new object[] { element, serializedObject });
+//
+//             if (elementContext == null)
+//             {
+// #if SAINTSFIELD_DEBUG
+//                 Debug.LogWarning($"Unbind skip: failed to find binding context for element {element}");
+// #endif
+//                 return;
+//             }
+//
+//             // get the binding updater (.Add method will always return it)
+//             MethodInfo bindingUpdaterAddMethod = elementContext.GetType().GetMethod("AddBindingUpdater", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+//
+//             if (bindingUpdaterAddMethod == null)
+//             {
+// #if SAINTSFIELD_DEBUG
+//                 Debug.LogWarning($"Unbind skip: failed to find AddBindingUpdater method in {elementContext.GetType()}");
+// #endif
+//                 return;
+//             }
+//
+//             object bindingUpdater = bindingUpdaterAddMethod.Invoke(elementContext, new object[] { element });
+//
+//             if (bindingUpdater == null)
+//             {
+// #if SAINTSFIELD_DEBUG
+//                 Debug.LogWarning($"Unbind skip: failed to get binding updater for element {element}");
+// #endif
+//                 return;
+//             }
+//             // and call .Unbind() for a blanket removal
+//             MethodInfo unbindMethod = bindingUpdater.GetType().GetMethod("Unbind", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+//
+//             if (unbindMethod == null)
+//             {
+// #if SAINTSFIELD_DEBUG
+//                 Debug.LogWarning($"Unbind skip: failed to find Unbind method in {bindingUpdater.GetType()}");
+// #endif
+//                 _fallbackUnbindReflectionFailed = true;
+//                 return;
+//             }
+//
+//             unbindMethod.Invoke(bindingUpdater, Array.Empty<object>());
+//             Debug.Log("unbindMethod!");
+#endif
         }
     }
 #endif

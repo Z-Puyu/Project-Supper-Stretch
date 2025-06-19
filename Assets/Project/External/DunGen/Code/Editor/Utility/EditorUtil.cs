@@ -1,13 +1,14 @@
-using DunGen.Graph;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DunGen.Project.External.DunGen.Code;
+using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor
+namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
 {
 	public static class EditorUtil
 	{
@@ -93,7 +94,7 @@ namespace DunGen.Editor
 
 			if (evt.type == EventType.DragUpdated || evt.type == EventType.DragPerform)
 			{
-				var validDraggingObjects = GetValidGameObjects(DragAndDrop.objectReferences, allowSceneObjects, allowAssetObjects);
+				var validDraggingObjects = EditorUtil.GetValidGameObjects(DragAndDrop.objectReferences, allowSceneObjects, allowAssetObjects);
 
 				if (dragTargetRect.Contains(evt.mousePosition) && validDraggingObjects.Any())
 				{
@@ -134,7 +135,7 @@ namespace DunGen.Editor
 		/// <param name="range">The range to modify</param>
 		public static void DrawIntRange(string name, IntRange range)
 		{
-			DrawIntRange(new GUIContent(name), range);
+			EditorUtil.DrawIntRange(new GUIContent(name), range);
 		}
 
 		/// <summary>
@@ -167,7 +168,7 @@ namespace DunGen.Editor
 			float min = range.Min;
 			float max = range.Max;
 
-			DrawLimitedFloatRange(name, ref min, ref max, limitMin, limitMax);
+			EditorUtil.DrawLimitedFloatRange(name, ref min, ref max, limitMin, limitMax);
 
 			range.Min = min;
 			range.Max = max;
@@ -204,7 +205,7 @@ namespace DunGen.Editor
 		/// <typeparam name="T">The type of object in the list</typeparam>
 		public static void DrawObjectList<T>(string header, IList<T> objects, GameObjectSelectionTypes allowedSelectionTypes, UnityEngine.Object owningObject) where T : UnityEngine.Object
 		{
-			DrawObjectList(new GUIContent(header), objects, allowedSelectionTypes, owningObject);
+			EditorUtil.DrawObjectList(new GUIContent(header), objects, allowedSelectionTypes, owningObject);
 		}
 
 		/// <summary>
@@ -360,106 +361,57 @@ namespace DunGen.Editor
 			EditorGUILayout.EndVertical();
 		}
 
-		public static void DrawDungeonGenerator(DungeonGenerator generator, bool isRuntimeDungeon)
+		public static void DrawStraightenSettings(SerializedProperty straightenSettingsProperty, bool showCheckboxes)
 		{
-			generator.DungeonFlow = (DungeonFlow)EditorGUILayout.ObjectField("Dungeon Flow", generator.DungeonFlow, typeof(DungeonFlow), false);
+			var straightenChanceProp = straightenSettingsProperty.FindPropertyRelative(nameof(PathStraighteningSettings.StraightenChance));
+			EditorGUILayout.PropertyField(straightenChanceProp, new GUIContent("Straighten Chance", "The chance that the next tile spawned will continue in the same direction as the previous tile"));
 
-			generator.ShouldRandomizeSeed = EditorGUILayout.Toggle(new GUIContent("Randomize Seed", "If checked, a new random seed will be created every time a dungeon is generated. If unchecked, a specific seed will be used each time"), generator.ShouldRandomizeSeed);
-
-			if (!generator.ShouldRandomizeSeed)
-				generator.Seed = EditorGUILayout.IntField(new GUIContent("Seed", "The seed used to generate a dungeon layout. Generating a dungoen multiple times with the same seed will produce the exact same results each time"), generator.Seed);
-
-			generator.MaxAttemptCount = EditorGUILayout.IntField(new GUIContent("Max Failed Attempts", "The maximum number of times DunGen is allowed to fail at generating a dungeon layout before giving up. This only applies in-editor; in a packaged build, DunGen will keep trying indefinitely"), generator.MaxAttemptCount);
-			generator.LengthMultiplier = EditorGUILayout.FloatField(new GUIContent("Length Multiplier", "Used to alter the length of the dungeon without modifying the Dungeon Flow asset. 1 = normal-length, 2 = double-length, 0.5 = half-length, etc."), generator.LengthMultiplier);
-			generator.IgnoreSpriteBounds = EditorGUILayout.Toggle(new GUIContent("Ignore Sprite Bounds", "When calculating bounding boxes for tiles, if this is checked, sprited will be ignored"), generator.IgnoreSpriteBounds);
-
-			int selectedUpDirectionIndex = (int)generator.UpDirection;
-			var upDirectionDisplayOptions = new GUIContent[]
+			if (showCheckboxes)
 			{
-				new GUIContent("+X"), new GUIContent("-X"), new GUIContent("+Y"), new GUIContent("-Y"), new GUIContent("+Z"), new GUIContent("-Z")
-			};
-
-			generator.UpDirection = (AxisDirection)EditorGUILayout.Popup(new GUIContent("Up Direction", "The up direction of the dungeon. This won't actually rotate your dungeon, but it must match the expected up-vector for your dungeon layout - usually +Y for 3D and side-on 2D, -Z for top-down 2D"), selectedUpDirectionIndex, upDirectionDisplayOptions);
-
-			if (generator.LengthMultiplier < 0)
-				generator.LengthMultiplier = 0.0f;
-
-			if (isRuntimeDungeon)
-				generator.DebugRender = EditorGUILayout.Toggle("Debug Render", generator.DebugRender);
-
-			generator.PlaceTileTriggers = EditorGUILayout.Toggle(new GUIContent("Place Tile Triggers", "Places trigger colliders around Tiles which can be used in conjunction with the DungenCharacter component to receieve events when changing rooms"), generator.PlaceTileTriggers);
-			generator.TileTriggerLayer = EditorGUILayout.LayerField(new GUIContent("Trigger Layer", "The layer to place the tile root objects on if \"Place Tile Triggers\" is checked"), generator.TileTriggerLayer);
-
-			if (isRuntimeDungeon)
-			{
-				generator.GenerateAsynchronously = EditorGUILayout.Toggle(new GUIContent("Generate Asynchronously", "If checked, DunGen will generate the layout without blocking Unity's main thread, allowing for things like animated loading screens to be shown"), generator.GenerateAsynchronously);
-
-				EditorGUI.BeginDisabledGroup(!generator.GenerateAsynchronously);
-				generator.MaxAsyncFrameMilliseconds = EditorGUILayout.Slider(new GUIContent("Max Frame Time", "How many milliseconds the dungeon generation is allowed to take per-frame"), generator.MaxAsyncFrameMilliseconds, 0f, 1000f);
-				generator.PauseBetweenRooms = EditorGUILayout.Slider(new GUIContent("Pause Between Rooms", "If greater than zero, the dungeon generation will pause for the set time (in seconds) after placing a room; useful for visualising the generation process"), generator.PauseBetweenRooms, 0, 5);
-				EditorGUI.EndDisabledGroup();
+				var canStraightenMainPathProp = straightenSettingsProperty.FindPropertyRelative(nameof(PathStraighteningSettings.CanStraightenMainPath));
+				var canStraightenBranchPathsProp = straightenSettingsProperty.FindPropertyRelative(nameof(PathStraighteningSettings.CanStraightenBranchPaths));
+				EditorGUILayout.PropertyField(canStraightenMainPathProp, new GUIContent("Straighten Main Path", "Whether or not the main path should be straightened using StraightenChance"));
+				EditorGUILayout.PropertyField(canStraightenBranchPathsProp, new GUIContent("Straighten Branch Paths", "Whether or not branch paths should be straightened using StraightenChance"));
 			}
-
-			generator.OverlapThreshold = EditorGUILayout.Slider(new GUIContent("Overlap Threshold", "Maximum distance two connected tiles are allowed to overlap without being discarded. If doorways aren't exactly on the tile's axis-aligned bounding box, two tiles can overlap slighty when connected. This property can help to fix this issue"), generator.OverlapThreshold, 0.0001f, 1.0f);
-
-			generator.AvoidCollisionsWithOtherDungeons = EditorGUILayout.Toggle(new GUIContent("Collide All Dungeons", "When placing a new tile, DunGen will test for collisions against all tiles in every dungeon in the scene, instead of just this one"), generator.AvoidCollisionsWithOtherDungeons);
-
-			EditorGUILayout.Space();
-			EditorGUILayout.Space();
-			EditorGUILayout.BeginVertical("box");
-
-			EditorGUILayout.LabelField("Constraints", EditorStyles.boldLabel);
-			EditorGUILayout.HelpBox("Constraints can make dungeon generation more likely to fail. Stricter constraints increase the chance of failure.", MessageType.Info);
-			EditorGUILayout.Space();
-
-			EditorGUI.BeginChangeCheck();
-			float padding = EditorGUILayout.DelayedFloatField(new GUIContent("Padding", "A minimum buffer distance between two unconnected tiles"), generator.Padding);
-			if (EditorGUI.EndChangeCheck())
-				generator.Padding = Mathf.Max(0f, padding);
-
-			generator.DisallowOverhangs = EditorGUILayout.Toggle(new GUIContent("Disallow Overhangs", "If checked, two tiles cannot overlap along the Up-Vector (a room cannot spawn above another room)"), generator.DisallowOverhangs);
-
-			EditorGUI.BeginChangeCheck();
-			generator.RestrictDungeonToBounds = EditorGUILayout.Toggle(new GUIContent("Restrict to Bounds?", "If checked, tiles will only be placed within the specified bounds below. May increase generation times"), generator.RestrictDungeonToBounds);
-
-			EditorGUI.BeginDisabledGroup(!generator.RestrictDungeonToBounds);
-			generator.TilePlacementBounds = EditorGUILayout.BoundsField(new GUIContent("Placement Bounds", "Tiles are not allowed to be placed outside of these bounds"), generator.TilePlacementBounds);
-			EditorGUI.EndDisabledGroup();
-
-			EditorGUILayout.EndVertical();
-
-			if (EditorGUI.EndChangeCheck() && isRuntimeDungeon)
-				SceneView.RepaintAll();
-
-			EditorGUILayout.Space();
-			EditorGUILayout.BeginVertical("box");
-
-			EditorGUILayout.LabelField("Global Overrides", EditorStyles.boldLabel);
-			EditorGUILayout.Space();
-
-
-			EditorGUILayout.BeginHorizontal();
-			generator.OverrideRepeatMode = EditorGUILayout.Toggle(generator.OverrideRepeatMode, GUILayout.Width(10));
-			bool previousEnabled = GUI.enabled;
-			GUI.enabled = generator.OverrideRepeatMode;
-			generator.RepeatMode = (TileRepeatMode)EditorGUILayout.EnumPopup("Repeat Mode", generator.RepeatMode);
-			GUI.enabled = previousEnabled;
-			EditorGUILayout.EndHorizontal();
-
-			DrawOverride("Allow Tile Rotation", ref generator.OverrideAllowTileRotation, ref generator.AllowTileRotation);
-
-			EditorGUILayout.EndVertical();
 		}
 
-		public static void DrawOverride(string label, ref bool shouldOverride, ref bool value)
+		public static void DrawStraightenSettingsWithOverrides(SerializedProperty straightenSettingsProperty, bool showCheckboxes)
 		{
-			EditorGUILayout.BeginHorizontal();
-			shouldOverride = EditorGUILayout.Toggle(shouldOverride, GUILayout.Width(10));
-			bool previousEnabled = GUI.enabled;
-			GUI.enabled = shouldOverride;
-			value = EditorGUILayout.Toggle(label, value);
-			GUI.enabled = previousEnabled;
-			EditorGUILayout.EndHorizontal();
+			var overrideStraightenChanceProp = straightenSettingsProperty.FindPropertyRelative(nameof(PathStraighteningSettings.OverrideStraightenChance));
+			var straightenChanceProp = straightenSettingsProperty.FindPropertyRelative(nameof(PathStraighteningSettings.StraightenChance));
+
+			EditorUtil.DrawOverrideProperty(overrideStraightenChanceProp, straightenChanceProp, new GUIContent("Straighten Chance", "The chance that the next tile spawned will continue in the same direction as the previous tile"));
+
+			if (showCheckboxes)
+			{
+				var overrideMainPathProp = straightenSettingsProperty.FindPropertyRelative(nameof(PathStraighteningSettings.OverrideCanStraightenMainPath));
+				var canStraightenMainPathProp = straightenSettingsProperty.FindPropertyRelative(nameof(PathStraighteningSettings.CanStraightenMainPath));
+
+				var overrideBranchPathsProp = straightenSettingsProperty.FindPropertyRelative(nameof(PathStraighteningSettings.OverrideCanStraightenBranchPaths));
+				var canStraightenBranchPathsProp = straightenSettingsProperty.FindPropertyRelative(nameof(PathStraighteningSettings.CanStraightenBranchPaths));
+
+				EditorUtil.DrawOverrideProperty(overrideMainPathProp, canStraightenMainPathProp, new GUIContent("Straighten Main Path", "Whether or not the main path should be straightened using StraightenChance"));
+				EditorUtil.DrawOverrideProperty(overrideBranchPathsProp, canStraightenBranchPathsProp, new GUIContent("Straighten Branch Paths", "Whether or not branch paths should be straightened using StraightenChance"));
+			}
+		}
+
+		public static void DrawOverrideProperty(SerializedProperty overrideEnabledProp, SerializedProperty valueProp, GUIContent label)
+		{
+			if(overrideEnabledProp.propertyType != SerializedPropertyType.Boolean)
+			{
+				Debug.LogError("OverrideEnabled property must be a boolean");
+				return;
+			}
+
+			using (new EditorGUILayout.HorizontalScope())
+			{
+				EditorGUILayout.PropertyField(overrideEnabledProp, GUIContent.none, GUILayout.Width(15));
+
+				using (new EditorGUI.DisabledGroupScope(!overrideEnabledProp.boolValue))
+				{
+					EditorGUILayout.PropertyField(valueProp, label);
+				}
+			}
 		}
 
 		public static void ObjectField(Rect rect, SerializedProperty property, GUIContent label, Type objectType, bool allowSceneObjects, bool allowAssets)
@@ -516,11 +468,11 @@ namespace DunGen.Editor
 				{
 					string elementName = element.Substring(0, element.IndexOf("["));
 					int index = int.Parse(element.Substring(element.IndexOf("[")).Replace("[", "").Replace("]", ""));
-					obj = GetValue(obj, elementName, index);
+					obj = EditorUtil.GetValue(obj, elementName, index);
 				}
 				else
 				{
-					obj = GetValue(obj, element);
+					obj = EditorUtil.GetValue(obj, element);
 				}
 			}
 
@@ -554,7 +506,7 @@ namespace DunGen.Editor
 
 		private static object GetValue(object source, string name, int index)
 		{
-			var enumerable = GetValue(source, name) as IEnumerable;
+			var enumerable = EditorUtil.GetValue(source, name) as IEnumerable;
 
 			if (enumerable == null)
 				return null;

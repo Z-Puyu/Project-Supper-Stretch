@@ -59,6 +59,17 @@ Unity: 2019.1 or higher
     }
     ```
 
+*   Using git upm (Unity UI):
+
+    1. `Window` - `Package Manager`
+    2. Click `+` button, `Add package from git URL`
+    3. Enter the following URL:
+
+    ```
+    https://github.com/TylerTemp/SaintsField.git
+    ```
+
+
 *   Using a `unitypackage`:
 
     Go to the [Release Page](https://github.com/TylerTemp/SaintsField/releases) to download a desired version of `unitypackage` and import it to your project
@@ -90,10 +101,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.12.0**
+**4.16.4**
 
-1.  Add `PlayaAboveRichLabel`/`PlayaBelowRichLabel` to draw a rich label above/below a field/method/property (including array/list)
-2.  UI Toolkit: Allow `PlayaAboveRichLabel` & `PlayaInfoBox` be applied to a class/struct definition
+1.  `ListDrawerSetting`, `Table`, `SaintsDictionary` search now support `SerializeReference` field search, and is case-insensitive.
+2.  UI Toolkit: `SaintsDictionary` now support debounce search
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -1696,6 +1707,88 @@ public List<MyStruct> myStructs;
 ```
 
 [![video](https://github.com/user-attachments/assets/2bf6480a-65f7-4dfc-bf96-bfee9497428e)](https://github.com/user-attachments/assets/66fa7d10-427c-4f8c-b23f-f4bb29faa9f6)
+
+**`TableHeaders`/`TableHeadersHide`**
+
+> [!NOTE]
+> This feature is UI Toolkit only
+
+You can use `TableHeaders` to default show some columns for the table, or `TableHeadersHide` to hide them.
+
+Note: this does not remove the header, but hide it by default. You can still toggle it in header - right click menu.
+
+Thus, it'll only affect the appearance when the table is rendered, and will NOT dynamicly update it, unless you select away and back, as it will trigger the re-paint process.
+
+**Parameters**:
+
+*   `string headers...`: the headers to show/hide.
+
+    If it starts with `$`, a callback/property/field value is used. The target must return a string, or `IEnumerable<string>`
+
+```csharp
+using SaintsField;
+
+[Serializable]
+public struct TableHeaderStruct
+{
+    public int i1;
+
+    [TableColumn("Custom Header")] public int i2;
+    [TableColumn("Custom Header")] [Button] private void D() {}
+
+    public string str1;
+    public string str2;
+
+    [TableColumn("String")] public string str3;
+    [TableColumn("String")] public string str4;
+
+    public string str5;
+    public string str6;
+}
+
+[Table]
+[TableHeaders(  // what should be shown by default
+    nameof(TableHeaderStruct.i1),  // directly name
+    "Custom Header",  // directly custom name
+    "$" + nameof(showTableHeader),  // callback of a single name
+    "$" + nameof(ShowTableHeaders))  // callback of mutiple names
+]
+public TableHeaderStruct[] tableStruct;
+
+[Table]
+[TableHeadersHide(  // what should be hidden by default
+        nameof(TableHeaderStruct.i1),  // directly name
+        "Custom Header",  // directly custom name
+        "$" + nameof(showTableHeader),  // callback of a single name
+        "$" + nameof(ShowTableHeaders))  // callback of mutiple names
+]
+public TableHeaderStruct[] tableHideStruct;
+
+[Space]
+public string showTableHeader = nameof(TableHeaderStruct.str2);
+
+protected virtual IEnumerable<string> ShowTableHeaders() => new[]
+{
+    nameof(TableHeaderStruct.str5),
+    nameof(TableHeaderStruct.str6),
+};
+```
+
+Then you can inherent or change field to make the table display differently
+
+```csharp
+public class TableHeadersExampleInh : TableHeadersExample
+{
+    protected override IEnumerable<string> ShowTableHeaders() => new[]
+    {
+        "String",
+    };
+}
+```
+
+Results:
+
+![image](https://github.com/user-attachments/assets/c33a6875-bebd-4998-bfec-97575ac781ec)
 
 #### `ShowInInspector` ####
 
@@ -4497,7 +4590,6 @@ public string alignField;
 
 ![show_image](https://github.com/TylerTemp/SaintsField/assets/6391063/8fb6397f-12a7-4eaf-9e2b-65f563c89f97)
 
-
 #### `ParticlePlay` ####
 
 A button to play a particle system of the field value, or the one on the field value.
@@ -4521,7 +4613,6 @@ Note: because of the limitation from Unity, it can NOT detect if a `ParticleSyst
 ```
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/18ab2c32-9be9-49f5-9a3a-058fa4c3c7bd)](https://github.com/TylerTemp/SaintsField/assets/6391063/2473df2b-39fc-47bc-829e-eeb65c411131)
-
 
 #### `ButtonAddOnClick` ####
 
@@ -4690,9 +4781,85 @@ A simple color palette tool to select a color from a list of colors.
 
 You can add/modify/remove color palette in the `Window/Saints/Color Palette` menu.
 
+#### `Searchable` ####
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+> [!NOTE]
+> This is UI Toolkit only
+
+This allows you to search for a field in a `MonoBehavior` (`Component`) or `ScriptableObject`. This is useful is you have a big list of fields.
+
+It will draw a search icon in the header. Once clicked, you can input the field name you want to search.
+
+You can also use `Ctrl` + `F` (`Command` + `F` on macOS) to open the search bar.
+
+Note: this only search the field name. It does not search the nested fields, and it does not check with the `RichLabel`, `PlayaRichLabel`.
+
+```csharp
+using SaintsField.Playa;
+
+[Searchable]
+public class SearchableMono : SaintsMonoBehaviour
+{
+    public string myString;
+    public int myInt;
+    [ShowInInspector] private string MyInspectorString => "Non Ser Prop";
+    [ShowInInspector] private string otherInspectorString = "Non Ser Field";
+    public string otherString;
+    public int otherInt;
+
+    [ListDrawerSettings(searchable: true)]
+    public string[] myArray;
+
+    [Serializable]
+    public struct MyStruct
+    {
+        public string MyStructString;
+    }
+
+    [Table] public MyStruct[] myTable;
+}
+```
+
+[![video](https://github.com/user-attachments/assets/b8273285-d24e-441d-9ceb-f277685372f3)](https://github.com/user-attachments/assets/5a6b9aae-481d-4898-9cbe-6634c51cb3e4)
+
 ## Handles ##
 
-Handles is drawn in the scene view instead of inspector.
+`Handles` is drawn in the scene view instead of inspector.
+
+### `SceneViewPicker` ###
+
+Allow you to pick a target from a scene view, then sign it into your field.
+
+Once clicked the picking icon, use left mouse to choose a target. Once a popup is displayed, choose the target you want.
+
+If you just want the closest one, just click, then click again (because the closest one is always at the position of your cursor)
+
+Usage:
+
+*   Left Mouse: pick; when popup is displayed, click away to close the popup
+*   Middle Mouse: cancel
+
+```csharp
+using SaintsField;
+
+[SceneViewPicker] public Collider myCollider;
+// works with SaintsInterface
+[SceneViewPicker] public SaintsObjInterface<IInterface1> interf;
+
+// a notice will diplay if no target is found
+[SceneViewPicker] public NoThisInScene noSuch;
+// works for list elements too
+[SceneViewPicker] public Object[] anything;
+```
+
+[![video](https://github.com/user-attachments/assets/2f51ce8f-145e-4216-bd00-30ca1081ab4d)](https://github.com/user-attachments/assets/b994cc62-ad92-419e-9b6e-5029d662b601)
+
+This feature is heavily inspired by [Scene-View-Picker](https://github.com/RoyTheunissen/Scene-View-Picker)! If you like this feature, please consider go give them a star!
+
+Because Scene-View-Picker does not [provide API for script calling](https://github.com/RoyTheunissen/Scene-View-Picker/issues/4), I have to completely re-write the logic for in SaintsField instead of depended on it.
 
 ### `DrawLabel` ###
 
@@ -5592,36 +5759,17 @@ public SaintsDictionary<int, MyStruct> basicType;
 
 ![image](https://github.com/user-attachments/assets/c2dad54d-bfa6-4c52-acee-e2aa74898d71)
 
-At last, use auto getters so it can auto-fetch some values:
-
-(Note: ATM you still need to click the plus button once to make the array filling)
+You can also inherit `SaintsDictionaryBase<TKey, TValue>` to create your own custom dictionary.
 
 > [!WARNING]
-> Custom Dictionary is still under some test and need some API changes. Please avoid inherent a custom dictionary, but use `SaintsDictionary` directly.
+> Custom Dictionary is still under some test and need some API changes. Please avoid inherit a custom dictionary, but use `SaintsDictionary` directly.
+> If you still need it, please fork this project, use the forked one, and carefully exam the project when you upgrade, as it might break your inherence.
 
-```csharp
-suing SaintsField;
+See [DictInterface](https://github.com/TylerTemp/SaintsField/blob/master/Samples~/Scripts/IssueAndTesting/Issue/Issue241DictInterface.cs) as an example of making an `SerializedReference` dictionary.
 
-[Serializable]
-public class ValueFillerDict : SaintsDictionaryBase<int, GameObject>
-{
-    [SerializeField]
-    private List<Wrap<int>> _keys = new List<Wrap<int>>();
+![Image](https://github.com/user-attachments/assets/7b252440-c11d-4bd0-b206-4808cd4c3c01)
 
-    [SerializeField]
-    // [GetComponentInChildren]
-    private List<Wrap<MyStruct>> _values = new List<Wrap<MyStruct>>();
-
-#if UNITY_EDITOR
-    private static string EditorPropKeys => nameof(_intKeys);
-    private static string EditorPropValues => nameof(_objValues);
-#endif
-    protected override List<Wrap<int>> SerializedKeys => _intKeys;  // NOTE: need this `Wrap`
-    protected override List<Wrap<GameObject>> SerializedValues => _objValues;
-}
-
-public ValueFillerDict decValueFillerDict;
-```
+See [SaintsDictFiller](https://github.com/TylerTemp/SaintsField/blob/master/Samples~/Scripts/SaintsDictExamples/SaintsDictFillerExample.cs) as an example of making dictionary with auto getters.
 
 [![video](https://github.com/user-attachments/assets/ce2efb49-2723-4e43-a3a7-9969f229f591)](https://github.com/user-attachments/assets/38dcb22c-d30f-40d4-bd6b-420aa1b41588)
 
@@ -6079,6 +6227,39 @@ public Sequence DoNotIncludeMe() => DOTween.Sequence();    // this will NOT be a
 ```
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/db6b60b5-0d1d-43e2-9ab9-b2c7912d7e8d)
+
+## Wwise ##
+
+Wwise itself already has very nice drawer. SaintsField only provide some utility to make it easier to use.
+
+If you can't see the wwise related attributes, please add marco `SAINTSFIELD_WWISE` to enable it.
+
+If you face compatibility issue because of API changes in Wwise, please add marco `SAINTSFIELD_WWISE_DISABLE` to disable it.
+
+### `GetWwise` ###
+
+> [!NOTE]
+> This feature is UI Toolkit only
+
+Like the auto getters, this can auto-sign a wwise object (a state, a switch, a soundBank etc.) to a field.
+
+```csharp
+using SaintsField.Wwise;
+
+[GetWwise("BGM*")]  // Get a soundBank starts with `BGM`
+public Bank bank;
+
+[GetWwise("*BGM*")]  // Get all events contains `BGM`
+public Event[] events;
+
+[GetWwise]  // Get the first rtpc found
+public RTPC rtpc;
+
+[GetWwise("*/BGM/Stop*")]  // Get events that's under any work unit, under BGM folder, and starts with `Stop`
+public Event stopEvents;
+```
+
+![image](https://github.com/user-attachments/assets/72007c35-a0f5-4c66-bc29-803947b4d74a)
 
 ## I2 Localization ##
 

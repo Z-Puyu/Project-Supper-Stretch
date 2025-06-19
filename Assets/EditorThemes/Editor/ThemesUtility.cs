@@ -1,9 +1,10 @@
 using System.Collections.Generic;
-using UnityEngine;
 using System.IO;
-using UnityEditorInternal;
 using UnityEditor;
-namespace ThemesPlugin
+using UnityEditorInternal;
+using UnityEngine;
+
+namespace EditorThemes.Editor
 { 
     public static class ThemesUtility
     {
@@ -39,7 +40,7 @@ namespace ThemesPlugin
 
         public static string GetPathForTheme(string Name)
         {
-            return CustomThemesPath + Name + Enc;
+            return ThemesUtility.CustomThemesPath + Name + ThemesUtility.Enc;
         }
         public static void DeleteFileWithMeta(string Path)
         {
@@ -61,11 +62,11 @@ namespace ThemesPlugin
             ussText += "\n";
             ussText += "/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/";
             ussText += "\n";
-            ussText += "/*"+ Version + "*/";
+            ussText += "/*"+ ThemesUtility.Version + "*/";
 
             foreach (CustomTheme.UIItem I in c.Items)
             {
-                ussText += UssBlock(I.Name, I.Color);
+                ussText += ThemesUtility.UssBlock(I.Name, I.Color);
             }
 
             return ussText;
@@ -93,23 +94,23 @@ namespace ThemesPlugin
         public static void SaveJsonFileForTheme(CustomTheme t)
         {
 
-            t.Version = Version;
+            t.Version = ThemesUtility.Version;
             string NewJson = JsonUtility.ToJson(t);
 
 
-            string Path = GetPathForTheme(t.Name);
+            string Path = ThemesUtility.GetPathForTheme(t.Name);
             if (File.Exists(Path))
             {
                 File.Delete(Path);
             }
 
             File.WriteAllText(Path, NewJson);
-            LoadUssFileForTheme(t.Name);
+            ThemesUtility.LoadUssFileForTheme(t.Name);
 
         }
         public static void LoadUssFileForTheme(string Name)
         {
-            LoadUssFileForThemeUsingPath(ThemesUtility.GetPathForTheme(Name));
+            ThemesUtility.LoadUssFileForThemeUsingPath(ThemesUtility.GetPathForTheme(Name));
         }
         public static void LoadUssFileForThemeUsingPath(string Path)
         {
@@ -123,22 +124,22 @@ namespace ThemesPlugin
             }
 
             string ussText = ThemesUtility.GenerateUssString(t);
-            WriteUss(ussText);
+            ThemesUtility.WriteUss(ussText);
 
-            currentTheme = Path;
+            ThemesUtility.currentTheme = Path;
         }
 
 
         public static void WriteUss(string ussText)
         {
-            string Path = UssFilePath + "/dark.uss";
-            DeleteFileWithMeta(Path);
+            string Path = ThemesUtility.UssFilePath + "/dark.uss";
+            ThemesUtility.DeleteFileWithMeta(Path);
 
             File.WriteAllText(Path, ussText);
 
 
             string Path2 = Application.dataPath + "/EditorThemes/Editor/StyleSheets/Extensions/light.uss";
-            DeleteFileWithMeta(Path2);
+            ThemesUtility.DeleteFileWithMeta(Path2);
             
             File.WriteAllText(Path2, ussText);
 

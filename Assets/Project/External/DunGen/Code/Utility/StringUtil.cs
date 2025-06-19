@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code.Utility
 {
 	public static class StringUtil
 	{
@@ -9,7 +9,7 @@ namespace DunGen
 
 		public static string SplitCamelCase(string input)
 		{
-			return capitalLetterPattern.Replace(input, " $1").Trim();
+			return StringUtil.capitalLetterPattern.Replace(input, " $1").Trim();
 		}
 	}
 }

@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 namespace SaintsField.Editor.Drawers.CustomPicker.FieldTypeDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(FieldTypeAttribute), true)]
     public partial class FieldTypeAttributeDrawer: SaintsPropertyDrawer

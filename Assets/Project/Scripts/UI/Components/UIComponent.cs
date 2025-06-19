@@ -1,4 +1,4 @@
-﻿using Project.Scripts.UI.Components.Styles;
+﻿using Project.Scripts.UI.Styles;
 using SaintsField;
 using UnityEngine;
 
@@ -7,10 +7,15 @@ namespace Project.Scripts.UI.Components;
 public abstract class UIComponent<S> : UIElement where S : UIStyle {
     [field: SerializeField, Expandable]
     protected S? Style { get; set; }
-    
-    protected abstract void ApplyStyle(S style);
 
-    protected abstract void RevertStyle();
+    protected virtual void ApplyStyle(S style) {
+        style.OnStyleChanged += this.Init;
+        this.transform.localScale *= style.Scale;
+    }
+
+    protected virtual void RevertStyle() {
+        this.transform.localScale = Vector3.one;
+    }
 
     protected override void Configure() {
         if (this.Theme && this.Style) {

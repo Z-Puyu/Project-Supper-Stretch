@@ -1,8 +1,8 @@
 ﻿using System.Linq;
+using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
 using UnityEngine;
-using DunGen.Graph;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code.Utility
 {
 	/// <summary>
 	/// Used as a quick runtime check to ensure the dungeon is correctly set up
@@ -15,41 +15,41 @@ namespace DunGen
 
         public DungeonArchetypeValidator(DungeonFlow flow)
         {
-            Flow = flow;
+            this.Flow = flow;
         }
 
         public bool IsValid()
         {
             // Ensure archetype is not NULL
-            if (Flow == null)
+            if (this.Flow == null)
             {
-                LogError("No Dungeon Flow is assigned");
+                this.LogError("No Dungeon Flow is assigned");
                 return false;
             }
 
-            var archetypes = Flow.GetUsedArchetypes();
-            var tileSets = Flow.GetUsedTileSets();
+            var archetypes = this.Flow.GetUsedArchetypes();
+            var tileSets = this.Flow.GetUsedTileSets();
 
-            foreach (var line in Flow.Lines)
+            foreach (var line in this.Flow.Lines)
             {
                 if (line.DungeonArchetypes.Count == 0)
                 {
-                    LogError("One or more line segments in your dungeon flow graph have no archetype applied. Each line segment must have at least one archetype assigned to it.");
+                    this.LogError("One or more line segments in your dungeon flow graph have no archetype applied. Each line segment must have at least one archetype assigned to it.");
                     return false;
                 }
 
                 foreach(var archetype in line.DungeonArchetypes)
                     if (archetype == null)
                     {
-                        LogError("One or more of the archetypes in your dungeon flow graph have an unset archetype value.");
+                        this.LogError("One or more of the archetypes in your dungeon flow graph have an unset archetype value.");
                         return false;
                     }
             }
 
-            foreach(var node in Flow.Nodes)
+            foreach(var node in this.Flow.Nodes)
                 if (node.TileSets.Count == 0)
                 {
-                    LogError("The \"{0}\" node in your dungeon flow graph have no tile sets applied. Each node must have at least one tile set assigned to it.", node.Label);
+                    this.LogError("The \"{0}\" node in your dungeon flow graph have no tile sets applied. Each node must have at least one tile set assigned to it.", node.Label);
                     return false;
                 }
 
@@ -57,7 +57,7 @@ namespace DunGen
             {
                 if (archetype == null)
                 {
-                    LogError("An Archetype in the Dungeon Flow has not been assigned a value");
+                    this.LogError("An Archetype in the Dungeon Flow has not been assigned a value");
                     return false;
                 }
                 else
@@ -71,7 +71,7 @@ namespace DunGen
 							int doorwayCount = tile.GetComponentsInChildren<Doorway>(true).Count();
 
 							if (doorwayCount <= 1)
-								LogWarning("The Tile \"{0}\" in TileSet \"{1}\" has {2} doorways. Tiles in an archetype should have more than 1 doorway.", tile.name, tileSet.name, doorwayCount);
+								this.LogWarning("The Tile \"{0}\" in TileSet \"{1}\" has {2} doorways. Tiles in an archetype should have more than 1 doorway.", tile.name, tileSet.name, doorwayCount);
                         }
                 }
             }
@@ -80,14 +80,14 @@ namespace DunGen
             {
                 if (tileSet == null)
                 {
-                    LogError("A TileSet in the Dungeon Flow has not been assigned a value");
+                    this.LogError("A TileSet in the Dungeon Flow has not been assigned a value");
                     return false;
                 }
 
                 // Make sure each TileSet has at least one Tile
                 if (tileSet.TileWeights.Weights.Count == 0)
                 {
-                    LogError("TileSet \"{0}\" contains no Tiles", tileSet.name);
+                    this.LogError("TileSet \"{0}\" contains no Tiles", tileSet.name);
                     return false;
                 }
 
@@ -95,9 +95,9 @@ namespace DunGen
                 foreach (var weight in tileSet.TileWeights.Weights)
                 {
                     if (weight.Value == null)
-                        LogWarning("TileSet \"{0}\" contains an entry with no Tile", tileSet.name);
+                        this.LogWarning("TileSet \"{0}\" contains an entry with no Tile", tileSet.name);
                     if (weight.MainPathWeight <= 0 && weight.BranchPathWeight <= 0)
-                        LogWarning("TileSet \"{0}\" contains an entry with an invalid weight. Both weights are below zero, resulting in no chance for this tile to spawn in the dungeon. Either MainPathWeight or BranchPathWeight can be zero, not both.", tileSet.name);
+                        this.LogWarning("TileSet \"{0}\" contains an entry with an invalid weight. Both weights are below zero, resulting in no chance for this tile to spawn in the dungeon. Either MainPathWeight or BranchPathWeight can be zero, not both.", tileSet.name);
                 }
             }
 

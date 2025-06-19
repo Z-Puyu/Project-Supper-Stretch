@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.Common.UI;
 using Project.Scripts.UI.Components;
 using Project.Scripts.Util.Pooling;
 using UnityEngine;
@@ -7,28 +8,26 @@ using UnityEngine.Events;
 
 namespace Project.Scripts.UI.Control;
 
-public abstract class ListPresenter<L, T> : UIPresenter<ListContainer, T> {
+public abstract class ListPresenter<L, M> : UIPresenter<M, List, ListUIData<L, M>> where M : class {
     [NotNull]
     [field: SerializeField]
-    private ListEntry<L>? ItemEntryPrefab { get; set; }
+    private ListEntry? ItemEntryPrefab { get; set; }
     
-    [NotNull] private Pool<ListEntry<L>>? Pool { get; set; }
+    [NotNull] private Pool<ListEntry>? Pool { get; set; }
     [field: SerializeField] private int InitialPoolCapacity { get; set; } = 20;
     [field: SerializeField] private int MaxPoolCapacity { get; set; } = 1000;
     protected Dictionary<object, ListEntry> Entries { get; private init; } = [];
     protected Dictionary<ListEntry, L> Data { get; private init; } = [];
-
-    public event UnityAction<L> OnEntrySelected = delegate { }; 
     
-    protected override void Awake() {
-        base.Awake();
-        this.Pool = Pool<ListEntry<L>>.Builder
-                                      .Of(this.ItemEntryPrefab)
-                                      .WithCapacity(this.InitialPoolCapacity, this.MaxPoolCapacity)
-                                      .Build();
+    public event UnityAction<L> OnEntrySelected = delegate { };
+    
+    protected void Awake() {
+        this.Pool = Pool<ListEntry>.Builder.Of(this.ItemEntryPrefab)
+                                   .WithCapacity(this.InitialPoolCapacity, this.MaxPoolCapacity)
+                                   .Build();
     }
 
-    protected void OnContentChanged(T source, L newData) {
+    protected void OnContentChanged(M source, L newData) {
         if (!object.Equals(source, this.Model)) {
             return;
         }
@@ -45,7 +44,7 @@ public abstract class ListPresenter<L, T> : UIPresenter<ListContainer, T> {
     /// </summary>
     /// <param name="data">The data to be associated with the list entry.</param>
     /// <returns>A new list entry.</returns>
-    protected virtual ListEntry<L> MakeEntry(L data) {
+    protected virtual ListEntry MakeEntry(L data) {
         return this.Pool.Get();
     }
     
@@ -85,9 +84,8 @@ public abstract class ListPresenter<L, T> : UIPresenter<ListContainer, T> {
     protected abstract object KeyOf(L data);
 
     protected void AddEntry(L data) {
-        ListEntry<L> entry = this.MakeEntry(data);
-        entry.OnClick += () => this.OnEntrySelected.Invoke(this.Data[entry]);
-        this.View.AddEntry(entry);
+        ListEntry entry = this.MakeEntry(data);
+        this.View.AddEntry(entry, onClick: () => this.OnEntrySelected.Invoke(this.Data[entry]));
         this.Entries.Add(this.KeyOf(data), entry);
         this.Data.Add(entry, data);
         entry.Display(data);
@@ -97,5 +95,15 @@ public abstract class ListPresenter<L, T> : UIPresenter<ListContainer, T> {
         this.View.Clear();
         this.Entries.Clear();
         this.Data.Clear();
+    }
+    
+    public override void Present(ListUIData<L, M> data) {
+        if (this.Model == null || !object.Equals(this.Model, data.Model)) {
+            this.Clear();
+            this.Model = data.Model;
+        }
+        
+        this.OnEntrySelected = data.OnSelect ?? delegate { };
+        this.Refresh();
     }
 }

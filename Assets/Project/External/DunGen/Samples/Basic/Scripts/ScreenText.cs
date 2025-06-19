@@ -1,7 +1,8 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using DunGen.Project.External.DunGen.Code.Utility;
+using UnityEngine;
 
-namespace DunGen.Demo
+namespace Project.External.DunGen.Samples.Basic.Scripts
 {
 	public class ScreenText : MonoBehaviour
 	{
@@ -23,21 +24,21 @@ namespace DunGen.Demo
 
 		public void AddMessage(string message)
 		{
-			messages.Add(new ScreenTextData() { Text = message, Timer = MessageFadeTime });
+			this.messages.Add(new ScreenTextData() { Text = message, Timer = this.MessageFadeTime });
 		}
 
 		private void Update()
 		{
-			for (int i = messages.Count - 1; i >= 0; i--)
+			for (int i = this.messages.Count - 1; i >= 0; i--)
 			{
-				var message = messages[i];
+				var message = this.messages[i];
 
 				if (message.Timer > 0)
 				{
 					message.Timer -= Time.deltaTime;
 
 					if (message.Timer <= 0)
-						messages.RemoveAt(i);
+						this.messages.RemoveAt(i);
 				}
 			}
 		}
@@ -49,14 +50,14 @@ namespace DunGen.Demo
 
 			bottomRight -= new Vector2(bufferSize, bufferSize);
 
-			for (int i = messages.Count - 1; i >= 0; i--)
+			for (int i = this.messages.Count - 1; i >= 0; i--)
 			{
-				var msg = messages[i];
+				var msg = this.messages[i];
 
 				GUIContent content = new GUIContent(msg.Text);
 				Vector2 stringSize = GUI.skin.label.CalcSize(content);
 
-				GUI.Label(new Rect(bottomRight.x - stringSize.x, bottomRight.y - stringSize.y, stringSize.x, stringSize.y), content, Style);
+				GUI.Label(new Rect(bottomRight.x - stringSize.x, bottomRight.y - stringSize.y, stringSize.x, stringSize.y), content, this.Style);
 				bottomRight -= new Vector2(0, stringSize.y + bufferSize);
 			}
 		}

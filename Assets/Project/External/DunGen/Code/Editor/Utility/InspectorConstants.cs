@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DunGen.Editor
+namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
 {
 	public static class InspectorConstants
 	{

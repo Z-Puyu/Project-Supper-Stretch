@@ -318,20 +318,20 @@ namespace SaintsField.Editor.Core
         private static float GetPropertyHeightFallback(SerializedProperty property, GUIContent label,
             FieldInfo fieldInfo, string preferredLabel)
         {
-            (Attribute _, Type attributeDrawerType) = GetOtherAttributeDrawerType(fieldInfo);
-            if (attributeDrawerType == null)
-            {
-                Type drawerType = FindTypeDrawerNonSaints(SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(fieldInfo.FieldType): fieldInfo.FieldType);
-                if (drawerType != null)
-                {
-                    // type drawer has no attribute
-                    PropertyDrawer drawerInstance = MakePropertyDrawer(drawerType, fieldInfo, null, preferredLabel);
-                    if (drawerInstance != null)
-                    {
-                        return drawerInstance.GetPropertyHeight(property, label);
-                    }
-                }
-            }
+            // (Attribute _, Type attributeDrawerType) = GetOtherAttributeDrawerType(fieldInfo);
+            // if (attributeDrawerType == null)
+            // {
+            //     Type drawerType = FindTypeDrawerNonSaints(SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(fieldInfo.FieldType): fieldInfo.FieldType);
+            //     if (drawerType != null)
+            //     {
+            //         // type drawer has no attribute
+            //         PropertyDrawer drawerInstance = MakePropertyDrawer(drawerType, fieldInfo, null, preferredLabel);
+            //         if (drawerInstance != null)
+            //         {
+            //             return drawerInstance.GetPropertyHeight(property, label);
+            //         }
+            //     }
+            // }
 
             // TODO: check, if it has dec, this value might be wrong
             using (new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
@@ -1216,7 +1216,7 @@ namespace SaintsField.Editor.Core
         private static void UnityDraw(Rect position, SerializedProperty property, GUIContent label, FieldInfo fieldInfo, string preferredLabel)
         {
             // Wait... it works now?
-            (Attribute attributeInstance, Type attributeDrawerType) = GetOtherAttributeDrawerType(fieldInfo);
+            (Attribute attributeInstance, Type attributeDrawerType) = GetOtherAttributeDrawerType(ReflectCache.GetCustomAttributes(fieldInfo));
 
             if(attributeDrawerType != null)
             {

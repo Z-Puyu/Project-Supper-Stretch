@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	[AddComponentMenu("DunGen/Runtime Dungeon")]
 	public class RuntimeDungeon : MonoBehaviour
@@ -12,17 +12,25 @@ namespace DunGen
 
 		protected virtual void Start()
 		{
-			if (GenerateOnStart)
-				Generate();
+			if (this.GenerateOnStart)
+				this.Generate();
 		}
 
 		public void Generate()
 		{
-			if (Root != null)
-				Generator.Root = Root;
+			if (this.Root != null)
+				this.Generator.Root = this.Root;
 
-			if (!Generator.IsGenerating)
-				Generator.Generate();
+			if (!this.Generator.IsGenerating)
+				this.Generator.Generate();
+		}
+
+		private void OnDrawGizmos()
+		{
+			if (this.Generator == null || !this.Generator.DebugRender)
+				return;
+
+			this.Generator.CollisionManager?.Broadphase?.DrawDebug();
 		}
 	}
 }

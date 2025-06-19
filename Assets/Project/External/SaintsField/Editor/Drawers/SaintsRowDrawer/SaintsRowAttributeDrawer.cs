@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Playa;
 using SaintsField.Editor.Utils;
 using UnityEditor;
 
 namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 {
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
+#endif
     [CustomPropertyDrawer(typeof(SaintsRowAttribute))]
-    public partial class SaintsRowAttributeDrawer: SaintsPropertyDrawer, IMakeRenderer
+    public partial class SaintsRowAttributeDrawer: SaintsPropertyDrawer
     {
         private static (string error, int arrayIndex, object parent, object current) GetTargets(FieldInfo fieldInfo, SerializedProperty property)
         {

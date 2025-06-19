@@ -14,7 +14,7 @@ using Object = UnityEngine.Object;
 namespace SaintsField.Editor.Drawers.CustomPicker.ResourcePathDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.WrapperPriority)]
 #endif
     [CustomPropertyDrawer(typeof(ResourcePathAttribute), true)]
     public partial class ResourcePathAttributeDrawer: RequireTypeAttributeDrawer

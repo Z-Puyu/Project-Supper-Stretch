@@ -1,8 +1,8 @@
-﻿using DunGen.Graph;
+﻿using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
 using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Drawers
+namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers
 {
 	[CustomPropertyDrawer(typeof(DungeonFlow.GlobalPropSettings))]
 	sealed class GlobalPropSettingsDrawer : PropertyDrawer
@@ -19,27 +19,27 @@ namespace DunGen.Editor.Drawers
 			return	EditorGUI.GetPropertyHeight(idProperty) +
 					EditorGUI.GetPropertyHeight(countProperty) +
 					EditorGUIUtility.standardVerticalSpacing * 2 +
-					Margin * 2 +
-					PaddingBetweenElements;
+					GlobalPropSettingsDrawer.Margin * 2 +
+					GlobalPropSettingsDrawer.PaddingBetweenElements;
 		}
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			position.height = GetPropertyHeight(property, label);
+			position.height = this.GetPropertyHeight(property, label);
 
 			var idProperty = property.FindPropertyRelative("ID");
 			var countProperty = property.FindPropertyRelative("Count");
 
 			EditorGUI.BeginProperty(position, label, property);
-			position.position += new Vector2(0, Margin);
-			position.height -= Margin * 2;
+			position.position += new Vector2(0, GlobalPropSettingsDrawer.Margin);
+			position.height -= GlobalPropSettingsDrawer.Margin * 2;
 
 			var idPosition = position;
 			idPosition.height = EditorGUI.GetPropertyHeight(idProperty) + EditorGUIUtility.standardVerticalSpacing;
 
 			var countPosition = position;
 			countPosition.height = EditorGUI.GetPropertyHeight(countProperty) + EditorGUIUtility.standardVerticalSpacing;
-			countPosition.position += new Vector2(0f, idPosition.height + PaddingBetweenElements);
+			countPosition.position += new Vector2(0f, idPosition.height + GlobalPropSettingsDrawer.PaddingBetweenElements);
 
 			EditorGUI.PropertyField(idPosition, idProperty);
 			EditorGUI.PropertyField(countPosition, countProperty);

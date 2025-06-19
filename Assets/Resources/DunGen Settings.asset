@@ -12,14 +12,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad1ebb4e3aa3b474d849bc53fbe48191, type: 3}
   m_Name: DunGen Settings
   m_EditorClassIdentifier: 
-  defaultSocket: {fileID: 0}
+  BroadphaseSettings:
+    rid: 1548064411412594688
+  BoundsCalculationsIgnoreSprites: 0
+  RecalculateTileBoundsOnSave: 1
+  EnableTilePooling: 0
+  DisplayFailureReportWindow: 1
+  CheckForUnusedFiles: 1
+  defaultSocket: {fileID: 4298491947992812740}
   tagManager:
-    keys: 00000000010000000200000003000000
+    keys: 00000000010000000600000005000000040000000700000008000000
     values:
-    - Room
-    - Corridor
-    - CorridorDoorway
-    - RoomDoorway
+    - Room:Room
+    - Room:Corridor
+    - Doorway:Corridor-Corridor
+    - Doorway:Corridor-Room
+    - Room:CorridorJunction
+    - Doorway:Junction-Corridor
+    - Room:Hallway
+  references:
+    version: 2
+    RefIds:
+    - rid: 1548064411412594688
+      type: {class: SpatialHashBroadphaseSettings, ns: DunGen.Project.External.DunGen.Code.Collision, asm: DunGen}
+      data:
+        CellSize: 40
 --- !u!114 &4298491947992812740
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-namespace FastScriptReload.Runtime
+namespace Project.External.FastScriptReload.Scripts.Runtime
 {
 #if UNITY_EDITOR
     [UnityEditor.InitializeOnLoad]
@@ -17,7 +17,7 @@ namespace FastScriptReload.Runtime
         static DetourCrashHandler()
         {
 #if UNITY_EDITOR
-            Init();
+            DetourCrashHandler.Init();
 #else
             LoggerScoped.Log($"{nameof(DetourCrashHandler)}: currently only supported in Editor");
 #endif
@@ -27,10 +27,10 @@ namespace FastScriptReload.Runtime
         static void Init()
         {
 #if UNITY_EDITOR
-            LastDetourFilePath = Path.GetTempPath() + Application.productName + "-last-detour.txt";
+            DetourCrashHandler.LastDetourFilePath = Path.GetTempPath() + Application.productName + "-last-detour.txt";
             foreach (var c in Path.GetInvalidFileNameChars()) 
             { 
-                LastDetourFilePath = LastDetourFilePath.Replace(c, '-'); 
+                DetourCrashHandler.LastDetourFilePath = DetourCrashHandler.LastDetourFilePath.Replace(c, '-'); 
             }
 #else
             LoggerScoped.Log($"{nameof(DetourCrashHandler)}: currently only supported in Editor");
@@ -40,7 +40,7 @@ namespace FastScriptReload.Runtime
         public static void LogDetour(string fullName)
         {
 #if UNITY_EDITOR
-            File.AppendAllText(LastDetourFilePath, fullName + Environment.NewLine);
+            File.AppendAllText(DetourCrashHandler.LastDetourFilePath, fullName + Environment.NewLine);
 #else
             LoggerScoped.Log($"{nameof(DetourCrashHandler)}: currently only supported in Editor");
 #endif
@@ -49,9 +49,9 @@ namespace FastScriptReload.Runtime
         public static string RetrieveLastDetour()
         {
 #if UNITY_EDITOR
-            if (File.Exists(LastDetourFilePath))
+            if (File.Exists(DetourCrashHandler.LastDetourFilePath))
             {
-                var lines = File.ReadAllLines(LastDetourFilePath);
+                var lines = File.ReadAllLines(DetourCrashHandler.LastDetourFilePath);
                 return lines.Length > 0 ? lines.Last() : string.Empty;
             }
 
@@ -65,7 +65,7 @@ namespace FastScriptReload.Runtime
         public static void ClearDetourLog()
         {
 #if UNITY_EDITOR
-            File.Delete(LastDetourFilePath);
+            File.Delete(DetourCrashHandler.LastDetourFilePath);
 #else
             LoggerScoped.Log($"{nameof(DetourCrashHandler)}: currently only supported in Editor");
 #endif

@@ -15,6 +15,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
@@ -195,7 +196,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             visualElement.SetEnabled(false);
             visualElement.AddToClassList(ClassSaintsFieldEditingDisabled);
             // visualElement.AddToClassList("unity-base-field__aligned");
-            visualElement.AddToClassList(BaseField<UnityEngine.Object>.alignedFieldUssClassName);
+            visualElement.AddToClassList(BaseField<Object>.alignedFieldUssClassName);
             return visualElement;
         }
 
@@ -217,7 +218,10 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         {
             public Type UnityObjectOverrideType;
             public UIToolkitValueEditPayloadState State;
+            public bool IsFullFilled;
         }
+
+        private static Color reColor = EColor.EditorSeparator.GetColor();
 
         // before set: useful for struct editing that C# will messup and change the value of the reference you have
         protected static (VisualElement result, bool isNestedField) UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
@@ -230,7 +234,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 return (null, false);
             }
 
-            Color reColor = EColor.EditorSeparator.GetColor();
+            // Color reColor = EColor.EditorSeparator.GetColor();
 
             if (valueType == typeof(bool) || value is bool)
             {
@@ -1371,9 +1375,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
-            if (typeof(UnityEngine.Object).IsAssignableFrom(valueType) || value is UnityEngine.Object)
+            if (typeof(Object).IsAssignableFrom(valueType) || value is Object)
             {
-                return (UIToolkitObjectFieldEdit(oldElement, label, valueType, (UnityEngine.Object)value, beforeSet,
+                return (UIToolkitObjectFieldEdit(oldElement, label, valueType, (Object)value, beforeSet,
                     setterOrNull, labelGrayColor, inHorizontalLayout), false);
             }
 
@@ -1702,7 +1706,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         textField.labelElement.style.color = reColor;
                     }
 
-                    if(_nullUss == null)
+                    if(_nullUss is null)  // bypass life circle
                     {
                         _nullUss = Util.LoadResource<StyleSheet>("UIToolkit/UnityTextInputElementWarning.uss");
                     }
@@ -1723,7 +1727,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             const string objFieldName = "saintsfield-objectfield";
 
             // Debug.Log(ReflectUtils.GetMostBaseType(valueType));
-            const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
             Foldout genFoldout = oldElement as Foldout;
             if (genFoldout != null && !genFoldout.ClassListContains("saintsfield-general"))
             {
@@ -1735,6 +1738,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 genFoldout = new Foldout
                 {
+                    value = _expandedValue.Contains(value),
                     text = label,
                     style =
                     {
@@ -1742,6 +1746,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     },
                     userData = new UIToolkitValueEditPayload
                     {
+                        IsFullFilled = false,
                         UnityObjectOverrideType = value?.GetType(),
                     },
                 };
@@ -1763,7 +1768,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     payload.UnityObjectOverrideType = newType;
 
                     if (payload.State == UIToolkitValueEditPayloadState.FieldObject && newType != null &&
-                        typeof(UnityEngine.Object).IsAssignableFrom(newType))
+                        typeof(Object).IsAssignableFrom(newType))
                     {
                         // string objFieldName = $"saintsfield-objectfield";
                         if (preType != newType)
@@ -1779,7 +1784,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             if(canConvert)
                             {
                                 objFieldResult =
-                                    UIToolkitObjectFieldEdit(null, label, newType, (UnityEngine.Object) value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
+                                    UIToolkitObjectFieldEdit(null, label, newType, (Object) value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
                             }
                             else
                             {
@@ -1806,7 +1811,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                             fieldsBodyNew.Clear();
                         }
                     }
-                    else if (typeof(UnityEngine.Object).IsAssignableFrom(newType))
+                    else if (typeof(Object).IsAssignableFrom(newType))
                     {
                         setterOrNull?.Invoke(null);
                         // the objectoverride will handle the rest
@@ -1855,6 +1860,19 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 // {
                 //     name = "saintsfield-edit-fields",
                 // });
+
+
+
+                genFoldout.RegisterValueChangedCallback(evt =>
+                {
+                    bool expanded = evt.newValue;
+                    FillExpandIfNeeded(expanded, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
+                });
+
+                if (_expandedValue.Contains(value))
+                {
+                    FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
+                }
             }
 
             VisualElement fieldsBody = genFoldout.Q<VisualElement>(name: "saintsfield-edit-fields");
@@ -1863,9 +1881,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             Type valueActualType = payload.UnityObjectOverrideType ?? value?.GetType();
             // Debug.Log($"valueActualType={valueActualType}");
-            if (valueActualType != null && typeof(UnityEngine.Object).IsAssignableFrom(valueActualType))
+            if (valueActualType != null && typeof(Object).IsAssignableFrom(valueActualType))
             {
-                ObjectField objFieldResult = UIToolkitObjectFieldEdit(fieldsBody.Q<ObjectField>(name: objFieldName), label, valueActualType, (UnityEngine.Object)value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
+                ObjectField objFieldResult = UIToolkitObjectFieldEdit(fieldsBody.Q<ObjectField>(name: objFieldName), label, valueActualType, (Object)value, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
                 // Debug.Log($"objFieldResult={objFieldResult}");
                 if (objFieldResult != null)
                 {
@@ -1883,10 +1901,61 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             {
                 fieldsBody.Clear();
                 payload.State = UIToolkitValueEditPayloadState.FieldObject;
+                payload.IsFullFilled = false;
                 return (useOld ? null : genFoldout, true);
             }
 
             payload.State = UIToolkitValueEditPayloadState.GenericType;
+
+            if (genFoldout.value)
+            {
+                FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout);
+            }
+
+            bool enabled = setterOrNull != null;
+            // ReSharper disable once InvertIf
+            if (genFoldout.enabledSelf != enabled)
+            {
+                genFoldout.SetEnabled(enabled);
+                genFoldout.AddToClassList(ClassSaintsFieldEditingDisabled);
+            }
+
+            return (useOld ? null : genFoldout, true);
+        }
+
+        private static void FillExpandIfNeeded(bool expanded, object value, Foldout genFoldout, VisualElement oldElement,
+            Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
+        {
+            const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+
+            bool valueIsNull = RuntimeUtil.IsNull(value);
+            if (valueIsNull)
+            {
+                return;
+            }
+
+            if (expanded)
+            {
+                _expandedValue.Add(value);
+            }
+            else
+            {
+                _expandedValue.Remove(value);
+            }
+
+            if (!expanded)
+            {
+                return;
+            }
+
+            UIToolkitValueEditPayload payload = (UIToolkitValueEditPayload)genFoldout.userData;
+            if (payload.IsFullFilled)
+            {
+                return;
+            }
+
+            payload.IsFullFilled = true;
+            VisualElement fieldsBody = genFoldout.Q<VisualElement>(name: "saintsfield-edit-fields");
 
             // ReSharper disable once PossibleNullReferenceException
             List<FieldInfo> fieldTargets = value.GetType().GetFields(bindAttrNormal).ToList();
@@ -2097,15 +2166,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     fieldsBody.Add(result);
                 }
             }
-
-            bool enabled = setterOrNull != null;
-            if (genFoldout.enabledSelf != enabled)
-            {
-                genFoldout.SetEnabled(enabled);
-                genFoldout.AddToClassList(ClassSaintsFieldEditingDisabled);
-            }
-
-            return (useOld ? null : genFoldout, true);
         }
 
         private static readonly Type[] SkipTypes = { typeof(IntPtr), typeof(UIntPtr), typeof(void) };
@@ -2123,7 +2183,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return false;
         }
 
-        private static ObjectField UIToolkitObjectFieldEdit(VisualElement oldElement, string label, Type valueType, UnityEngine.Object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
+        private static HashSet<object> _expandedValue = new HashSet<object>();
+
+        private static ObjectField UIToolkitObjectFieldEdit(VisualElement oldElement, string label, Type valueType, Object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout)
         {
             if (oldElement is ObjectField oldUnityEngineObjectField)
             {
@@ -2301,7 +2363,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     // nullable
                     foldout.Q<Toggle>().Add(new Button(() =>
                     {
-                        beforeSet(rawListValue);
+                        beforeSet?.Invoke(rawListValue);
                         setterOrNull(null);
                     })
                     {

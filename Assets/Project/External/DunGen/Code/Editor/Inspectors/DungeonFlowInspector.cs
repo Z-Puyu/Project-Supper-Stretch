@@ -1,11 +1,14 @@
-﻿using UnityEditor;
-using DunGen.Graph;
-using UnityEngine;
-using DunGen.Editor.Validation;
-using System;
+﻿using System;
+using DunGen.Editor.Project.External.DunGen.Code.Editor.Utility;
+using DunGen.Editor.Project.External.DunGen.Code.Editor.Validation;
+using DunGen.Editor.Project.External.DunGen.Code.Editor.Windows;
+using DunGen.Project.External.DunGen.Code;
+using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
+using UnityEditor;
 using UnityEditorInternal;
+using UnityEngine;
 
-namespace DunGen.Editor
+namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 {
 	[CustomEditor(typeof(DungeonFlow))]
 	public sealed class DungeonFlowInspector : UnityEditor.Editor
@@ -25,6 +28,7 @@ namespace DunGen.Editor
 			public SerializedProperty TileConnectionTags;
 			public SerializedProperty BranchTagPruneMode;
 			public SerializedProperty BranchPruneTags;
+			public SerializedProperty StraighteningSettings;
 
 			public ReorderableList GlobalProps;
 			public ReorderableList TileConnectionTagsList;
@@ -51,7 +55,8 @@ namespace DunGen.Editor
 			public static readonly GUIContent TileConnectionRules = new GUIContent("Tile Connection Rules", "Allows us to accept or reject a connection between two tiles based on the tags each of them have.");
 			public static readonly GUIContent BranchPruneMode = new GUIContent("Branch Prune Mode", "The method by which tiles at the end of a branch are pruned based on the tags below.");
 			public static readonly GUIContent BranchPruneTags = new GUIContent("Branch Prune Tags", "Tiles on the end of branches will be deleted depending on which tags they have. Based on the branch prune mode");
-
+			public static readonly GUIContent PathStraighteningHeader = new GUIContent("Path Straightening", "Determines if and how the path should be straightened. These settings can be overridden in the Archetype asset and on Nodes in the flow graph");
+			public static readonly GUIContent BranchingHeader = new GUIContent("Branching");
 
 			public static readonly string LocalBranchMode = "In Local mode, the number of branches is calculated per-tile using the Archetype's 'Branch Count' property";
 			public static readonly string GlobalBranchMode = "In Global mode, the number of branches is calculated across the entire dungeon. NOTE: The number of branches might be less than the specified minimum value, but will never be more than the maximum";
@@ -65,35 +70,35 @@ namespace DunGen.Editor
 
 		private void OnEnable()
 		{
-			properties = new Properties()
+			this.properties = new Properties()
 			{
-				Length = serializedObject.FindProperty("Length"),
-				BranchMode = serializedObject.FindProperty("BranchMode"),
-				BranchCount = serializedObject.FindProperty("BranchCount"),
-				KeyManager = serializedObject.FindProperty("KeyManager"),
-				DoorwayConnectionChance = serializedObject.FindProperty("DoorwayConnectionChance"),
-				RestrictConnectionToSameSection = serializedObject.FindProperty("RestrictConnectionToSameSection"),
-				TileInjectionRules = serializedObject.FindProperty("TileInjectionRules"),
-				TileTagConnectionMode = serializedObject.FindProperty("TileTagConnectionMode"),
-				TileConnectionTags = serializedObject.FindProperty("TileConnectionTags"),
-				BranchTagPruneMode = serializedObject.FindProperty("BranchTagPruneMode"),
-				BranchPruneTags = serializedObject.FindProperty("BranchPruneTags"),
+				Length = this.serializedObject.FindProperty(nameof(DungeonFlow.Length)),
+				BranchMode = this.serializedObject.FindProperty(nameof(DungeonFlow.BranchMode)),
+				BranchCount = this.serializedObject.FindProperty(nameof(DungeonFlow.BranchCount)),
+				KeyManager = this.serializedObject.FindProperty(nameof(DungeonFlow.KeyManager)),
+				DoorwayConnectionChance = this.serializedObject.FindProperty(nameof(DungeonFlow.DoorwayConnectionChance)),
+				RestrictConnectionToSameSection = this.serializedObject.FindProperty(nameof(DungeonFlow.RestrictConnectionToSameSection)),
+				TileInjectionRules = this.serializedObject.FindProperty(nameof(DungeonFlow.TileInjectionRules)),
+				TileTagConnectionMode = this.serializedObject.FindProperty(nameof(DungeonFlow.TileTagConnectionMode)),
+				TileConnectionTags = this.serializedObject.FindProperty(nameof(DungeonFlow.TileConnectionTags)),
+				BranchTagPruneMode = this.serializedObject.FindProperty(nameof(DungeonFlow.BranchTagPruneMode)),
+				BranchPruneTags = this.serializedObject.FindProperty(nameof(DungeonFlow.BranchPruneTags)),
+				StraighteningSettings = this.serializedObject.FindProperty(nameof(DungeonFlow.GlobalStraighteningSettings)),
 
-
-				GlobalProps = new ReorderableList(serializedObject, serializedObject.FindProperty("GlobalProps"), true, false, true, true)
+				GlobalProps = new ReorderableList(this.serializedObject, this.serializedObject.FindProperty("GlobalProps"), true, false, true, true)
 				{
-					drawElementCallback = (rect, index, isActive, isFocused) => DrawGlobalProp(rect, index),
-					elementHeightCallback = GetGlobalPropHeight,
+					drawElementCallback = (rect, index, isActive, isFocused) => this.DrawGlobalProp(rect, index),
+					elementHeightCallback = this.GetGlobalPropHeight,
 				},
 			};
 
-			properties.TileConnectionTagsList = new ReorderableList(serializedObject, properties.TileConnectionTags)
+			this.properties.TileConnectionTagsList = new ReorderableList(this.serializedObject, this.properties.TileConnectionTags)
 			{
-				drawHeaderCallback = DrawTileConnectionTagsHeader,
-				drawElementCallback = DrawTileConnectionTagsElement,
+				drawHeaderCallback = this.DrawTileConnectionTagsHeader,
+				drawElementCallback = this.DrawTileConnectionTagsElement,
 			};
 
-			properties.BranchPruneTagsList = new ReorderableList(serializedObject, properties.BranchPruneTags)
+			this.properties.BranchPruneTagsList = new ReorderableList(this.serializedObject, this.properties.BranchPruneTags)
 			{
 				drawHeaderCallback = (Rect rect) =>
 				{
@@ -101,11 +106,11 @@ namespace DunGen.Editor
 				},
 				drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
 				{
-					EditorGUI.PropertyField(rect, properties.BranchPruneTags.GetArrayElementAtIndex(index), GUIContent.none);
+					EditorGUI.PropertyField(rect, this.properties.BranchPruneTags.GetArrayElementAtIndex(index), GUIContent.none);
 				},
 			};
 
-			var flow = target as DungeonFlow;
+			var flow = this.target as DungeonFlow;
 
 			if (flow != null)
 			{
@@ -123,12 +128,12 @@ namespace DunGen.Editor
 
 		private void DrawTileConnectionTagsElement(Rect rect, int index, bool isActive, bool isFocused)
 		{
-			EditorGUI.PropertyField(rect, properties.TileConnectionTags.GetArrayElementAtIndex(index), GUIContent.none);
+			EditorGUI.PropertyField(rect, this.properties.TileConnectionTags.GetArrayElementAtIndex(index), GUIContent.none);
 		}
 
 		private string GetCurrentBranchModeLabel()
 		{
-			var dungeonFlow = target as DungeonFlow;
+			var dungeonFlow = this.target as DungeonFlow;
 
 			switch (dungeonFlow.BranchMode)
 			{
@@ -146,12 +151,12 @@ namespace DunGen.Editor
 
 		public override void OnInspectorGUI()
 		{
-			var data = target as DungeonFlow;
+			var data = this.target as DungeonFlow;
 
 			if (data == null)
 				return;
 
-			serializedObject.Update();
+			this.serializedObject.Update();
 
 			if (GUILayout.Button(Labels.Validate))
 				DungeonValidator.Instance.Validate(data);
@@ -160,35 +165,45 @@ namespace DunGen.Editor
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();
 
-			EditorGUILayout.PropertyField(properties.KeyManager, Labels.KeyManager);
-			EditorGUILayout.PropertyField(properties.Length, Labels.Length);
+			EditorGUILayout.PropertyField(this.properties.KeyManager, Labels.KeyManager);
+			EditorGUILayout.PropertyField(this.properties.Length, Labels.Length);
 
 			// Doorway Connections
-			EditorGUILayout.BeginVertical("box");
-			EditorGUILayout.LabelField(Labels.DoorwayConnectionHeader, EditorStyles.boldLabel);
-			EditorGUILayout.PropertyField(properties.DoorwayConnectionChance, Labels.DoorwayConnectionChance);
-			EditorGUILayout.PropertyField(properties.RestrictConnectionToSameSection, Labels.RestrictConnectionToSameSection);
-			EditorGUILayout.EndVertical();
+			using (new EditorGUILayout.VerticalScope("box"))
+			{
+				EditorGUILayout.LabelField(Labels.DoorwayConnectionHeader, EditorStyles.boldLabel);
+				EditorGUILayout.PropertyField(this.properties.DoorwayConnectionChance, Labels.DoorwayConnectionChance);
+				EditorGUILayout.PropertyField(this.properties.RestrictConnectionToSameSection, Labels.RestrictConnectionToSameSection);
+			}
 
-			// Branch Mode
-			EditorGUILayout.BeginVertical("box");
+			// Straightening Section
+			using (new EditorGUILayout.VerticalScope("box"))
+			{
+				EditorGUILayout.LabelField(Labels.PathStraighteningHeader, EditorStyles.boldLabel);
+				EditorUtil.DrawStraightenSettings(this.properties.StraighteningSettings, true);
+			}
 
-			EditorGUILayout.HelpBox(GetCurrentBranchModeLabel(), MessageType.Info);
-			EditorGUILayout.PropertyField(properties.BranchMode, Labels.BranchMode);
+			// Branches Section
+			using (new EditorGUILayout.VerticalScope("box"))
+			{
+				EditorGUILayout.LabelField(Labels.BranchingHeader, EditorStyles.boldLabel);
 
-			EditorGUI.BeginDisabledGroup(data.BranchMode != BranchMode.Global);
-			EditorGUILayout.PropertyField(properties.BranchCount, Labels.BranchCount);
-			EditorGUI.EndDisabledGroup();
+				// Branch Mode
+				EditorGUILayout.HelpBox(this.GetCurrentBranchModeLabel(), MessageType.Info);
+				EditorGUILayout.PropertyField(this.properties.BranchMode, Labels.BranchMode);
 
-			EditorGUILayout.Space();
-			EditorGUILayout.Space();
+				EditorGUI.BeginDisabledGroup(data.BranchMode != BranchMode.Global);
+				EditorGUILayout.PropertyField(this.properties.BranchCount, Labels.BranchCount);
+				EditorGUI.EndDisabledGroup();
 
-			// Branch Prune Tags
-			EditorGUILayout.PropertyField(properties.BranchTagPruneMode, Labels.BranchPruneMode);
-			EditorGUILayout.Space();
-			properties.BranchPruneTagsList.DoLayoutList();
+				EditorGUILayout.Space();
+				EditorGUILayout.Space();
 
-			EditorGUILayout.EndVertical();
+				// Branch Prune Tags
+				EditorGUILayout.PropertyField(this.properties.BranchTagPruneMode, Labels.BranchPruneMode);
+				EditorGUILayout.Space();
+				this.properties.BranchPruneTagsList.DoLayoutList();
+			}
 
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();
@@ -199,33 +214,33 @@ namespace DunGen.Editor
 				DungeonFlowEditorWindow.Open(data);
 
 			// Tile Injection Rules
-			DrawTileInjectionRules(data);
+			this.DrawTileInjectionRules(data);
 
 			EditorGUILayout.Space();
 
 			// Global Props
-			var globalProps = properties.GlobalProps.serializedProperty;
+			var globalProps = this.properties.GlobalProps.serializedProperty;
 			globalProps.isExpanded = EditorGUILayout.Foldout(globalProps.isExpanded, Labels.GlobalProps, true);
 
 			if (globalProps.isExpanded)
 			{
 				EditorGUI.indentLevel++;
-				properties.GlobalProps.DoLayoutList();
+				this.properties.GlobalProps.DoLayoutList();
 				EditorGUI.indentLevel--;
 			}
 
 			EditorGUILayout.Space();
 
 			// Tile Connection Rules
-			properties.TileConnectionTags.isExpanded = EditorGUILayout.Foldout(properties.TileConnectionTags.isExpanded, Labels.TileConnectionRules);
+			this.properties.TileConnectionTags.isExpanded = EditorGUILayout.Foldout(this.properties.TileConnectionTags.isExpanded, Labels.TileConnectionRules);
 
-			if(properties.TileConnectionTags.isExpanded)
+			if(this.properties.TileConnectionTags.isExpanded)
 			{
 				EditorGUI.indentLevel++;
 				EditorGUILayout.Space();
-				EditorGUILayout.PropertyField(properties.TileTagConnectionMode, Labels.TileConnectionTagMode);
+				EditorGUILayout.PropertyField(this.properties.TileTagConnectionMode, Labels.TileConnectionTagMode);
 				EditorGUILayout.Space();
-				properties.TileConnectionTagsList.DoLayoutList();
+				this.properties.TileConnectionTagsList.DoLayoutList();
 				EditorGUI.indentLevel--;
 			}
 
@@ -233,17 +248,17 @@ namespace DunGen.Editor
 			if (GUI.changed)
 				EditorUtility.SetDirty(data);
 
-			serializedObject.ApplyModifiedProperties();
+			this.serializedObject.ApplyModifiedProperties();
 		}
 
 		private float GetGlobalPropHeight(int index)
 		{
-			return EditorGUI.GetPropertyHeight(properties.GlobalProps.serializedProperty.GetArrayElementAtIndex(index));
+			return EditorGUI.GetPropertyHeight(this.properties.GlobalProps.serializedProperty.GetArrayElementAtIndex(index));
 		}
 
 		private void DrawGlobalProp(Rect rect, int index)
 		{
-			var propProperty = properties.GlobalProps.serializedProperty.GetArrayElementAtIndex(index);
+			var propProperty = this.properties.GlobalProps.serializedProperty.GetArrayElementAtIndex(index);
 			EditorGUI.PropertyField(rect, propProperty);
 		}
 
@@ -252,9 +267,9 @@ namespace DunGen.Editor
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();
 
-			properties.TileInjectionRules.isExpanded = EditorGUILayout.Foldout(properties.TileInjectionRules.isExpanded, "Special Tile Injection", true);
+			this.properties.TileInjectionRules.isExpanded = EditorGUILayout.Foldout(this.properties.TileInjectionRules.isExpanded, "Special Tile Injection", true);
 
-			if (!properties.TileInjectionRules.isExpanded)
+			if (!this.properties.TileInjectionRules.isExpanded)
 				return;
 
 			int indexToRemove = -1;

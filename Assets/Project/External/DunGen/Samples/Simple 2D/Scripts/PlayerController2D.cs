@@ -1,7 +1,8 @@
-﻿using DunGen.Demo;
+﻿using DunGen.Project.External.DunGen.Code;
+using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 
-namespace DunGen.Demo2D
+namespace Project.External.DunGen.Samples.Simple_2D.Scripts
 {
 	sealed class PlayerController2D : MonoBehaviour
 	{
@@ -14,23 +15,23 @@ namespace DunGen.Demo2D
 
 		private void Start()
 		{
-			collider = GetComponent<CircleCollider2D>();
-			hitBuffer = new RaycastHit2D[10];
+			this.collider = this.GetComponent<CircleCollider2D>();
+			this.hitBuffer = new RaycastHit2D[10];
 
-			var gen = UnityUtil.FindObjectByType<Generator>();
-			dungeonGenerator = gen.DungeonGenerator.Generator;
+			var gen = UnityUtil.FindObjectByType<global::Project.External.DunGen.Samples.Basic.Scripts.Generator>();
+			this.dungeonGenerator = gen.DungeonGenerator.Generator;
 
-			dungeonGenerator.OnGenerationStatusChanged += OnGeneratorStatusChanged;
+			this.dungeonGenerator.OnGenerationStatusChanged += this.OnGeneratorStatusChanged;
 		}
 
 		private void OnDestroy()
 		{
-			dungeonGenerator.OnGenerationStatusChanged -= OnGeneratorStatusChanged;
+			this.dungeonGenerator.OnGenerationStatusChanged -= this.OnGeneratorStatusChanged;
 		}
 
 		private void OnGeneratorStatusChanged(DungeonGenerator generator, GenerationStatus status)
 		{
-			transform.position = Vector3.zero;
+			this.transform.position = Vector3.zero;
 		}
 
 		private void Update()
@@ -41,18 +42,18 @@ namespace DunGen.Demo2D
 				input.Normalize();
 
 			Vector3 direction = new Vector3(input.x, input.y, 0f);
-			float distance = MovementSpeed * Time.deltaTime;
+			float distance = this.MovementSpeed * Time.deltaTime;
 			Vector3 motion = direction * distance;
 
-			int hitCount = collider.Cast(direction, hitBuffer, distance);
+			int hitCount = this.collider.Cast(direction, this.hitBuffer, distance);
 
 			if (hitCount > 0)
 			{
-				var hit = hitBuffer[0];
+				var hit = this.hitBuffer[0];
 				motion = direction * hit.distance;
 			}
 
-			transform.position += motion;
+			this.transform.position += motion;
 		}
 	}
 }

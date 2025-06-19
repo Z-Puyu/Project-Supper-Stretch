@@ -997,11 +997,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DoorPrefabPriority: 0
-  ConnectorPrefabWeights: []
-  BlockerPrefabWeights: []
   AvoidRotatingDoorPrefab: 0
-  AvoidRotatingBlockerPrefab: 0
+  DoorPrefabPositionOffset: {x: 0, y: 0, z: 0}
+  DoorPrefabRotationOffset: {x: 0, y: 0, z: 0}
+  ConnectorPrefabWeights: []
   ConnectorSceneObjects: []
+  AvoidRotatingBlockerPrefab: 0
+  BlockerPrefabPositionOffset: {x: 0, y: 0, z: 0}
+  BlockerPrefabRotationOffset: {x: 0, y: 0, z: 0}
+  BlockerPrefabWeights: []
   BlockerSceneObjects:
   - {fileID: 100016}
   Tags:
@@ -1062,11 +1066,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DoorPrefabPriority: 0
-  ConnectorPrefabWeights: []
-  BlockerPrefabWeights: []
   AvoidRotatingDoorPrefab: 0
-  AvoidRotatingBlockerPrefab: 0
+  DoorPrefabPositionOffset: {x: 0, y: 0, z: 0}
+  DoorPrefabRotationOffset: {x: 0, y: 0, z: 0}
+  ConnectorPrefabWeights: []
   ConnectorSceneObjects: []
+  AvoidRotatingBlockerPrefab: 0
+  BlockerPrefabPositionOffset: {x: 0, y: 0, z: 0}
+  BlockerPrefabRotationOffset: {x: 0, y: 0, z: 0}
+  BlockerPrefabWeights: []
   BlockerSceneObjects:
   - {fileID: 100018}
   Tags:
@@ -1225,11 +1233,11 @@ MonoBehaviour:
     branchId: -1
     isOnMainPath: 0
     localBounds:
-      m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 0, y: 0, z: 0}
+      m_Center: {x: -0.00062417984, y: 1.4999996, z: 5}
+      m_Extent: {x: 5.0006237, y: 1.5000005, z: 10}
     worldBounds:
-      m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 0, y: 0, z: 0}
+      m_Center: {x: -0.00062417984, y: 1.4999996, z: 5}
+      m_Extent: {x: 5.0006237, y: 1.5000005, z: 10}
     graphNode:
       Graph: {fileID: 0}
       TileSets: []
@@ -1250,7 +1258,8 @@ MonoBehaviour:
     tileSet: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 1}
-  fileVersion: 2
+  fileVersion: 3
+  hasCachedBounds: 1
 --- !u!1 &100030
 GameObject:
   m_ObjectHideFlags: 0

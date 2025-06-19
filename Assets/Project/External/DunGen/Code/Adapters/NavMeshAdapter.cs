@@ -1,4 +1,4 @@
-﻿namespace DunGen.Adapters
+﻿namespace DunGen.Project.External.DunGen.Code.Adapters
 {
 	public abstract class NavMeshAdapter : BaseAdapter
 	{
@@ -19,7 +19,7 @@
 
 		protected override void Run(DungeonGenerator generator)
 		{
-			Generate(generator.CurrentDungeon);
+			this.Generate(generator.CurrentDungeon);
 		}
 
 		public abstract void Generate(Dungeon dungeon);

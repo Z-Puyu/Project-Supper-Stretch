@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SaintsField.Animate;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -33,15 +32,15 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer
         private static string NameSubStateMachineNameChain(SerializedProperty property) =>
             $"{property.propertyPath}__AnimatorState_SubStateMachineNameChain";
 
-        private static readonly Type[] InterfaceTypes = {
-            // typeof(IAnimationClip),
-            typeof(ILayerIndex),
-            typeof(IStateNameHash),
-            typeof(IStateName),
-            typeof(IStateSpeed),
-            typeof(IStateTag),
-            typeof(ISubStateMachineNameChain),
-        };
+        // private static readonly Type[] InterfaceTypes = {
+        //     // typeof(IAnimationClip),
+        //     typeof(ILayerIndex),
+        //     typeof(IStateNameHash),
+        //     typeof(IStateName),
+        //     typeof(IStateSpeed),
+        //     typeof(IStateTag),
+        //     typeof(ISubStateMachineNameChain),
+        // };
 
         // [InitializeOnLoadMethod]
         // private static void AddSaintsPropertyInfoInjectAnimatorState()

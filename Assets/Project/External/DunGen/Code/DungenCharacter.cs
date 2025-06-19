@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	public delegate void DungenCharacterDelegate(DungenCharacter character);
 	public delegate void CharacterTileChangedEvent(DungenCharacter character, Tile previousTile, Tile newTile);
@@ -23,7 +24,7 @@ namespace DunGen
 
 		static DungenCharacter()
 		{
-			AllCharacters = new ReadOnlyCollection<DungenCharacter>(allCharacters);
+			DungenCharacter.AllCharacters = new ReadOnlyCollection<DungenCharacter>(DungenCharacter.allCharacters);
 		}
 
 		#endregion
@@ -32,10 +33,10 @@ namespace DunGen
 		{
 			get
 			{
-				if (overlappingTiles == null || overlappingTiles.Count == 0)
+				if (this.overlappingTiles == null || this.overlappingTiles.Count == 0)
 					return null;
 				else
-					return overlappingTiles[overlappingTiles.Count - 1];
+					return this.overlappingTiles[this.overlappingTiles.Count - 1];
 			}
 		}
 		public event CharacterTileChangedEvent OnTileChanged;
@@ -45,31 +46,31 @@ namespace DunGen
 
 		protected virtual void OnEnable()
 		{
-			if (overlappingTiles == null)
-				overlappingTiles = new List<Tile>();
+			if (this.overlappingTiles == null)
+				this.overlappingTiles = new List<Tile>();
 
-			allCharacters.Add(this);
+			DungenCharacter.allCharacters.Add(this);
 
-			if (CharacterAdded != null)
-				CharacterAdded(this);
+			if (DungenCharacter.CharacterAdded != null)
+				DungenCharacter.CharacterAdded(this);
 		}
 
 		protected virtual void OnDisable()
 		{
-			allCharacters.Remove(this);
+			DungenCharacter.allCharacters.Remove(this);
 
-			if (CharacterRemoved != null)
-				CharacterRemoved(this);
+			if (DungenCharacter.CharacterRemoved != null)
+				DungenCharacter.CharacterRemoved(this);
 		}
 
 		internal void ForceRecheckTile()
 		{
-			overlappingTiles.Clear();
+			this.overlappingTiles.Clear();
 
 			foreach (var tile in UnityUtil.FindObjectsByType<Tile>())
-				if (tile.Placement.Bounds.Contains(transform.position))
+				if (tile.Placement.Bounds.Contains(this.transform.position))
 				{
-					OnTileEntered(tile);
+					this.OnTileEntered(tile);
 					break;
 				}
 		}
@@ -78,31 +79,31 @@ namespace DunGen
 
 		internal void OnTileEntered(Tile tile)
 		{
-			if (overlappingTiles.Contains(tile))
+			if (this.overlappingTiles.Contains(tile))
 				return;
 
-			var previousTile = CurrentTile;
-			overlappingTiles.Add(tile);
+			var previousTile = this.CurrentTile;
+			this.overlappingTiles.Add(tile);
 
-			if (CurrentTile != previousTile)
+			if (this.CurrentTile != previousTile)
 			{
-				OnTileChanged?.Invoke(this, previousTile, CurrentTile);
-				OnTileChangedEvent(previousTile, CurrentTile);
+				this.OnTileChanged?.Invoke(this, previousTile, this.CurrentTile);
+				this.OnTileChangedEvent(previousTile, this.CurrentTile);
 			}
 		}
 
 		internal void OnTileExited(Tile tile)
 		{
-			if (!overlappingTiles.Contains(tile))
+			if (!this.overlappingTiles.Contains(tile))
 				return;
 
-			var previousTile = CurrentTile;
-			overlappingTiles.Remove(tile);
+			var previousTile = this.CurrentTile;
+			this.overlappingTiles.Remove(tile);
 
-			if (CurrentTile != previousTile)
+			if (this.CurrentTile != previousTile)
 			{
-				OnTileChanged?.Invoke(this, previousTile, CurrentTile);
-				OnTileChangedEvent(previousTile, CurrentTile);
+				this.OnTileChanged?.Invoke(this, previousTile, this.CurrentTile);
+				this.OnTileChangedEvent(previousTile, this.CurrentTile);
 			}
 		}
 	}

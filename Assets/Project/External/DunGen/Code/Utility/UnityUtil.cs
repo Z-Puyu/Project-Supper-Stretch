@@ -4,7 +4,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code.Utility
 {
 	public static class UnityUtil
 	{
@@ -16,12 +16,12 @@ namespace DunGen
 
 		static UnityUtil()
 		{
-			FindProBuilderObjectType();
+			UnityUtil.FindProBuilderObjectType();
 		}
 
 		public static void FindProBuilderObjectType()
 		{
-			if (ProBuilderMeshType != null)
+			if (UnityUtil.ProBuilderMeshType != null)
 				return;
 
 			// Look through each of the loaded assemblies in our current AppDomain, looking for ProBuilder's pb_Object type
@@ -29,13 +29,13 @@ namespace DunGen
 			{
 				if (assembly.FullName.Contains("ProBuilder"))
 				{
-					ProBuilderMeshType = assembly.GetType("UnityEngine.ProBuilder.ProBuilderMesh");
+					UnityUtil.ProBuilderMeshType = assembly.GetType("UnityEngine.ProBuilder.ProBuilderMesh");
 
-					if (ProBuilderMeshType != null)
+					if (UnityUtil.ProBuilderMeshType != null)
 					{
-						ProBuilderPositionsProperty = ProBuilderMeshType.GetProperty("positions");
+						UnityUtil.ProBuilderPositionsProperty = UnityUtil.ProBuilderMeshType.GetProperty("positions");
 
-						if (ProBuilderPositionsProperty != null)
+						if (UnityUtil.ProBuilderPositionsProperty != null)
 							break;
 					}
 				}
@@ -112,31 +112,33 @@ namespace DunGen
 			gameObject.layer = layer;
 
 			for (int i = 0; i < gameObject.transform.childCount; i++)
-				SetLayerRecursive(gameObject.transform.GetChild(i).gameObject, layer);
+				UnityUtil.SetLayerRecursive(gameObject.transform.GetChild(i).gameObject, layer);
 		}
 
 		public static void Destroy(UnityEngine.Object obj)
 		{
-			if (Application.isPlaying)
-			{
-				// Work-Around
-				// If we're destroying a GameObject, disable it first to avoid tile colliders from contributing to the NavMesh when generating synchronously
-				// since Destroy() only destroys the GameObject at the end of the frame. Are there any down-sides to using DestroyImmediate() here instead?
-				GameObject go = obj as GameObject;
+			//if (Application.isPlaying)
+			//{
+			//	// Work-Around
+			//	// If we're destroying a GameObject, disable it first to avoid tile colliders from contributing to the NavMesh when generating synchronously
+			//	// since Destroy() only destroys the GameObject at the end of the frame. Are there any down-sides to using DestroyImmediate() here instead?
+			//	GameObject go = obj as GameObject;
 
-				if (go != null)
-					go.SetActive(false);
+			//	if (go != null)
+			//		go.SetActive(false);
 
-				UnityEngine.Object.Destroy(obj);
-			}
-			else
-				UnityEngine.Object.DestroyImmediate(obj);
+			//	UnityEngine.Object.Destroy(obj);
+			//}
+			//else
+			//	UnityEngine.Object.DestroyImmediate(obj);
+
+			UnityEngine.Object.DestroyImmediate(obj);
 		}
 
 		public static string GetUniqueName(string name, IEnumerable<string> usedNames)
 		{
 			if(string.IsNullOrEmpty(name))
-				return GetUniqueName("New", usedNames);
+				return UnityUtil.GetUniqueName("New", usedNames);
 			
 			string baseName = name;
 			int number = 0;
@@ -156,9 +158,9 @@ namespace DunGen
 				if(n == name)
 				{
 					if(hasNumber)
-						return GetUniqueName(baseName + " " + number.ToString(), usedNames);
+						return UnityUtil.GetUniqueName(baseName + " " + number.ToString(), usedNames);
 					else
-						return GetUniqueName(name + " 2", usedNames);
+						return UnityUtil.GetUniqueName(name + " 2", usedNames);
 				}
 			}
 			
@@ -180,19 +182,19 @@ namespace DunGen
 			return combinedBounds;
 		}
 
-		public static Bounds CalculateProxyBounds(GameObject prefab, bool ignoreSpriteRendererBounds, Vector3 upVector)
+		public static Bounds CalculateProxyBounds(GameObject prefab, Vector3 upVector)
 		{
-			var bounds = UnityUtil.CalculateObjectBounds(prefab, true, ignoreSpriteRendererBounds);
+			var bounds = UnityUtil.CalculateObjectBounds(prefab, true, DunGenSettings.Instance.BoundsCalculationsIgnoreSprites);
 
 			// Since ProBuilder objects don't have a mesh until they're instantiated, we have to calculate the bounds manually
-			if (ProBuilderMeshType != null && ProBuilderPositionsProperty != null)
+			if (UnityUtil.ProBuilderMeshType != null && UnityUtil.ProBuilderPositionsProperty != null)
 			{
-				foreach (var pbMesh in prefab.GetComponentsInChildren(ProBuilderMeshType))
+				foreach (var pbMesh in prefab.GetComponentsInChildren(UnityUtil.ProBuilderMeshType))
 				{
 					Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
 					Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
-					var vertices = (IList<Vector3>)ProBuilderPositionsProperty.GetValue(pbMesh, null);
+					var vertices = (IList<Vector3>)UnityUtil.ProBuilderPositionsProperty.GetValue(pbMesh, null);
 
 					foreach (var vert in vertices)
 					{
@@ -256,7 +258,7 @@ namespace DunGen
 			}
 
 			// Terrain
-			foreach(var terrain in obj.GetComponentsInChildren<Terrain>(includeInactive))
+			foreach (var terrain in obj.GetComponentsInChildren<Terrain>(includeInactive))
 			{
 				var terrainBounds = terrain.terrainData.bounds;
 				terrainBounds.center += terrain.gameObject.transform.position;
@@ -300,7 +302,7 @@ namespace DunGen
 		/// <param name="socketB">The socket we want to attach the object to (must not be a child in the object's hierarchy)</param>
 		public static void PositionObjectBySocket(GameObject objectA, GameObject socketA, GameObject socketB)
 		{
-			PositionObjectBySocket(objectA.transform, socketA.transform, socketB.transform);
+			UnityUtil.PositionObjectBySocket(objectA.transform, socketA.transform, socketB.transform);
 		}
 
 		/// <summary>
@@ -338,13 +340,13 @@ namespace DunGen
 
 		public static bool AreBoundsOverlapping(Bounds boundsA, Bounds boundsB, float maxOverlap)
 		{
-			Vector3 overlap = CalculateBoundsOverlap(boundsA, boundsB);
+			Vector3 overlap = UnityUtil.CalculateBoundsOverlap(boundsA, boundsB);
 			return Mathf.Min(overlap.x, overlap.y, overlap.z) > maxOverlap;
 		}
 
 		public static bool AreBoundsOverlappingOrOverhanging(Bounds boundsA, Bounds boundsB, AxisDirection upDirection, float maxOverlap)
 		{
-			Vector3 overlaps = CalculatePerAxisOverlap(boundsB, boundsA);
+			Vector3 overlaps = UnityUtil.CalculatePerAxisOverlap(boundsB, boundsA);
 			float overlap;
 
 			// Check for overlaps only along the ground plane, disregarding the up-axis
@@ -454,9 +456,9 @@ namespace DunGen
 				Vector3 dir = UnityUtil.GetCardinalDirection(doorway.transform.forward, out magnitude);
 
 				if (magnitude < 0)
-					SetVector3Masked(ref min, doorway.transform.position, dir);
+					UnityUtil.SetVector3Masked(ref min, doorway.transform.position, dir);
 				else
-					SetVector3Masked(ref max, doorway.transform.position, dir);
+					UnityUtil.SetVector3Masked(ref max, doorway.transform.position, dir);
 			}
 
 			Vector3 size = max - min;
@@ -474,7 +476,7 @@ namespace DunGen
 			}
 
 			if (obj.transform.parent != null)
-				foreach (var comp in GetComponentsInParents<T>(obj.transform.parent.gameObject, includeInactive))
+				foreach (var comp in UnityUtil.GetComponentsInParents<T>(obj.transform.parent.gameObject, includeInactive))
 					yield return comp;
 		}
 
@@ -487,7 +489,7 @@ namespace DunGen
 			}
 
 			if (obj.transform.parent != null)
-				return GetComponentInParents<T>(obj.transform.parent.gameObject, includeInactive);
+				return UnityUtil.GetComponentInParents<T>(obj.transform.parent.gameObject, includeInactive);
 			else
 				return null;
 		}

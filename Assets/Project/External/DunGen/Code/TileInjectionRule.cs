@@ -1,6 +1,7 @@
 ﻿using System;
+using DunGen.Project.External.DunGen.Code.Utility;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	[Serializable]
 	public sealed class TileInjectionRule

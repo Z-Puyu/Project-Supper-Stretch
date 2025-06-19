@@ -1,9 +1,9 @@
-﻿using DunGen.Graph;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
 using UnityEngine;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	public struct ProxyDoorwayConnection
 	{
@@ -13,8 +13,8 @@ namespace DunGen
 
 		public ProxyDoorwayConnection(DoorwayProxy a, DoorwayProxy b)
 		{
-			A = a;
-			B = b;
+			this.A = a;
+			this.B = b;
 		}
 	}
 
@@ -31,17 +31,17 @@ namespace DunGen
 
 		public DungeonProxy(Transform debugVisualsRoot = null)
 		{
-			visualsRoot = debugVisualsRoot;
+			this.visualsRoot = debugVisualsRoot;
 		}
 
 		public void ClearDebugVisuals()
 		{
-			var instances = tileVisuals.Values.ToArray();
+			var instances = this.tileVisuals.Values.ToArray();
 
 			foreach (var instance in instances)
 				GameObject.DestroyImmediate(instance);
 
-			tileVisuals.Clear();
+			this.tileVisuals.Clear();
 		}
 
 		public void MakeConnection(DoorwayProxy a, DoorwayProxy b)
@@ -52,62 +52,62 @@ namespace DunGen
 
 			DoorwayProxy.Connect(a, b);
 			var conn = new ProxyDoorwayConnection(a, b);
-			Connections.Add(conn);
+			this.Connections.Add(conn);
 		}
 
 		public void RemoveLastConnection()
 		{
-			Debug.Assert(Connections.Any(), "No connections to remove");
+			Debug.Assert(this.Connections.Any(), "No connections to remove");
 
-			RemoveConnection(Connections.Last());
+			this.RemoveConnection(this.Connections.Last());
 		}
 
 		public void RemoveConnection(ProxyDoorwayConnection connection)
 		{
 			connection.A.Disconnect();
-			Connections.Remove(connection);
+			this.Connections.Remove(connection);
 		}
 
 		internal void AddTile(TileProxy tile)
 		{
-			AllTiles.Add(tile);
+			this.AllTiles.Add(tile);
 
 			if (tile.Placement.IsOnMainPath)
-				MainPathTiles.Add(tile);
+				this.MainPathTiles.Add(tile);
 			else
-				BranchPathTiles.Add(tile);
+				this.BranchPathTiles.Add(tile);
 
-			if(visualsRoot != null)
+			if(this.visualsRoot != null)
 			{
-				var tileObj = GameObject.Instantiate(tile.Prefab, visualsRoot);
+				var tileObj = GameObject.Instantiate(tile.Prefab, this.visualsRoot);
 				tileObj.transform.localPosition = tile.Placement.Position;
 				tileObj.transform.localRotation = tile.Placement.Rotation;
 
-				tileVisuals[tile] = tileObj;
+				this.tileVisuals[tile] = tileObj;
 			}
 		}
 
 		internal void RemoveTile(TileProxy tile)
 		{
-			AllTiles.Remove(tile);
+			this.AllTiles.Remove(tile);
 
 			if (tile.Placement.IsOnMainPath)
-				MainPathTiles.Remove(tile);
+				this.MainPathTiles.Remove(tile);
 			else
-				BranchPathTiles.Remove(tile);
+				this.BranchPathTiles.Remove(tile);
 
 			GameObject tileInstance;
-			if(tileVisuals.TryGetValue(tile, out tileInstance))
+			if(this.tileVisuals.TryGetValue(tile, out tileInstance))
 			{
 				GameObject.DestroyImmediate(tileInstance);
-				tileVisuals.Remove(tile);
+				this.tileVisuals.Remove(tile);
 			}	
 		}
 
 		internal void ConnectOverlappingDoorways(float globalChance, DungeonFlow dungeonFlow, RandomStream randomStream)
 		{
 			const float epsilon = 0.00001f;
-			var doorways = AllTiles.SelectMany(t => t.UnusedDoorways);
+			var doorways = this.AllTiles.SelectMany(t => t.UnusedDoorways).ToArray();
 
 			foreach (var previousDoorway in doorways)
 			{
@@ -161,7 +161,7 @@ namespace DunGen
 						continue;
 
 					if (randomStream.NextDouble() < chance)
-						MakeConnection(previousDoorway, nextDoorway);
+						this.MakeConnection(previousDoorway, nextDoorway);
 				}
 			}
 		}

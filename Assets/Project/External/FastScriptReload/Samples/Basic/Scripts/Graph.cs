@@ -3,7 +3,7 @@
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace FastScriptReload.Examples
+namespace Project.External.FastScriptReload.Samples.Basic.Scripts
 {
 	public class Graph : MonoBehaviour {
 
@@ -37,11 +37,11 @@ namespace FastScriptReload.Examples
 		{
 			var pointsHolderGo = new GameObject("PointsHolder");
 		
-			float step = 2f / resolution;
+			float step = 2f / this.resolution;
 			var scale = Vector3.one * step;
-			points = new Transform[resolution * resolution];
-			for (int i = 0; i < points.Length; i++) {
-				Transform point = points[i] = Instantiate(pointPrefab);
+			this.points = new Transform[this.resolution * this.resolution];
+			for (int i = 0; i < this.points.Length; i++) {
+				Transform point = this.points[i] = Object.Instantiate(this.pointPrefab);
 				point.localScale = scale;
 				point.SetParent(pointsHolderGo.transform, false);
 			}
@@ -50,13 +50,13 @@ namespace FastScriptReload.Examples
 
 		void Update() 
 		{
-			var f = FunctionLibrary.GetFunction(function);
+			var f = FunctionLibrary.GetFunction(this.function);
 			var time = Time.time;
-			var step = 2f / resolution;
+			var step = 2f / this.resolution;
 			var v = 0.5f * step - 1f;
-			for (int i = 0, x = 0, z = 0; i < points.Length; i++, x++)
+			for (int i = 0, x = 0, z = 0; i < this.points.Length; i++, x++)
 			{
-				if (x == resolution)
+				if (x == this.resolution)
 				{
 					x = 0;
 					z += 1;
@@ -65,7 +65,7 @@ namespace FastScriptReload.Examples
 
 				var u = (x + 0.5f) * step - 1f;
 				
-				points[i].localPosition = f(u, v, time);
+				this.points[i].localPosition = f(u, v, time);
 				
 				// EXPERIMENTAL: add new fields flow - uncomment below line to see changes
 				// points[i].localPosition = f(u + _testUMove, v, time); 
@@ -74,7 +74,7 @@ namespace FastScriptReload.Examples
 
 		void OnScriptHotReload()
 		{
-			Debug.Log($"Script 'Graph.cs' was changed and hot reloaded, you have access to instance via 'this', eg: {nameof(resolution)} value is: {resolution}"); 
+			Debug.Log($"Script 'Graph.cs' was changed and hot reloaded, you have access to instance via 'this', eg: {nameof(this.resolution)} value is: {this.resolution}"); 
 		}
 		
 		static void OnScriptHotReloadNoInstance()

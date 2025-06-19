@@ -1439,6 +1439,27 @@ namespace SaintsField.Editor.Utils
             }
         }
 
+        public static (bool hasElement, IEnumerable<T> elements) HasAnyElement<T>(IEnumerable<T> elements)
+        {
+            IEnumerator<T> enumerator = elements.GetEnumerator();
+            if (!enumerator.MoveNext())
+            {
+                return (false, Array.Empty<T>());
+            }
+
+            T first = enumerator.Current;
+            return (true, RePrependEnumerable(first, enumerator));
+        }
+
+        private static IEnumerable<T> RePrependEnumerable<T>(T first, IEnumerator<T> enumerator)
+        {
+            yield return first;
+            while (enumerator.MoveNext())
+            {
+                yield return enumerator.Current;
+            }
+        }
+
         #region Scene Related
 
         public struct TargetWorldPosInfo
@@ -1729,5 +1750,16 @@ namespace SaintsField.Editor.Utils
         }
 
         #endregion
+
+        public static bool UnityDefaultSimpleSearch(string target, string search)
+        {
+            if (string.IsNullOrEmpty(search))
+            {
+                return true;
+            }
+
+            string targetLower = target.ToLower();
+            return search.ToLower().Split(new [] { ' ' }, StringSplitOptions.RemoveEmptyEntries).All(searchSegment => targetLower.Contains(searchSegment));
+        }
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Project.Scripts.Common;
+using Project.Scripts.Common.UI;
 using UnityEngine;
 
 namespace Project.Scripts.UI.Control;
 
+[DisallowMultipleComponent]
 public class UIBook : MonoBehaviour {
     private Dictionary<Type, UIPage> Pages { get; init; } = [];
     private Stack<UIPage> History { get; init; } = [];
@@ -26,9 +28,7 @@ public class UIBook : MonoBehaviour {
         }
         
         page.Close();
-        foreach (UIPresenter presenter in page.UIComponents) {
-            this.Pages.Add(presenter.GetType(), page);
-        }
+        this.Pages.Add(page.MainPresenter.GetType(), page);
     }
 
     /// <summary>
@@ -36,13 +36,13 @@ public class UIBook : MonoBehaviour {
     /// </summary>
     /// <param name="data">The data to display on the page.</param>
     /// <typeparam name="U">The presenter's type.</typeparam>
-    public void Refresh<U>(object? data = null) where U : UIPresenter {
+    public void Refresh<U>(IPresentable data) where U : IPresenter {
         if (!this.Pages.TryGetValue(typeof(U), out UIPage page)) {
             Debug.LogError($"No page found for UI component {typeof(U)}");
             return;
         }
 
-        page.Refresh<U>(data);
+        page.Refresh(data);
     }
     
     /// <summary>
@@ -50,7 +50,7 @@ public class UIBook : MonoBehaviour {
     /// </summary>
     /// <param name="data">The initial data to display when the page opens.</param>
     /// <typeparam name="U">The presenter's type.</typeparam>
-    public void Open<U>(object? data = null) where U : UIPresenter {
+    public void Open<U>(IPresentable data) where U : IPresenter {
         if (!this.Pages.TryGetValue(typeof(U), out UIPage page)) {
             Debug.LogError($"No page found for UI component {typeof(U)}");
             return;
@@ -62,7 +62,7 @@ public class UIBook : MonoBehaviour {
         }
         
         page.Open();
-        page.Refresh<U>(data);
+        page.Refresh(data);
         this.History.Push(page);
         if (this.History.Count == 1) {
             GameEvents.OnPause.Invoke();
@@ -88,7 +88,7 @@ public class UIBook : MonoBehaviour {
         }
     }
 
-    public void Toggle<U>(object? data = null) where U : UIPresenter {
+    public void Toggle<U>(IPresentable data) where U : IPresenter {
         if (!this.Pages.TryGetValue(typeof(U), out UIPage page)) {
             Debug.LogError($"No page found for UI component {typeof(U)}");
         } else if (page.IsClosed) {

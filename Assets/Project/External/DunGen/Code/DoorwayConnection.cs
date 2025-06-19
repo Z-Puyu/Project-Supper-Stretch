@@ -1,13 +1,13 @@
 ﻿using System;
 using UnityEngine;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	[Serializable]
 	public sealed class DoorwayConnection
 	{
-		public Doorway A => a;
-		public Doorway B => b;
+		public Doorway A => this.a;
+		public Doorway B => this.b;
 
 		[SerializeField]
 		private Doorway a;

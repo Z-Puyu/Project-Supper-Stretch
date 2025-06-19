@@ -1,7 +1,8 @@
+using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	public class DungeonAttachmentSettings
 	{
@@ -22,83 +23,93 @@ namespace DunGen
 		public DungeonAttachmentSettings(Doorway attachmentDoorway)
 		{
 			Assert.IsNotNull(attachmentDoorway, "attachmentDoorway cannot be null");
-			AttachmentDoorway = attachmentDoorway;
-
-			if (AttachmentDoorway.Tile.UsedDoorways.Contains(AttachmentDoorway))
-				Debug.LogError($"Cannot attach dungeon to doorway '{attachmentDoorway.name}' as it is already in use");
+			this.AttachmentDoorway = attachmentDoorway;
 		}
 
 		public DungeonAttachmentSettings(Tile attachmentTile)
 		{
 			Assert.IsNotNull(attachmentTile, "attachmentTile cannot be null");
-			AttachmentTile = attachmentTile;
+			this.AttachmentTile = attachmentTile;
 		}
 
-		public TileProxy GenerateAttachmentProxy(bool ignoreSpriteRendererBounds, Vector3 upVector, RandomStream randomStream)
+		public TileProxy GenerateAttachmentProxy(Vector3 upVector, RandomStream randomStream)
 		{
-			if (AttachmentTile != null)
+			if (this.AttachmentTile != null)
 			{
 				// This tile wasn't placed by DunGen so we'll need to do
 				// some extra setup to ensure we have all the data we'll need later
-				if (AttachmentTile.Prefab == null)
-					PrepareManuallyPlacedTile(ignoreSpriteRendererBounds, upVector, randomStream);
+				if (this.AttachmentTile.Prefab == null)
+					this.PrepareManuallyPlacedTile(this.AttachmentTile, upVector, randomStream);
 
-				TileProxy = new TileProxy(AttachmentTile.Prefab,
-					ignoreSpriteRendererBounds,
-					upVector,
-					(doorway, index) => AttachmentTile.UnusedDoorways.Contains(AttachmentTile.AllDoorways[index])); // Ensure chosen doorway is unused
+				this.TileProxy = new TileProxy(this.AttachmentTile.Prefab,
+					(doorway, index) => this.AttachmentTile.UnusedDoorways.Contains(this.AttachmentTile.AllDoorways[index])); // Ensure chosen doorway is unused
 
-				TileProxy.Placement.Position = AttachmentTile.transform.localPosition;
-				TileProxy.Placement.Rotation = AttachmentTile.transform.localRotation;
+				this.TileProxy.Placement.Position = this.AttachmentTile.transform.localPosition;
+				this.TileProxy.Placement.Rotation = this.AttachmentTile.transform.localRotation;
 			}
-			else if (AttachmentDoorway != null)
+			else if (this.AttachmentDoorway != null)
 			{
-				var attachmentTile = AttachmentDoorway.Tile;
+				var attachmentTile = this.AttachmentDoorway.Tile;
 
-				TileProxy = new TileProxy(AttachmentDoorway.Tile.Prefab,
-					ignoreSpriteRendererBounds,
-					upVector,
-					(doorway, index) => index == attachmentTile.AllDoorways.IndexOf(AttachmentDoorway));
+				if(attachmentTile == null)
+				{
+					attachmentTile = this.AttachmentDoorway.GetComponentInParent<Tile>();
 
-				TileProxy.Placement.Position = AttachmentDoorway.Tile.transform.localPosition;
-				TileProxy.Placement.Rotation = AttachmentDoorway.Tile.transform.localRotation;
+					if(attachmentTile == null)
+					{
+						Debug.LogError($"Cannot attach to a doorway that doesn't belong to a Tile. Ensure the Doorway is parented to a GameObject with a Tile component");
+						return null;
+					}
+				}
+
+				if(attachmentTile.Prefab == null)
+					this.PrepareManuallyPlacedTile(attachmentTile, upVector, randomStream);
+
+				if (this.AttachmentDoorway.Tile.UsedDoorways.Contains(this.AttachmentDoorway))
+					Debug.LogError($"Cannot attach dungeon to doorway '{this.AttachmentDoorway.name}' as it is already in use");
+
+				this.TileProxy = new TileProxy(this.AttachmentDoorway.Tile.Prefab,
+					(doorway, index) => index == attachmentTile.AllDoorways.IndexOf(this.AttachmentDoorway));
+
+				this.TileProxy.Placement.Position = this.AttachmentDoorway.Tile.transform.localPosition;
+				this.TileProxy.Placement.Rotation = this.AttachmentDoorway.Tile.transform.localRotation;
 			}
 
-			return TileProxy;
+			return this.TileProxy;
 		}
 
-		private void PrepareManuallyPlacedTile(bool ignoreSpriteRendererBounds, Vector3 upVector, RandomStream randomStream)
+		private void PrepareManuallyPlacedTile(Tile tileToPrepare, Vector3 upVector, RandomStream randomStream)
 		{
-			AttachmentTile.Prefab = AttachmentTile.gameObject;
+			tileToPrepare.Prefab = tileToPrepare.gameObject;
 
-			foreach (var doorway in AttachmentTile.GetComponentsInChildren<Doorway>())
+			foreach (var doorway in tileToPrepare.GetComponentsInChildren<Doorway>())
 			{
-				doorway.Tile = AttachmentTile;
+				doorway.Tile = tileToPrepare;
 
-				AttachmentTile.AllDoorways.Add(doorway);
-				AttachmentTile.UnusedDoorways.Add(doorway);
+				tileToPrepare.AllDoorways.Add(doorway);
+				tileToPrepare.UnusedDoorways.Add(doorway);
 
 				doorway.ProcessDoorwayObjects(false, randomStream);
 			}
 
 			Bounds bounds;
 
-			if (AttachmentTile.OverrideAutomaticTileBounds)
-				bounds = AttachmentTile.TileBoundsOverride;
+			if (tileToPrepare.OverrideAutomaticTileBounds)
+				bounds = tileToPrepare.TileBoundsOverride;
 			else
-				bounds = UnityUtil.CalculateProxyBounds(AttachmentTile.gameObject, ignoreSpriteRendererBounds, upVector);
+				bounds = UnityUtil.CalculateProxyBounds(tileToPrepare.gameObject, upVector);
 
-			AttachmentTile.Placement.LocalBounds = UnityUtil.CondenseBounds(bounds, AttachmentTile.AllDoorways);
+			tileToPrepare.Placement.LocalBounds = UnityUtil.CondenseBounds(bounds, tileToPrepare.AllDoorways);
 		}
 
 		public Tile GetAttachmentTile()
 		{
 			Tile attachmentTile = null;
 
-			if (AttachmentTile != null)
-				attachmentTile = AttachmentTile;
-			else if (AttachmentDoorway != null)
-				attachmentTile = AttachmentDoorway.Tile;
+			if (this.AttachmentTile != null)
+				attachmentTile = this.AttachmentTile;
+			else if (this.AttachmentDoorway != null)
+				attachmentTile = this.AttachmentDoorway.Tile;
 
 			return attachmentTile;
 		}

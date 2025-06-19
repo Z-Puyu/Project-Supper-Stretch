@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DunGen.Adapters
+namespace DunGen.Project.External.DunGen.Code.Adapters
 {
 	public abstract class BaseAdapter : MonoBehaviour
 	{
@@ -12,31 +12,31 @@ namespace DunGen.Adapters
 
 		protected virtual void OnEnable()
 		{
-			var runtimeDungeon = GetComponent<RuntimeDungeon>();
+			var runtimeDungeon = this.GetComponent<RuntimeDungeon>();
 
 			if (runtimeDungeon != null)
 			{
-				dungeonGenerator = runtimeDungeon.Generator;
-				dungeonGenerator.RegisterPostProcessStep(OnPostProcess, Priority);
-				dungeonGenerator.Cleared += Clear;
+				this.dungeonGenerator = runtimeDungeon.Generator;
+				this.dungeonGenerator.RegisterPostProcessStep(this.OnPostProcess, this.Priority);
+				this.dungeonGenerator.Cleared += this.Clear;
 			}
 			else
-				Debug.LogError("[DunGen Adapter] RuntimeDungeon component is missing on GameObject '" + gameObject.name + "'. Adapters must be attached to the same GameObject as your RuntimeDungeon component");
+				Debug.LogError("[DunGen Adapter] RuntimeDungeon component is missing on GameObject '" + this.gameObject.name + "'. Adapters must be attached to the same GameObject as your RuntimeDungeon component");
 		}
 
 		protected virtual void OnDisable()
 		{
-			if (dungeonGenerator != null)
+			if (this.dungeonGenerator != null)
 			{
-				dungeonGenerator.UnregisterPostProcessStep(OnPostProcess);
-				dungeonGenerator.Cleared -= Clear;
+				this.dungeonGenerator.UnregisterPostProcessStep(this.OnPostProcess);
+				this.dungeonGenerator.Cleared -= this.Clear;
 			}
 		}
 
 		private void OnPostProcess(DungeonGenerator generator)
 		{
-			if (!generator.IsAnalysis || RunDuringAnalysis)
-				Run(generator);
+			if (!generator.IsAnalysis || this.RunDuringAnalysis)
+				this.Run(generator);
 		}
 
 		protected virtual void Clear() { }

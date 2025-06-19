@@ -1,14 +1,14 @@
 ﻿using System;
 using UnityEngine;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	public enum GameObjectFilter
 	{
 		Scene = 1,
 		Asset = 2,
 
-		All = Scene | Asset,
+		All = GameObjectFilter.Scene | GameObjectFilter.Asset,
 	}
 
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
@@ -19,7 +19,7 @@ namespace DunGen
 
 		public AcceptGameObjectTypesAttribute(GameObjectFilter filter)
 		{
-			Filter = filter;
+			this.Filter = filter;
 		}
 	}
 }

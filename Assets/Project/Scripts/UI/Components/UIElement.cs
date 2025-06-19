@@ -1,13 +1,12 @@
-﻿using Project.Scripts.UI.Components.Styles.Themes;
+﻿using Project.Scripts.UI.Styles.Themes;
 using SaintsField.Playa;
 using UnityEngine;
 
 namespace Project.Scripts.UI.Components;
 
 [DisallowMultipleComponent]
-public abstract class UIElement : MonoBehaviour {
-    [field: SerializeField]
-    protected Theme? Theme { get; set; }
+public abstract class UIElement : UIObject {
+    [field: SerializeField] protected Theme? Theme { get; private set; }
 
     private void Awake() {
         this.Init();
@@ -35,6 +34,10 @@ public abstract class UIElement : MonoBehaviour {
     }
 
     private void ConfigureChildElements() {
+        if (!this.Theme) {
+            return;
+        }
+        
         UIElement[] components = this.GetComponentsInChildren<UIElement>();
         for (int i = components.Length - 1; i >= 0; i -= 1) {
             if (components[i].Theme == this.Theme) {
@@ -46,12 +49,8 @@ public abstract class UIElement : MonoBehaviour {
             components[i].Configure();
         }
     }
-
-    public virtual void Display(object? data) { }
     
-    public virtual void Clear() { }
-    
-    protected void OnValidate() {
+    protected virtual void OnValidate() {
         this.Init();
     }
 }

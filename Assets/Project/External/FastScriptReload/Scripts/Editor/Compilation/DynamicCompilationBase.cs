@@ -4,19 +4,19 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using FastScriptReload.Editor.Compilation.CodeRewriting;
-using FastScriptReload.Editor.Compilation.ScriptGenerationOverrides;
-using FastScriptReload.Runtime;
-using FastScriptReload.Scripts.Runtime;
 using ImmersiveVRTools.Editor.Common.Cache;
 using ImmersiveVrToolsCommon.Runtime.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting;
+using Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting.Partials;
+using Project.External.FastScriptReload.Scripts.Editor.Compilation.ScriptGenerationOverrides;
+using Project.External.FastScriptReload.Scripts.Runtime;
 using UnityEditor;
 using UnityEngine;
 
-namespace FastScriptReload.Editor.Compilation
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation
 {
     [InitializeOnLoad]
     public class DynamicCompilationBase
@@ -58,8 +58,8 @@ namespace FastScriptReload.Editor.Compilation
         static DynamicCompilationBase()
         {
             //needs to be set from main thread
-            ActiveScriptCompilationDefines = EditorUserBuildSettings.activeScriptCompilationDefines;
-            AssemblyCsharpFullPath = SessionStateCache.GetOrCreateString(
+            DynamicCompilationBase.ActiveScriptCompilationDefines = EditorUserBuildSettings.activeScriptCompilationDefines;
+            DynamicCompilationBase.AssemblyCsharpFullPath = SessionStateCache.GetOrCreateString(
 	            $"FSR:AssemblyCsharpFullPath", 
 	            () => AssetDatabase.FindAssets("Microsoft.CSharp")
 					            .Select(g => new System.IO.FileInfo(UnityEngine.Application.dataPath + "/../" + AssetDatabase.GUIDToAssetPath(g)))
@@ -177,40 +177,40 @@ namespace FastScriptReload.Editor.Compilation
                 //WARN: application order is important, eg ctors need to happen before class names as otherwise ctors will not be recognised as ctors
                 if (FastScriptReloadManager.Instance.EnableExperimentalThisCallLimitationFix)
                 {
-					root = new ThisCallRewriter(DebugWriteRewriteReasonAsComment).Visit(root);
-					root = new ThisAssignmentRewriter(DebugWriteRewriteReasonAsComment).Visit(root);
+					root = new ThisCallRewriter(DynamicCompilationBase.DebugWriteRewriteReasonAsComment).Visit(root);
+					root = new ThisAssignmentRewriter(DynamicCompilationBase.DebugWriteRewriteReasonAsComment).Visit(root);
                 }
 
                 if (FastScriptReloadManager.Instance.AssemblyChangesLoaderEditorOptionsNeededInBuild.EnableExperimentalAddedFieldsSupport)
                 {
-                    root = new NewFieldsRewriter(typeToNewFieldDeclarations, DebugWriteRewriteReasonAsComment).Visit(root);
-                    root = new CreateNewFieldInitMethodRewriter(typeToNewFieldDeclarations, DebugWriteRewriteReasonAsComment).Visit(root);
+                    root = new NewFieldsRewriter(typeToNewFieldDeclarations, DynamicCompilationBase.DebugWriteRewriteReasonAsComment).Visit(root);
+                    root = new CreateNewFieldInitMethodRewriter(typeToNewFieldDeclarations, DynamicCompilationBase.DebugWriteRewriteReasonAsComment).Visit(root);
                 }
                 
-                root = new RedundantTypeNameQualifierRewriter(DebugWriteRewriteReasonAsComment).Visit(root);
+                root = new RedundantTypeNameQualifierRewriter(DynamicCompilationBase.DebugWriteRewriteReasonAsComment).Visit(root);
                 
-                root = new ConstructorRewriter(adjustCtorOnlyForNonNestedTypes: true, DebugWriteRewriteReasonAsComment).Visit(root);
+                root = new ConstructorRewriter(adjustCtorOnlyForNonNestedTypes: true, DynamicCompilationBase.DebugWriteRewriteReasonAsComment).Visit(root);
                 
-                var hotReloadCompliantRewriter = new HotReloadCompliantRewriter(DebugWriteRewriteReasonAsComment);
+                var hotReloadCompliantRewriter = new HotReloadCompliantRewriter(DynamicCompilationBase.DebugWriteRewriteReasonAsComment);
                 root = hotReloadCompliantRewriter.Visit(root);
                 combinedUsingStatements.AddRange(hotReloadCompliantRewriter.StrippedUsingDirectives);
                 
-                root = new BuilderPatternFunctionsRewriter(DebugWriteRewriteReasonAsComment).Visit(root);
-                root = new RecordeRewriter(DebugWriteRewriteReasonAsComment).Visit(root);
-                root = new ExtensionMethodsCallingOtherExtensionMethodsInSameFileRewriter(DebugWriteRewriteReasonAsComment).Visit(root);
+                root = new BuilderPatternFunctionsRewriter(DynamicCompilationBase.DebugWriteRewriteReasonAsComment).Visit(root);
+                root = new RecordeRewriter(DynamicCompilationBase.DebugWriteRewriteReasonAsComment).Visit(root);
+                root = new ExtensionMethodsCallingOtherExtensionMethodsInSameFileRewriter(DynamicCompilationBase.DebugWriteRewriteReasonAsComment).Visit(root);
                 
                 //processed as last step to simply rewrite all changes made before
-                if (TryResolveUserDefinedOverridesRoot(tree.FilePath, definedPreprocessorSymbols, out var userDefinedOverridesRoot))
+                if (DynamicCompilationBase.TryResolveUserDefinedOverridesRoot(tree.FilePath, definedPreprocessorSymbols, out var userDefinedOverridesRoot))
                 {
-                    root = ProcessUserDefinedOverridesReplacements(tree.FilePath, root, userDefinedOverridesRoot);
-                    root = AddUserDefinedOverridenTypes(userDefinedOverridesRoot, root);
+                    root = DynamicCompilationBase.ProcessUserDefinedOverridesReplacements(tree.FilePath, root, userDefinedOverridesRoot);
+                    root = DynamicCompilationBase.AddUserDefinedOverridenTypes(userDefinedOverridesRoot, root);
                 }
 
                 return root.ToFullString();
             }).ToList();
 
             var sourceCodeCombinedSb = new StringBuilder();
-            sourceCodeCombinedSb.Append(DebuggingInformationComment);
+            sourceCodeCombinedSb.Append(DynamicCompilationBase.DebuggingInformationComment);
             
             foreach (var usingStatement in combinedUsingStatements.Distinct())
             {
@@ -339,11 +339,11 @@ namespace FastScriptReload.Editor.Compilation
                 }
             }
             
-            referencesToAdd = referencesToAdd.Where(r => !ReferencesExcludedFromHotReload.Any(rTe => r.EndsWith(rTe))).ToList();
+            referencesToAdd = referencesToAdd.Where(r => !DynamicCompilationBase.ReferencesExcludedFromHotReload.Any(rTe => r.EndsWith(rTe))).ToList();
 
-            if (EnableExperimentalThisCallLimitationFix || FastScriptReloadManager.Instance.AssemblyChangesLoaderEditorOptionsNeededInBuild.EnableExperimentalAddedFieldsSupport)
+            if (DynamicCompilationBase.EnableExperimentalThisCallLimitationFix || FastScriptReloadManager.Instance.AssemblyChangesLoaderEditorOptionsNeededInBuild.EnableExperimentalAddedFieldsSupport)
             {
-	            IncludeMicrosoftCsharpReferenceToSupportDynamicKeyword(referencesToAdd);
+	            DynamicCompilationBase.IncludeMicrosoftCsharpReferenceToSupportDynamicKeyword(referencesToAdd);
             }
 
             return referencesToAdd;
@@ -353,7 +353,7 @@ namespace FastScriptReload.Editor.Compilation
         {
 	        //TODO: check .net4.5 backend not breaking?
 	        //ThisRewriters will cast to dynamic - if using .NET Standard 2.1 - reference is required
-	        referencesToAdd.Add(AssemblyCsharpFullPath);
+	        referencesToAdd.Add(DynamicCompilationBase.AssemblyCsharpFullPath);
 	        // referencesToAdd.Add(@"C:\Program Files\Unity\Hub\Editor\2021.3.12f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\Microsoft.CSharp.dll");
         }
     }
@@ -365,14 +365,14 @@ namespace FastScriptReload.Editor.Compilation
 
         public CreateSourceCodeCombinedContentsResult(string sourceCode, List<string> typeNamesDefinitions)
         {
-            SourceCode = sourceCode;
-            TypeNamesDefinitions = typeNamesDefinitions;
+            this.SourceCode = sourceCode;
+            this.TypeNamesDefinitions = typeNamesDefinitions;
         }
     }
 
     public class SourceCodeHasErrorsException : Exception
     {
-        public SourceCodeHasErrorsException(IEnumerable<Diagnostic> errorDiagnostics) : base(MakeMessage(errorDiagnostics))
+        public SourceCodeHasErrorsException(IEnumerable<Diagnostic> errorDiagnostics) : base(SourceCodeHasErrorsException.MakeMessage(errorDiagnostics))
         {
         }
 

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 
-namespace DunGen
+namespace DunGen.Project.External.DunGen.Code
 {
 	public enum LocalPropSetCountMode
 	{
@@ -27,36 +28,46 @@ namespace DunGen
 
 		public override void Process(RandomStream randomStream, Tile tile, ref List<GameObject> spawnedObjects)
 		{
-			var propTable = Props.Clone();
+			var propTable = this.Props.Clone();
 
-			GetPropCountDelegate getCountDelegate;
-
-			if (!GetCountMethods.TryGetValue(CountMode, out getCountDelegate))
-				throw new NotImplementedException("LocalPropSet count mode \"" + CountMode + "\" is not yet implemented");
+			if (!LocalPropSet.GetCountMethods.TryGetValue(this.CountMode, out var getCountDelegate))
+				throw new NotImplementedException("LocalPropSet count mode \"" + this.CountMode + "\" is not yet implemented");
 
 			int count = getCountDelegate(this, randomStream, tile);
-			List<GameObject> toKeep = new List<GameObject>(count);
+			var toKeep = new List<GameObject>(count);
 
 			for (int i = 0; i < count; i++)
 			{
-				var chosenEntry = propTable.GetRandom(randomStream, tile.Placement.IsOnMainPath, tile.Placement.NormalizedDepth, null, true, true, true);
+				// allowNullSelection is true so that we can treat empty entries as "no prop"
+				var chosenEntry = propTable.GetRandom(randomStream,
+					tile.Placement.IsOnMainPath,
+					tile.Placement.NormalizedDepth,
+					previouslyChosen: null,
+					allowImmediateRepeats: true,
+					removeFromTable: true,
+					allowNullSelection: true);
 
 				if (chosenEntry != null && chosenEntry.Value != null)
 					toKeep.Add(chosenEntry.Value);
 			}
 
-			foreach (var prop in Props.Weights)
-				if (!toKeep.Contains(prop.Value))
-					UnityUtil.Destroy(prop.Value);
+			foreach (var prop in this.Props.Weights)
+			{
+				if (prop.Value == null)
+					continue;
+
+				bool isActive = toKeep.Contains(prop.Value);
+				prop.Value.SetActive(isActive);
+			}
 		}
 
 		#region GetCount Methods
 
 		static LocalPropSet()
 		{
-			GetCountMethods[LocalPropSetCountMode.Random] = GetCountRandom;
-			GetCountMethods[LocalPropSetCountMode.DepthBased] = GetCountDepthBased;
-			GetCountMethods[LocalPropSetCountMode.DepthMultiply] = GetCountDepthMultiply;
+			LocalPropSet.GetCountMethods[LocalPropSetCountMode.Random] = LocalPropSet.GetCountRandom;
+			LocalPropSet.GetCountMethods[LocalPropSetCountMode.DepthBased] = LocalPropSet.GetCountDepthBased;
+			LocalPropSet.GetCountMethods[LocalPropSetCountMode.DepthMultiply] = LocalPropSet.GetCountDepthMultiply;
 		}
 
 		private static int GetCountRandom(LocalPropSet propSet, RandomStream randomStream, Tile tile)
@@ -78,7 +89,7 @@ namespace DunGen
 		private static int GetCountDepthMultiply(LocalPropSet propSet, RandomStream randomStream, Tile tile)
 		{
 			float curveValue = Mathf.Clamp(propSet.CountDepthCurve.Evaluate(tile.Placement.NormalizedPathDepth), 0, 1);
-			int count = GetCountRandom(propSet, randomStream, tile);
+			int count = LocalPropSet.GetCountRandom(propSet, randomStream, tile);
 			count = Mathf.RoundToInt(count * curveValue);
 
 			return count;

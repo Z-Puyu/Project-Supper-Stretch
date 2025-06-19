@@ -6,7 +6,7 @@ using System.Reflection;
 using ImmersiveVRTools.Runtime.Common;
 using ImmersiveVrToolsCommon.Runtime.Logging;
 
-namespace FastScriptReload.Editor.Compilation
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation
 {
     public class DynamicAssemblyCompiler
     {
@@ -42,7 +42,7 @@ namespace FastScriptReload.Editor.Compilation
         public Assembly CompiledAssembly { get; }
         public string CompiledAssemblyPath { get; }
         public List<string> MessagesFromCompilerProcess { get; }
-        public bool IsError => string.IsNullOrEmpty(CompiledAssemblyPath);
+        public bool IsError => string.IsNullOrEmpty(this.CompiledAssemblyPath);
         public int NativeCompilerReturnValue { get; }
         public string SourceCodeCombined { get; }
         public string SourceCodeCombinedFileLocation { get; }
@@ -50,13 +50,13 @@ namespace FastScriptReload.Editor.Compilation
 
         public CompileResult(string compiledAssemblyPath, List<string> messagesFromCompilerProcess, int nativeCompilerReturnValue, Assembly compiledAssembly, string sourceCodeCombined, string sourceCodeCombinedFileLocation, float creatingAssemblyWithInternalsVisibleToTook)
         {
-            CompiledAssemblyPath = compiledAssemblyPath;
-            MessagesFromCompilerProcess = messagesFromCompilerProcess;
-            NativeCompilerReturnValue = nativeCompilerReturnValue;
-            CompiledAssembly = compiledAssembly;
-            SourceCodeCombined = sourceCodeCombined;
-            SourceCodeCombinedFileLocation = sourceCodeCombinedFileLocation;
-            CreatingAssemblyWithInternalsVisibleToTook = creatingAssemblyWithInternalsVisibleToTook;
+            this.CompiledAssemblyPath = compiledAssemblyPath;
+            this.MessagesFromCompilerProcess = messagesFromCompilerProcess;
+            this.NativeCompilerReturnValue = nativeCompilerReturnValue;
+            this.CompiledAssembly = compiledAssembly;
+            this.SourceCodeCombined = sourceCodeCombined;
+            this.SourceCodeCombinedFileLocation = sourceCodeCombinedFileLocation;
+            this.CreatingAssemblyWithInternalsVisibleToTook = creatingAssemblyWithInternalsVisibleToTook;
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using DunGen.Graph;
+﻿using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
 
-namespace DunGen.Editor.Validation.Rules
+namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Validation.Rules
 {
 	sealed class DungeonFlowIntegrityRule : IValidationRule
 	{
@@ -13,10 +13,10 @@ namespace DunGen.Editor.Validation.Rules
 				return;
 			}
 
-			CheckLineSegments(flow, validator);
-			CheckNodes(flow, validator);
-			CheckArchetypes(flow, validator);
-			CheckTileSets(flow, validator);
+			this.CheckLineSegments(flow, validator);
+			this.CheckNodes(flow, validator);
+			this.CheckArchetypes(flow, validator);
+			this.CheckTileSets(flow, validator);
 		}
 
 		private void CheckLineSegments(DungeonFlow flow, DungeonValidator validator)
