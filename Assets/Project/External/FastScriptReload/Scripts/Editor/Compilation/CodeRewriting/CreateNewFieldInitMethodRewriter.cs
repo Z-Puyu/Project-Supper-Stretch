@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace FastScriptReload.Editor.Compilation.CodeRewriting
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting
 {
 	class CreateNewFieldInitMethodRewriter: FastScriptReloadCodeRewriterBase {
 		private readonly Dictionary<string, List<string>> _typeToNewFieldDeclarations;
@@ -17,38 +17,38 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 
 		public static Dictionary<string, Func<object>> ResolveNewFieldsToCreateValueFn(Type forType)
 		{
-			return (Dictionary<string, Func<object>>) forType.GetField(NewFieldsToCreateValueFnDictionaryFieldName, BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+			return (Dictionary<string, Func<object>>) forType.GetField(CreateNewFieldInitMethodRewriter.NewFieldsToCreateValueFnDictionaryFieldName, BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
 		}
 		
 		public static Dictionary<string, Func<object>> ResolveNewFieldsToTypeFn(Type forType)
 		{
-			return (Dictionary<string, Func<object>>) forType.GetField(NewFieldsToGetTypeFnDictionaryFieldName, BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+			return (Dictionary<string, Func<object>>) forType.GetField(CreateNewFieldInitMethodRewriter.NewFieldsToGetTypeFnDictionaryFieldName, BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
 		}
 
 		public CreateNewFieldInitMethodRewriter(Dictionary<string, List<string>> typeToNewFieldDeclarations, bool writeRewriteReasonAsComment)
 			:base(writeRewriteReasonAsComment)
 		{
-			_typeToNewFieldDeclarations = typeToNewFieldDeclarations;
+			this._typeToNewFieldDeclarations = typeToNewFieldDeclarations;
 		}
 
 		public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
 		{
 			var fullClassName = RoslynUtils.GetMemberFQDN(node, node.Identifier.ToString());
-			if (!_typeToNewFieldDeclarations.TryGetValue(fullClassName, out var newClassFields))
+			if (!this._typeToNewFieldDeclarations.TryGetValue(fullClassName, out var newClassFields))
 			{
 				LoggerScoped.LogWarning($"Unable to find new-fields for type: {fullClassName}, this is not an issue if there are no new fields for that type.");
 			}
 
 			Func<FieldDeclarationSyntax, ExpressionSyntax> getObjectFnSyntax = fieldDeclarationNode => fieldDeclarationNode.Declaration.Variables[0].Initializer?.Value //value captured from initializer
 			                                            ?? SyntaxFactory.DefaultExpression(SyntaxFactory.IdentifierName(fieldDeclarationNode.Declaration.Type.ToString()));
-			var withDictionaryFieldNameToInitFieldValue = CreateNewFieldNameToGetObjectFnDictionary(node, newClassFields, getObjectFnSyntax, NewFieldsToCreateValueFnDictionaryFieldName);
+			var withDictionaryFieldNameToInitFieldValue = this.CreateNewFieldNameToGetObjectFnDictionary(node, newClassFields, getObjectFnSyntax, CreateNewFieldInitMethodRewriter.NewFieldsToCreateValueFnDictionaryFieldName);
 
 			//TODO: slightly odd scenario 'When explicit #nullable enable is used, reference types should be rewritten to typeof(type) for initialization and value types should remain typeof(type?)'
 			// Func<FieldDeclarationSyntax, ExpressionSyntax> getObjectTypeFnSyntax = fieldDeclarationNode => SyntaxFactory.TypeOfExpression(
 			// 	SyntaxFactory.ParseTypeName(fieldDeclarationNode.Declaration.Type.ToFullString().Replace("?", ""))
 			// );
 			Func<FieldDeclarationSyntax, ExpressionSyntax> getObjectTypeFnSyntax = fieldDeclarationNode => SyntaxFactory.TypeOfExpression(fieldDeclarationNode.Declaration.Type);
-			return CreateNewFieldNameToGetObjectFnDictionary(withDictionaryFieldNameToInitFieldValue, newClassFields, getObjectTypeFnSyntax, NewFieldsToGetTypeFnDictionaryFieldName);
+			return this.CreateNewFieldNameToGetObjectFnDictionary(withDictionaryFieldNameToInitFieldValue, newClassFields, getObjectTypeFnSyntax, CreateNewFieldInitMethodRewriter.NewFieldsToGetTypeFnDictionaryFieldName);
 		}
 
 		private ClassDeclarationSyntax CreateNewFieldNameToGetObjectFnDictionary(ClassDeclarationSyntax node,
@@ -89,7 +89,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 				SyntaxFactory.FieldDeclaration(
 						SyntaxFactory.VariableDeclaration(
 								SyntaxFactory.GenericName(
-										SyntaxFactory.Identifier(DictionaryFullNamespaceTypeName))
+										SyntaxFactory.Identifier(CreateNewFieldInitMethodRewriter.DictionaryFullNamespaceTypeName))
 									.WithTypeArgumentList(
 										SyntaxFactory.TypeArgumentList(
 											SyntaxFactory.SeparatedList<TypeSyntax>(
@@ -114,7 +114,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 											SyntaxFactory.EqualsValueClause(
 												SyntaxFactory.ObjectCreationExpression(
 														SyntaxFactory.GenericName(
-																SyntaxFactory.Identifier(DictionaryFullNamespaceTypeName))
+																SyntaxFactory.Identifier(CreateNewFieldInitMethodRewriter.DictionaryFullNamespaceTypeName))
 															.WithTypeArgumentList(
 																SyntaxFactory.TypeArgumentList(
 																	SyntaxFactory.SeparatedList<TypeSyntax>(
@@ -147,7 +147,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 					.WithLeadingTrivia(SyntaxFactory.TriviaList(SyntaxFactory.ElasticCarriageReturnLineFeed))
 					.WithTrailingTrivia(SyntaxFactory.TriviaList(SyntaxFactory.ElasticCarriageReturnLineFeed, SyntaxFactory.ElasticCarriageReturnLineFeed))
 			);
-			return AddRewriteCommentIfNeeded(withDictionaryFieldNameToInitFieldValue, $"{nameof(CreateNewFieldInitMethodRewriter)}", true);
+			return this.AddRewriteCommentIfNeeded(withDictionaryFieldNameToInitFieldValue, $"{nameof(CreateNewFieldInitMethodRewriter)}", true);
 		}
 	}
 }

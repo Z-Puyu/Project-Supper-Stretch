@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace FastScriptReload.Editor.Compilation.CodeRewriting
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting.Partials
 {
     internal static class PartialTreeProcessor
     {
@@ -25,7 +25,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
         /// </remarks>
         internal static SyntaxTree ProcessPartialTree(SyntaxTree tree, IEnumerable<string> definedPreprocessorSymbols)
         {
-            if (!HasPartialTypes(tree))
+            if (!PartialTreeProcessor.HasPartialTypes(tree))
             {
                 return tree;
             }
@@ -34,7 +34,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
             var combinedUsingDirectives = new HashSet<UsingDirectiveSyntax>();
             var combinedTypesDefined = new HashSet<string>();
 
-            ProcessTree(tree, combinedTypes, combinedUsingDirectives, combinedTypesDefined);
+            PartialTreeProcessor.ProcessTree(tree, combinedTypes, combinedUsingDirectives, combinedTypesDefined);
 
             const int fileSearchMaxDepth = 5;
             var otherPartialFiles = PartialClassFinder.FindPartialClassFilesInDirectory(tree.FilePath, fileSearchMaxDepth)
@@ -43,7 +43,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
             foreach (var file in otherPartialFiles)
             {
                 var partialTree = CSharpSyntaxTree.ParseText(File.ReadAllText(file), path: file);
-                ProcessTree(partialTree, combinedTypes, combinedUsingDirectives, combinedTypesDefined);
+                PartialTreeProcessor.ProcessTree(partialTree, combinedTypes, combinedUsingDirectives, combinedTypesDefined);
             }
 
             var combinedTypeDeclarations = combinedTypes

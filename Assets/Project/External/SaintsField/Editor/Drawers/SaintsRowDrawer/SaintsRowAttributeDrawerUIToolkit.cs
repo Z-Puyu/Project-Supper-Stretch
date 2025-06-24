@@ -8,7 +8,6 @@ using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Playa;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -92,7 +91,17 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     {
                         long curId = (long) root.userData;
                         // ReSharper disable once InvertIf
-                        if (curId != property.managedReferenceId)
+                        long newId;
+                        try
+                        {
+                            newId = property.managedReferenceId;
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            return;
+                        }
+                        // ReSharper disable once InvertIf
+                        if (curId != newId)
                         {
                             // Debug.Log($"{property.propertyPath} Changed {curId} -> {property.managedReferenceId}/{property.managedReferenceFieldTypename}");
                             root.userData = property.managedReferenceId;
@@ -133,6 +142,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
 
         private static void FillElement(VisualElement root, SerializedProperty property, MemberInfo info, bool inHorizontalLayout, IMakeRenderer makeRenderer, IDOTweenPlayRecorder doTweenPlayRecorder)
         {
+            // Debug.Log($"{property.propertyPath}: {inHorizontalLayout}");
             object value = null;
             if (property.propertyType == SerializedPropertyType.ManagedReference)
             {
@@ -163,33 +173,33 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                         value = getValue;
 
                         // Debug.Log(value);
-                        if (value == null)
-                        {
-                            // foreach (SerializedProperty subProp in SerializedUtils.GetPropertyChildren(property))
-                            // {
-                            //     // switch (subProp.)
-                            //     // {
-                            //     //
-                            //     // }
-                            // }
-
-                            // var p = new PropertyField(property);
-                            // root.Add(p);
-                            // return;
-
-                            // Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
-                            //     ? ReflectUtils.GetElementType(GetMemberType(info))
-                            //     : GetMemberType(info);
-                            //
-                            // // Undo.RecordObject(property.serializedObject.targetObject, property.propertyPath);
-                            // // value = Activator.CreateInstance(rawType, true);
-                            // // Util.SignPropertyValue(property, info, parent, value);
-                            //
-                            // property.boxedValue = value = Activator.CreateInstance(rawType, true);
-                            // property.serializedObject.ApplyModifiedProperties();
-
-                            // return;
-                        }
+                        // if (value == null)
+                        // {
+                        //     // foreach (SerializedProperty subProp in SerializedUtils.GetPropertyChildren(property))
+                        //     // {
+                        //     //     // switch (subProp.)
+                        //     //     // {
+                        //     //     //
+                        //     //     // }
+                        //     // }
+                        //
+                        //     // var p = new PropertyField(property);
+                        //     // root.Add(p);
+                        //     // return;
+                        //
+                        //     // Type rawType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)
+                        //     //     ? ReflectUtils.GetElementType(GetMemberType(info))
+                        //     //     : GetMemberType(info);
+                        //     //
+                        //     // // Undo.RecordObject(property.serializedObject.targetObject, property.propertyPath);
+                        //     // // value = Activator.CreateInstance(rawType, true);
+                        //     // // Util.SignPropertyValue(property, info, parent, value);
+                        //     //
+                        //     // property.boxedValue = value = Activator.CreateInstance(rawType, true);
+                        //     // property.serializedObject.ApplyModifiedProperties();
+                        //
+                        //     // return;
+                        // }
 
 
 
@@ -212,6 +222,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
                     return;
                 }
 
+                Debug.Assert(value != null);
                 // value = getValue;
             }
 
@@ -223,7 +234,7 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
             // SaintsRowAttribute saintsRowAttribute = (SaintsRowAttribute)attribute;
 
             IReadOnlyList<ISaintsRenderer> renderer =
-                SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, makeRenderer, value);
+                SaintsEditor.HelperGetRenderers(serializedFieldNames, property.serializedObject, makeRenderer, new []{value});
 
 //             // Debug.Log($"{renderer.Count}");
 //
@@ -242,6 +253,18 @@ namespace SaintsField.Editor.Drawers.SaintsRowDrawer
              //     prop.Bind(property.serializedObject);
              //     bodyElement.Add(prop);
              // }
+
+             Type objectType = value.GetType();
+             IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetCustomAttributes<IPlayaClassAttribute>(objectType);
+
+             foreach (ISaintsRenderer saintsRenderer in SaintsEditor.GetClassStructRenderer(objectType, playaClassAttributes, property.serializedObject, new[]{value}))
+             {
+                 VisualElement rendererElement = saintsRenderer.CreateVisualElement();
+                 if (rendererElement != null)
+                 {
+                     bodyElement.Add(rendererElement);
+                 }
+             }
 
              // this... fixed by adding Bind()... wtf...
              foreach (ISaintsRenderer saintsRenderer in renderer)

@@ -6,16 +6,14 @@ using System.Reflection;
 using SaintsField.Editor.AutoRunner;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
-using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
-using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 {
 #if ODIN_INSPECTOR
-    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.SuperPriority)]
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
 #endif
     [CustomPropertyDrawer(typeof(ShaderParamAttribute), true)]
     public partial class ShaderParamAttributeDrawer: SaintsPropertyDrawer, IAutoRunnerFixDrawer

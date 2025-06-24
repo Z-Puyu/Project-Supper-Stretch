@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace FastScriptReload.Editor.Compilation.CodeRewriting
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting
 {
     public abstract class FastScriptReloadCodeRewriterBase : CSharpSyntaxRewriter
     {
@@ -9,12 +9,12 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 
         protected FastScriptReloadCodeRewriterBase(bool writeRewriteReasonAsComment, bool visitIntoStructuredTrivia = false) : base(visitIntoStructuredTrivia)
         {
-            _writeRewriteReasonAsComment = writeRewriteReasonAsComment;
+            this._writeRewriteReasonAsComment = writeRewriteReasonAsComment;
         }
         
         protected SyntaxToken AddRewriteCommentIfNeeded(SyntaxToken syntaxToken, string commentText, bool append = false)
         {
-            return AddRewriteCommentIfNeeded(syntaxToken, commentText, _writeRewriteReasonAsComment, append);
+            return FastScriptReloadCodeRewriterBase.AddRewriteCommentIfNeeded(syntaxToken, commentText, this._writeRewriteReasonAsComment, append);
         }
 
         public static SyntaxToken AddRewriteCommentIfNeeded(SyntaxToken syntaxToken, string commentText, bool writeRewriteReasonAsComment, bool append)
@@ -39,7 +39,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
         protected T AddRewriteCommentIfNeeded<T>(T syntaxNode, string commentText, bool append = false)
             where T : SyntaxNode
         {
-            return AddRewriteCommentIfNeeded(syntaxNode, commentText, _writeRewriteReasonAsComment, append);
+            return FastScriptReloadCodeRewriterBase.AddRewriteCommentIfNeeded(syntaxNode, commentText, this._writeRewriteReasonAsComment, append);
         }
 
         public static T AddRewriteCommentIfNeeded<T>(T syntaxNode, string commentText, bool writeRewriteReasonAsComment, bool append) where T : SyntaxNode

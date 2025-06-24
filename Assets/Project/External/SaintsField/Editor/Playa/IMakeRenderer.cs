@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using UnityEditor;
 

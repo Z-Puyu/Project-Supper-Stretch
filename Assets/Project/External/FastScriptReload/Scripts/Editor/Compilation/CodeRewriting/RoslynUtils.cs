@@ -2,13 +2,13 @@
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace FastScriptReload.Editor.Compilation.CodeRewriting
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting
 {
     public class RoslynUtils
     {
         public static string GetMemberFQDN(MemberDeclarationSyntax memberNode, string memberName) //TODO: try get rid of member name (needs to cast to whatever member it could be to get identifier)
         {
-            var outer = GetMemberFQDNWithoutMemberName(memberNode);
+            var outer = RoslynUtils.GetMemberFQDNWithoutMemberName(memberNode);
             return !string.IsNullOrEmpty(outer)
                 ? $"{outer}.{memberName}"
                 : memberName;

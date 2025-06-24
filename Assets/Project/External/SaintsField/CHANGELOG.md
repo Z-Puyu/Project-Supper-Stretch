@@ -1,5 +1,116 @@
 # Changelog
 
+## 4.16.4 ##
+
+1.  `ListDrawerSetting`, `Table`, `SaintsDictionary` search now support `SerializeReference` field search, and is case-insensitive.
+2.  UI Toolkit: `SaintsDictionary` now support debounce search
+
+## 4.16.3 ##
+
+Fix project failed to compile due to code changed in SaintsDictionary
+
+## 4.16.2 ##
+
+
+1.  UI Toolkit: If you have multiple targets selected, `Button` can be triggered on all the targets. (NOTE: this does not work on `AboveButton`, `BelowButton`, `PostFieldButton` yet)
+2.  Change the logic of `SaintsDictionary` to allow inherent
+3.  Add constructor method for `SaintsList` & `SaintsArray` so they can be used more like a native array/list
+
+## 4.16.1 ##
+
+1.  UI Toolkit: `Searchable` now can search a field when you input a field name from code. In previous version it need to match the display name
+2.  UI Toolkit: if you're using Unity 6k+, we now `Unbind` the element to stop the property tracking [#239](https://github.com/TylerTemp/SaintsField/issues/239)
+3.  Fix `OnValueChanged` callback does not work when the target field is an `Enum` and the callback receives the corresponding type of `Enum`
+
+## 4.16.0 ##
+
+UI Toolkit: Add `Searchable` to search field name for MonoBehavior (Component) or ScriptableObject
+
+## 4.15.1 ##
+
+1.  UI Toolkit: fix `ShowInInspector` setting a list to `null` gave an error
+2.  UI Toolkit: `ShowInInspector` now fold the struct/class by default. This is to avoid a looped references stack overflow rendering. The data will only be filled the first time you expand it.
+
+    Some genius decide to use loop-referenced data in the game save data type. I can not tell them not to do so. No cap frfr.
+
+## 4.15.0 ##
+
+1.  UI Toolkit + IMGUI: Add `SceneViewPicker` to pick an object from the scene view into a field [#231](https://github.com/TylerTemp/SaintsField/issues/231)
+2.  Improve the compatibility with Odin Inspector. Now most attributes can be used together with Odin Inspector.
+
+## 4.14.0 ##
+
+UI Toolkit: Add `TableHeaders` & `TableHeadersHide` to default show/hide table columns
+
+## 4.13.5 ##
+
+1.  UI Toolkit: fix unity might give an error when removing an element from list
+2.  IMGUI: add right click context menu support for `Table` [#211](https://github.com/TylerTemp/SaintsField/issues/211)
+3.  UI Toolkit: fix auto validator UI logic; add validation if an animator state has any `StateMachineBehaviour` scripts
+4.  Auto Validator add button for quick adding Addressable scenes and assets
+
+## 4.13.4 ##
+
+1.  UI Toolkit: fix default item in object picker might give an error
+2.  Fix `AdvancedDropdown` can not property handle rich tags because `/` is used as path separator
+
+## 4.13.3 ##
+
+1.  UI Toolkit: Fix `GetWwise` can not find `State`, `Switch`
+2.  UI Toolkit: Fix `GetWwise` can not work with `IWrapProp` (`SaintsDictionary`)
+3.  UI Toolkit: Fix some label issue when fallback to IMGUI drawer
+4.  Change the behavior of auto getters when `ResignToNull` is on: it'll not try to reduce the size of the array
+5.  UI Toolkit: Fix duplicated `ReferencePicker` when user already uses one [#237](https://github.com/TylerTemp/SaintsField/issues/237)
+
+## 4.13.2 ##
+
+Fix the way to get IMGUI fallback drawer height. This inflects both IMGUI, and UI Toolkit falling-back to IMGUI
+
+## 4.13.1 ##
+
+1.  UI Toolkit: fix `SaintsDictionary` enum dropdown didn't display the correct selected value [#236](https://github.com/TylerTemp/SaintsField/issues/236)
+2.  Fix auto getter order checking issue in auto validator
+3.  Auto validator now only check prefab & `ScriptableObject` for assets
+4.  Add `Add Scenes In Build` & `Add All Assets` buttons in auto validator window for quick checking
+5.  UI Toolkit: fix `bool` type display in horizontal layout
+
+## 4.13.0 ##
+
+1.  UI Toolkit: Add `GetWwise` to automatically get a Wwise object
+2.  Fix a false array detection in SaintsEditor
+
+## 4.12.0 ##
+
+1.  Add `PlayaAboveRichLabel`/`PlayaBelowRichLabel` to draw a rich label above/below a field/method/property (including array/list)
+2.  UI Toolkit: Allow `PlayaAboveRichLabel` & `PlayaInfoBox` be applied to a class/struct definition
+
+## 4.11.0 ##
+
+1.  Add `HeaderLabel` to draw a label in component header
+2.  `Required` now check truly value for `I2.LocalizedString`
+3.  Add customize `Required` message type [#234](https://github.com/TylerTemp/SaintsField/issues/234)
+4.  Add `AddressableSubAssetRequired` to validate `subAsset` in types like `Addressable.AssetReferenceSprite`
+
+## 4.10.0 ##
+
+1.  Add `Component Header` related attributes. Now you can draw buttons, icons etc on the component header. [#154](https://github.com/TylerTemp/SaintsField/issues/154)
+2.  UI Toolkit: `MinMaxSlider` friendly error if been used on wrong type [#232](https://github.com/TylerTemp/SaintsField/issues/232)
+3.  UI Toolkit: `ShowInInspector` now shows an error box if the target attributes raises an error in its getter
+4.  UI Toolkit: `ShowInInspector` now always update the sub-field value display if the target (e.g. a class) has sub-fields/properties
+5.  UI Toolkit: if you have `SaintsEditor` enabled, a bare `[SerializedReference]` will automatically use `ReferencePicker` + `SaintsRow` drawer
+
+## 4.9.0 ##
+
+1.  UI Toolkit: if you have `SaintsEditor` enabled, `enum` will automatically use `AdvancedDropdown` drawer
+2.  UI Toolkit: if you have `SaintsEditor` enabled, `enum` with `[Flags]` will automatically use `FlagsDropdown` drawer
+3.  UI Toolkit: now you can use keyboard (up/down/left/right arrow, return key) to select an `AdvancedDropdown`
+4.  UI Toolkit: fix custom picker when you have search in block view, arrow key gives error if the currently selected item is not in loaded results
+5.  UI Toolkit: fix custom picker show placeholder information when the selected item has not appeared in loading results yet
+6.  UI Toolkit: fix custom picker showing results that does not match the search when you start typing before the loading process finished
+7.  UI Toolkit: fix `AdvancedDropdown` layout issue that an item can overlap a bit with the search box
+8.  UI Toolkit: fix `AdvancedDropdown` didn't show the selected group when you backward a page
+9.  If you use a low version of `.NET` which does not support `B`, `B8` formatting string, `RichLabel` can now property format it like `<field=B/>`, `<field=B16/>`
+
 ## 4.8.0 ##
 
 1.  UI Toolkit: Add `TableHide` to exclude a field/column from `Table` [#225](https://github.com/TylerTemp/SaintsField/issues/225)

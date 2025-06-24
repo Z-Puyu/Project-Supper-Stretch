@@ -1,8 +1,9 @@
 #if UNITY_2021_3_OR_NEWER && !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
 using System.Collections.Generic;
+using SaintsField.Editor.HeaderGUI;
 using SaintsField.Editor.Playa;
-using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -18,17 +19,42 @@ namespace SaintsField.Editor
         [Obsolete("No longer needed")]
         protected virtual bool TryFixUIToolkit => false;
 
+        private void OnHeaderButtonClickUIToolkit()
+        {
+            _toolbarSearchField.style.display = _searchableShown ? DisplayStyle.Flex : DisplayStyle.None;
+            if(_searchableShown)
+            {
+                _toolbarSearchField.Focus();
+            }
+        }
+
+        private ToolbarSearchField _toolbarSearchField;
+
+        private IReadOnlyList<ISaintsRenderer> _renderersUIToolkit = Array.Empty<ISaintsRenderer>();
+
         public override VisualElement CreateInspectorGUI()
         {
             _saintsEditorIMGUI = false;
             // Debug.Log("CreateInspectorGUI");
 
-            if (target == null)
+            if (!target)
             {
                 return new HelpBox("The target object is null. Check for missing scripts.", HelpBoxMessageType.Error);
             }
 
             VisualElement root = new VisualElement();
+
+            Type objectType = target.GetType();
+            IPlayaClassAttribute[] playaClassAttributes = ReflectCache.GetCustomAttributes<IPlayaClassAttribute>(objectType);
+
+            foreach (ISaintsRenderer saintsRenderer in GetClassStructRenderer(objectType, playaClassAttributes, serializedObject, targets))
+            {
+                VisualElement ve = saintsRenderer.CreateVisualElement();
+                if(ve != null)
+                {
+                    root.Add(ve);
+                }
+            }
 
             MonoScript monoScript = GetMonoScript(target);
             if(monoScript)
@@ -50,20 +76,59 @@ namespace SaintsField.Editor
                 root.Add(objectField);
             }
 
+            SearchableAttribute searchableAttribute = null;
+            foreach (IPlayaClassAttribute playaClassAttribute in playaClassAttributes)
+            {
+                if (playaClassAttribute is SearchableAttribute sa)
+                {
+                    searchableAttribute = sa;
+                    break;
+                }
+            }
+
+            if (searchableAttribute != null)
+            {
+                _toolbarSearchField = new ToolbarSearchField
+                {
+                    style =
+                    {
+                        // flexGrow = 1,
+                        display = DisplayStyle.None,
+                        width = Length.Percent(100),
+                    },
+#if UNITY_6000_0_OR_NEWER
+                    placeholderText = "Search Field Name",
+#endif
+                };
+                root.Add(_toolbarSearchField);
+
+                _toolbarSearchField.RegisterValueChangedCallback(evt =>
+                {
+                    string searchRaw = evt.newValue;
+                    string searchUse = searchRaw.Contains(' ') ? searchRaw : ObjectNames.NicifyVariableName(searchRaw);
+                    OnSearch(searchUse);
+                });
+                DrawHeaderGUI.SaintsEditorEnqueueSearchable(this);
+            }
+
             // Debug.Log($"ser={serializedObject.targetObject}, target={target}");
 
-            IReadOnlyList<ISaintsRenderer> renderers = Setup(Array.Empty<string>(), serializedObject, this, target);
+            IReadOnlyList<ISaintsRenderer> renderers = Setup(Array.Empty<string>(), serializedObject, this, targets);
 
             // Debug.Log($"renderers.Count={renderers.Count}");
+            List<ISaintsRenderer> usedRenderers = new List<ISaintsRenderer>();
             foreach (ISaintsRenderer saintsRenderer in renderers)
             {
                 // Debug.Log($"renderer={saintsRenderer}");
                 VisualElement ve = saintsRenderer.CreateVisualElement();
                 if(ve != null)
                 {
+                    usedRenderers.Add(saintsRenderer);
                     root.Add(ve);
                 }
             }
+
+            _renderersUIToolkit = usedRenderers;
 
             // root.Add(CreateVisualElement(renderers));
 
@@ -71,7 +136,42 @@ namespace SaintsField.Editor
             root.RegisterCallback<AttachToPanelEvent>(_ => AddInstance(this));
             root.RegisterCallback<DetachFromPanelEvent>(_ => RemoveInstance(this));
 #endif
+
+            root.schedule.Execute(DrawHeaderGUI.HelperUpdate).Every(1);
+
+            // ReSharper disable once InvertIf
+            if (_toolbarSearchField != null)
+            {
+                root.focusable = true;
+                root.RegisterCallback<KeyUpEvent>(evt =>
+                {
+                    if(evt.keyCode == KeyCode.F && evt.actionKey)
+                    {
+                        OnHeaderButtonClick();
+                    }
+                }, TrickleDown.TrickleDown);
+            }
+
             return root;
+        }
+
+        private void OnSearchUIToolkit(string search)
+        {
+            foreach (ISaintsRenderer saintsRenderer in _renderersUIToolkit)
+            {
+                saintsRenderer.OnSearchField(search);
+            }
+        }
+
+        private void ResetSearchUIToolkit()
+        {
+            // ReSharper disable once InvertIf
+            if (_toolbarSearchField.parent != null)
+            {
+                _toolbarSearchField.parent.Focus();
+                _toolbarSearchField.value = "";
+            }
+
         }
     }
 }

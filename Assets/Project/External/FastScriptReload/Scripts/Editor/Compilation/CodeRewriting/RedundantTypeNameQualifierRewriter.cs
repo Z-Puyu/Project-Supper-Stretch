@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace FastScriptReload.Editor.Compilation.CodeRewriting
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting
 {
     //ideally we'd use Simplifier but FSR doesn't have access to semantic model on which simplifier works
     
@@ -27,7 +27,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
                 //enclosing type name same as first id node
                 if((idNode.Ancestors().First(n => n is TypeDeclarationSyntax) as TypeDeclarationSyntax)?.Identifier.ToString() == idNode.Identifier.ToString())
                 {
-                    return AddRewriteCommentIfNeeded(
+                    return this.AddRewriteCommentIfNeeded(
                         SyntaxFactory.ParseExpression(node.ToString().Replace($"{firstNode.Identifier.ToString()}.", string.Empty)),
                         $"{nameof(RedundantTypeNameQualifierRewriter)}"
                     );

@@ -55,7 +55,7 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
                 messageType = infoBoxAttribute.MessageType.GetUIToolkitMessageType(),
                 style =
                 {
-                    display = DisplayStyle.Flex,
+                    display = DisplayStyle.None,
                     flexGrow = 1,
                     flexShrink = 0,
                 },
@@ -78,26 +78,16 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
                 showHasError = showError != "";
                 willShow = show;
             }
-
-            if (!willShow)
-            {
-                if (helpBox.style.display != DisplayStyle.None)
-                {
-                    helpBox.style.display = DisplayStyle.None;
-                }
-                return;
-            }
-
             if (!showHasError)
             {
-                UpdateInfoBoxContent(helpBox, infoBoxUserData);
+                UpdateInfoBoxContent(willShow, helpBox, infoBoxUserData);
             }
         }
 
         private static (string error, bool show) UpdateInfoBoxShow(HelpBox helpBox,
             InfoBoxUserData infoBoxUserData)
         {
-            (string showError, object showResult) = Util.GetOfNoParams<object>(infoBoxUserData.FieldWithInfo.Target,
+            (string showError, object showResult) = Util.GetOfNoParams<object>(infoBoxUserData.FieldWithInfo.Targets[0],
                 infoBoxUserData.InfoBoxAttribute.ShowCallback, null);
             if (showError != "")
             {
@@ -119,8 +109,17 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             return ("", willShow);
         }
 
-        private static void UpdateInfoBoxContent(HelpBox helpBox, InfoBoxUserData infoBoxUserData)
+        private static void UpdateInfoBoxContent(bool willShow, HelpBox helpBox, InfoBoxUserData infoBoxUserData)
         {
+            if (!willShow)
+            {
+                if (helpBox.style.display != DisplayStyle.None)
+                {
+                    helpBox.style.display = DisplayStyle.None;
+                }
+                return;
+            }
+
             string xmlContent = ((InfoBoxUserData)helpBox.userData).InfoBoxAttribute.Content;
 
             if (infoBoxUserData.InfoBoxAttribute.IsCallback)
@@ -155,15 +154,24 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
                 }
             }
 
+            // Debug.Log($"{infoBoxUserData.XmlContent} == {xmlContent}: {infoBoxUserData.XmlContent == xmlContent}");
             if (infoBoxUserData.XmlContent == xmlContent)
             {
                 return;
             }
 
-            if (string.IsNullOrEmpty(xmlContent))
+            bool notShow = string.IsNullOrEmpty(xmlContent);
+            DisplayStyle style = notShow
+                ? DisplayStyle.None
+                : DisplayStyle.Flex;
+
+            if (helpBox.style.display != style)
             {
-                helpBox.style.display = DisplayStyle.None;
-                infoBoxUserData.XmlContent = "";
+                helpBox.style.display = style;
+            }
+
+            if (notShow)
+            {
                 return;
             }
 
@@ -172,14 +180,25 @@ namespace SaintsField.Editor.Playa.Renderer.PlayaInfoBoxFakeRenderer
             label.text = "";
             label.style.flexDirection = FlexDirection.Row;
 
-            MemberInfo member = GetMemberInfo(infoBoxUserData.FieldWithInfo);
-            string useLabel = ObjectNames.NicifyVariableName(member.Name);
+            string useLabel;
+            MemberInfo member;
+            if (infoBoxUserData.FieldWithInfo.RenderType == SaintsRenderType.ClassStruct)
+            {
+                member = null;
+                useLabel = ObjectNames.NicifyVariableName(infoBoxUserData.FieldWithInfo.Targets[0].GetType().Name);
+            }
+            else
+            {
+                member = GetMemberInfo(infoBoxUserData.FieldWithInfo);
+                useLabel = ObjectNames.NicifyVariableName(member.Name);
+            }
 
             label.Clear();
             foreach (VisualElement richTextElement in infoBoxUserData.RichTextDrawer.DrawChunksUIToolKit(
-                         RichTextDrawer.ParseRichXml(xmlContent, useLabel, infoBoxUserData.FieldWithInfo.SerializedProperty, member, infoBoxUserData.FieldWithInfo.Target))
+                         RichTextDrawer.ParseRichXml(xmlContent, useLabel, infoBoxUserData.FieldWithInfo.SerializedProperty, member, infoBoxUserData.FieldWithInfo.Targets[0]))
                      )
             {
+
                 label.Add(richTextElement);
             }
         }

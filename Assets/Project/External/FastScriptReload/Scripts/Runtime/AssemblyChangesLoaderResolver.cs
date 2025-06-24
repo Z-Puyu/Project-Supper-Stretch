@@ -1,17 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using ImmersiveVRTools.Runtime.Common.Utilities;
-using UnityEngine;
+﻿#if UNITY_EDITOR || LiveScriptReload_Enabled
 
-#if UNITY_EDITOR || LiveScriptReload_Enabled
-
-namespace FastScriptReload.Runtime
+namespace Project.External.FastScriptReload.Scripts.Runtime
 {
     public class AssemblyChangesLoaderResolver
     {
         private static AssemblyChangesLoaderResolver _instance;
-        public static AssemblyChangesLoaderResolver Instance => _instance ?? (_instance = new AssemblyChangesLoaderResolver());
+        public static AssemblyChangesLoaderResolver Instance => AssemblyChangesLoaderResolver._instance ?? (AssemblyChangesLoaderResolver._instance = new AssemblyChangesLoaderResolver());
 
         private IAssemblyChangesLoader _cachedNetworkLoader;
         

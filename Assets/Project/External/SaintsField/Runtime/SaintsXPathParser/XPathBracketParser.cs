@@ -1,6 +1,5 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using SaintsField.SaintsXPathParser.XPathAttribute;
 using SaintsField.SaintsXPathParser.XPathFilter;

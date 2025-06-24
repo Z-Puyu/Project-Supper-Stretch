@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using SaintsField.Editor.Utils;
 using UnityEditor;
-using UnityEngine;
 
 namespace SaintsField.Editor.Core
 {

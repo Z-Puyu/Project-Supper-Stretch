@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -86,71 +85,6 @@ namespace SaintsField.Editor.Core
             }
 
             return ("", result);
-            // List<Type> types = ReflectUtils.GetSelfAndBaseTypes(target);
-            // types.Reverse();
-            // foreach (Type eachType in types)
-            // {
-            //     (ReflectUtils.GetPropType getPropType, object fieldOrMethodInfo) =
-            //         ReflectUtils.GetProp(eachType, richTextXml);
-            //     switch (getPropType)
-            //     {
-            //         case ReflectUtils.GetPropType.Field:
-            //         {
-            //             object result = ((FieldInfo)fieldOrMethodInfo).GetValue(target);
-            //             return ("", result == null ? string.Empty : result.ToString());
-            //         }
-            //
-            //         case ReflectUtils.GetPropType.Property:
-            //         {
-            //             object result = ((PropertyInfo)fieldOrMethodInfo).GetValue(target);
-            //             return ("", result == null ? string.Empty : result.ToString());
-            //         }
-            //         case ReflectUtils.GetPropType.Method:
-            //         {
-            //             MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
-            //
-            //             int arrayIndex = SerializedUtils.PropertyPathIndex(property.propertyPath);
-            //             object rawValue = fieldInfo.GetValue(target);
-            //             object curValue = arrayIndex == -1 ? rawValue : SerializedUtils.GetValueAtIndex(rawValue, arrayIndex);
-            //             object[] passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
-            //                 ? new[]
-            //                 {
-            //                     curValue,
-            //                 }
-            //                 : new []
-            //                 {
-            //                     curValue,
-            //                     arrayIndex,
-            //                 });
-            //
-            //             try
-            //             {
-            //                 return ("", (string)methodInfo.Invoke(
-            //                     target,
-            //                     passParams
-            //                 ));
-            //             }
-            //             catch (TargetInvocationException e)
-            //             {
-            //                 Debug.LogException(e);
-            //                 Debug.Assert(e.InnerException != null);
-            //                 return (e.InnerException.Message, property.displayName);
-            //             }
-            //             catch (Exception e)
-            //             {
-            //                 // _error = e.Message;
-            //                 Debug.LogException(e);
-            //                 return (e.Message, property.displayName);
-            //             }
-            //         }
-            //         case ReflectUtils.GetPropType.NotFound:
-            //             continue;
-            //         default:
-            //             throw new ArgumentOutOfRangeException(nameof(getPropType), getPropType, null);
-            //     }
-            // }
-            //
-            // return ($"not found `{richTextXml}` on `{target}`", property.displayName);
         }
 
         public struct RichTextChunk: IEquatable<RichTextChunk>
@@ -187,6 +121,7 @@ namespace SaintsField.Editor.Core
 
         // NOTE: Unity rich text is NOT xml; This is not Unity rich text as
         // Unity will treat invalid rich text as plain text. This will try to fix the broken xml
+        // TODO: use RuntimeUil.ParseRichXml parser
         public static IEnumerable<RichTextChunk> ParseRichXml(string richXml, string labelText, SerializedProperty property, MemberInfo fieldInfo, object parent)
         {
             List<string> colors = new List<string>();
@@ -387,30 +322,45 @@ namespace SaintsField.Editor.Core
 
                                     if (!hasError)
                                     {
-                                        string tagFinalResult;
+                                        string tagFinalResult = $"{finalValue}";
                                         if (RuntimeUtil.IsNull(finalValue))
                                         {
                                             tagFinalResult = "";
                                         }
                                         else if (string.IsNullOrEmpty(parsedResult.value))
                                         {
-                                            tagFinalResult = $"{finalValue}";
+                                            // tagFinalResult = $"{finalValue}";
                                         }
                                         else
                                         {
-                                            string formatString = $"{{0:{parsedResult.value}}}";
-                                            try
+                                            bool binaryFormatted = false;
+                                            if (parsedResult.value.StartsWith("B"))
                                             {
-                                                tagFinalResult = string.Format(formatString, finalValue);
+                                                string binaryFormatResult = Util.FormatBinary(parsedResult.value, finalValue);
+                                                // Debug.Log($"{parsedResult.value}/{finalValue}/{binaryFormatResult}");
+                                                binaryFormatted = binaryFormatResult != "";
+                                                if (binaryFormatted)
+                                                {
+                                                    tagFinalResult = binaryFormatResult;
+                                                }
                                             }
-#pragma warning disable CS0168
-                                            catch (Exception ex)
-#pragma warning restore CS0168
+
+                                            if(!binaryFormatted)
                                             {
+                                                string formatString = $"{{0:{parsedResult.value}}}";
+                                                try
+                                                {
+                                                    tagFinalResult = string.Format(formatString, finalValue);
+                                                }
+#pragma warning disable CS0168
+                                                catch (Exception ex)
+#pragma warning restore CS0168
+                                                {
 #if SAINTSFIELD_DEBUG
-                                                Debug.LogException(ex);
+                                                    // Debug.LogException(ex);
 #endif
-                                                tagFinalResult = $"{finalValue}";
+                                                    tagFinalResult = $"{finalValue}";
+                                                }
                                             }
                                         }
                                         richText.Append(tagFinalResult);

@@ -9,8 +9,9 @@ using UnityEditor;
 
 namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 {
-
-
+#if ODIN_INSPECTOR
+    [Sirenix.OdinInspector.Editor.DrawerPriority(Sirenix.OdinInspector.Editor.DrawerPriorityLevel.AttributePriority)]
+#endif
     [CustomPropertyDrawer(typeof(AdvancedDropdownAttribute), true)]
     public partial class AdvancedDropdownAttributeDrawer: SaintsPropertyDrawer
     {
@@ -149,12 +150,6 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 {
                     error = $"{funcName} return value is not a AdvancedDropdownList";
                 }
-
-                // dropdownListValue = getOfDropdownListValue;
-                // (string getOfError, IAdvancedDropdownList getOfDropdownListValue) =
-                //     Util.GetOf<IAdvancedDropdownList>(funcName, null, property, field, parentObj);
-                // error = getOfError;
-                // dropdownListValue = getOfDropdownListValue;
             }
             if(dropdownListValue == null || error != "")
             {

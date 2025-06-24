@@ -2,7 +2,6 @@
 using Obvious.Soap;
 #endif
 using SaintsField.Samples.Scripts.SaintsEditor;
-using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
 {

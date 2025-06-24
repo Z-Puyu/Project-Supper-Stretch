@@ -1,0 +1,203 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef7f45ecd88948f4ae10e9e974de65b7, type: 3}
+  m_Name: CharacterAttributes
+  m_EditorClassIdentifier: 
+  <Namespace>k__BackingField: CharacterAttributes
+  <Nodes>k__BackingField:
+  - rid: 1548064550727712886
+  - rid: 1548064550727712889
+  - rid: 1548064550727712890
+  - rid: 1548064550727712891
+  - rid: 1548064550727712892
+  - rid: 1548064550727712893
+  references:
+    version: 2
+    RefIds:
+    - rid: 1548064550727712886
+      type: {class: AttributeType, ns: Project.Scripts.AttributeSystem.Attributes.Definitions, asm: Project.Scripts.AttributeSystem}
+      data:
+        <Namespace>k__BackingField: CharacterAttributes
+        <Path>k__BackingField: Health
+        <Tag>k__BackingField: Health
+        <SubAttributes>k__BackingField: []
+        <HowToClamp>k__BackingField: 1
+        <Cap>k__BackingField: CharacterAttributes.MaxHealth
+        <MaxValue>k__BackingField: 0
+        <AllowNegative>k__BackingField: 0
+    - rid: 1548064550727712889
+      type: {class: AttributeType, ns: Project.Scripts.AttributeSystem.Attributes.Definitions, asm: Project.Scripts.AttributeSystem}
+      data:
+        <Namespace>k__BackingField: CharacterAttributes
+        <Path>k__BackingField: MaxHealth
+        <Tag>k__BackingField: MaxHealth
+        <SubAttributes>k__BackingField: []
+        <HowToClamp>k__BackingField: 0
+        <Cap>k__BackingField: 
+        <MaxValue>k__BackingField: 0
+        <AllowNegative>k__BackingField: 0
+    - rid: 1548064550727712890
+      type: {class: AttributeType, ns: Project.Scripts.AttributeSystem.Attributes.Definitions, asm: Project.Scripts.AttributeSystem}
+      data:
+        <Namespace>k__BackingField: CharacterAttributes
+        <Path>k__BackingField: Satiation
+        <Tag>k__BackingField: Satiation
+        <SubAttributes>k__BackingField: []
+        <HowToClamp>k__BackingField: 2
+        <Cap>k__BackingField: 
+        <MaxValue>k__BackingField: 100
+        <AllowNegative>k__BackingField: 0
+    - rid: 1548064550727712891
+      type: {class: AttributeType, ns: Project.Scripts.AttributeSystem.Attributes.Definitions, asm: Project.Scripts.AttributeSystem}
+      data:
+        <Namespace>k__BackingField: CharacterAttributes
+        <Path>k__BackingField: Damage
+        <Tag>k__BackingField: Damage
+        <SubAttributes>k__BackingField:
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: Damage.Physical
+          <Tag>k__BackingField: Physical
+          <SubAttributes>k__BackingField: []
+          <HowToClamp>k__BackingField: 0
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 0
+          <AllowNegative>k__BackingField: 0
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: Damage.Elemental
+          <Tag>k__BackingField: Elemental
+          <SubAttributes>k__BackingField:
+          - <Namespace>k__BackingField: CharacterAttributes
+            <Path>k__BackingField: Damage.Elemental.Fire
+            <Tag>k__BackingField: Fire
+            <SubAttributes>k__BackingField: []
+            <HowToClamp>k__BackingField: 0
+            <Cap>k__BackingField: 
+            <MaxValue>k__BackingField: 0
+            <AllowNegative>k__BackingField: 0
+          - <Namespace>k__BackingField: CharacterAttributes
+            <Path>k__BackingField: Damage.Elemental.Ice
+            <Tag>k__BackingField: Ice
+            <SubAttributes>k__BackingField: []
+            <HowToClamp>k__BackingField: 0
+            <Cap>k__BackingField: 
+            <MaxValue>k__BackingField: 0
+            <AllowNegative>k__BackingField: 0
+          - <Namespace>k__BackingField: CharacterAttributes
+            <Path>k__BackingField: Damage.Elemental.Lightning
+            <Tag>k__BackingField: Lightning
+            <SubAttributes>k__BackingField: []
+            <HowToClamp>k__BackingField: 0
+            <Cap>k__BackingField: 
+            <MaxValue>k__BackingField: 0
+            <AllowNegative>k__BackingField: 0
+          - <Namespace>k__BackingField: CharacterAttributes
+            <Path>k__BackingField: Damage.Elemental.Poison
+            <Tag>k__BackingField: Poison
+            <SubAttributes>k__BackingField: []
+            <HowToClamp>k__BackingField: 0
+            <Cap>k__BackingField: 
+            <MaxValue>k__BackingField: 0
+            <AllowNegative>k__BackingField: 0
+          - <Namespace>k__BackingField: CharacterAttributes
+            <Path>k__BackingField: Damage.Elemental.Divine
+            <Tag>k__BackingField: Divine
+            <SubAttributes>k__BackingField: []
+            <HowToClamp>k__BackingField: 0
+            <Cap>k__BackingField: 
+            <MaxValue>k__BackingField: 0
+            <AllowNegative>k__BackingField: 0
+          - <Namespace>k__BackingField: CharacterAttributes
+            <Path>k__BackingField: Damage.Elemental.Dark
+            <Tag>k__BackingField: Dark
+            <SubAttributes>k__BackingField: []
+            <HowToClamp>k__BackingField: 0
+            <Cap>k__BackingField: 
+            <MaxValue>k__BackingField: 0
+            <AllowNegative>k__BackingField: 0
+          <HowToClamp>k__BackingField: 0
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 0
+          <AllowNegative>k__BackingField: 0
+        <HowToClamp>k__BackingField: 0
+        <Cap>k__BackingField: 
+        <MaxValue>k__BackingField: 0
+        <AllowNegative>k__BackingField: 0
+    - rid: 1548064550727712892
+      type: {class: AttributeType, ns: Project.Scripts.AttributeSystem.Attributes.Definitions, asm: Project.Scripts.AttributeSystem}
+      data:
+        <Namespace>k__BackingField: CharacterAttributes
+        <Path>k__BackingField: Defence
+        <Tag>k__BackingField: Defence
+        <SubAttributes>k__BackingField: []
+        <HowToClamp>k__BackingField: 0
+        <Cap>k__BackingField: 
+        <MaxValue>k__BackingField: 0
+        <AllowNegative>k__BackingField: 0
+    - rid: 1548064550727712893
+      type: {class: AttributeType, ns: Project.Scripts.AttributeSystem.Attributes.Definitions, asm: Project.Scripts.AttributeSystem}
+      data:
+        <Namespace>k__BackingField: CharacterAttributes
+        <Path>k__BackingField: ElementalResistance
+        <Tag>k__BackingField: ElementalResistance
+        <SubAttributes>k__BackingField:
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: ElementalResistance.Fire
+          <Tag>k__BackingField: Fire
+          <SubAttributes>k__BackingField: []
+          <HowToClamp>k__BackingField: 2
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 100
+          <AllowNegative>k__BackingField: 1
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: ElementalResistance.Ice
+          <Tag>k__BackingField: Ice
+          <SubAttributes>k__BackingField: []
+          <HowToClamp>k__BackingField: 2
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 100
+          <AllowNegative>k__BackingField: 1
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: ElementalResistance.Lightning
+          <Tag>k__BackingField: Lightning
+          <SubAttributes>k__BackingField: []
+          <HowToClamp>k__BackingField: 2
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 100
+          <AllowNegative>k__BackingField: 1
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: ElementalResistance.Poison
+          <Tag>k__BackingField: Poison
+          <SubAttributes>k__BackingField: []
+          <HowToClamp>k__BackingField: 2
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 100
+          <AllowNegative>k__BackingField: 1
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: ElementalResistance.Divine
+          <Tag>k__BackingField: Divine
+          <SubAttributes>k__BackingField: []
+          <HowToClamp>k__BackingField: 2
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 100
+          <AllowNegative>k__BackingField: 1
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: ElementalResistance.Dark
+          <Tag>k__BackingField: Dark
+          <SubAttributes>k__BackingField: []
+          <HowToClamp>k__BackingField: 2
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 100
+          <AllowNegative>k__BackingField: 1
+        <HowToClamp>k__BackingField: 0
+        <Cap>k__BackingField: 
+        <MaxValue>k__BackingField: 0
+        <AllowNegative>k__BackingField: 1

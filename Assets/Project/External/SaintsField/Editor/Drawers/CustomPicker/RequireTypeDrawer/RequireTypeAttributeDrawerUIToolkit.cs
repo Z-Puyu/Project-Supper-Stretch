@@ -161,6 +161,10 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
             SaintsObjectPickerWindowUIToolkit objectPickerWindowUIToolkit = ScriptableObject.CreateInstance<SaintsObjectPickerWindowUIToolkit>();
             // objectPickerWindowUIToolkit.ResetClose();
             objectPickerWindowUIToolkit.titleContent = new GUIContent($"Select {fieldType} with {string.Join(", ", requireTypeAttribute.RequiredTypes)}");
+            (string __, int _, object curValue) = Util.GetValue(property, info, parent);
+            Object curValueObj = curValue as Object;
+            bool curValueObjIsNull = RuntimeUtil.IsNull(curValueObj);
+
             if(_useCache)
             {
                 objectPickerWindowUIToolkit.AssetsObjects =
@@ -199,6 +203,21 @@ namespace SaintsField.Editor.Drawers.CustomPicker.RequireTypeDrawer
             });
 
             objectPickerWindowUIToolkit.ShowAuxWindow();
+            if (curValueObjIsNull)
+            {
+                objectPickerWindowUIToolkit.SetInitDetailPanel(SaintsObjectPickerWindowUIToolkit.NoneObjectInfo);
+            }
+            else
+            {
+                objectPickerWindowUIToolkit.SetInitDetailPanel(new SaintsObjectPickerWindowUIToolkit.ObjectBaseInfo(
+                    curValueObj,
+                    // ReSharper disable once PossibleNullReferenceException
+                    curValueObj.name,
+                    curValueObj.GetType().Name,
+                    AssetDatabase.GetAssetPath(curValueObj)
+                ));
+            }
+
             objectPickerWindowUIToolkit.RefreshDisplay();
             if(_useCache)
             {

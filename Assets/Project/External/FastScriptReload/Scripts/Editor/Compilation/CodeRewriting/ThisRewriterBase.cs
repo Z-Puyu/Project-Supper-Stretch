@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace FastScriptReload.Editor.Compilation.CodeRewriting
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting
 {
     abstract class ThisRewriterBase : FastScriptReloadCodeRewriterBase
     {
@@ -45,7 +45,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
                 )
             );
 
-            return AddRewriteCommentIfNeeded(resultNode, $"{nameof(ThisRewriterBase)}:{nameof(CreateCastedThisExpression)}");
+            return this.AddRewriteCommentIfNeeded(resultNode, $"{nameof(ThisRewriterBase)}:{nameof(this.CreateCastedThisExpression)}");
         }
     }
 }

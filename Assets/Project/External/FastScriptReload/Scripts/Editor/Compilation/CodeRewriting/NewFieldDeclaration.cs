@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace FastScriptReload.Editor.Compilation.CodeRewriting
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting
 {
     public class NewFieldDeclaration
     {
@@ -10,9 +10,9 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 
         public NewFieldDeclaration(string fieldName, string typeName, FieldDeclarationSyntax fieldDeclarationSyntax)
         {
-            FieldName = fieldName;
-            TypeName = typeName;
-            FieldDeclarationSyntax = fieldDeclarationSyntax;
+            this.FieldName = fieldName;
+            this.TypeName = typeName;
+            this.FieldDeclarationSyntax = fieldDeclarationSyntax;
         }
     }
 }

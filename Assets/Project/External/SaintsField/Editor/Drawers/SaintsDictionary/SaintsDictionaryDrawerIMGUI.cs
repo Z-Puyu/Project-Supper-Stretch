@@ -10,7 +10,6 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.Events;
-using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.SaintsDictionary
 {
@@ -716,7 +715,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
             if (!string.IsNullOrEmpty(cachedInfo.KeySearch) || !string.IsNullOrEmpty(cachedInfo.ValueSearch))
             {
-                refreshedHitTargetIndexes = Search(cachedInfo.KeysProp, cachedInfo.ValuesProp, cachedInfo.KeySearch, cachedInfo.ValueSearch);
+                refreshedHitTargetIndexes = Search(cachedInfo.KeysProp, cachedInfo.ValuesProp, cachedInfo.KeySearch, cachedInfo.ValueSearch).Where(each => each != -1).ToList();
             }
 
             if (cachedInfo.NumberOfItemsPerPage > 0)

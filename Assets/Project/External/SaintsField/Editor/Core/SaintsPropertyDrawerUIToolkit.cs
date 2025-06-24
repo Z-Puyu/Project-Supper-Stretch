@@ -9,13 +9,11 @@ using SaintsField.Editor.Drawers.RichLabelDrawer;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
 using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
-using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 // #if SAINTSFIELD_OBVIOUS_SOAP
@@ -54,6 +52,7 @@ namespace SaintsField.Editor.Core
 
         // public IReadOnlyList<(ISaintsAttribute Attribute, SaintsPropertyDrawer Drawer)> AppendSaintsAttributeDrawer;
         public IReadOnlyList<PropertyAttribute> AppendPropertyAttributes = null;
+        public IReadOnlyList<PropertyAttribute> OverridePropertyAttributes = null;
 
         protected List<SaintsPropertyInfo> SaintsPropertyDrawers;
 
@@ -87,9 +86,17 @@ namespace SaintsField.Editor.Core
             };
 
             (PropertyAttribute[] allAttributesRaw, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(property);
-            PropertyAttribute[] allAttributes = AppendPropertyAttributes == null
-                ? allAttributesRaw
-                : allAttributesRaw.Concat(AppendPropertyAttributes).ToArray();
+            PropertyAttribute[] allAttributes;
+            if (OverridePropertyAttributes != null)
+            {
+                allAttributes = OverridePropertyAttributes.ToArray();
+            }
+            else
+            {
+                allAttributes = AppendPropertyAttributes == null
+                    ? allAttributesRaw
+                    : allAttributesRaw.Concat(AppendPropertyAttributes).ToArray();
+            }
 
             ISaintsAttribute[] iSaintsAttributes = allAttributes.OfType<ISaintsAttribute>().ToArray();
             // Debug.Assert(iSaintsAttributes.Length > 0, property.propertyPath);
@@ -622,7 +629,9 @@ namespace SaintsField.Editor.Core
 #if UNITY_2021_3_OR_NEWER // && !SAINTSFIELD_UI_TOOLKIT_DISABLE
         protected VisualElement UnityFallbackUIToolkit(FieldInfo info, SerializedProperty property, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement containerElement, string passedPreferredLabel, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, object parent)
         {
-            (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property);
+            (Attribute attrOrNull, Type drawerType) = GetFallbackDrawerType(info, property, allAttributes);
+
+            // Debug.Log($"attrOrNull={attrOrNull}; drawerType={drawerType}; allAttribute={string.Join(", ", allAttributes)}");
 
             if (drawerType == null)
             {
@@ -638,8 +647,12 @@ namespace SaintsField.Editor.Core
             // return PropertyFieldFallbackUIToolkit(property);
 
             PropertyDrawer typeDrawer = MakePropertyDrawer(drawerType, info, attrOrNull, passedPreferredLabel);
+            if (typeDrawer is SaintsPropertyDrawer spd)
+            {
+                spd.InHorizontalLayout = InHorizontalLayout;
+            }
 
-            VisualElement element = DrawUsingDrawerInstance(drawerType, typeDrawer, property, info,
+            VisualElement element = DrawUsingDrawerInstance(passedPreferredLabel, drawerType, typeDrawer, property, info,
                 saintsPropertyDrawers, containerElement);
             // ReSharper disable once InvertIf
             if (element != null)
@@ -651,7 +664,7 @@ namespace SaintsField.Editor.Core
         }
 #endif
 
-        private static VisualElement DrawUsingDrawerInstance(Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement)
+        private static VisualElement DrawUsingDrawerInstance(string passedLabel, Type drawerType, PropertyDrawer drawerInstance, SerializedProperty property, FieldInfo info, IReadOnlyList<SaintsPropertyInfo> saintsPropertyDrawers, VisualElement containerElement)
         {
             Debug.Assert(drawerType != null);
             if (drawerInstance == null)
@@ -664,7 +677,7 @@ namespace SaintsField.Editor.Core
             if(uiToolkitMethod == null || uiToolkitMethod.DeclaringType == typeof(PropertyDrawer))  // null: old Unity || did not override
             {
 #if UNITY_6000_0_OR_NEWER
-                return PropertyFieldFallbackUIToolkit(property);
+                return PropertyFieldFallbackUIToolkit(property, passedLabel);
 #else
 
                 Action<object> onValueChangedCallback = null;
@@ -685,6 +698,8 @@ namespace SaintsField.Editor.Core
                             onValueChangedCallback,
                             value);
                     }
+
+                    SaintsEditorApplicationChanged.OnAnyEvent.Invoke();
                 };
 
                 // This breaks: AYellowPaper SerializedDictionary
@@ -765,7 +780,7 @@ namespace SaintsField.Editor.Core
 
 
                 // This works fine with: AYellowPaper.SerializedDictionary, Wwise.Event, I2Language.LocalizedString
-                IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(property.displayName);
+                IMGUILabelHelper imguiLabelHelper = new IMGUILabelHelper(passedLabel);
 
                 IMGUIContainer imGuiContainer = new IMGUIContainer(() =>
                 {
@@ -805,8 +820,11 @@ namespace SaintsField.Editor.Core
                         using(new InsideSaintsFieldScoop(SubGetHeightCounter, InsideSaintsFieldScoop.MakeKey(property)))
                         {
                             // Debug.Log($"Fall {property.propertyPath}");
+                            // This works with Wwise.Bank/Event in list; not work with AYellowPaper.SerializedDictionary
                             // EditorGUILayout.PropertyField(property, label, true);
                             // Debug.Log($"Fall Done {property.propertyPath}");
+
+                            // This not work with Wwise.Bank/Event in list; But for other situation it works just fine
                             float height = drawerInstance.GetPropertyHeight(property, label);
                             Rect rect = EditorGUILayout.GetControlRect(true, height, GUILayout.ExpandWidth(true));
                             drawerInstance.OnGUI(rect, property, label);
@@ -871,7 +889,7 @@ namespace SaintsField.Editor.Core
             IReadOnlyList<PropertyAttribute> allAttributes, bool manuallyWatch)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_DRAW_PROCESS_CORE
-            Debug.Log($"On Awake {property.propertyPath}: {string.Join(",", saintsPropertyDrawers.Select(each => each.Attribute.GetType().Name))}");
+            Debug.Log($"On Awake {property.propertyPath}: {string.Join(",", saintsPropertyDrawers.Select(each => each.Attribute?.GetType().Name))}");
 #endif
             try
             {
@@ -905,6 +923,7 @@ namespace SaintsField.Editor.Core
                         onValueChangedCallback,
                         obj);
                 }
+                SaintsEditorApplicationChanged.OnAnyEvent.Invoke();
             };
 
             PropertyField fallbackField = containerElement.Q<PropertyField>(name: UIToolkitFallbackName(property));
@@ -987,6 +1006,11 @@ namespace SaintsField.Editor.Core
                 {
                     containerElement.TrackPropertyValue(property, _ =>
                     {
+                        if (!SerializedUtils.IsOk(property))
+                        {
+                            return;
+                        }
+
                         object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
                         if (noCacheParent == null)
                         {
@@ -1127,6 +1151,7 @@ namespace SaintsField.Editor.Core
                 Debug.Log($"remove old tracker main: {trackerMain}");
 #endif
                 trackerMain.RemoveFromHierarchy();
+                UIToolkitUtils.Unbind(trackerMain, property.serializedObject);
             }
             // if (trackerMain == null)
             {
@@ -1242,6 +1267,7 @@ namespace SaintsField.Editor.Core
 #endif
                     // continue;
                     subTracker.RemoveFromHierarchy();
+                    UIToolkitUtils.Unbind(subTracker, watchSubProperty.serializedObject);
                 }
 
                 subTracker = new VisualElement
@@ -1366,7 +1392,7 @@ namespace SaintsField.Editor.Core
 
         private static StyleSheet GetNoDecoratorUss()
         {
-            if (_noDecoratorDrawer == null)
+            if (!_noDecoratorDrawer)
             {
                 _noDecoratorDrawer = Util.LoadResource<StyleSheet>(UIToolkitUtils.NoDecoratorDrawerUssFile);
             }
@@ -1374,10 +1400,10 @@ namespace SaintsField.Editor.Core
             return _noDecoratorDrawer;
         }
 
-        protected static PropertyField PropertyFieldFallbackUIToolkit(SerializedProperty property)
+        protected static PropertyField PropertyFieldFallbackUIToolkit(SerializedProperty property, string label)
         {
             // PropertyField propertyField = new PropertyField(property, new string(' ', property.displayName.Length))
-            PropertyField propertyField = new PropertyField(property)
+            PropertyField propertyField = new PropertyField(property, label)
             {
                 style =
                 {

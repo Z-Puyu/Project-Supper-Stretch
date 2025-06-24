@@ -11,9 +11,8 @@ using ImmersiveVRTools.Runtime.Common;
 using ImmersiveVRTools.Runtime.Common.Extensions;
 using ImmersiveVrToolsCommon.Runtime.Logging;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
-namespace FastScriptReload.Runtime
+namespace Project.External.FastScriptReload.Scripts.Runtime
 {
     [PreventHotReload]
 #if UNITY_EDITOR
@@ -43,7 +42,7 @@ namespace FastScriptReload.Runtime
         }; //TODO: move out and possibly define a way to exclude all non-client created code? as this will crash editor
         
         private static AssemblyChangesLoader _instance;
-        public static AssemblyChangesLoader Instance => _instance ?? (_instance = new AssemblyChangesLoader());
+        public static AssemblyChangesLoader Instance => AssemblyChangesLoader._instance ?? (AssemblyChangesLoader._instance = new AssemblyChangesLoader());
 
         private Dictionary<Type, Type> _existingTypeToRedirectedType = new Dictionary<Type, Type>();
 
@@ -68,25 +67,25 @@ namespace FastScriptReload.Runtime
                         continue;
                     }
                     
-                    var createdTypeNameWithoutPatchedPostfix = RemoveClassPostfix(createdType.FullName);
+                    var createdTypeNameWithoutPatchedPostfix = AssemblyChangesLoader.RemoveClassPostfix(createdType.FullName);
                     if (ProjectTypeCache.AllTypesInNonDynamicGeneratedAssemblies.TryGetValue(createdTypeNameWithoutPatchedPostfix, out var matchingTypeInExistingAssemblies))
                     {
-                        _existingTypeToRedirectedType[matchingTypeInExistingAssemblies] = createdType;
+                        this._existingTypeToRedirectedType[matchingTypeInExistingAssemblies] = createdType;
                         
                         if (!editorOptions.IsDidFieldsOrPropertyCountChangedCheckDisabled 
                             && !editorOptions.EnableExperimentalAddedFieldsSupport
-                            && DidFieldsOrPropertyCountChanged(createdType,  matchingTypeInExistingAssemblies))
+                            && AssemblyChangesLoader.DidFieldsOrPropertyCountChanged(createdType,  matchingTypeInExistingAssemblies))
                         {
                             continue;
                         }
 
-                        var allDeclaredMethodsInExistingType = matchingTypeInExistingAssemblies.GetMethods(ALL_DECLARED_METHODS_BINDING_FLAGS)
-                            .Where(m => !ExcludeMethodsDefinedOnTypes.Contains(m.DeclaringType))
+                        var allDeclaredMethodsInExistingType = matchingTypeInExistingAssemblies.GetMethods(AssemblyChangesLoader.ALL_DECLARED_METHODS_BINDING_FLAGS)
+                            .Where(m => !AssemblyChangesLoader.ExcludeMethodsDefinedOnTypes.Contains(m.DeclaringType))
                             .ToList();
-                        foreach (var createdTypeMethodToUpdate in createdType.GetMethods(ALL_DECLARED_METHODS_BINDING_FLAGS)
-                                     .Where(m => !ExcludeMethodsDefinedOnTypes.Contains(m.DeclaringType)))
+                        foreach (var createdTypeMethodToUpdate in createdType.GetMethods(AssemblyChangesLoader.ALL_DECLARED_METHODS_BINDING_FLAGS)
+                                     .Where(m => !AssemblyChangesLoader.ExcludeMethodsDefinedOnTypes.Contains(m.DeclaringType)))
                         {
-                            var createdTypeMethodToUpdateFullDescriptionWithoutPatchedClassPostfix = RemoveClassPostfix(createdTypeMethodToUpdate.FullDescription());
+                            var createdTypeMethodToUpdateFullDescriptionWithoutPatchedClassPostfix = AssemblyChangesLoader.RemoveClassPostfix(createdTypeMethodToUpdate.FullDescription());
                             var matchingMethodInExistingType = allDeclaredMethodsInExistingType
                                 .SingleOrDefault(m => m.FullDescription() == createdTypeMethodToUpdateFullDescriptionWithoutPatchedClassPostfix);
                             if (matchingMethodInExistingType != null)
@@ -116,14 +115,14 @@ namespace FastScriptReload.Runtime
                             }
                         }
                         
-                        FindAndExecuteStaticOnScriptHotReloadNoInstance(createdType);
-                        FindAndExecuteOnScriptHotReload(matchingTypeInExistingAssemblies, createdType);
+                        AssemblyChangesLoader.FindAndExecuteStaticOnScriptHotReloadNoInstance(createdType);
+                        AssemblyChangesLoader.FindAndExecuteOnScriptHotReload(matchingTypeInExistingAssemblies, createdType);
                     }
                     else
                     {
                         LoggerScoped.LogWarning($"FSR: Unable to find existing type for: '{createdType.FullName}', this is not an issue if you added new type. <color=orange>If it's an existing type please do a full domain-reload - one of optimisations is to cache existing types for later lookup on first call.</color>");
-                        FindAndExecuteStaticOnScriptHotReloadNoInstance(createdType);
-                        FindAndExecuteOnScriptHotReload(createdType, createdType);
+                        AssemblyChangesLoader.FindAndExecuteStaticOnScriptHotReloadNoInstance(createdType);
+                        AssemblyChangesLoader.FindAndExecuteOnScriptHotReload(createdType, createdType);
                     }
                 }
                 
@@ -137,13 +136,13 @@ namespace FastScriptReload.Runtime
         
         public Type GetRedirectedType(Type forExistingType)
         {
-            return _existingTypeToRedirectedType[forExistingType];
+            return this._existingTypeToRedirectedType[forExistingType];
         }
 
         private static bool DidFieldsOrPropertyCountChanged(Type createdType, Type matchingTypeInExistingAssemblies)
         {
-            var createdTypeFieldAndProperties = createdType.GetFields(ALL_BINDING_FLAGS).Concat(createdType.GetProperties(ALL_BINDING_FLAGS).Cast<MemberInfo>()).ToList();
-            var matchingTypeFieldAndProperties = matchingTypeInExistingAssemblies.GetFields(ALL_BINDING_FLAGS).Concat(matchingTypeInExistingAssemblies.GetProperties(ALL_BINDING_FLAGS).Cast<MemberInfo>()).ToList();
+            var createdTypeFieldAndProperties = createdType.GetFields(AssemblyChangesLoader.ALL_BINDING_FLAGS).Concat(createdType.GetProperties(AssemblyChangesLoader.ALL_BINDING_FLAGS).Cast<MemberInfo>()).ToList();
+            var matchingTypeFieldAndProperties = matchingTypeInExistingAssemblies.GetFields(AssemblyChangesLoader.ALL_BINDING_FLAGS).Concat(matchingTypeInExistingAssemblies.GetProperties(AssemblyChangesLoader.ALL_BINDING_FLAGS).Cast<MemberInfo>()).ToList();
             if (createdTypeFieldAndProperties.Count != matchingTypeFieldAndProperties.Count)
             {
                 var addedMemberNames = createdTypeFieldAndProperties.Select(m => m.Name).Except(matchingTypeFieldAndProperties.Select(m => m.Name)).ToList();
@@ -161,7 +160,7 @@ namespace FastScriptReload.Runtime
 
         private static void FindAndExecuteStaticOnScriptHotReloadNoInstance(Type createdType)
         {
-            var onScriptHotReloadStaticFnForType = createdType.GetMethod(ON_HOT_RELOAD_NO_INSTANCE_STATIC_METHOD_NAME,
+            var onScriptHotReloadStaticFnForType = createdType.GetMethod(AssemblyChangesLoader.ON_HOT_RELOAD_NO_INSTANCE_STATIC_METHOD_NAME,
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
             if (onScriptHotReloadStaticFnForType != null)
             {
@@ -174,10 +173,10 @@ namespace FastScriptReload.Runtime
 
         private static void FindAndExecuteOnScriptHotReload(Type originalType, Type detourType)
         {
-            var onScriptHotReloadFnForType = originalType.GetMethod(ON_HOT_RELOAD_METHOD_NAME, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var onScriptHotReloadFnForType = originalType.GetMethod(AssemblyChangesLoader.ON_HOT_RELOAD_METHOD_NAME, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             if (onScriptHotReloadFnForType != null)
             {
-                ExecuteFnOnMainThread(originalType, onScriptHotReloadFnForType);
+                AssemblyChangesLoader.ExecuteFnOnMainThread(originalType, onScriptHotReloadFnForType);
             }
             else
             { 
@@ -185,19 +184,19 @@ namespace FastScriptReload.Runtime
                 //creating dynamic method and dotouring that solves the issue
                 //On some 2020 Unity versions, eg 2020.3.27f DynamicMethod can not be resolved. Using reflection to ensure it can be compiled and potentially run if methods exist
                 
-                var onScriptHotReloadFnForCreatedType = detourType.GetMethod(ON_HOT_RELOAD_METHOD_NAME, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var onScriptHotReloadFnForCreatedType = detourType.GetMethod(AssemblyChangesLoader.ON_HOT_RELOAD_METHOD_NAME, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 if (onScriptHotReloadFnForCreatedType != null)
                 {
                     //PERF: could potentially cache, negligible overhead
                     var dynamicMethodType = Type.GetType("System.Reflection.Emit.DynamicMethod");
                     if (dynamicMethodType == null)
                     {
-                        LoggerScoped.LogWarning($"Unable to find DynamicMethod, added {ON_HOT_RELOAD_METHOD_NAME} won't be called. Make sure to add method before initial compilation.");
+                        LoggerScoped.LogWarning($"Unable to find DynamicMethod, added {AssemblyChangesLoader.ON_HOT_RELOAD_METHOD_NAME} won't be called. Make sure to add method before initial compilation.");
                         return;
                     }
                     
                     var dynamicMethodCtor = dynamicMethodType.GetConstructor(new Type[] { typeof(string), typeof(Type), typeof(Type[]) });
-                    var dynamicMethodDynamicallyAdded = (MethodInfo)dynamicMethodCtor.Invoke(new object[] { ON_HOT_RELOAD_METHOD_NAME + "_DynamicallyAdded", typeof(void), new Type[] { } });
+                    var dynamicMethodDynamicallyAdded = (MethodInfo)dynamicMethodCtor.Invoke(new object[] { AssemblyChangesLoader.ON_HOT_RELOAD_METHOD_NAME + "_DynamicallyAdded", typeof(void), new Type[] { } });
                 
                     var getILGeneratorMethod = dynamicMethodType.GetMethod("GetILGenerator", new Type[] { });
                     var gen = getILGeneratorMethod.Invoke(dynamicMethodDynamicallyAdded, new object[]{ });
@@ -207,7 +206,7 @@ namespace FastScriptReload.Runtime
                     
                     Memory.DetourMethod(dynamicMethodDynamicallyAdded, onScriptHotReloadFnForCreatedType);
 
-                    ExecuteFnOnMainThread(originalType, dynamicMethodDynamicallyAdded);
+                    AssemblyChangesLoader.ExecuteFnOnMainThread(originalType, dynamicMethodDynamicallyAdded);
                 }
             }
         }
@@ -218,7 +217,7 @@ namespace FastScriptReload.Runtime
             {
                 if (!typeof(MonoBehaviour).IsAssignableFrom(originalType))
                 {
-                    LoggerScoped.LogWarning($"Type: {originalType.Name} is not {nameof(MonoBehaviour)}, {ON_HOT_RELOAD_METHOD_NAME} method can't be executed. You can still use static version: {ON_HOT_RELOAD_NO_INSTANCE_STATIC_METHOD_NAME}");
+                    LoggerScoped.LogWarning($"Type: {originalType.Name} is not {nameof(MonoBehaviour)}, {AssemblyChangesLoader.ON_HOT_RELOAD_METHOD_NAME} method can't be executed. You can still use static version: {AssemblyChangesLoader.ON_HOT_RELOAD_NO_INSTANCE_STATIC_METHOD_NAME}");
                     return;
                 }
 
@@ -231,7 +230,7 @@ namespace FastScriptReload.Runtime
 
         private static string RemoveClassPostfix(string fqdn)
         {
-            return fqdn.Replace(ClassnamePatchedPostfix, string.Empty);
+            return fqdn.Replace(AssemblyChangesLoader.ClassnamePatchedPostfix, string.Empty);
         }
     }
     
@@ -263,8 +262,8 @@ namespace FastScriptReload.Runtime
 
         public AssemblyChangesLoaderEditorOptionsNeededInBuild(bool isDidFieldsOrPropertyCountChangedCheckDisabled, bool enableExperimentalAddedFieldsSupport)
         {
-            IsDidFieldsOrPropertyCountChangedCheckDisabled = isDidFieldsOrPropertyCountChangedCheckDisabled;
-            EnableExperimentalAddedFieldsSupport = enableExperimentalAddedFieldsSupport;
+            this.IsDidFieldsOrPropertyCountChangedCheckDisabled = isDidFieldsOrPropertyCountChangedCheckDisabled;
+            this.EnableExperimentalAddedFieldsSupport = enableExperimentalAddedFieldsSupport;
         }
         
 #pragma warning disable 0618
@@ -277,8 +276,8 @@ namespace FastScriptReload.Runtime
         //WARN: make sure it has same params as ctor
         public void UpdateValues(bool isDidFieldsOrPropertyCountChangedCheckDisabled, bool enableExperimentalAddedFieldsSupport)
         {
-            IsDidFieldsOrPropertyCountChangedCheckDisabled = isDidFieldsOrPropertyCountChangedCheckDisabled;
-            EnableExperimentalAddedFieldsSupport = enableExperimentalAddedFieldsSupport;
+            this.IsDidFieldsOrPropertyCountChangedCheckDisabled = isDidFieldsOrPropertyCountChangedCheckDisabled;
+            this.EnableExperimentalAddedFieldsSupport = enableExperimentalAddedFieldsSupport;
         }
     }
 }

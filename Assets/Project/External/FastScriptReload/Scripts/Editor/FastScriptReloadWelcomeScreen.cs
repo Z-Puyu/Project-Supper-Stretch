@@ -2,22 +2,22 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FastScriptReload.Editor.Compilation;
-using FastScriptReload.Editor.Compilation.ScriptGenerationOverrides;
-using FastScriptReload.Runtime;
 using ImmersiveVRTools.Editor.Common.Utilities;
 using ImmersiveVRTools.Editor.Common.WelcomeScreen;
 using ImmersiveVRTools.Editor.Common.WelcomeScreen.GuiElements;
 using ImmersiveVRTools.Editor.Common.WelcomeScreen.PreferenceDefinition;
 using ImmersiveVRTools.Editor.Common.WelcomeScreen.Utilities;
 using ImmersiveVrToolsCommon.Runtime.Logging;
+using Project.External.FastScriptReload.Scripts.Editor.Compilation;
+using Project.External.FastScriptReload.Scripts.Editor.Compilation.ScriptGenerationOverrides;
+using Project.External.FastScriptReload.Scripts.Runtime;
 using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace FastScriptReload.Editor
+namespace Project.External.FastScriptReload.Scripts.Editor
 {
     public class FastScriptReloadWelcomeScreen : ProductWelcomeScreenBase 
     {
@@ -25,7 +25,7 @@ namespace FastScriptReload.Editor
         public static string GenerateGetUpdatesUrl(string userId, string versionId)
         {
             //WARN: the URL can sometimes be adjusted, make sure updated correctly
-            return $"{BaseUrl}/updates/fast-script-reload/{userId}?CurrentVersion={versionId}";
+            return $"{FastScriptReloadWelcomeScreen.BaseUrl}/updates/fast-script-reload/{userId}?CurrentVersion={versionId}";
         }
         public static string VersionId = "1.8";
         private static readonly string ProjectIconName = "ProductIcon64";
@@ -44,28 +44,28 @@ namespace FastScriptReload.Editor
 
         public void OpenInspectError(DynamicFileHotReloadState fileHotReloadState)
         {
-            LastInspectFileHotReloadStateError = fileHotReloadState;
-            InspectError.OnClick(this);
+            FastScriptReloadWelcomeScreen.LastInspectFileHotReloadStateError = fileHotReloadState;
+            FastScriptReloadWelcomeScreen.InspectError.OnClick(this);
         }
         
         public void OpenExclusionsSection()
         {
-            ExclusionsSection.OnClick(this);
+            FastScriptReloadWelcomeScreen.ExclusionsSection.OnClick(this);
         }
         
         public void OpenUserScriptRewriteOverridesSection()
         {
-            UserScriptRewriteOverrides.OnClick(this);
+            FastScriptReloadWelcomeScreen.UserScriptRewriteOverrides.OnClick(this);
         }
         
         public void OpenEditorHotReloadSection()
         {
-            EditorHotReloadSection.OnClick(this);
+            FastScriptReloadWelcomeScreen.EditorHotReloadSection.OnClick(this);
         }
 
         public void OpenNewFieldsSection()
         {
-            NewFieldsSection.OnClick(this);
+            FastScriptReloadWelcomeScreen.NewFieldsSection.OnClick(this);
         }
         
         private static readonly ScrollViewGuiSection MainScrollViewSection = new ScrollViewGuiSection(
@@ -96,8 +96,8 @@ You can always get back to this screen via:
                         ProductPreferenceBase.RenderGuiAndPersistInput(FastScriptReloadPreference.EnableAutoReloadForChangedFiles);
                     }
                     
-                    RenderSettingsWithCheckLimitationsButton(FastScriptReloadPreference.EnableExperimentalAddedFieldsSupport, true, () => ((FastScriptReloadWelcomeScreen)screen).OpenNewFieldsSection());
-                    RenderSettingsWithCheckLimitationsButton(FastScriptReloadPreference.EnableExperimentalEditorHotReloadSupport, false, () => ((FastScriptReloadWelcomeScreen)screen).OpenEditorHotReloadSection());
+                    FastScriptReloadWelcomeScreen.RenderSettingsWithCheckLimitationsButton(FastScriptReloadPreference.EnableExperimentalAddedFieldsSupport, true, () => ((FastScriptReloadWelcomeScreen)screen).OpenNewFieldsSection());
+                    FastScriptReloadWelcomeScreen.RenderSettingsWithCheckLimitationsButton(FastScriptReloadPreference.EnableExperimentalEditorHotReloadSupport, false, () => ((FastScriptReloadWelcomeScreen)screen).OpenEditorHotReloadSection());
                 }
             }
         );
@@ -125,7 +125,7 @@ You can always get back to this screen via:
             EditorGUILayout.EndHorizontal();
         }
 
-        private static readonly List<GuiSection> LeftSections = CreateLeftSections(new List<ChangeMainViewButton>
+        private static readonly List<GuiSection> LeftSections = FastScriptReloadWelcomeScreen.CreateLeftSections(new List<ChangeMainViewButton>
             {
                 new ChangeMainViewButton("On-Device\r\nHot-Reload",  
                     (screen) =>
@@ -138,14 +138,14 @@ You can always get back to this screen via:
                         GUILayout.Space(20);
                         if (GUILayout.Button("View Live Script Reload on Asset Store"))
                         {
-                            Application.OpenURL($"{RedirectBaseUrl}/live-script-reload-extension");
+                            Application.OpenURL($"{FastScriptReloadWelcomeScreen.RedirectBaseUrl}/live-script-reload-extension");
                         }
                     }
                 )
             }, 
             new LaunchSceneButton("Basic Example", (s) =>
             {
-                var path = GetScenePath("ExampleScene");
+                var path = ProductWelcomeScreenBase.GetScenePath("ExampleScene");
                 if (path == null)
                 {
                     var userChoice = EditorUtility.DisplayDialogComplex("Example not found",
@@ -166,7 +166,7 @@ You can always get back to this screen via:
 1) Hit play to start.
 2) Go to 'FunctionLibrary.cs' ({@"Assets/FastScriptReload/Examples/Scripts/"})", screen.TextStyle);
                 
-                CreateOpenFunctionLibraryOnRippleMethodButton();
+                FastScriptReloadWelcomeScreen.CreateOpenFunctionLibraryOnRippleMethodButton();
 
                 
                 GUILayout.Label(
@@ -178,14 +178,14 @@ You can always get back to this screen via:
                 
                 GUILayout.Space(10);
                 EditorGUILayout.HelpBox("There are some limitations to what can be Hot-Reloaded, documentation lists them under 'limitations' section.", MessageType.Warning);
-            }), MainScrollViewSection);
+            }), FastScriptReloadWelcomeScreen.MainScrollViewSection);
 
         static void OnScriptHotReloadNoInstance() 
         { 
             Debug.Log("Reloaded - start");
-            LastInspectFileHotReloadStateError = (DynamicFileHotReloadState) HarmonyLib.AccessTools
-                .Field("FastScriptReload.Editor.FastScriptReloadWelcomeScreen:LastInspectFileHotReloadStateError")
-                .GetValue(null);
+            FastScriptReloadWelcomeScreen.LastInspectFileHotReloadStateError = (DynamicFileHotReloadState) HarmonyLib.AccessTools
+                                                                                                                     .Field("FastScriptReload.Editor.FastScriptReloadWelcomeScreen:LastInspectFileHotReloadStateError")
+                                                                                                                     .GetValue(null);
             Debug.Log("Reloaded - end");
         }
         
@@ -194,7 +194,7 @@ You can always get back to this screen via:
             return new List<GuiSection>() {
                 new GuiSection("", new List<ClickableElement>
                 {
-                    (InspectError = new ChangeMainViewButton("Error - Inspect", (screen) =>
+                    (FastScriptReloadWelcomeScreen.InspectError = new ChangeMainViewButton("Error - Inspect", (screen) =>
                     {
             if (FastScriptReloadWelcomeScreen.LastInspectFileHotReloadStateError == null)
             {
@@ -221,12 +221,12 @@ Output: '<filepath>.SourceCodeCombined.cs(940,1): error CS1027: #endif directive
 
             GUILayout.Space(10);
             GUILayout.Label("Error:");
-            GUILayout.TextArea(LastInspectFileHotReloadStateError.ErrorText);
+            GUILayout.TextArea(FastScriptReloadWelcomeScreen.LastInspectFileHotReloadStateError.ErrorText);
 
             GUILayout.Space(10);
             if (GUILayout.Button("2) Click here to open generated file that failed to compile"))
             {
-                InternalEditorUtility.OpenFileAtLineExternal(LastInspectFileHotReloadStateError.SourceCodeCombinedFilePath, 1);
+                InternalEditorUtility.OpenFileAtLineExternal(FastScriptReloadWelcomeScreen.LastInspectFileHotReloadStateError.SourceCodeCombinedFilePath, 1);
             }
 
             GUILayout.Label(
@@ -265,11 +265,11 @@ Support pack contains:
                 try
                 {
                     var folder = EditorUtility.OpenFolderPanel("Select Folder", "", "");
-                    var sourceCodeCombinedFile = new FileInfo(LastInspectFileHotReloadStateError.SourceCodeCombinedFilePath);
-                    var originalFile = new FileInfo(LastInspectFileHotReloadStateError.FullFileName);
-                    File.Copy(LastInspectFileHotReloadStateError.SourceCodeCombinedFilePath, Path.Combine(folder, sourceCodeCombinedFile.Name));
-                    File.Copy(LastInspectFileHotReloadStateError.FullFileName, Path.Combine(folder, originalFile.Name));
-                    File.WriteAllText(Path.Combine(folder, "error-message.txt"), LastInspectFileHotReloadStateError.ErrorText);
+                    var sourceCodeCombinedFile = new FileInfo(FastScriptReloadWelcomeScreen.LastInspectFileHotReloadStateError.SourceCodeCombinedFilePath);
+                    var originalFile = new FileInfo(FastScriptReloadWelcomeScreen.LastInspectFileHotReloadStateError.FullFileName);
+                    File.Copy(FastScriptReloadWelcomeScreen.LastInspectFileHotReloadStateError.SourceCodeCombinedFilePath, Path.Combine(folder, sourceCodeCombinedFile.Name));
+                    File.Copy(FastScriptReloadWelcomeScreen.LastInspectFileHotReloadStateError.FullFileName, Path.Combine(folder, originalFile.Name));
+                    File.WriteAllText(Path.Combine(folder, "error-message.txt"), FastScriptReloadWelcomeScreen.LastInspectFileHotReloadStateError.ErrorText);
                     
                     EditorUtility.DisplayDialog("Support Pack Created", $"Thanks!\r\n\r\nPlease send files from folder:\r\n'{folder}'\r\n\r\nto:\r\n\r\nsupport@immersivevrtools.com", "Ok, copy email to clipboard");
                     EditorGUIUtility.systemCopyBuffer = "support@immersivevrtools.com";
@@ -279,8 +279,8 @@ Support pack contains:
                     Debug.LogError($"Unable to create support pack., {e}");
                 }
             }
-                    })).WithShouldRender(() => LastInspectFileHotReloadStateError != null), 
-                    new LastUpdateButton("New Update!", (screen) => LastUpdateUpdateScrollViewSection.RenderMainScrollViewSection(screen)),
+                    })).WithShouldRender(() => FastScriptReloadWelcomeScreen.LastInspectFileHotReloadStateError != null), 
+                    new LastUpdateButton("New Update!", (screen) => ProductWelcomeScreenBase.LastUpdateUpdateScrollViewSection.RenderMainScrollViewSection(screen)),
                     new ChangeMainViewButton("Welcome", (screen) => mainScrollViewSection.RenderMainScrollViewSection(screen)),
                 }),
                 new GuiSection("Options", new List<ClickableElement>
@@ -371,7 +371,7 @@ Use this setting to force lock assemblies via code."
                         
                         GUILayout.Space(sectionBreakHeight);
                     }),
-                    (UserScriptRewriteOverrides = new ChangeMainViewButton("User Script\r\nRewrite Overrides", (screen) =>
+                    (FastScriptReloadWelcomeScreen.UserScriptRewriteOverrides = new ChangeMainViewButton("User Script\r\nRewrite Overrides", (screen) =>
                     {
                         EditorGUILayout.HelpBox(
                             $@"For tool to work it'll need to slightly adjust your code to make it compilable. Sometimes due to existing limitations this can fail and you'll see an error.
@@ -416,7 +416,7 @@ It'll open override file with template already in. You can read top comments tha
                         }
                         executeAfterIteration?.Invoke();
                     })),
-                    (ExclusionsSection = new ChangeMainViewButton("Exclusions", (screen) => 
+                    (FastScriptReloadWelcomeScreen.ExclusionsSection = new ChangeMainViewButton("Exclusions", (screen) => 
                     {
                         EditorGUILayout.HelpBox("Those are easiest to manage from Project window by right clicking on script file and selecting: " +
                                                 "\r\nFast Script Reload -> Add Hot-Reload Exclusion " +
@@ -463,7 +463,7 @@ BREAKPOINTS IN ORIGINAL FILE WON'T BE HIT!", MessageType.Error);
                 }.Concat(additionalSections).ToList()),
                 new GuiSection("Experimental", new List<ClickableElement>
                 {
-                    (NewFieldsSection = new ChangeMainViewButton("New Fields", (screen) =>
+                    (FastScriptReloadWelcomeScreen.NewFieldsSection = new ChangeMainViewButton("New Fields", (screen) =>
                     {
 #if LiveScriptReload_Enabled
                         EditorGUILayout.HelpBox(
@@ -505,7 +505,7 @@ New fields will also show in editor - you can tweak them as normal variables.", 
 
                         GUILayout.Space(10);
                     })),
-                    (EditorHotReloadSection = new ChangeMainViewButton("Editor Hot-Reload", (screen) =>
+                    (FastScriptReloadWelcomeScreen.EditorHotReloadSection = new ChangeMainViewButton("Editor Hot-Reload", (screen) =>
                     {
                         EditorGUILayout.HelpBox(@"Currently asset hot-reloads only in play-mode, you can enable experimental editor mode support here.
 
@@ -610,7 +610,7 @@ CustomPolling - (experimental) watches files by manual polling for changes, slow
         }
 
         private static readonly string RedirectBaseUrl = "https://immersivevrtools.com/redirect/fast-script-reload"; 
-        private static readonly GuiSection TopSection = CreateTopSectionButtons(RedirectBaseUrl);
+        private static readonly GuiSection TopSection = FastScriptReloadWelcomeScreen.CreateTopSectionButtons(FastScriptReloadWelcomeScreen.RedirectBaseUrl);
 
         protected static GuiSection CreateTopSectionButtons(string redirectBaseUrl)
         {
@@ -629,20 +629,20 @@ CustomPolling - (experimental) watches files by manual polling for changes, slow
             $"Please spread the word and star github repo. Alternatively if you're in a position to make a donation I'd hugely appreciate that. It allows me to spend more time on the tool instead of paid client projects.",
             new List<ClickableElement>
             {
-                new OpenUrlButton(" Star on Github", $"{RedirectBaseUrl}/github"),
-                new OpenUrlButton(" Donate", $"{RedirectBaseUrl}/donate"),
+                new OpenUrlButton(" Star on Github", $"{FastScriptReloadWelcomeScreen.RedirectBaseUrl}/github"),
+                new OpenUrlButton(" Donate", $"{FastScriptReloadWelcomeScreen.RedirectBaseUrl}/donate"),
             }
         );
 
-        public override string WindowTitle { get; } = _WindowTitle;
-        public override Vector2 WindowSizePx { get; } = _WindowSizePx;
+        public override string WindowTitle { get; } = FastScriptReloadWelcomeScreen._WindowTitle;
+        public override Vector2 WindowSizePx { get; } = FastScriptReloadWelcomeScreen._WindowSizePx;
 
 #if !LiveScriptReload_Enabled
         [MenuItem("Window/Fast Script Reload/Start Screen", false, 1999)]
 #endif
         public static FastScriptReloadWelcomeScreen Init()
         {
-            return OpenWindow<FastScriptReloadWelcomeScreen>(_WindowTitle, _WindowSizePx);
+            return ProductWelcomeScreenBase.OpenWindow<FastScriptReloadWelcomeScreen>(FastScriptReloadWelcomeScreen._WindowTitle, FastScriptReloadWelcomeScreen._WindowSizePx);
         }
     
 #if !LiveScriptReload_Enabled
@@ -669,12 +669,12 @@ CustomPolling - (experimental) watches files by manual polling for changes, slow
 
         public void OnEnable()
         {
-            OnEnableCommon(ProjectIconName);
+            this.OnEnableCommon(FastScriptReloadWelcomeScreen.ProjectIconName);
         }
 
         public void OnGUI()
         {
-            RenderGUI(LeftSections, TopSection, BottomSection, MainScrollViewSection);
+            this.RenderGUI(FastScriptReloadWelcomeScreen.LeftSections, FastScriptReloadWelcomeScreen.TopSection, FastScriptReloadWelcomeScreen.BottomSection, FastScriptReloadWelcomeScreen.MainScrollViewSection);
         }
         
         protected static void CreateOpenFunctionLibraryOnRippleMethodButton()
@@ -762,11 +762,11 @@ CustomPolling - (experimental) watches files by manual polling for changes, slow
             "Enable detailed debug logging", "EnableDetailedDebugLogging", false,
             (object newValue, object oldValue) =>
             {
-                BuildDefineSymbolManager.SetBuildDefineSymbolState(BuildSymbol_DetailedDebugLogging, (bool)newValue);
+                BuildDefineSymbolManager.SetBuildDefineSymbolState(FastScriptReloadPreference.BuildSymbol_DetailedDebugLogging, (bool)newValue);
             },
             (value) =>
             {
-                BuildDefineSymbolManager.SetBuildDefineSymbolState(BuildSymbol_DetailedDebugLogging, (bool)value);
+                BuildDefineSymbolManager.SetBuildDefineSymbolState(FastScriptReloadPreference.BuildSymbol_DetailedDebugLogging, (bool)value);
             }
         );
         
@@ -866,20 +866,20 @@ CustomPolling - (experimental) watches files by manual polling for changes, slow
 
         public static List<ProjectEditorPreferenceDefinitionBase> PreferenceDefinitions = new List<ProjectEditorPreferenceDefinitionBase>()
         {
-            CreateDefaultShowOptionPreferenceDefinition(),
-            BatchScriptChangesAndReloadEveryNSeconds,
-            EnableAutoReloadForChangedFiles,
-            EnableExperimentalThisCallLimitationFix,
-            LogHowToFixMessageOnCompilationError,
-            StopShowingAutoReloadEnabledDialogBox,
-            IsDidFieldsOrPropertyCountChangedCheckDisabled,
-            FileWatcherSetupEntries,
-            IsAutoOpenGeneratedSourceFileOnChangeEnabled,
-            EnableExperimentalAddedFieldsSupport,
-            ReferencesExcludedFromHotReload,
-            EnableExperimentalEditorHotReloadSupport,
-            TriggerDomainReloadIfOverNDynamicallyLoadedAssembles,
-            IsForceLockAssembliesViaCode
+            ProductPreferenceBase.CreateDefaultShowOptionPreferenceDefinition(),
+            FastScriptReloadPreference.BatchScriptChangesAndReloadEveryNSeconds,
+            FastScriptReloadPreference.EnableAutoReloadForChangedFiles,
+            FastScriptReloadPreference.EnableExperimentalThisCallLimitationFix,
+            FastScriptReloadPreference.LogHowToFixMessageOnCompilationError,
+            FastScriptReloadPreference.StopShowingAutoReloadEnabledDialogBox,
+            FastScriptReloadPreference.IsDidFieldsOrPropertyCountChangedCheckDisabled,
+            FastScriptReloadPreference.FileWatcherSetupEntries,
+            FastScriptReloadPreference.IsAutoOpenGeneratedSourceFileOnChangeEnabled,
+            FastScriptReloadPreference.EnableExperimentalAddedFieldsSupport,
+            FastScriptReloadPreference.ReferencesExcludedFromHotReload,
+            FastScriptReloadPreference.EnableExperimentalEditorHotReloadSupport,
+            FastScriptReloadPreference.TriggerDomainReloadIfOverNDynamicallyLoadedAssembles,
+            FastScriptReloadPreference.IsForceLockAssembliesViaCode
         };
 
         private static bool PrefsLoaded = false;
@@ -890,7 +890,7 @@ CustomPolling - (experimental) watches files by manual polling for changes, slow
         [SettingsProvider]
         public static SettingsProvider ImpostorsSettings()
         {
-            return GenerateProvider(ProductName, ProductKeywords, PreferencesGUI);
+            return ProductPreferenceBase.GenerateProvider(FastScriptReloadPreference.ProductName, FastScriptReloadPreference.ProductKeywords, FastScriptReloadPreference.PreferencesGUI);
         }
 
     #else
@@ -899,13 +899,13 @@ CustomPolling - (experimental) watches files by manual polling for changes, slow
 #endif
         public static void PreferencesGUI()
         {
-            if (!PrefsLoaded)
+            if (!FastScriptReloadPreference.PrefsLoaded)
             {
-                LoadDefaults(PreferenceDefinitions);
-                PrefsLoaded = true;
+                ProductPreferenceBase.LoadDefaults(FastScriptReloadPreference.PreferenceDefinitions);
+                FastScriptReloadPreference.PrefsLoaded = true;
             }
 
-            RenderGuiCommon(PreferenceDefinitions);
+            ProductPreferenceBase.RenderGuiCommon(FastScriptReloadPreference.PreferenceDefinitions);
         }
 
         public enum ShadersMode
@@ -926,17 +926,17 @@ CustomPolling - (experimental) watches files by manual polling for changes, slow
         {
             var userId = ProductPreferenceBase.CreateDefaultUserIdDefinition(FastScriptReloadWelcomeScreen.ProjectName).GetEditorPersistedValueOrDefault().ToString();
 
-            HandleUnityStartup(
+            WelcomeScreenInitializerBase.HandleUnityStartup(
                 () => FastScriptReloadWelcomeScreen.Init(),
                 FastScriptReloadWelcomeScreen.GenerateGetUpdatesUrl(userId, FastScriptReloadWelcomeScreen.VersionId),
                 new List<ProjectEditorPreferenceDefinitionBase>(),
                 (isFirstRun) =>
                 {
-                    MigrateObsoleteEnableCustomFileWatcherPreference();
+                    FastScriptReloadWelcomeScreenInitializer.MigrateObsoleteEnableCustomFileWatcherPreference();
                 }
             );
             
-            InitCommon();
+            FastScriptReloadWelcomeScreenInitializer.InitCommon();
         }
 
         private static void MigrateObsoleteEnableCustomFileWatcherPreference()
@@ -953,8 +953,8 @@ CustomPolling - (experimental) watches files by manual polling for changes, slow
         
         protected static void InitCommon()
         {
-            DisplayMessageIfLastDetourPotentiallyCrashedEditor();
-            EnsureUserAwareOfAutoRefresh();
+            FastScriptReloadWelcomeScreenInitializer.DisplayMessageIfLastDetourPotentiallyCrashedEditor();
+            FastScriptReloadWelcomeScreenInitializer.EnsureUserAwareOfAutoRefresh();
 
             DynamicCompilationBase.LogHowToFixMessageOnCompilationError = (bool)FastScriptReloadPreference.LogHowToFixMessageOnCompilationError.GetEditorPersistedValueOrDefault();
             DynamicCompilationBase.DebugWriteRewriteReasonAsComment = (bool)FastScriptReloadPreference.DebugWriteRewriteReasonAsComment.GetEditorPersistedValueOrDefault();
@@ -968,7 +968,7 @@ CustomPolling - (experimental) watches files by manual polling for changes, slow
                 (bool)FastScriptReloadPreference.EnableDetailedDebugLogging.GetEditorPersistedValueOrDefault()
             );
             
-            AutoDetectAndSetShaderMode();
+            FastScriptReloadWelcomeScreenInitializer.AutoDetectAndSetShaderMode();
         }
 
         private static void EnsureUserAwareOfAutoRefresh()

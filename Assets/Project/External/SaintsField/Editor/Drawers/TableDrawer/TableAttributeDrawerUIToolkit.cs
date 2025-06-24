@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Drawers.ArraySizeDrawer;
 using SaintsField.Editor.Drawers.SaintsRowDrawer;
-using SaintsField.Editor.Linq;
 using SaintsField.Editor.Playa;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Playa.RendererGroup;
@@ -55,8 +54,8 @@ namespace SaintsField.Editor.Drawers.TableDrawer
             if(itemIsObject)
             {
                 Object obj0 = MakeSource(arrayProp).Select(each => each.objectReferenceValue)
-                    .FirstOrDefault(each => each != null);
-                if (obj0 == null)
+                    .FirstOrDefault(each => each);
+                if (!obj0)
                 {
                     // PropertyField nullProp = new PropertyField(child0);
                     // nullProp.Bind(child0.serializedObject);
@@ -73,17 +72,17 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         root.Clear();
                         property.objectReferenceValue = evt.newValue;
                         property.serializedObject.ApplyModifiedProperties();
-                        BuildContent(arrayProp, root, tableAttribute, property, info);
+                        BuildContent(arrayProp, root, tableAttribute, allAttributes, property, info, parent);
                     });
                     return root;
                 }
             }
 
-            BuildContent(arrayProp, root, tableAttribute, property, info);
+            BuildContent(arrayProp, root, tableAttribute, allAttributes, property, info, parent);
             return root;
         }
 
-        private void BuildContent(SerializedProperty arrayProp, VisualElement root, TableAttribute tableAttribute, SerializedProperty property, FieldInfo info)
+        private void BuildContent(SerializedProperty arrayProp, VisualElement root, TableAttribute tableAttribute, IReadOnlyList<PropertyAttribute> allAttributes, SerializedProperty property, FieldInfo info, object parent)
         {
             bool itemIsObject = property.propertyType == SerializedPropertyType.ObjectReference;
 
@@ -193,11 +192,66 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
             root.Add(controls);
 
+            #region Headers
+
+            TableHeadersAttribute tableHeadersAttribute = allAttributes
+                .OfType<TableHeadersAttribute>()
+                .FirstOrDefault();
+            HashSet<string> valueTableHeaders = new HashSet<string>();
+            bool headerIsHide = true;
+            if (tableHeadersAttribute != null)
+            {
+                headerIsHide = tableHeadersAttribute.IsHide;
+                foreach (TableHeadersAttribute.Header header in tableHeadersAttribute.Headers)
+                {
+                    // string rawName = header.Name;
+                    List<string> rawNames = new List<string>();
+                    if (header.IsCallback)
+                    {
+                        (string error, object value) = Util.GetOfNoParams<object>(parent, header.Name, null);
+                        if (error != "")
+                        {
+#if UNITY_EDITOR
+                            Debug.LogError(error);
+#endif
+                            continue;
+                        }
+
+                        if (RuntimeUtil.IsNull(value))
+                        {
+                        }
+                        // ReSharper disable once ConvertIfStatementToSwitchStatement
+                        else if (value is string s)
+                        {
+                            rawNames.Add(s);
+                        }
+                        else if (value is IEnumerable<string> si)
+                        {
+                            rawNames.AddRange(si.Where(each => each != null));
+                        }
+                        else if (value is IEnumerable<object> oi)
+                        {
+                            rawNames.AddRange(oi.Where(each => !RuntimeUtil.IsNull(each))
+                                .Select(each => each.ToString()));
+                        }
+                    }
+                    else
+                    {
+                        rawNames.Add(header.Name);
+                    }
+
+                    valueTableHeaders.UnionWith(rawNames.SelectMany(each => new[]{each, ObjectNames.NicifyVariableName(each)}));
+                }
+            }
+
+
+            #endregion
+
             if (itemIsObject)
             {
                 Object obj0 = multiColumnListView.itemsSource.Cast<SerializedProperty>()
                     .Select(each => each.objectReferenceValue)
-                    .FirstOrDefault(each => each != null);
+                    .FirstOrDefault(each => each);
 
                 Dictionary<string, List<string>> columnToMemberIds = new Dictionary<string, List<string>>();
                 Dictionary<string, bool> columnToDefaultHide = new Dictionary<string, bool>();
@@ -209,7 +263,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         .Where(each => each != null)
                         .ToDictionary(each => each.name, each => each.Copy());
                     IEnumerable<SaintsFieldInfoName> saintsFieldWithInfos = SaintsEditor
-                        .HelperGetSaintsFieldWithInfo(serializedPropertyDict, obj0)
+                        .HelperGetSaintsFieldWithInfo(serializedPropertyDict, new []{obj0})
                         .Where(SaintsEditor.SaintsFieldInfoShouldDraw)
                         .Select(each => new SaintsFieldInfoName(each, AbsRenderer.GetFriendlyName(each)));
 
@@ -226,13 +280,23 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                             }
                         }
 
-                        foreach (IPlayaAttribute playaAttribute in saintsFieldInfoName.SaintsFieldWithInfo.PlayaAttributes)
+                        bool headerHide = HeaderDefaultHide(columnName, valueTableHeaders, headerIsHide);
+                        if (headerHide)
                         {
-                            // ReSharper disable once InvertIf
-                            if (playaAttribute is TableHideAttribute)
+                            columnToDefaultHide[columnName] = true;
+                        }
+                        else
+                        {
+                            // ReSharper disable once LoopCanBeConvertedToQuery
+                            foreach (IPlayaAttribute playaAttribute in saintsFieldInfoName.SaintsFieldWithInfo
+                                         .PlayaAttributes)
                             {
-                                columnToDefaultHide[columnName] = true;
-                                break;
+                                // ReSharper disable once InvertIf
+                                if (playaAttribute is TableHideAttribute)
+                                {
+                                    columnToDefaultHide[columnName] = true;
+                                    break;
+                                }
                             }
                         }
 
@@ -265,96 +329,94 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         title = columnName,
                         stretchable = true,
                         visible = visible,
-                    });
-
-                    multiColumnListView.columns[id].makeCell = () =>
-                    {
-                        VisualElement itemContainer = new VisualElement();
-
-                        HashSet<Toggle> toggles = new HashSet<Toggle>();
-
-                        itemContainer.schedule
-                            .Execute(() => SaintsRendererGroup.CheckOutOfScoopFoldout(itemContainer, toggles))
-                            .Every(250);
-
-                        return itemContainer;
-                    };
-
-                    multiColumnListView.columns[id].bindCell = (element, index) =>
-                    {
-                        SerializedProperty targetProp = ((SerializedProperty)multiColumnListView.itemsSource[index]).Copy();
-                        targetProp.isExpanded = true;
-
-                        Object targetPropValue = targetProp.objectReferenceValue;
-
-                        if (RuntimeUtil.IsNull(targetPropValue))
+                        makeCell = () =>
                         {
-                            ObjectField arrayItemProp = new ObjectField("")
+                            VisualElement itemContainer = new VisualElement();
+
+                            HashSet<Toggle> toggles = new HashSet<Toggle>();
+
+                            itemContainer.schedule
+                                .Execute(() => SaintsRendererGroup.CheckOutOfScoopFoldout(itemContainer, toggles))
+                                .Every(250);
+
+                            return itemContainer;
+                        },
+                        bindCell = (element, index) =>
+                        {
+                            SerializedProperty targetProp = ((SerializedProperty)multiColumnListView.itemsSource[index]).Copy();
+                            targetProp.isExpanded = true;
+
+                            Object targetPropValue = targetProp.objectReferenceValue;
+
+                            if (RuntimeUtil.IsNull(targetPropValue))
                             {
-                                objectType = ReflectUtils.GetElementType(info.FieldType),
-                            };
+                                ObjectField arrayItemProp = new ObjectField("")
+                                {
+                                    objectType = ReflectUtils.GetElementType(info.FieldType),
+                                };
+
+                                element.Clear();
+                                element.Add(arrayItemProp);
+
+                                arrayItemProp.RegisterValueChangedCallback(evt =>
+                                {
+                                    targetProp.objectReferenceValue = evt.newValue;
+                                    targetProp.serializedObject.ApplyModifiedProperties();
+                                    multiColumnListView.Rebuild();
+                                });
+                                return;
+                            }
+
+                            SerializedObject targetSerializedObject = new SerializedObject(targetPropValue);
+
+                            Dictionary<string, SerializedProperty> targetPropertyDict = SerializedUtils
+                                .GetAllField(targetSerializedObject)
+                                .Where(each => each != null)
+                                .ToDictionary(each => each.name, each => each.Copy());
+
+                            List<SaintsFieldWithInfo> allSaintsFieldWithInfos =
+                                new List<SaintsFieldWithInfo>(memberIds.Count);
+
+                            int serCount = 0;
+                            foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor
+                                         .HelperGetSaintsFieldWithInfo(targetPropertyDict, new[]{targetPropValue})
+                                         .Where(saintsFieldWithInfo => memberIds.Contains(saintsFieldWithInfo.MemberId)))
+                            {
+                                allSaintsFieldWithInfos.Add(saintsFieldWithInfo);
+                                if (saintsFieldWithInfo.SerializedProperty != null)
+                                {
+                                    serCount += 1;
+                                }
+                            }
 
                             element.Clear();
-                            element.Add(arrayItemProp);
 
-                            arrayItemProp.RegisterValueChangedCallback(evt =>
+                            bool saintsRowInline = memberIds.Count == 1;
+                            bool noLabel = serCount <= 1;
+
+                            using(new SaintsRowAttributeDrawer.ForceInlineScoop(saintsRowInline))
                             {
-                                targetProp.objectReferenceValue = evt.newValue;
-                                targetProp.serializedObject.ApplyModifiedProperties();
-                                multiColumnListView.Rebuild();
-                            });
-                            return;
-                        }
-
-                        SerializedObject targetSerializedObject = new SerializedObject(targetPropValue);
-
-                        Dictionary<string, SerializedProperty> targetPropertyDict = SerializedUtils
-                            .GetAllField(targetSerializedObject)
-                            .Where(each => each != null)
-                            .ToDictionary(each => each.name, each => each.Copy());
-
-                        List<SaintsFieldWithInfo> allSaintsFieldWithInfos =
-                            new List<SaintsFieldWithInfo>(memberIds.Count);
-
-                        int serCount = 0;
-                        foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor
-                                     .HelperGetSaintsFieldWithInfo(targetPropertyDict, targetPropValue)
-                                     .Where(saintsFieldWithInfo => memberIds.Contains(saintsFieldWithInfo.MemberId)))
-                        {
-                            allSaintsFieldWithInfos.Add(saintsFieldWithInfo);
-                            if (saintsFieldWithInfo.SerializedProperty != null)
-                            {
-                                serCount += 1;
-                            }
-                        }
-
-                        element.Clear();
-
-                        bool saintsRowInline = memberIds.Count == 1;
-                        bool noLabel = serCount <= 1;
-
-                        using(new SaintsRowAttributeDrawer.ForceInlineScoop(saintsRowInline))
-                        {
-                            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-                            foreach (SaintsFieldWithInfo saintsFieldWithInfo in allSaintsFieldWithInfos)
-                            {
-                                AbsRenderer renderer =
-                                    SaintsEditor.HelperMakeRenderer(property.serializedObject, saintsFieldWithInfo);
-                                // Debug.Log(renderer);
-                                // ReSharper disable once InvertIf
-                                if (renderer != null)
+                                // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+                                foreach (SaintsFieldWithInfo saintsFieldWithInfo in allSaintsFieldWithInfos)
                                 {
-                                    renderer.NoLabel = noLabel;
-                                    renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
-                                    VisualElement fieldElement = renderer.CreateVisualElement();
-                                    if (fieldElement != null)
+                                    AbsRenderer renderer =
+                                        SaintsEditor.HelperMakeRenderer(property.serializedObject, saintsFieldWithInfo);
+                                    // Debug.Log(renderer);
+                                    // ReSharper disable once InvertIf
+                                    if (renderer != null)
                                     {
-                                        element.Add(fieldElement);
+                                        renderer.NoLabel = noLabel;
+                                        renderer.InDirectHorizontalLayout = renderer.InAnyHorizontalLayout = true;
+                                        VisualElement fieldElement = renderer.CreateVisualElement();
+                                        if (fieldElement != null)
+                                        {
+                                            element.Add(fieldElement);
+                                        }
                                     }
                                 }
                             }
                         }
-                    };
+                    });
                 }
             }
             else  // item is general
@@ -365,12 +427,12 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                     .Where(each => each != null)
                     .ToDictionary(each => each.name);
 
-                (PropertyAttribute[] _, object parent) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(firstProp);
+                (PropertyAttribute[] _, object parentRefreshed) = SerializedUtils.GetAttributesAndDirectParent<PropertyAttribute>(firstProp);
 
-                (string error, int index, object value) firstPropValue = Util.GetValue(firstProp, info, parent);
+                (string error, int index, object value) firstPropValue = Util.GetValue(firstProp, info, parentRefreshed);
 
                 IEnumerable<SaintsFieldWithInfo> firstSaintsFieldWithInfos = SaintsEditor
-                    .HelperGetSaintsFieldWithInfo(firstSerializedPropertyDict, firstPropValue.value)
+                    .HelperGetSaintsFieldWithInfo(firstSerializedPropertyDict, new[]{firstPropValue.value})
                     .Where(SaintsEditor.SaintsFieldInfoShouldDraw);
 
                 Dictionary<string, List<string>> columnToMemberIds = new Dictionary<string, List<string>>();
@@ -389,13 +451,22 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         }
                     }
 
-                    foreach (IPlayaAttribute playaAttribute in saintsFieldWithInfo.PlayaAttributes)
+                    bool headerHide = HeaderDefaultHide(columnName, valueTableHeaders, headerIsHide);
+                    if (headerHide)
                     {
-                        // ReSharper disable once InvertIf
-                        if (playaAttribute is TableHideAttribute)
+                        columnToDefaultHide[columnName] = true;
+                    }
+                    else
+                    {
+                        // ReSharper disable once LoopCanBeConvertedToQuery
+                        foreach (IPlayaAttribute playaAttribute in saintsFieldWithInfo.PlayaAttributes)
                         {
-                            columnToDefaultHide[columnName] = true;
-                            break;
+                            // ReSharper disable once InvertIf
+                            if (playaAttribute is TableHideAttribute)
+                            {
+                                columnToDefaultHide[columnName] = true;
+                                break;
+                            }
                         }
                     }
 
@@ -449,7 +520,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
                         SerializedProperty targetProp = (SerializedProperty)multiColumnListView.itemsSource[index];
                         targetProp.isExpanded = true;
 
-                        (string error, int index, object value) targetPropValue = Util.GetValue(targetProp, info, parent);
+                        (string error, int index, object value) targetPropValue = Util.GetValue(targetProp, info, parentRefreshed);
                         Dictionary<string, SerializedProperty> targetSerializedPropertyDict = SerializedUtils.GetPropertyChildren(targetProp)
                             .Where(each => each != null)
                             .ToDictionary(each => each.name);
@@ -458,7 +529,7 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 
                         int serCount = 0;
                         foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor
-                                     .HelperGetSaintsFieldWithInfo(targetSerializedPropertyDict, targetPropValue.value)
+                                     .HelperGetSaintsFieldWithInfo(targetSerializedPropertyDict, new[]{targetPropValue.value})
                                      .Where(saintsFieldWithInfo => memberIds.Contains(saintsFieldWithInfo.MemberId)))
                         {
                             allSaintsFieldWithInfos.Add(saintsFieldWithInfo);
@@ -565,6 +636,16 @@ namespace SaintsField.Editor.Drawers.TableDrawer
 // #endif
 
             // return root;
+        }
+
+        private static bool HeaderDefaultHide(string value, ICollection<string> valueTableHeaders, bool headerIsHide)
+        {
+            bool inHeader = valueTableHeaders.Contains(value);
+            if (headerIsHide)
+            {
+                return inHeader;
+            }
+            return !inHeader;
         }
 
         private readonly struct SaintsFieldInfoName

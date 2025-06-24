@@ -10,7 +10,6 @@ using SaintsField.Interfaces;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 using PropertyAttribute = UnityEngine.PropertyAttribute;
 
@@ -294,7 +293,7 @@ namespace SaintsField.Editor.TroubleshootEditor
                     .ToDictionary(each => each, serializedObject.FindProperty);
             }
 
-            foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor.HelperGetSaintsFieldWithInfo(serializedPropertyDict, inspectTarget))
+            foreach (SaintsFieldWithInfo saintsFieldWithInfo in SaintsEditor.HelperGetSaintsFieldWithInfo(serializedPropertyDict, new[]{inspectTarget}))
             {
                 // Debug.Log(saintsFieldWithInfo.RenderType);
                 if (saintsFieldWithInfo.RenderType == SaintsRenderType.SerializedField)

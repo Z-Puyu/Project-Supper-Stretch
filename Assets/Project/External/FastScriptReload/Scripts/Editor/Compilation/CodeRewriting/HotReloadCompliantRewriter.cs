@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using FastScriptReload.Runtime;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Project.External.FastScriptReload.Scripts.Runtime;
 
-namespace FastScriptReload.Editor.Compilation.CodeRewriting
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting
 {
     class HotReloadCompliantRewriter : FastScriptReloadCodeRewriterBase
     {
@@ -18,7 +18,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            return AddPatchedPostfixToTopLevelDeclarations(node, node.Identifier);
+            return this.AddPatchedPostfixToTopLevelDeclarations(node, node.Identifier);
             //if subclasses need to be adjusted, it's done via recursion.
             // foreach (var childNode in node.ChildNodes().OfType<ClassDeclarationSyntax>())
             // {
@@ -29,29 +29,29 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 
         public override SyntaxNode VisitStructDeclaration(StructDeclarationSyntax node)
         {
-            return AddPatchedPostfixToTopLevelDeclarations(node, node.Identifier);
+            return this.AddPatchedPostfixToTopLevelDeclarations(node, node.Identifier);
         }
 
         public override SyntaxNode VisitEnumDeclaration(EnumDeclarationSyntax node)
         {
-            return AddPatchedPostfixToTopLevelDeclarations(node, node.Identifier);
+            return this.AddPatchedPostfixToTopLevelDeclarations(node, node.Identifier);
         }
 
         public override SyntaxNode VisitDelegateDeclaration(DelegateDeclarationSyntax node)
         {
-            return AddPatchedPostfixToTopLevelDeclarations(node, node.Identifier);
+            return this.AddPatchedPostfixToTopLevelDeclarations(node, node.Identifier);
         }
 
         public override SyntaxNode VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
         {
-            return AddPatchedPostfixToTopLevelDeclarations(node, node.Identifier);
+            return this.AddPatchedPostfixToTopLevelDeclarations(node, node.Identifier);
         }
 
         public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
         {
             if (node.Parent is CompilationUnitSyntax)
             {
-                StrippedUsingDirectives.Add(node.ToFullString());
+                this.StrippedUsingDirectives.Add(node.ToFullString());
                 return null;
             }
 
@@ -60,10 +60,10 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 
         private SyntaxNode AddPatchedPostfixToTopLevelDeclarations(CSharpSyntaxNode node, SyntaxToken identifier)
         {
-            OriginalIdentifiersRenamedToContainPatchedPostfix.Add(identifier.ValueText);
+            this.OriginalIdentifiersRenamedToContainPatchedPostfix.Add(identifier.ValueText);
             
             var newIdentifier = SyntaxFactory.Identifier(identifier + AssemblyChangesLoader.ClassnamePatchedPostfix);
-            newIdentifier = AddRewriteCommentIfNeeded(newIdentifier, $"{nameof(HotReloadCompliantRewriter)}:{nameof(AddPatchedPostfixToTopLevelDeclarations)}");
+            newIdentifier = this.AddRewriteCommentIfNeeded(newIdentifier, $"{nameof(HotReloadCompliantRewriter)}:{nameof(this.AddPatchedPostfixToTopLevelDeclarations)}");
             node = node.ReplaceToken(identifier, newIdentifier);
             return node;
         }

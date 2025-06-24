@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using FastScriptReload.Runtime;
-using FastScriptReload.Scripts.Runtime;
 using ImmersiveVrToolsCommon.Runtime.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Project.External.FastScriptReload.Scripts.Runtime;
 
-namespace FastScriptReload.Editor.Compilation.CodeRewriting
+namespace Project.External.FastScriptReload.Scripts.Editor.Compilation.CodeRewriting
 {
 	class NewFieldsRewriter : FastScriptReloadCodeRewriterBase
 	{
@@ -18,7 +17,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 		public NewFieldsRewriter(Dictionary<string, List<string>> typeToNewFieldDeclarations, bool writeRewriteReasonAsComment) 
 			:base(writeRewriteReasonAsComment)
 		{
-			_typeToNewFieldDeclarations = typeToNewFieldDeclarations;
+			this._typeToNewFieldDeclarations = typeToNewFieldDeclarations;
 		}
 
 		public static List<MemberInfo> GetReplaceableMembers(Type type)
@@ -39,13 +38,13 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 					{
 						var nameofExpressionParts = node.ArgumentList.Arguments.First().ToFullString().Split('.'); //nameof could have multiple . like NewFieldCustomClass.FieldInThatClass
 						var fieldName = nameofExpressionParts.First();  // should take first part only to determine if new field eg. 'NewFieldCustomClass'
-						if (_typeToNewFieldDeclarations.TryGetValue(fullClassName, out var allNewFieldNamesForClass))
+						if (this._typeToNewFieldDeclarations.TryGetValue(fullClassName, out var allNewFieldNamesForClass))
 						{
 							if (allNewFieldNamesForClass.Contains(fieldName))
 							{
-								return AddRewriteCommentIfNeeded(
+								return this.AddRewriteCommentIfNeeded(
 									SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(nameofExpressionParts.Last())), // should take last part only to for actual string eg. 'FieldInThatClass'
-									$"{nameof(NewFieldsRewriter)}:{nameof(VisitInvocationExpression)}");
+									$"{nameof(NewFieldsRewriter)}:{nameof(this.VisitInvocationExpression)}");
 							}
 							
 						}
@@ -65,7 +64,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 				if (!string.IsNullOrEmpty(fullClassName))
 				{
 					var fieldName = node.Identifier.ToString();
-					if (_typeToNewFieldDeclarations.TryGetValue(fullClassName, out var allNewFieldNamesForClass))
+					if (this._typeToNewFieldDeclarations.TryGetValue(fullClassName, out var allNewFieldNamesForClass))
 					{
 						if (allNewFieldNamesForClass.Contains(fieldName))
 						{
@@ -82,7 +81,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 							if (!isNameOfExpression) //nameof expression will be rewritten via VisitInvocationExpression
 							{
 								return
-								AddRewriteCommentIfNeeded(
+								this.AddRewriteCommentIfNeeded(
 									SyntaxFactory.MemberAccessExpression(
 											SyntaxKind.SimpleMemberAccessExpression,
 											SyntaxFactory.InvocationExpression(
@@ -102,7 +101,7 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 																SyntaxFactory.ThisExpression())))),
 											SyntaxFactory.IdentifierName(fieldName))
 										.WithTriviaFrom(node),
-									$"{nameof(NewFieldsRewriter)}:{nameof(VisitIdentifierName)}"
+									$"{nameof(NewFieldsRewriter)}:{nameof(this.VisitIdentifierName)}"
 								);
 							}
 						}
@@ -122,18 +121,18 @@ namespace FastScriptReload.Editor.Compilation.CodeRewriting
 			var fieldName = node.Declaration.Variables.First().Identifier.ToString();
 			var fullClassName = RoslynUtils.GetMemberFQDNWithoutMemberName(node);
 
-			if (_typeToNewFieldDeclarations.TryGetValue(fullClassName, out var newFields))
+			if (this._typeToNewFieldDeclarations.TryGetValue(fullClassName, out var newFields))
 			{
 				if (newFields.Contains(fieldName))
 				{
 					var existingLeading = node.GetLeadingTrivia();
 					var existingTrailing = node.GetTrailingTrivia();
 
-					return AddRewriteCommentIfNeeded(
+					return this.AddRewriteCommentIfNeeded(
 						node
 							.WithLeadingTrivia(existingLeading.Add(SyntaxFactory.Comment("/* ")))
 							.WithTrailingTrivia(existingTrailing.Insert(0, SyntaxFactory.Comment(" */ //Auto-excluded to prevent exceptions - see docs"))),
-						$"{nameof(NewFieldsRewriter)}:{nameof(VisitFieldDeclaration)}"
+						$"{nameof(NewFieldsRewriter)}:{nameof(this.VisitFieldDeclaration)}"
 					);
 				}
 			}

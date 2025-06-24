@@ -5,7 +5,7 @@ using ImmersiveVRTools.Runtime.Common;
 using UnityEditor;
 using UnityEngine;
 
-namespace FastScriptReload.Editor.GUI
+namespace Project.External.FastScriptReload.Scripts.Editor.GUI
 {
     [InitializeOnLoad]
     public class ProjectWindowReloadStatusIndicatorDrawer
@@ -17,17 +17,17 @@ namespace FastScriptReload.Editor.GUI
         
         static ProjectWindowReloadStatusIndicatorDrawer()
         {
-            EditorApplication.projectWindowItemOnGUI += ProjectWindowItemOnGUI;
-            FastScriptReloadManager.Instance.HotReloadFailed += OnHotReloadFailed;
+            EditorApplication.projectWindowItemOnGUI += ProjectWindowReloadStatusIndicatorDrawer.ProjectWindowItemOnGUI;
+            FastScriptReloadManager.Instance.HotReloadFailed += ProjectWindowReloadStatusIndicatorDrawer.OnHotReloadFailed;
             EditorApplication.update += () =>
             {
-                IsEnabled = (bool)FastScriptReloadPreference.IsVisualHotReloadIndicationShownInProjectWindow.GetEditorPersistedValueOrDefault();
+                ProjectWindowReloadStatusIndicatorDrawer.IsEnabled = (bool)FastScriptReloadPreference.IsVisualHotReloadIndicationShownInProjectWindow.GetEditorPersistedValueOrDefault();
             };
         }
 
         private static void OnHotReloadFailed(List<DynamicFileHotReloadState> failedForFileStates)
         {
-            if (!IsEnabled)
+            if (!ProjectWindowReloadStatusIndicatorDrawer.IsEnabled)
             {
                 return;
             }
@@ -45,14 +45,14 @@ namespace FastScriptReload.Editor.GUI
 
         private static void ProjectWindowItemOnGUI(string guid, Rect rect)
         {
-            if (!IsEnabled)
+            if (!ProjectWindowReloadStatusIndicatorDrawer.IsEnabled)
             {
                 return;
             }
             
-            if (HelpTexture == null)
+            if (ProjectWindowReloadStatusIndicatorDrawer.HelpTexture == null)
             {
-                HelpTexture = EditorGUIUtility.TrIconContent("_Help").image;
+                ProjectWindowReloadStatusIndicatorDrawer.HelpTexture = EditorGUIUtility.TrIconContent("_Help").image;
             }
 
             if (FastScriptReloadManager.Instance.LastProcessedDynamicFileHotReloadStatesInSession.TryGetValue(guid, out var fileHotReloadState))
@@ -64,7 +64,7 @@ namespace FastScriptReload.Editor.GUI
                     
                     var sideInfoRect = new Rect(1, rect.y - 3, 20, 20);
                     if (UnityEngine.GUI.Button(sideInfoRect,
-                            new GUIContent(new GUIContent(HelpTexture, 
+                            new GUIContent(new GUIContent(ProjectWindowReloadStatusIndicatorDrawer.HelpTexture, 
 @"Fast Script Reload - Error
 
 Last hot reload failed.

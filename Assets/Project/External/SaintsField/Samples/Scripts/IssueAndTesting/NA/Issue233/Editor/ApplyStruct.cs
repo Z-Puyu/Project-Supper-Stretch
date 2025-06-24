@@ -1,6 +1,4 @@
-﻿using UnityEditor;
-
-namespace SaintsField.Samples.Scripts.IssueAndTesting.NA.Issue233.Editor
+﻿namespace SaintsField.Samples.Scripts.IssueAndTesting.NA.Issue233.Editor
 {
     // No. This does not work. struct field needs a property drawer, not Editor
     // But SaintsPropertyDrawer does not support `Button` etc.
