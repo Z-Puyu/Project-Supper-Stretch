@@ -5,10 +5,8 @@ using Object = UnityEngine.Object;
 namespace Project.Scripts.Items.Equipments;
 
 public class EquipmentSocket : MonoBehaviour, IComparable<EquipmentSocket> {
-    [field: SerializeField]
-    private EquipmentSlot Slot { get; set; }
-    
-    private GameObject? Equipment { get; set; }
+    [field: SerializeField] public EquipmentSlot Slot { get; private set; }
+    public GameObject? Equipment { get; private set; }
     
     public bool IsAvailable => !this.Equipment;
 

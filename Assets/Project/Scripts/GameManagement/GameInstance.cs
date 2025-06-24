@@ -3,12 +3,14 @@ using DunGen.Project.External.DunGen.Code;
 using Project.Scripts.Characters.CharacterControl.Combat;
 using Project.Scripts.Characters.Enemies;
 using Project.Scripts.Characters.Player;
+using Project.Scripts.Common.Input;
 using Project.Scripts.Map;
 using Project.Scripts.Util.Linq;
 using SaintsField.Playa;
 using Project.Scripts.Util.Singleton;
 using Unity.Cinemachine;
 using UnityEngine;
+using CameraTarget = Project.Scripts.Characters.Player.CameraTarget;
 
 namespace Project.Scripts.GameManagement;
 
@@ -38,7 +40,6 @@ public class GameInstance : Singleton<GameInstance> {
     private GameMap? StartingMap { get; set; }
     private CinemachineCamera? VirtualCamera { get; set; }
     [NotNull] public PlayerCharacter? PlayerInstance { get; private set; }
-    private PlayerInputInterpreter? Input { get; set; }
     
     private void Start() {
         this.InstantiateObjects();
@@ -56,28 +57,30 @@ public class GameInstance : Singleton<GameInstance> {
         this.Eyes = Camera.main!.transform;
         this.VirtualCamera = Object.Instantiate(this.CinemachineCamera);
         this.PlayerInstance = Object.Instantiate(this.Player).GetComponent<PlayerCharacter>();
-        this.Input = this.PlayerInstance.GetComponent<PlayerInputInterpreter>();
     }
 
     private void InitialiseObjects() {
-        this.VirtualCamera!.Target.TrackingTarget = this.PlayerInstance!.transform;
-        this.PlayerInstance.Initialise();
+        this.VirtualCamera!.Target.TrackingTarget =
+                this.PlayerInstance.GetComponentInChildren<CameraTarget>().transform;
     }
     
     private void InitialiseLevel() {
-        this.StartingMap!.Generate(this.PrepareGame);
+        // this.StartingMap!.Generate(this.PrepareGame);
+        Transform player = this.PlayerInstance.transform;
+        player.position = Vector3.zero;
+        player.rotation = Quaternion.identity;
+        this.InitialiseUI();
+        this.BeginGame();
     }
 
     private void PrepareGame(DungeonGenerator dungeon) {
-        Transform player = this.PlayerInstance.transform;
+        /*Transform player = this.PlayerInstance.transform;
         player.position = dungeon.Root.transform.position;
-        player.rotation = dungeon.Root.transform.rotation;
-        dungeon.Root.GetComponentsInChildren<EnemyCharacter>().ForEach(enemy => enemy.Initialise());
+        player.rotation = dungeon.Root.transform.rotation;*/
         this.InitialiseUI();
         this.BeginGame();
     }
 
     private void BeginGame() {
-        this.Input!.enabled = true;
     }
 }

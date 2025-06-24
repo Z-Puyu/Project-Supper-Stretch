@@ -12,21 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ed4bfbad18b40e7b42737dbd1a6f467, type: 3}
   m_Name: IronSword
   m_EditorClassIdentifier: 
-  <Type>k__BackingField: 6
-  <Slot>k__BackingField: 1
+  <Type>k__BackingField:
+    <Namespace>k__BackingField: Items
+    <Path>k__BackingField: Equipment
+    <Tag>k__BackingField: Equipment
+    <Priority>k__BackingField: 0
+    <Flags>k__BackingField: 2
+    <Icon>k__BackingField: {fileID: 1744151977, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
+    <Subtypes>k__BackingField: []
   <Name>k__BackingField: Iron Sword
   <Model>k__BackingField: {fileID: 7728824248015367572, guid: bdeba134202d3b54d98a5832cc15d663, type: 3}
-  <Properties>k__BackingField:
-  - rid: 1548064347122565217
   <Worth>k__BackingField: 30
+  <Properties>k__BackingField:
+  - <Key>k__BackingField:
+      <TargetAttribute>k__BackingField: CharacterAttribute.Damage.Physical
+      <Type>k__BackingField: 0
+    <Target>k__BackingField:
+      <FullName>k__BackingField: CharacterAttribute.Damage.Physical
+      <Name>k__BackingField: Physical
+    <Method>k__BackingField: 0
+    <Value>k__BackingField: 10
+  <CraftTime>k__BackingField: 0
+  <Slot>k__BackingField: 1
   references:
     version: 2
-    RefIds:
-    - rid: 1548064347122565217
-      type: {class: WeaponProperties, ns: Project.Scripts.Items.Equipments.Weapons, asm: Project.Scripts.Items}
-      data:
-        <WeaponAttributes>k__BackingField:
-        - <AttributeType>k__BackingField: 0
-          <Value>k__BackingField: 10
-          <ModifierType>k__BackingField: 0
-          <ModifierOperation>k__BackingField: 0
+    RefIds: []

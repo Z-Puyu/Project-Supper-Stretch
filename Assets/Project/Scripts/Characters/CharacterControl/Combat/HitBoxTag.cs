@@ -7,12 +7,12 @@ public enum HitBoxTag {
     RightArm,
     LeftShoulder,
     RightShoulder,
-    LeftHandWeapon,
-    RightHandWeapon,
-    LeftKnee,
-    RightKnee,
     LeftFoot,
     RightFoot,
+    LeftLeg,
+    RightLeg,
+    Chest,
+    Belly,
     Head,
     Generic
 }

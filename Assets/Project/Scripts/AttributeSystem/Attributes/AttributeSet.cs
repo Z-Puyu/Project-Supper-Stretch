@@ -8,7 +8,10 @@ using SaintsField;
 using Project.Scripts.AttributeSystem.Attributes.AttributeTypes;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.AttributeSystem.GameplayEffects;
+using Project.Scripts.AttributeSystem.GameplayEffects.Executions;
 using Project.Scripts.AttributeSystem.Modifiers;
+using Project.Scripts.Common;
+using Project.Scripts.Common.GameplayTags;
 using Project.Scripts.Util.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -19,12 +22,17 @@ namespace Project.Scripts.AttributeSystem.Attributes;
 public class AttributeSet : MonoBehaviour, IEnumerable<Attribute>, IAttributeReader {
     private bool IsInitialised { get; set; }
     public Guid Id { get; private set; }
+    
+    [NotNull] [field: SerializeField] public AttributeDefinition? Source { get; private set; }
+    [field: SerializeField] private AttributeConversion? Converter { get; set; }
+    
+    public Dictionary<string, AttributeType> Defined { get; private init; } = [];
     [field: SerializeField, ReadOnly] public string Identifier { get; set; }
-    [NotNull] [field: SerializeField] public AttributeDefinition? AttributeDefinition { get; private set; }
+    
+    
     private Dictionary<string, Attribute> Attributes { get; init; } = [];
-    private Dictionary<AttributeKey, Vector4> Modifiers { get; init; } = [];
-
-    public AdvancedDropdownList<AttributeKey> AllAccessibleAttributes => this.AttributeDefinition.FetchLeaves();
+    private ModifierManager Mediator { get; init; } = new ModifierManager();
+    public AdvancedDropdownList<string> AllAccessibleAttributes => this.Source.AllTags();
 
     public event UnityAction<AttributeChange> OnAttributeChanged = delegate { };
 
@@ -37,108 +45,86 @@ public class AttributeSet : MonoBehaviour, IEnumerable<Attribute>, IAttributeRea
         this.Id = Guid.Parse(this.Identifier);
     }
 
+    private void Start() {
+        PreorderIterator<AttributeType> iterator = new PreorderIterator<AttributeType>(this.Source.Nodes);
+        iterator.ForEach = attribute => this.Defined.Add(attribute.Name, attribute);
+        this.Source.Traverse(iterator);
+    }
+
     public void Initialise(IEnumerable<AttributeInitialisationData> initial) {
         if (this.IsInitialised) {
-            throw new InvalidOperationException($"Trying to initialise {this.gameObject.name} twice");
+            Logging.Error("The attribute set is already initialised.", this);
+            return;   
         }
         
         this.IsInitialised = true;
-        initial.ForEach(init);
-        this.AttributeDefinition.PreorderTraverse(forEach: setZeroIfAbsent);
+        initial.Where(data => this.Defined.ContainsKey(data.Key)).ForEach(init);
+        this.Defined
+            .Where(pair => pair.Value.IsLeaf && !this.Attributes.ContainsKey(pair.Key))
+            .ForEach(pair => this.Attributes.Add(pair.Key, pair.Value.Zero));
         return;
-
-        void setZeroIfAbsent(AttributeTag attribute) {
-            if (attribute.SubAttributes.Count > 0 || this.Attributes.ContainsKey(attribute.Key.FullName)) {
-                return;
-            }
-
-            this.Attributes.Add(attribute.Key.FullName, attribute.Zero);
-        }
-                
         
         void init(AttributeInitialisationData data) {
-            if (!this.AttributeDefinition.Contains(data.Key, out AttributeTag? a) || a is null) {
-                throw new ArgumentException($"Attribute {data.Key} is undefined in attribute set of {this.gameObject.name}");
-            }
-            
-            Attribute zero = a.Zero;
+            Attribute zero = this.Defined[data.Key].Zero;
             if (zero.Cap != string.Empty) {
-                if (!this.AttributeDefinition.Contains(zero.Cap, out AttributeTag? cap)) {
-                    throw new ArgumentException($"{data.Key} requires an attribute of type {cap?.Key.FullName}");
-                }
-                
-                if (!this.Attributes.ContainsKey(cap!.Key.FullName)) {
-                    this.Attributes.Add(cap.Key.FullName, new Attribute(cap.Key.FullName, data.Value, data.Value));   
+                if (!this.Attributes.ContainsKey(zero.Cap)) {
+                    this.Attributes.Add(zero.Cap, new Attribute(zero.Cap, data.Value));   
                 }
 
-                int value = Mathf.Clamp(data.Value, 0, this.ReadCurrent(cap.Key.FullName));
-                this.Attributes.Add(data.Key.FullName, zero with { BaseValue = value, CurrentValue = value });
+                int value = this.Defined[data.Key].AllowNegative
+                        ? Mathf.Min(data.Value, this.ReadCurrent(zero.Cap))
+                        : Mathf.Clamp(data.Value, 0, this.ReadCurrent(zero.Cap));
+                this.Attributes.Add(data.Key, zero with { BaseValue = value, CurrentValue = value });
             } else {
-                this.Attributes.Add(data.Key.FullName, zero with { BaseValue = data.Value, CurrentValue = data.Value });
+                int value = this.Defined[data.Key].AllowNegative ? data.Value : Mathf.Max(data.Value, 0);
+                this.Attributes.Add(data.Key, zero with { BaseValue = value, CurrentValue = value });
             }
         }
     }
 
-    /// <summary>
-    /// Update the current value of the attribute. Called after every modifier change.
-    /// </summary>
-    /// <param name="attribute">The attribute to recompute.</param>
-    private void Recompute(string attribute) {
-        AttributeKey key = attribute;
-        int value = this.ReadBase(attribute);
-        if (this.Modifiers.TryGetValue(key, out Vector4 m)) {
-            value = Mathf.CeilToInt(((value + m.x) * (1 + m.y / 100) + m.z) * (1 + m.w / 100));
-        }
-        
-        this.UpdateAttribute(key, value);
-    }
-
-    private void UpdateAttribute(AttributeKey key, int value) {
-        if (!this.AttributeDefinition.Contains(key, out AttributeTag? attribute)) {
+    private void UpdateAttribute(string key, int value) {
+        if (!this.Defined.TryGetValue(key, out AttributeType def)) {
             throw new ArgumentException($"{key} is undefined in {this.gameObject.name}. Check spelling.");    
         }
         
-        write(key);
-        foreach (AttributeKey k in attribute!.SameSetSynonyms) {
-            write(k);
-        }
-
-        return;
-        
-        void write(AttributeKey k) {
-            Attribute old = this.Read(k.FullName);
-            Attribute updated = old with { CurrentValue = Mathf.Clamp(value, 0, this.ReadMax(k.FullName)) };
-            this.Attributes[k.FullName] = updated;
-            this.PostAttributeUpdate(updated);
-            this.OnAttributeChanged.Invoke(new AttributeChange(k, old.BaseValue, updated.BaseValue,
-                old.CurrentValue, updated.CurrentValue));
-        }
+        Attribute old = this.Read(key);
+        int @new = def.AllowNegative ? Mathf.Min(value, this.ReadMax(key)) : Mathf.Clamp(value, 0, this.ReadMax(key));
+        Attribute updated = old with { CurrentValue = @new };
+        this.Attributes[key] = updated;
+        this.PostAttributeUpdate(updated);
+        this.OnAttributeChanged.Invoke(new AttributeChange(key, old.BaseValue, updated.BaseValue,
+            old.CurrentValue, updated.CurrentValue));
     }
 
     private void AddModifier(Modifier modifier) {
-        if (!this.AttributeDefinition.Contains(modifier.Target, out AttributeTag? @as)) {
-            throw new ArgumentException($"{modifier.Target} is undefined in {this.gameObject.name}. Check spelling.");
+        if (!this.Defined.ContainsKey(modifier.Target)) {
+            if (!this.Converter ||
+                !this.Converter.TryConvert(modifier.Value, modifier.Target, out (string key, float value) result) ||
+                !this.Defined.ContainsKey(result.key)) {
+                Logging.Error($"{modifier.Target} is undefined in {this.gameObject.name}", this);
+                return;
+            }
+            
+            this.AddModifier(modifier with { Target = result.key, Value = result.value });
             return;
         }
 
-        if (@as!.SubAttributes.Count > 0) {
-            @as.SubAttributes.ForEach(a => this.AddModifier(modifier with { Target = a.Key }));
+        foreach (Modifier m in modifier.Reduce(this.Defined)) {
+            this.Mediator.Add(m);
+            int updated = Mathf.CeilToInt(this.Mediator.Query(modifier.Target, this.ReadBase(modifier.Target)));
+            if (updated < 0 && !this.Defined[m.Target].AllowNegative) {
+                this.Mediator.Add(Modifier.Of(-updated, modifier.Target, ModifierType.FinalOffset));
+                updated = 0;
+            }
+            
+            int max = this.ReadMax(modifier.Target);
+            if (updated > max) {
+                this.Mediator.Add(Modifier.Of(max - updated, modifier.Target, ModifierType.FinalOffset));
+                updated = max;
+            }
+        
+            this.UpdateAttribute(modifier.Target, updated);
         }
-
-        AttributeKey key = modifier.Target;
-        foreach (AttributeTag attribute in this.AttributeDefinition.CollectIf(isNonzeroAntonym)) {
-            modifier = -modifier with { Target = attribute.Key };
-            break;
-        }
-
-        if (!this.Modifiers.TryAdd(modifier.Target, modifier)) {
-            this.Modifiers[modifier.Target] += modifier;
-        }
-
-        this.Recompute(modifier.Target.FullName);
-
-        return;
-        bool isNonzeroAntonym(AttributeTag a) => a.Antonyms.Contains(key) && this.ReadCurrent(a.Key.FullName) != 0;
     }
 
     public void AddEffect(
@@ -206,15 +192,26 @@ public class AttributeSet : MonoBehaviour, IEnumerable<Attribute>, IAttributeRea
     protected virtual void PostAttributeUpdate(Attribute updated) { }
 
     public Attribute Read(string attribute) {
-        if (!this.AttributeDefinition.Contains(attribute, out AttributeTag? @as)) {
-            throw new KeyNotFoundException($"{attribute} is undefined in {this.gameObject.name}. Check spelling.");
+        if (this.Attributes.TryGetValue(attribute, out Attribute value)) {
+            return value;
         }
 
-        if (@as!.SubAttributes.Count > 0) {
-            throw new ArgumentException($"{attribute} is a composite attribute.");
+        /*if (!this.Converter) {
+            throw new ArgumentException($"{attribute} is undefined in {this.gameObject.name}.");   
         }
         
-        return this.Attributes[@as.Key.FullName];
+        foreach ((string key, Attribute data) in this.Attributes) {
+            if (!this.Converter.TryConvertTo(key, data.BaseValue, out (string key, float value) res)) {
+                continue;
+            }
+            
+            float current = this.Converter.Convert(data.CurrentValue, attribute, key);
+            Logging.Warn($"{attribute} is undefined. Returning a converted value.", this);
+            return new Attribute(attribute, Mathf.CeilToInt(converted), Mathf.CeilToInt(current));
+        }
+        */
+
+        throw new ArgumentException($"{attribute} is undefined in {this.gameObject.name}.");
     }
 
     public int ReadCurrent(string attribute) {

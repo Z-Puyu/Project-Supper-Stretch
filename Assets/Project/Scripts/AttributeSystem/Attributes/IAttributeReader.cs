@@ -12,5 +12,5 @@ public interface IAttributeReader {
     
     public abstract int ReadMax(string attribute);
 
-    public abstract AdvancedDropdownList<AttributeKey> AllAccessibleAttributes { get; }
+    public abstract AdvancedDropdownList<string> AllAccessibleAttributes { get; }
 }

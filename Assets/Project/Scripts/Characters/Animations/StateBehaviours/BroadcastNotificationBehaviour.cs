@@ -7,6 +7,6 @@ public class BroadcastNotificationBehaviour : AnimatorStateBehaviour {
     [field: SerializeField] private GameNotification Message { get; set; }
 
     protected override void Execute(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        animator.GetComponent<AnimationEventProxy>().OnAnimatorStateNotification(this.Message);
+        animator.GetComponent<AnimatorNotificationProxy>().OnAnimatorStateNotification(this.Message);
     }
 }

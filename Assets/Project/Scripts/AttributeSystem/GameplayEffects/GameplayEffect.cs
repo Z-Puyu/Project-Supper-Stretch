@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
+using Project.Scripts.AttributeSystem.GameplayEffects.Executions;
 using Project.Scripts.AttributeSystem.Modifiers;
+using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.AttributeSystem.GameplayEffects;
@@ -13,7 +15,11 @@ namespace Project.Scripts.AttributeSystem.GameplayEffects;
 [CreateAssetMenu(fileName = "GameplayEffect", menuName = "Attribute System/Gameplay Effect")]
 public class GameplayEffect : ScriptableObject {
     [field: SerializeReference] private EffectExecution Executor { get; set; } = new ModifierEffectExecution();
-    [field: SerializeField] public List<AttributeDefinition> ApplicableTargets { get; private set; } = [];
+    [field: SerializeField] private bool HasLevel { get; set; }
+    
+    [field: SerializeField, Tooltip("This curve describes how a level is mapped to a modifier value coefficient")]
+    [field: ShowIf(nameof(this.HasLevel))]
+    private AnimationCurve LevelEffect { get; set; } = AnimationCurve.Linear(-1, -1, 1, 1);
 
     /// <summary>
     /// Invoke the gameplay effect to produce a set of modifiers.
@@ -25,10 +31,8 @@ public class GameplayEffect : ScriptableObject {
     public GameplayEffectExecutionResult Execute(
         AttributeSet target, GameplayEffectExecutionArgs args, out IEnumerable<Modifier> outcome
     ) {
-        return this.Executor.Execute(target, args, out outcome);
-    }
-
-    public bool ApplicableTo(AttributeSet target) {
-        return this.ApplicableTargets.Contains(target.AttributeDefinition);
+        return this.HasLevel
+                ? this.Executor.Execute(target, args, out outcome)
+                : this.Executor.Execute(target, args, out outcome, this.LevelEffect.Evaluate(args.Level));
     }
 }

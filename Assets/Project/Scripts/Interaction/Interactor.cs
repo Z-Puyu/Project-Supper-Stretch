@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.Common.Input;
+using Project.Scripts.Player;
 using UnityEngine;
 
 namespace Project.Scripts.Interaction;
 
 [DisallowMultipleComponent]
-public class Interactor : MonoBehaviour {
+public class Interactor : MonoBehaviour, IPlayerControllable {
     [NotNull]
     private Transform? CameraTransform { get; set; }
 
@@ -96,5 +98,9 @@ public class Interactor : MonoBehaviour {
         
         this.CurrentTarget = target;
         this.CurrentTarget!.Activate();
+    }
+
+    public void BindInput(InputActions actions) {
+        actions.Player.Interact.performed += _ => this.Interact();
     }
 }

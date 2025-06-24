@@ -12,378 +12,192 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef7f45ecd88948f4ae10e9e974de65b7, type: 3}
   m_Name: CharacterAttributes
   m_EditorClassIdentifier: 
-  <RootAttribute>k__BackingField:
-    <Key>k__BackingField:
-      <FullName>k__BackingField: CharacterAttribute
-      <Name>k__BackingField: CharacterAttribute
-    <Name>k__BackingField: CharacterAttribute
-    <HowToClamp>k__BackingField: 0
-    <Cap>k__BackingField:
-      <FullName>k__BackingField: 
-      <Name>k__BackingField: 
-    <MaxValue>k__BackingField: 0
-    <Synonyms>k__BackingField: []
-    <Antonyms>k__BackingField: []
-    <SubAttributes>k__BackingField:
-    - <Key>k__BackingField:
-        <FullName>k__BackingField: CharacterAttribute.Health
-        <Name>k__BackingField: Health
-      <Name>k__BackingField: Health
-      <HowToClamp>k__BackingField: 1
-      <Cap>k__BackingField:
-        <FullName>k__BackingField: CharacterAttribute.MaxHealth
-        <Name>k__BackingField: MaxHealth
-      <MaxValue>k__BackingField: 0
-      <Synonyms>k__BackingField:
-      - <FullName>k__BackingField: CookingAttribute.Health
-        <Name>k__BackingField: Health
-      <Antonyms>k__BackingField: []
-      <SubAttributes>k__BackingField: []
-    - <Key>k__BackingField:
-        <FullName>k__BackingField: CharacterAttribute.MaxHealth
-        <Name>k__BackingField: MaxHealth
-      <Name>k__BackingField: MaxHealth
-      <HowToClamp>k__BackingField: 0
-      <Cap>k__BackingField:
-        <FullName>k__BackingField: 
-        <Name>k__BackingField: 
-      <MaxValue>k__BackingField: 0
-      <Synonyms>k__BackingField: []
-      <Antonyms>k__BackingField: []
-      <SubAttributes>k__BackingField: []
-    - <Key>k__BackingField:
-        <FullName>k__BackingField: CharacterAttribute.Sanity
-        <Name>k__BackingField: Sanity
-      <Name>k__BackingField: Sanity
-      <HowToClamp>k__BackingField: 2
-      <Cap>k__BackingField:
-        <FullName>k__BackingField: 
-        <Name>k__BackingField: 
-      <MaxValue>k__BackingField: 100
-      <Synonyms>k__BackingField: []
-      <Antonyms>k__BackingField: []
-      <SubAttributes>k__BackingField: []
-    - <Key>k__BackingField:
-        <FullName>k__BackingField: CharacterAttribute.Satiation
-        <Name>k__BackingField: Satiation
-      <Name>k__BackingField: Satiation
-      <HowToClamp>k__BackingField: 2
-      <Cap>k__BackingField:
-        <FullName>k__BackingField: 
-        <Name>k__BackingField: 
-      <MaxValue>k__BackingField: 100
-      <Synonyms>k__BackingField:
-      - <FullName>k__BackingField: CookingAttribute.Satiation
-        <Name>k__BackingField: Satiation
-      <Antonyms>k__BackingField: []
-      <SubAttributes>k__BackingField: []
-    - <Key>k__BackingField:
-        <FullName>k__BackingField: CharacterAttribute.Damage
-        <Name>k__BackingField: Damage
-      <Name>k__BackingField: Damage
-      <HowToClamp>k__BackingField: 0
-      <Cap>k__BackingField:
-        <FullName>k__BackingField: 
-        <Name>k__BackingField: 
-      <MaxValue>k__BackingField: 100
-      <Synonyms>k__BackingField:
-      - <FullName>k__BackingField: CombatAttribute.BaseDamage
-        <Name>k__BackingField: BaseDamage
-      <Antonyms>k__BackingField: []
-      <SubAttributes>k__BackingField: []
-    - <Key>k__BackingField:
-        <FullName>k__BackingField: CharacterAttribute.ElementalWeakness
-        <Name>k__BackingField: ElementalWeakness
-      <Name>k__BackingField: ElementalWeakness
-      <HowToClamp>k__BackingField: 0
-      <Cap>k__BackingField:
-        <FullName>k__BackingField: 
-        <Name>k__BackingField: 
-      <MaxValue>k__BackingField: 100
-      <Synonyms>k__BackingField: []
-      <Antonyms>k__BackingField:
-      - <FullName>k__BackingField: CharacterAttribute.ElementalResistance
-        <Name>k__BackingField: ElementalResistance
-      <SubAttributes>k__BackingField:
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalWeakness.Fire
-          <Name>k__BackingField: Fire
-        <Name>k__BackingField: Fire
-        <HowToClamp>k__BackingField: 0
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
+  <Namespace>k__BackingField: CharacterAttributes
+  <Nodes>k__BackingField:
+  - rid: 1548064550727712886
+  - rid: 1548064550727712889
+  - rid: 1548064550727712890
+  - rid: 1548064550727712891
+  - rid: 1548064550727712892
+  - rid: 1548064550727712893
+  references:
+    version: 2
+    RefIds:
+    - rid: 1548064550727712886
+      type: {class: AttributeType, ns: Project.Scripts.AttributeSystem.Attributes.Definitions, asm: Project.Scripts.AttributeSystem}
+      data:
+        <Namespace>k__BackingField: CharacterAttributes
+        <Path>k__BackingField: Health
+        <Tag>k__BackingField: Health
+        <SubAttributes>k__BackingField: []
+        <HowToClamp>k__BackingField: 1
+        <Cap>k__BackingField: CharacterAttributes.MaxHealth
         <MaxValue>k__BackingField: 0
-        <Synonyms>k__BackingField: []
-        <Antonyms>k__BackingField:
-        - <FullName>k__BackingField: CharacterAttribute.ElementalResistance.Fire
-          <Name>k__BackingField: Fire
+        <AllowNegative>k__BackingField: 0
+    - rid: 1548064550727712889
+      type: {class: AttributeType, ns: Project.Scripts.AttributeSystem.Attributes.Definitions, asm: Project.Scripts.AttributeSystem}
+      data:
+        <Namespace>k__BackingField: CharacterAttributes
+        <Path>k__BackingField: MaxHealth
+        <Tag>k__BackingField: MaxHealth
         <SubAttributes>k__BackingField: []
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalWeakness.Ice
-          <Name>k__BackingField: Ice
-        <Name>k__BackingField: Ice
         <HowToClamp>k__BackingField: 0
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
+        <Cap>k__BackingField: 
         <MaxValue>k__BackingField: 0
-        <Synonyms>k__BackingField: []
-        <Antonyms>k__BackingField:
-        - <FullName>k__BackingField: CharacterAttribute.ElementalResistance.Ice
-          <Name>k__BackingField: Ice
+        <AllowNegative>k__BackingField: 0
+    - rid: 1548064550727712890
+      type: {class: AttributeType, ns: Project.Scripts.AttributeSystem.Attributes.Definitions, asm: Project.Scripts.AttributeSystem}
+      data:
+        <Namespace>k__BackingField: CharacterAttributes
+        <Path>k__BackingField: Satiation
+        <Tag>k__BackingField: Satiation
         <SubAttributes>k__BackingField: []
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalWeakness.Lightning
-          <Name>k__BackingField: Lightning
-        <Name>k__BackingField: Lightning
+        <HowToClamp>k__BackingField: 2
+        <Cap>k__BackingField: 
+        <MaxValue>k__BackingField: 100
+        <AllowNegative>k__BackingField: 0
+    - rid: 1548064550727712891
+      type: {class: AttributeType, ns: Project.Scripts.AttributeSystem.Attributes.Definitions, asm: Project.Scripts.AttributeSystem}
+      data:
+        <Namespace>k__BackingField: CharacterAttributes
+        <Path>k__BackingField: Damage
+        <Tag>k__BackingField: Damage
+        <SubAttributes>k__BackingField:
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: Damage.Physical
+          <Tag>k__BackingField: Physical
+          <SubAttributes>k__BackingField: []
+          <HowToClamp>k__BackingField: 0
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 0
+          <AllowNegative>k__BackingField: 0
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: Damage.Elemental
+          <Tag>k__BackingField: Elemental
+          <SubAttributes>k__BackingField:
+          - <Namespace>k__BackingField: CharacterAttributes
+            <Path>k__BackingField: Damage.Elemental.Fire
+            <Tag>k__BackingField: Fire
+            <SubAttributes>k__BackingField: []
+            <HowToClamp>k__BackingField: 0
+            <Cap>k__BackingField: 
+            <MaxValue>k__BackingField: 0
+            <AllowNegative>k__BackingField: 0
+          - <Namespace>k__BackingField: CharacterAttributes
+            <Path>k__BackingField: Damage.Elemental.Ice
+            <Tag>k__BackingField: Ice
+            <SubAttributes>k__BackingField: []
+            <HowToClamp>k__BackingField: 0
+            <Cap>k__BackingField: 
+            <MaxValue>k__BackingField: 0
+            <AllowNegative>k__BackingField: 0
+          - <Namespace>k__BackingField: CharacterAttributes
+            <Path>k__BackingField: Damage.Elemental.Lightning
+            <Tag>k__BackingField: Lightning
+            <SubAttributes>k__BackingField: []
+            <HowToClamp>k__BackingField: 0
+            <Cap>k__BackingField: 
+            <MaxValue>k__BackingField: 0
+            <AllowNegative>k__BackingField: 0
+          - <Namespace>k__BackingField: CharacterAttributes
+            <Path>k__BackingField: Damage.Elemental.Poison
+            <Tag>k__BackingField: Poison
+            <SubAttributes>k__BackingField: []
+            <HowToClamp>k__BackingField: 0
+            <Cap>k__BackingField: 
+            <MaxValue>k__BackingField: 0
+            <AllowNegative>k__BackingField: 0
+          - <Namespace>k__BackingField: CharacterAttributes
+            <Path>k__BackingField: Damage.Elemental.Divine
+            <Tag>k__BackingField: Divine
+            <SubAttributes>k__BackingField: []
+            <HowToClamp>k__BackingField: 0
+            <Cap>k__BackingField: 
+            <MaxValue>k__BackingField: 0
+            <AllowNegative>k__BackingField: 0
+          - <Namespace>k__BackingField: CharacterAttributes
+            <Path>k__BackingField: Damage.Elemental.Dark
+            <Tag>k__BackingField: Dark
+            <SubAttributes>k__BackingField: []
+            <HowToClamp>k__BackingField: 0
+            <Cap>k__BackingField: 
+            <MaxValue>k__BackingField: 0
+            <AllowNegative>k__BackingField: 0
+          <HowToClamp>k__BackingField: 0
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 0
+          <AllowNegative>k__BackingField: 0
         <HowToClamp>k__BackingField: 0
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
+        <Cap>k__BackingField: 
         <MaxValue>k__BackingField: 0
-        <Synonyms>k__BackingField: []
-        <Antonyms>k__BackingField:
-        - <FullName>k__BackingField: CharacterAttribute.ElementalResistance.Lightning
-          <Name>k__BackingField: Lightning
+        <AllowNegative>k__BackingField: 0
+    - rid: 1548064550727712892
+      type: {class: AttributeType, ns: Project.Scripts.AttributeSystem.Attributes.Definitions, asm: Project.Scripts.AttributeSystem}
+      data:
+        <Namespace>k__BackingField: CharacterAttributes
+        <Path>k__BackingField: Defence
+        <Tag>k__BackingField: Defence
         <SubAttributes>k__BackingField: []
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalWeakness.Poison
-          <Name>k__BackingField: Poison
-        <Name>k__BackingField: Poison
         <HowToClamp>k__BackingField: 0
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
+        <Cap>k__BackingField: 
         <MaxValue>k__BackingField: 0
-        <Synonyms>k__BackingField: []
-        <Antonyms>k__BackingField:
-        - <FullName>k__BackingField: CharacterAttribute.ElementalResistance.Poison
-          <Name>k__BackingField: Poison
-        <SubAttributes>k__BackingField: []
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalWeakness.Divine
-          <Name>k__BackingField: Divine
-        <Name>k__BackingField: Divine
+        <AllowNegative>k__BackingField: 0
+    - rid: 1548064550727712893
+      type: {class: AttributeType, ns: Project.Scripts.AttributeSystem.Attributes.Definitions, asm: Project.Scripts.AttributeSystem}
+      data:
+        <Namespace>k__BackingField: CharacterAttributes
+        <Path>k__BackingField: ElementalResistance
+        <Tag>k__BackingField: ElementalResistance
+        <SubAttributes>k__BackingField:
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: ElementalResistance.Fire
+          <Tag>k__BackingField: Fire
+          <SubAttributes>k__BackingField: []
+          <HowToClamp>k__BackingField: 2
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 100
+          <AllowNegative>k__BackingField: 1
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: ElementalResistance.Ice
+          <Tag>k__BackingField: Ice
+          <SubAttributes>k__BackingField: []
+          <HowToClamp>k__BackingField: 2
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 100
+          <AllowNegative>k__BackingField: 1
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: ElementalResistance.Lightning
+          <Tag>k__BackingField: Lightning
+          <SubAttributes>k__BackingField: []
+          <HowToClamp>k__BackingField: 2
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 100
+          <AllowNegative>k__BackingField: 1
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: ElementalResistance.Poison
+          <Tag>k__BackingField: Poison
+          <SubAttributes>k__BackingField: []
+          <HowToClamp>k__BackingField: 2
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 100
+          <AllowNegative>k__BackingField: 1
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: ElementalResistance.Divine
+          <Tag>k__BackingField: Divine
+          <SubAttributes>k__BackingField: []
+          <HowToClamp>k__BackingField: 2
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 100
+          <AllowNegative>k__BackingField: 1
+        - <Namespace>k__BackingField: CharacterAttributes
+          <Path>k__BackingField: ElementalResistance.Dark
+          <Tag>k__BackingField: Dark
+          <SubAttributes>k__BackingField: []
+          <HowToClamp>k__BackingField: 2
+          <Cap>k__BackingField: 
+          <MaxValue>k__BackingField: 100
+          <AllowNegative>k__BackingField: 1
         <HowToClamp>k__BackingField: 0
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
+        <Cap>k__BackingField: 
         <MaxValue>k__BackingField: 0
-        <Synonyms>k__BackingField: []
-        <Antonyms>k__BackingField:
-        - <FullName>k__BackingField: CharacterAttribute.ElementalResistance.Divine
-          <Name>k__BackingField: Divine
-        <SubAttributes>k__BackingField: []
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalWeakness.Dark
-          <Name>k__BackingField: Dark
-        <Name>k__BackingField: Dark
-        <HowToClamp>k__BackingField: 0
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
-        <MaxValue>k__BackingField: 0
-        <Synonyms>k__BackingField: []
-        <Antonyms>k__BackingField:
-        - <FullName>k__BackingField: CharacterAttribute.ElementalResistance.Dark
-          <Name>k__BackingField: Dark
-        <SubAttributes>k__BackingField: []
-    - <Key>k__BackingField:
-        <FullName>k__BackingField: CharacterAttribute.ElementalResistance
-        <Name>k__BackingField: ElementalResistance
-      <Name>k__BackingField: ElementalResistance
-      <HowToClamp>k__BackingField: 0
-      <Cap>k__BackingField:
-        <FullName>k__BackingField: 
-        <Name>k__BackingField: 
-      <MaxValue>k__BackingField: 100
-      <Synonyms>k__BackingField: []
-      <Antonyms>k__BackingField:
-      - <FullName>k__BackingField: CharacterAttribute.ElementalWeakness
-        <Name>k__BackingField: ElementalWeakness
-      <SubAttributes>k__BackingField:
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalResistance.Fire
-          <Name>k__BackingField: Fire
-        <Name>k__BackingField: Fire
-        <HowToClamp>k__BackingField: 2
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
-        <MaxValue>k__BackingField: 100
-        <Synonyms>k__BackingField: []
-        <Antonyms>k__BackingField:
-        - <FullName>k__BackingField: CharacterAttribute.ElementalWeakness.Fire
-          <Name>k__BackingField: Fire
-        <SubAttributes>k__BackingField: []
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalResistance.Ice
-          <Name>k__BackingField: Ice
-        <Name>k__BackingField: Ice
-        <HowToClamp>k__BackingField: 2
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
-        <MaxValue>k__BackingField: 100
-        <Synonyms>k__BackingField: []
-        <Antonyms>k__BackingField:
-        - <FullName>k__BackingField: CharacterAttribute.ElementalWeakness.Ice
-          <Name>k__BackingField: Ice
-        <SubAttributes>k__BackingField: []
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalResistance.Lightning
-          <Name>k__BackingField: Lightning
-        <Name>k__BackingField: Lightning
-        <HowToClamp>k__BackingField: 2
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
-        <MaxValue>k__BackingField: 100
-        <Synonyms>k__BackingField: []
-        <Antonyms>k__BackingField:
-        - <FullName>k__BackingField: CharacterAttribute.ElementalWeakness.Lightning
-          <Name>k__BackingField: Lightning
-        <SubAttributes>k__BackingField: []
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalResistance.Poison
-          <Name>k__BackingField: Poison
-        <Name>k__BackingField: Poison
-        <HowToClamp>k__BackingField: 2
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
-        <MaxValue>k__BackingField: 100
-        <Synonyms>k__BackingField: []
-        <Antonyms>k__BackingField:
-        - <FullName>k__BackingField: CharacterAttribute.ElementalWeakness.Poison
-          <Name>k__BackingField: Poison
-        <SubAttributes>k__BackingField: []
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalResistance.Divine
-          <Name>k__BackingField: Divine
-        <Name>k__BackingField: Divine
-        <HowToClamp>k__BackingField: 2
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
-        <MaxValue>k__BackingField: 100
-        <Synonyms>k__BackingField: []
-        <Antonyms>k__BackingField:
-        - <FullName>k__BackingField: CharacterAttribute.ElementalWeakness.Divine
-          <Name>k__BackingField: Divine
-        <SubAttributes>k__BackingField: []
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalResistance.Dark
-          <Name>k__BackingField: Dark
-        <Name>k__BackingField: Dark
-        <HowToClamp>k__BackingField: 2
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
-        <MaxValue>k__BackingField: 100
-        <Synonyms>k__BackingField: []
-        <Antonyms>k__BackingField:
-        - <FullName>k__BackingField: CharacterAttribute.ElementalWeakness.Dark
-          <Name>k__BackingField: Dark
-        <SubAttributes>k__BackingField: []
-    - <Key>k__BackingField:
-        <FullName>k__BackingField: CharacterAttribute.ElementalDamage
-        <Name>k__BackingField: ElementalDamage
-      <Name>k__BackingField: ElementalDamage
-      <HowToClamp>k__BackingField: 0
-      <Cap>k__BackingField:
-        <FullName>k__BackingField: 
-        <Name>k__BackingField: 
-      <MaxValue>k__BackingField: 100
-      <Synonyms>k__BackingField:
-      - <FullName>k__BackingField: CombatAttribute.ElementalDamage
-        <Name>k__BackingField: ElementalDamage
-      <Antonyms>k__BackingField:
-      - <FullName>k__BackingField: CharacterAttribute.ElementalWeakness
-        <Name>k__BackingField: ElementalWeakness
-      <SubAttributes>k__BackingField:
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalDamage.Fire
-          <Name>k__BackingField: Fire
-        <Name>k__BackingField: Fire
-        <HowToClamp>k__BackingField: 0
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
-        <MaxValue>k__BackingField: 100
-        <Synonyms>k__BackingField:
-        - <FullName>k__BackingField: CombatAttribute.ElementalDamage.Fire
-          <Name>k__BackingField: Fire
-        <Antonyms>k__BackingField: []
-        <SubAttributes>k__BackingField: []
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalDamage.Lightning
-          <Name>k__BackingField: Lightning
-        <Name>k__BackingField: Lightning
-        <HowToClamp>k__BackingField: 0
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
-        <MaxValue>k__BackingField: 100
-        <Synonyms>k__BackingField:
-        - <FullName>k__BackingField: CombatAttribute.ElementalDamage.Lightning
-          <Name>k__BackingField: Lightning
-        <Antonyms>k__BackingField: []
-        <SubAttributes>k__BackingField: []
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalDamage.Ice
-          <Name>k__BackingField: Ice
-        <Name>k__BackingField: Ice
-        <HowToClamp>k__BackingField: 0
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
-        <MaxValue>k__BackingField: 100
-        <Synonyms>k__BackingField:
-        - <FullName>k__BackingField: CombatAttribute.ElementalDamage.Ice
-          <Name>k__BackingField: Ice
-        <Antonyms>k__BackingField: []
-        <SubAttributes>k__BackingField: []
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalDamage.Poison
-          <Name>k__BackingField: Poison
-        <Name>k__BackingField: Poison
-        <HowToClamp>k__BackingField: 0
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
-        <MaxValue>k__BackingField: 100
-        <Synonyms>k__BackingField:
-        - <FullName>k__BackingField: CombatAttribute.ElementalDamage.Poison
-          <Name>k__BackingField: Poison
-        <Antonyms>k__BackingField: []
-        <SubAttributes>k__BackingField: []
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalDamage.Divine
-          <Name>k__BackingField: Divine
-        <Name>k__BackingField: Divine
-        <HowToClamp>k__BackingField: 0
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
-        <MaxValue>k__BackingField: 100
-        <Synonyms>k__BackingField:
-        - <FullName>k__BackingField: CombatAttribute.ElementalDamage.Divine
-          <Name>k__BackingField: Divine
-        <Antonyms>k__BackingField: []
-        <SubAttributes>k__BackingField: []
-      - <Key>k__BackingField:
-          <FullName>k__BackingField: CharacterAttribute.ElementalDamage.Dark
-          <Name>k__BackingField: Dark
-        <Name>k__BackingField: Dark
-        <HowToClamp>k__BackingField: 0
-        <Cap>k__BackingField:
-          <FullName>k__BackingField: 
-          <Name>k__BackingField: 
-        <MaxValue>k__BackingField: 100
-        <Synonyms>k__BackingField:
-        - <FullName>k__BackingField: CombatAttribute.ElementalDamage.Dark
-          <Name>k__BackingField: Dark
-        <Antonyms>k__BackingField: []
-        <SubAttributes>k__BackingField: []
+        <AllowNegative>k__BackingField: 1

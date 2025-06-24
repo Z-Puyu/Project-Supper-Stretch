@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Project.Scripts.AttributeSystem.Modifiers;
 using Project.Scripts.Util.Linq;
+using SaintsField;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -20,16 +21,8 @@ public class CookingMethod : ScriptableObject {
     [field: SerializeField] private Category FoodType { get; set; } = Category.Salad;
     [field: SerializeField] private string Name { get; set; } = string.Empty;
     [field: SerializeField] private string AlternativeName { get; set; } = string.Empty;
-    [field: SerializeField] public List<Modifier> Properties { get; private set; } = [];
-
-    /*[field: SerializeField, PropRange(0, 12)]
-    public int BaseCookingTime { get; private set; }
-
-    [field: SerializeField, PropRange(0, 100), PostFieldRichLabel("<color=grey>%")]
-    public int BaseLabourCost { get; private set; }
-
-    [field: SerializeField, PropRange(0, 100), PostFieldRichLabel("<color=grey>%")]
-    public int SatiationBonus { get; private set; }*/
+    [field: SerializeField] public int BaseCraftTime { get; private set; } = 1;
+    [field: SerializeField] public List<Modifier> FoodModifiers { get; private set; } = [];
 
     private string SelectName() {
         if (this.AlternativeName == string.Empty) {

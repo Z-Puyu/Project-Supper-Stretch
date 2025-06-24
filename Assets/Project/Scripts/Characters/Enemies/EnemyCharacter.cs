@@ -25,13 +25,9 @@ public class EnemyCharacter : GameCharacter<Enemy> {
         }
     }
     
-    public override void Initialise() {
-        base.Initialise();
+    protected override void Start() {
+        base.Start();
         this.LootContainer!.LootTable = this.CharacterData.LootTable;
-        foreach (HitBox box in this.GetComponentsInChildren<HitBox>()) {
-            this.ComboAttack.OnPerformed += box.RegisterAttackEvent;
-        }
-
         this.GetComponent<NavMeshAgent>().enabled = true;
         this.GetComponent<BehaviorGraphAgent>().enabled = true;
         this.LootContainer.gameObject.SetActive(false);

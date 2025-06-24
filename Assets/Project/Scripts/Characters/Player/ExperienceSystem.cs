@@ -1,4 +1,3 @@
-using Project.Scripts.Common.UI;
 using SaintsField;
 using UnityEngine;
 using UnityEngine.Events;
@@ -6,10 +5,7 @@ using UnityEngine.Events;
 namespace Project.Scripts.Characters.Player;
 
 public class ExperienceSystem : MonoBehaviour {
-    public sealed record class UIData((int level, int xp, int xpToNextLevel) Value)
-            : UIData<(int level, int xp, int xpToNextLevel)>(Value);
-    
-    public static event UnityAction<ExperienceSystem, UIData> OnLevelUp;
+    public static event UnityAction<ExperienceSystem> OnLevelUp;
     
     [field: SerializeField, Tooltip("This curve maps current level to experience points required to level up")] 
     private AnimationCurve LevellingCurve { get; set; } = new AnimationCurve();
@@ -34,7 +30,6 @@ public class ExperienceSystem : MonoBehaviour {
         this.CurrentXp -= this.XpToNextLevel;
         this.CurrentLevel += 1;
         this.XpToNextLevel = Mathf.FloorToInt(this.LevellingCurve.Evaluate(this.CurrentLevel));
-        ExperienceSystem.OnLevelUp
-                        .Invoke(this, new UIData((this.CurrentLevel, this.CurrentXp, this.XpToNextLevel)));
+        ExperienceSystem.OnLevelUp.Invoke(this);
     }
 }

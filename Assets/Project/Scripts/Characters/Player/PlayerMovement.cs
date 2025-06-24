@@ -2,13 +2,17 @@
 using System.Diagnostics.CodeAnalysis;
 using SaintsField;
 using Project.Scripts.Characters.CharacterControl;
+using Project.Scripts.Common;
+using Project.Scripts.Common.Input;
+using Project.Scripts.Player;
 using Project.Scripts.Util.Components;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Project.Scripts.Characters.Player;
 
 [DisallowMultipleComponent, RequireComponent(typeof(Animator))]
-public class PlayerMovement : MonoBehaviour {
+public class PlayerMovement : MonoBehaviour, IPlayerControllable {
     public enum Mode { Walk = 1, Run = 2, Sprint = 3 }
 
     
@@ -107,5 +111,21 @@ public class PlayerMovement : MonoBehaviour {
 
     private void OnAnimatorMove() {
         this.Controller.Move(this.Animator.deltaPosition with { y = this.FallingSpeed * Time.deltaTime });
+    }
+
+    public void BindInput(InputActions actions) {
+        actions.Player.Move.performed += parseInput;
+        actions.Player.Move.canceled += _ => this.StopImmediately();
+        actions.Player.Run.performed += _ => this.SwitchMode(Mode.Run);
+        actions.Player.Run.canceled += _ => this.SwitchMode(Mode.Walk);
+        actions.Player.Sprint.performed += _ => this.SwitchMode(Mode.Sprint);
+        actions.Player.Sprint.canceled += _ => this.SwitchMode(Mode.Walk);
+        actions.Player.LockWalking.performed += _ => this.Locked = !this.Locked;
+        return;
+        
+        void parseInput(InputAction.CallbackContext context) {
+            Vector2 input = context.ReadValue<Vector2>();
+            this.MoveTowards(new Vector3(input.x, 0, input.y));
+        }
     }
 }

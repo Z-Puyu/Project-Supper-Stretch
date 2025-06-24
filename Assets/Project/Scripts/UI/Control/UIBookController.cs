@@ -3,7 +3,7 @@ using Project.Scripts.Common;
 using Project.Scripts.Items.CraftingSystem;
 using Project.Scripts.Items.InventorySystem;
 using Project.Scripts.Items.InventorySystem.LootContainers;
-using Project.Scripts.UI.Control.Game.InventoryUI;
+using Project.Scripts.UI.Control.MVP.Presenters;
 using UnityEngine;
 
 namespace Project.Scripts.UI.Control;
@@ -19,8 +19,8 @@ public class UIBookController : MonoBehaviour {
 
     private void Start() {
         GameEvents.UI.OnGoBack += this.Book.PreviousPage;
-        Inventory.OnOpen += this.Book.Open<InventoryPresenter>;
-        LootContainer.OnOpen += this.Book.Open<LootContainerPresenter>;
-        CampFire.OnOpen += this.Book.Open<CampPanelPresenter>;
+        Inventory.OnOpen += this.Book.Open<InventoryCoordinator>;
+        LootContainer.OnOpen += this.Book.Open<LootContainerCoordinator>;
+        CampFire.OnOpen += this.Book.Open<CampMenuCoordinator>;
     }
 }

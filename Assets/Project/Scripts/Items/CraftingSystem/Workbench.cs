@@ -2,90 +2,109 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Editor;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.AttributeSystem.GameplayEffects;
+using Project.Scripts.AttributeSystem.GameplayEffects.Executions;
 using Project.Scripts.AttributeSystem.Modifiers;
+using Project.Scripts.Common;
+using Project.Scripts.Common.GameplayTags;
+using Project.Scripts.Items.Definitions;
 using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.Items.CraftingSystem;
 
-[DisallowMultipleComponent, RequireComponent(typeof(AttributeSet))]
+[DisallowMultipleComponent]
 public class Workbench : MonoBehaviour {
     private Recipe? Recipe { get; set; }
-    [NotNull] private AttributeSet? AttributeSet { get; set; }
+    private float CraftTime { get; set; }
+    
+    [field: SerializeField, AdvancedDropdown(nameof(this.AllItemTypes))] 
+    private ItemType ProductItemType { get; set; }
+    
+    [field: SerializeField, AdvancedDropdown(nameof(this.AllItemTypes))] 
+    private ItemType IngredientItemType { get; set; }
+    
     [field: SerializeField] private List<CookingMethod> CookingMethods { get; set; } = [];
     [field: SerializeField] public int MaxMainIngredients { get; private set; } = 3;
     [field: SerializeField] public int MaxSpices { get; private set; } = 2;
     [field: SerializeField] public int MaxAdditives { get; private set; } = 2;
-    
-    [field: SerializeField, Header("Attributes")]
-    [field: AdvancedDropdown(nameof(this.AttributeSet.AllAccessibleAttributes))]
-    private AttributeKey FoodCostAttribute { get; set; }
-    
-    [field: SerializeField, AdvancedDropdown(nameof(this.AttributeSet.AllAccessibleAttributes))]
-    private AttributeKey CookingTimeAttribute { get; set; }
 
-    [field: SerializeField, AdvancedDropdown(nameof(this.AttributeSet.AllAccessibleAttributes))]
-    private List<AttributeKey> FoodPropertyAttributes { get; set; } = [];
-    
-    [field: SerializeField, Header("Gameplay Effects")] 
-    private GameplayEffect? OnChangeCookingMethod { get; set; }
-    
-    [field: SerializeField]
-    private GameplayEffect? OnConsumeFood { get; set; }
+    private AdvancedDropdownList<ItemType> AllItemTypes => ObjectCache<ItemDefinition>.Instance.Objects.LeafNodes();
     
     public event Action<int, Item> OnCraft = delegate { };
-    public event Action<Recipe> OnRecipeChanged = delegate { };
+    public event Action<int, Recipe> OnRecipeChanged = delegate { };
 
-    private void Awake() {
-        this.AttributeSet = this.GetComponent<AttributeSet>();
+    private void Start() {
+        this.NewSession();
     }
 
-    public Recipe NewSession() {
-        return this.Recipe = new Recipe();
+    public void NewSession() {
+        this.Recipe = new Recipe(this.ProductItemType, this.IngredientItemType);
     }
 
     public void Craft() {
         if (this.Recipe is null) {
-            throw new ArgumentException("No recipe to craft.");
+            Logging.Error("No recipe to craft.", this);
+            return;
         }
-        
-        int cost = this.AttributeSet.ReadCurrent(this.FoodCostAttribute.FullName);
-        IEnumerable<Modifier> modifiers = this.FoodPropertyAttributes.Select(toModifier);
-        Item food = new Item(ItemType.Food, this.Recipe.FoodName, cost, [], [this.OnConsumeFood]);
-        this.OnCraft.Invoke(this.AttributeSet.ReadCurrent(this.CookingTimeAttribute.FullName), food);
-        return;
 
-        Modifier toModifier(AttributeKey key) =>
-                Modifier.Builder.Of(this.AttributeSet.ReadCurrent(key.FullName), key).Build();
+        this.OnCraft.Invoke(Mathf.FloorToInt(this.CraftTime), this.Recipe.Cook());
+        this.NewSession();
     }
 
     public void ChangeCookingMethod(int idx) {
-        this.Recipe ??= this.NewSession();
+        if (this.Recipe is null) {
+            Logging.Error("No recipe to change cooking method.", this);
+            return;
+        }
+        
         CookingMethod? current = this.Recipe.CookingMethod;
         CookingMethod next = this.CookingMethods[idx];
         if (current == next) {
             return;
         }
 
-        if (this.OnChangeCookingMethod) {
-            GameplayEffectExecutionArgs args = !current
-                    ? new GameplayEffectExecutionArgs.Builder().WithCustomModifiers(next.Properties).Build()
-                    : new GameplayEffectExecutionArgs.Builder()
-                      .WithCustomModifiers(current.Properties.Select(modifier => -modifier))
-                      .WithCustomModifiers(next.Properties).Build();
-            this.AttributeSet.AddEffect(this.OnChangeCookingMethod, args);
+        if (current) {
+            this.CraftTime -= current.BaseCraftTime;
         }
         
-        this.Recipe.CookingMethod = this.CookingMethods[idx];
-        this.OnRecipeChanged.Invoke(this.Recipe);
+        this.CraftTime += this.CookingMethods[idx].BaseCraftTime;
+        this.Recipe.SwitchMethod(current, next);
+        this.OnRecipeChanged.Invoke(Mathf.FloorToInt(this.CraftTime), this.Recipe);
     }
     
     public void AddIngredient(Item item) {
-        this.Recipe ??= this.NewSession(); 
+        if (!item.Type.Flags.HasFlag(ItemFlag.CraftingMaterial)) {
+            Logging.Error($"{item} is not a food ingredient", this);
+            return;
+        }
+
+        if (this.Recipe is null) {
+            Logging.Error("No recipe to add ingredient.", this);
+            return;
+        }
+
+        this.CraftTime += item.CraftTime;
         this.Recipe.AddIngredient(item);
-        this.OnRecipeChanged.Invoke(this.Recipe);
+        this.OnRecipeChanged.Invoke(Mathf.FloorToInt(this.CraftTime), this.Recipe);
+    }
+
+    public void RemoveIngredient(Item item) {
+        if (!item.Type.Flags.HasFlag(ItemFlag.CraftingMaterial)) {
+            Logging.Error($"{item} is not a food ingredient", this);
+            return;
+        }
+
+        if (this.Recipe is null) {
+            Logging.Error("No recipe to remove ingredient.", this);
+            return;
+        }
+        
+        this.CraftTime -= item.CraftTime;
+        this.Recipe.RemoveIngredient(item);
+        this.OnRecipeChanged.Invoke(Mathf.FloorToInt(this.CraftTime), this.Recipe);
     }
 }

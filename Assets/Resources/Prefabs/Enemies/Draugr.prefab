@@ -60,6 +60,10 @@ PrefabInstance:
       propertyPath: LayoutPosition.x
       value: -52.690002
       objectReference: {fileID: 0}
+    - target: {fileID: 563944156086725387, guid: 3770c7be706eeb84da1957756e7d2272, type: 3}
+      propertyPath: <Animator>k__BackingField
+      value: 
+      objectReference: {fileID: 7947196856300321505}
     - target: {fileID: 797145680963793731, guid: 3770c7be706eeb84da1957756e7d2272, type: 3}
       propertyPath: m_Layer
       value: 8
@@ -409,13 +413,25 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7947196856300321505}
     - target: {fileID: 8651783515095840489, guid: 3770c7be706eeb84da1957756e7d2272, type: 3}
+      propertyPath: <CharacterData>k__BackingField
+      value: 
+      objectReference: {fileID: 11400000, guid: d65bd77345999054c9e4534d99b9887c, type: 2}
+    - target: {fileID: 8651783515095840489, guid: 3770c7be706eeb84da1957756e7d2272, type: 3}
       propertyPath: <CharacterModel>k__BackingField
       value: 
       objectReference: {fileID: 3925370577239938424}
     - target: {fileID: 8651783515095840489, guid: 3770c7be706eeb84da1957756e7d2272, type: 3}
+      propertyPath: <DeathAnimationTrigger>k__BackingField
+      value: 20298039
+      objectReference: {fileID: 0}
+    - target: {fileID: 8651783515095840489, guid: 3770c7be706eeb84da1957756e7d2272, type: 3}
       propertyPath: <AnimatorParameterForDeathEvent>k__BackingField
       value: 20298039
       objectReference: {fileID: 0}
+    - target: {fileID: 8888168400417119833, guid: 3770c7be706eeb84da1957756e7d2272, type: 3}
+      propertyPath: <OnUseItemEffect>k__BackingField
+      value: 
+      objectReference: {fileID: 11400000, guid: eb0c522c5acc67c4e83321b389fa29bf, type: 2}
     - target: {fileID: 9005554323254800776, guid: 3770c7be706eeb84da1957756e7d2272, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -883,7 +899,11 @@ PrefabInstance:
       propertyPath: <Source>k__BackingField
       value: 
       objectReference: {fileID: 1997773273444314631}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 138532536330091614, guid: c6db6855d4168a545874589bf35e237b, type: 3}
+    - {fileID: 1476822526937909261, guid: c6db6855d4168a545874589bf35e237b, type: 3}
+    - {fileID: 3184179031342721739, guid: c6db6855d4168a545874589bf35e237b, type: 3}
+    - {fileID: 4153138187948662424, guid: c6db6855d4168a545874589bf35e237b, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

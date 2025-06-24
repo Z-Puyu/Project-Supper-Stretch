@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4430174135294324258}
   - component: {fileID: 3872939503836012416}
-  - component: {fileID: 7454755242899594733}
   - component: {fileID: -7205027608365108340}
+  - component: {fileID: 3176784367414212871}
   m_Layer: 0
   m_Name: GameMap
   m_TagString: Untagged
@@ -84,38 +84,6 @@ MonoBehaviour:
     fileVersion: 2
   GenerateOnStart: 1
   Root: {fileID: 1370095269514090419}
---- !u!114 &7454755242899594733
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 544687851105093017}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SerializedVersion: 0
-  m_AgentTypeID: 0
-  m_CollectObjects: 0
-  m_Size: {x: 10, y: 10, z: 10}
-  m_Center: {x: 0, y: 2, z: 0}
-  m_LayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_UseGeometry: 0
-  m_DefaultArea: 0
-  m_GenerateLinks: 0
-  m_IgnoreNavMeshAgent: 1
-  m_IgnoreNavMeshObstacle: 1
-  m_OverrideTileSize: 0
-  m_TileSize: 256
-  m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
-  m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 8a3b3bbed9acb9c4989b5dec4f1a585f, type: 2}
-  m_BuildHeightMesh: 0
 --- !u!114 &-7205027608365108340
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -128,6 +96,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ff6c90183988b74f82fd263fd678479, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <TutorialEnd>k__BackingField: {fileID: 0}
+--- !u!114 &3176784367414212871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 544687851105093017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f76f356143a516846a54607aa83a9ae8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Priority: 0
+  BakeMode: 1
+  LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  AddNavMeshLinksBetweenRooms: 1
+  NavMeshAgentTypes:
+  - AgentTypeID: 0
+    AreaTypeID: 0
+    DisableLinkWhenDoorIsClosed: 1
+  NavMeshLinkDistanceFromDoorway: 2.5
+  AutoGenerateFullRebakeSurfaces: 1
+  FullRebakeTargets: []
+  UseAutomaticLinkDistance: 0
+  AutomaticLinkDistanceOffset: 0.1
 --- !u!1 &1370095269514090419
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using Project.Scripts.Common;
 using SaintsField;
-using Project.Scripts.Common.UI;
 using Project.Scripts.Interaction;
 using UnityEngine;
 using UnityEngine.Events;
@@ -11,8 +12,19 @@ using Random = UnityEngine.Random;
 namespace Project.Scripts.Items.InventorySystem.LootContainers;
 
 [DisallowMultipleComponent, RequireComponent(typeof(Inventory), typeof(InteractableObject))]
-public class LootContainer : MonoBehaviour { 
-    public static event UnityAction<UIData<(Inventory loot, Inventory inventory)>> OnOpen = delegate { };
+public class LootContainer : MonoBehaviour {
+    public sealed record class UIData(Inventory Loot, Inventory Inventory) : IPresentable {
+        public string FormatAsText() {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("Loot Container:");
+            sb.AppendLine(this.Loot.FormatAsText());
+            sb.AppendLine("Inventory:");
+            sb.AppendLine(this.Inventory.FormatAsText());
+            return sb.ToString();
+        }
+    }
+    
+    public static event UnityAction<UIData> OnOpen = delegate { };
     
     [NotNull] private Inventory? Inventory { get; set; }
     [NotNull] private InteractableObject? Interactable { get; set; }
@@ -26,6 +38,9 @@ public class LootContainer : MonoBehaviour {
     
     [field: SerializeField, MinMaxSlider(1, 20)] 
     private Vector2Int DropAmount { get; set; } = new Vector2Int(1, 5);
+    
+    /*private List<Item> AlwaysDrop { get; init; } = [];
+    private List<Item> GuaranteedToExistAtLeastOne { get; init; } = [];*/
     
     private bool HasBeenOpenedBefore { get; set; }
 
@@ -62,11 +77,11 @@ public class LootContainer : MonoBehaviour {
         }
 
         Debug.Log($"Open loot container {this.Inventory}");
-        LootContainer.OnOpen.Invoke(new UIData<(Inventory loot, Inventory inventory)>((this.Inventory, this.CurrentInteractorInventory)));
+        LootContainer.OnOpen.Invoke(new UIData(this.Inventory, interactor.GetComponent<Inventory>()));
     }
 
     private void DropRandom(LootDropParameters parameters) {
-        if (this.HasBeenOpenedBefore) {
+        if (this.HasBeenOpenedBefore || this.LootTable.IsEmpty) {
             return;
         }
         

@@ -74,6 +74,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3854815919275850781, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
+      propertyPath: <Value>k__BackingField
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3854815919275850781, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
+      propertyPath: <TargetDetector>k__BackingField
+      value: 
+      objectReference: {fileID: 8371048698638176623}
+    - target: {fileID: 3854815919275850781, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
+      propertyPath: <BaseDamageAttribute>k__BackingField.<Name>k__BackingField
+      value: Physical
+      objectReference: {fileID: 0}
+    - target: {fileID: 3854815919275850781, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
+      propertyPath: <BaseDamageAttribute>k__BackingField.<FullName>k__BackingField
+      value: CharacterAttribute.Damage.Physical
+      objectReference: {fileID: 0}
     - target: {fileID: 4428175858345570371, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
       propertyPath: m_Size.x
       value: 1
@@ -95,6 +111,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4540627417990741776, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
+      propertyPath: m_Name
+      value: Collider
+      objectReference: {fileID: 0}
+    - target: {fileID: 4540627417990741776, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
@@ -105,6 +125,18 @@ PrefabInstance:
     - target: {fileID: 6348679018340516672, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
       propertyPath: <Tag>k__BackingField
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6410411607124362786, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6410411607124362786, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6410411607124362786, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 6410411607124362786, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
       propertyPath: m_LocalPosition.x
@@ -146,6 +178,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6410411607124362786, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6429411675553298424, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
       propertyPath: m_Size.x
       value: 1
@@ -162,7 +198,9 @@ PrefabInstance:
       propertyPath: m_Center.y
       value: 2.5
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8486851531970074069, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
+    - {fileID: 6348679018340516672, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 6410411607124362786, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
@@ -170,6 +208,11 @@ PrefabInstance:
       addedObject: {fileID: 2313920568971083197}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
+--- !u!65 &8371048698638176623 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 6429411675553298424, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}
+  m_PrefabInstance: {fileID: 3247706291300820631}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8495038829902241973 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6410411607124362786, guid: c662486ce2b9d8940a9dc41ac02b0364, type: 3}

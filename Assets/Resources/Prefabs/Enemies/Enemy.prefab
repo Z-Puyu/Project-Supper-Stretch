@@ -62,13 +62,15 @@ GameObject:
   m_Component:
   - component: {fileID: 3340732948612350273}
   - component: {fileID: 1039391704743846764}
-  - component: {fileID: 1224194316103002433}
   - component: {fileID: 8651783515095840489}
   - component: {fileID: 2261095092488433972}
   - component: {fileID: 7461364171460478845}
   - component: {fileID: 9005554323254800776}
   - component: {fileID: 2774415105521556210}
   - component: {fileID: 8888168400417119833}
+  - component: {fileID: 8044921094953846611}
+  - component: {fileID: 563944156086725387}
+  - component: {fileID: 2972031340535610124}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -109,25 +111,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Identifier>k__BackingField: bc383046-aa82-44e3-890c-ba4fb4f9a10b
   <AttributeDefinition>k__BackingField: {fileID: 11400000, guid: 6501741a3b1ca164a8ba394ce86c2a9e, type: 2}
---- !u!114 &1224194316103002433
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6183244989024991191}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37b40eb6f2384c16bbc73863391bfeea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <IsAttributeBased>k__BackingField: 1
-  <Current>k__BackingField: 0
-  <Max>k__BackingField: 0
-  <HealthAttribute>k__BackingField:
-    <FullName>k__BackingField: CharacterAttribute.Health
-    <Name>k__BackingField: Health
-  <EffectOnDamageTaken>k__BackingField: {fileID: 11400000, guid: 3a9c7a6a7d758b14aa171972be7c39c3, type: 2}
 --- !u!114 &8651783515095840489
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -140,18 +123,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39c0040891bd4666ad71fc44722f774c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <CharacterModel>k__BackingField: {fileID: 0}
-  <Animator>k__BackingField: {fileID: 0}
-  <AnimatorParameterForDeathEvent>k__BackingField: 0
   <DestroyOnDeath>k__BackingField:
   - {fileID: 8472921216109331405}
   - {fileID: 2257371015772926883}
   <EnableAfterDeath>k__BackingField:
   - {fileID: 8412853109287462564}
-  <CharacterData>k__BackingField: {fileID: 11400000, guid: d65bd77345999054c9e4534d99b9887c, type: 2}
-  <EnableAfterInitialisation>k__BackingField:
-  - {fileID: 6647154057451197459}
-  - {fileID: 2257371015772926883}
+  <CharacterModel>k__BackingField: {fileID: 0}
+  <Animator>k__BackingField: {fileID: 0}
+  <DeathAnimationTrigger>k__BackingField: 0
+  <CharacterData>k__BackingField: {fileID: 0}
   <LootContainer>k__BackingField: {fileID: 6431126089331606219}
 --- !u!195 &2261095092488433972
 NavMeshAgent:
@@ -189,7 +169,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Animator>k__BackingField: {fileID: 0}
   <ComboLength>k__BackingField: 2
-  <AnimatorParameterForComboStage>k__BackingField: 1895636814
+  <AnimatorComboCounter>k__BackingField: 0
+  <AnimatorAttackTrigger>k__BackingField: 0
 --- !u!114 &9005554323254800776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -251,6 +232,65 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90e9f8317ba5479baa4c5d0447be5a54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <OnUseItemEffect>k__BackingField: {fileID: 0}
+--- !u!54 &8044921094953846611
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6183244989024991191}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &563944156086725387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6183244989024991191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f06edfad0a654bbd875fc7147d40382b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Animator>k__BackingField: {fileID: 0}
+--- !u!114 &2972031340535610124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6183244989024991191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0fd4de18fd4356a6491d5a53f33bdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Current>k__BackingField: 0
+  <Max>k__BackingField: 0
+  <AttributeSet>k__BackingField: {fileID: 1039391704743846764}
+  <HealthAttribute>k__BackingField:
+    <FullName>k__BackingField: CharacterAttribute.Health
+    <Name>k__BackingField: Health
 --- !u!1001 &67356557361852650
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -648,11 +688,6 @@ Transform:
 --- !u!224 &5324770337118384307 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1451748975142157471, guid: 73c6b3a20843d494a8f6daf1b5550195, type: 3}
-  m_PrefabInstance: {fileID: 6755615394831584300}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &6647154057451197459 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 144021785450649663, guid: 73c6b3a20843d494a8f6daf1b5550195, type: 3}
   m_PrefabInstance: {fileID: 6755615394831584300}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7091773348790548518

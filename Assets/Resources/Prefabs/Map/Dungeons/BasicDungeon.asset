@@ -52,11 +52,20 @@ MonoBehaviour:
       id: 8
     TagB:
       id: 0
+  - TagA:
+      id: 9
+    TagB:
+      id: 8
+  - TagA:
+      id: 9
+    TagB:
+      id: 1
   BranchTagPruneMode: 0
   BranchPruneTags:
   - id: 1
   - id: 4
   - id: 8
+  - id: 9
   GlobalStraighteningSettings:
     OverrideStraightenChance: 0
     StraightenChance: 0

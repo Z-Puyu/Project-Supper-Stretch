@@ -40,7 +40,7 @@ public class InteractableObject : MonoBehaviour {
     /// <summary>
     /// Invoked when the interactor looks at the object.
     /// </summary>
-    public event UnityAction OnActivated = delegate { };
+    public event UnityAction<InteractableObject> OnActivated = delegate { };
     
     /// <summary>
     /// Invoked when the interactor looks away from the object.
@@ -67,7 +67,6 @@ public class InteractableObject : MonoBehaviour {
     }
 
     private void OnInteractorDetected(Collider actor) {
-        Debug.Log($"Interactor detected: {actor.name}");
         if (!actor.TryGetComponent(out Interactor interactor)) {
             return;
         }
@@ -78,7 +77,6 @@ public class InteractableObject : MonoBehaviour {
     }
 
     private void OnInteractorOutOfRange(Collider actor) {
-        Debug.Log($"Interactor lost: {actor.name}");
         if (!actor.TryGetComponent(out Interactor interactor)) {
             return;
         }
@@ -90,7 +88,6 @@ public class InteractableObject : MonoBehaviour {
     }
     
     public void Interact(Interactor interactor) {
-        Debug.Log($"Interacting with: {this.name}");
         this.OnInteraction.Invoke(interactor);
         if (!this.ShouldDestroyAfterInteraction) {
             return;
@@ -106,7 +103,7 @@ public class InteractableObject : MonoBehaviour {
         }
         
         this.PromptWidget.SetActive(true);
-        this.OnActivated.Invoke();
+        this.OnActivated.Invoke(this);
     }
 
     public void Deactivate() {

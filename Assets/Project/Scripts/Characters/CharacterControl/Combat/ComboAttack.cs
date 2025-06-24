@@ -1,12 +1,17 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.Characters.Player;
+using Project.Scripts.Common;
+using Project.Scripts.Common.Input;
+using Project.Scripts.Player;
 using SaintsField;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 namespace Project.Scripts.Characters.CharacterControl.Combat;
 
 [DisallowMultipleComponent]
-public class ComboAttack : MonoBehaviour {
+public class ComboAttack : MonoBehaviour, IPlayerControllable {
     [NotNull]
     [field: SerializeField]
     private Animator? Animator { get; set; }
@@ -14,20 +19,18 @@ public class ComboAttack : MonoBehaviour {
     [field: SerializeField, MinValue(0)] private int ComboLength { get; set; } = 3;
     
     [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Int)]
-    private int AnimatorParameterForComboStage { get; set; }
+    private int AnimatorComboCounter { get; set; }
+    
+    [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Trigger)]
+    private int AnimatorAttackTrigger { get; set; }
     
     private int CurrentStage { get; set; }
-    private bool IsAttacking { get; set; }
+    public bool IsAttacking { private get; set; }
     
-    public event UnityAction<HitBoxTag> OnPerformed = delegate { };
     public event UnityAction OnAttackCommitted = delegate { };
 
-    /// <summary>
-    /// Emit a signal for executing the actual attack logic.
-    /// </summary>
-    public void Perform(HitBoxTag hitbox) {
-        this.OnPerformed.Invoke(hitbox);
-        this.IsAttacking = false;
+    public void BindInput(InputActions actions) {
+        actions.Player.RightHandAttack.performed += _ => this.CommitNextStage();
     }
 
     public void AcknowledgeAttack() {
@@ -36,7 +39,8 @@ public class ComboAttack : MonoBehaviour {
     
     private void CommitStage(int stage) {
         this.IsAttacking = true;
-        this.Animator.SetInteger(this.AnimatorParameterForComboStage, stage);
+        this.Animator.SetInteger(this.AnimatorComboCounter, stage);
+        this.Animator.SetTrigger(this.AnimatorAttackTrigger);
     }
 
     /// <summary>
@@ -66,24 +70,8 @@ public class ComboAttack : MonoBehaviour {
     /// End the current combo and reset the states.
     /// </summary>
     public void EndCombo() {
-        this.Animator.SetInteger(this.AnimatorParameterForComboStage, 0);
+        this.Animator.SetInteger(this.AnimatorComboCounter, 0);
         this.CurrentStage = 0;
         this.IsAttacking = false;
-    }
-
-    public void RegisterWeapon(GameObject? weapon) {
-        if (!weapon || !weapon.TryGetComponent(out HitBox box)) {
-            return;
-        }
-
-        this.OnPerformed += box.RegisterAttackEvent;
-    }
-    
-    public void ForgetWeapon(GameObject? weapon) {
-        if (!weapon || !weapon.TryGetComponent(out HitBox box)) {
-            return;
-        }
-
-        this.OnPerformed -= box.RegisterAttackEvent;
     }
 }

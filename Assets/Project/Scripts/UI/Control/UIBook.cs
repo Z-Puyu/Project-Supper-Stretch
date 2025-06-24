@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using Project.Scripts.Common;
-using Project.Scripts.Common.UI;
+using Project.Scripts.Common.Input;
+using Project.Scripts.Player;
+using Project.Scripts.UI.Control.MVP;
+using Project.Scripts.UI.Control.MVP.Interfaces;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Project.Scripts.UI.Control;
 
 [DisallowMultipleComponent]
-public class UIBook : MonoBehaviour {
+public class UIBook : MonoBehaviour, IUserInterface {
     private Dictionary<Type, UIPage> Pages { get; init; } = [];
     private Stack<UIPage> History { get; init; } = [];
 
     private void Start() {
-        foreach (UIPage page in this.GetComponentsInChildren<UIPage>()) {
+        foreach (UIPage page in this.GetComponentsInChildren<UIPage>(includeInactive: true)) {
             this.AddNewPage(page);
         }
     }
@@ -27,7 +31,6 @@ public class UIBook : MonoBehaviour {
             page.transform.SetParent(this.transform);   
         }
         
-        page.Close();
         this.Pages.Add(page.MainPresenter.GetType(), page);
     }
 
@@ -41,7 +44,7 @@ public class UIBook : MonoBehaviour {
             Debug.LogError($"No page found for UI component {typeof(U)}");
             return;
         }
-
+        
         page.Refresh(data);
     }
     
@@ -106,5 +109,9 @@ public class UIBook : MonoBehaviour {
         }
         
         GameEvents.OnPlay.Invoke();
+    }
+
+    public void BindInput(InputActions actions) {
+        actions.UI.GoBack.performed += _ => this.PreviousPage();
     }
 }

@@ -12,7 +12,7 @@ public class AttributeAccess : MonoBehaviour, IAttributeReader {
     [field: InfoBox("If unassigned, the component will fetch the closest one in its parents.")]
     private AttributeSet? Source { get; set; }
     
-    public AdvancedDropdownList<AttributeKey> AllAccessibleAttributes => !this.Source 
+    public AdvancedDropdownList<string> AllAccessibleAttributes => !this.Source 
             ? this.GetComponentInParent<AttributeSet>().AllAccessibleAttributes
             : this.Source.AllAccessibleAttributes;
 

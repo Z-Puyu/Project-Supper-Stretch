@@ -1,7 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.GameplayEffects;
-using Project.Scripts.Common.UI;
+using Project.Scripts.AttributeSystem.GameplayEffects.Executions;
+using Project.Scripts.Common;
 using Project.Scripts.Interaction;
 using Project.Scripts.Items.InventorySystem;
 using SaintsField;
@@ -13,8 +14,15 @@ namespace Project.Scripts.Items.CraftingSystem;
 
 [DisallowMultipleComponent, RequireComponent(typeof(InteractableObject), typeof(Workbench))]
 public class CampFire : MonoBehaviour {
-    public static event UnityAction<UIData<(Workbench workbench, Inventory inventory)>> OnOpen = delegate { };
-    public static event UnityAction<bool> OnCookingStatusChecked = delegate { }; 
+    public sealed record class UIData(Workbench Workbench, Inventory Inventory) : IPresentable {
+        public string FormatAsText() {
+            return string.Empty;
+        }
+    }
+    
+    public static event UnityAction<UIData> OnOpen = delegate { };
+    public static event UnityAction<bool, Recipe> OnCraftStatusChecked = delegate { }; 
+    public static event UnityAction<int> OnCraftCompleted = delegate { };
     
     [NotNull] private AttributeSet? PlayerAttributes { get; set; }
     [NotNull] private Inventory? PlayerInventory { get; set; }
@@ -37,18 +45,19 @@ public class CampFire : MonoBehaviour {
     }
 
     private void Start() {
-        this.Workbench.OnRecipeChanged += this.AdjustRecipe;
+        this.Workbench.OnRecipeChanged += this.TestRecipe;
         this.Workbench.OnCraft += this.CraftSomething;
         this.Interactable.OnInteraction += this.Enter;
     }
 
-    private void AdjustRecipe(Recipe recipe) {
-        CampFire.OnCookingStatusChecked.Invoke(recipe.CookingTime <= this.CampingDuration);
+    private void TestRecipe(int time, Recipe recipe) {
+        CampFire.OnCraftStatusChecked.Invoke(time <= this.CampingDuration, recipe);
     }
 
     private void CraftSomething(int cookingTime, Item food) {
         this.CampingDuration -= cookingTime;
         this.PlayerInventory.Add(food);
+        CampFire.OnCraftCompleted.Invoke(this.CampingDuration);
     }
 
     private void Rest() {
@@ -77,8 +86,6 @@ public class CampFire : MonoBehaviour {
             this.HasBeenUsedBefore = true;
         }
         
-        Debug.Log($"{interactor.gameObject.name} opened campfire.");
-        CampFire.OnOpen.Invoke(
-            new UIData<(Workbench workbench, Inventory inventory)>((this.Workbench, this.PlayerInventory)));
+        CampFire.OnOpen.Invoke(new UIData(this.Workbench, this.PlayerInventory));
     }
 }
