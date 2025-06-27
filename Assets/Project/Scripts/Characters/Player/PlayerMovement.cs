@@ -1,13 +1,10 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using SaintsField;
-using Project.Scripts.Characters.CharacterControl;
-using Project.Scripts.Common;
 using Project.Scripts.Common.Input;
-using Project.Scripts.Player;
 using Project.Scripts.Util.Components;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using InputActions = Project.Scripts.Common.Input.InputActions;
 
 namespace Project.Scripts.Characters.Player;
 
@@ -25,6 +22,12 @@ public class PlayerMovement : MonoBehaviour, IPlayerControllable {
     [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Float)]
     protected int AnimatorParameterForSpeed { get; private set; }
     
+    [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Float)]
+    protected int AnimatorParameterForVelocityX { get; private set; }
+    
+    [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Float)]
+    protected int AnimatorParameterForVelocityY { get; private set; }
+    
     protected bool IsPaused { get; private set; }
     private Mode MovementMode { get; set; } = Mode.Walk;
     private Transform? CameraTransform { get; set; }
@@ -38,13 +41,16 @@ public class PlayerMovement : MonoBehaviour, IPlayerControllable {
     [field: SerializeField, PropRange(0, 1, 0.05f)] 
     protected float TurnSpeed { get; set; } = 0.2f;
 
-    /// <summary>
-    /// The direction of movement as a unit vector.
-    /// </summary>
     private Vector3 Direction {
-        get => this.CameraTransform!.TransformDirection(this.direction).normalized;
-        set => this.direction = value;
+        get => this.direction;
+        set {
+            this.direction = value;
+            this.DesiredVelocity = this.direction.normalized;
+        }
     }
+    
+    private Vector3 DesiredVelocity { get; set; }
+    private Vector3 LocalVelocity { get; set; }
     
     private void Awake() {
         this.CameraTransform = Camera.main.IfPresent(cam => cam.transform, @default: this.transform);
@@ -68,7 +74,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerControllable {
         }
         
         this.MovementMode = mode;
-        this.damping = Vector3.zero;
     }
     
     public void MoveTowards(Vector3 location) {
@@ -98,14 +103,17 @@ public class PlayerMovement : MonoBehaviour, IPlayerControllable {
         }
         
         float t = 1 - this.Acceleration;
-        Vector3 target = this.Direction * (int)this.MovementMode;
-        this.Velocity = Vector3.SmoothDamp(this.Velocity, target, ref this.damping, t);
-        this.Animator.SetFloat(this.AnimatorParameterForSpeed, this.Velocity.magnitude);
+        this.LocalVelocity = Vector3.SmoothDamp(this.LocalVelocity, this.DesiredVelocity * (int)this.MovementMode,
+            ref this.damping, t);
+        this.Animator.SetFloat(this.AnimatorParameterForVelocityX, this.LocalVelocity.x);
+        this.Animator.SetFloat(this.AnimatorParameterForVelocityY, this.LocalVelocity.z);
+        this.Velocity = this.CameraTransform!.TransformDirection(this.LocalVelocity);
+        this.Animator.SetFloat(this.AnimatorParameterForSpeed, this.LocalVelocity.magnitude);
         if (this.Velocity.magnitude == 0) {
             return;
         }
         
-        this.TurnTowards(this.Direction);
+        this.TurnTowards(this.CameraTransform.TransformDirection(Vector3.forward));
         this.Fall();
     }
 

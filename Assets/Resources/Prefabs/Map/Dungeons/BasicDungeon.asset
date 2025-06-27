@@ -21,7 +21,11 @@ MonoBehaviour:
   BranchCount:
     Min: 1
     Max: 5
-  GlobalProps: []
+  GlobalProps:
+  - ID: 0
+    Count:
+      Min: 1
+      Max: 3
   KeyManager: {fileID: 0}
   DoorwayConnectionChance: 1
   RestrictConnectionToSameSection: 0
@@ -68,7 +72,7 @@ MonoBehaviour:
   - id: 9
   GlobalStraighteningSettings:
     OverrideStraightenChance: 0
-    StraightenChance: 0
+    StraightenChance: 0.33
     OverrideCanStraightenMainPath: 0
     CanStraightenMainPath: 1
     OverrideCanStraightenBranchPaths: 0

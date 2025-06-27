@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	public enum LocalPropSetCountMode
 	{
@@ -28,10 +27,10 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public override void Process(RandomStream randomStream, Tile tile, ref List<GameObject> spawnedObjects)
 		{
-			var propTable = this.Props.Clone();
+			var propTable = Props.Clone();
 
-			if (!LocalPropSet.GetCountMethods.TryGetValue(this.CountMode, out var getCountDelegate))
-				throw new NotImplementedException("LocalPropSet count mode \"" + this.CountMode + "\" is not yet implemented");
+			if (!GetCountMethods.TryGetValue(CountMode, out var getCountDelegate))
+				throw new NotImplementedException("LocalPropSet count mode \"" + CountMode + "\" is not yet implemented");
 
 			int count = getCountDelegate(this, randomStream, tile);
 			var toKeep = new List<GameObject>(count);
@@ -51,7 +50,7 @@ namespace DunGen.Project.External.DunGen.Code
 					toKeep.Add(chosenEntry.Value);
 			}
 
-			foreach (var prop in this.Props.Weights)
+			foreach (var prop in Props.Weights)
 			{
 				if (prop.Value == null)
 					continue;
@@ -65,9 +64,9 @@ namespace DunGen.Project.External.DunGen.Code
 
 		static LocalPropSet()
 		{
-			LocalPropSet.GetCountMethods[LocalPropSetCountMode.Random] = LocalPropSet.GetCountRandom;
-			LocalPropSet.GetCountMethods[LocalPropSetCountMode.DepthBased] = LocalPropSet.GetCountDepthBased;
-			LocalPropSet.GetCountMethods[LocalPropSetCountMode.DepthMultiply] = LocalPropSet.GetCountDepthMultiply;
+			GetCountMethods[LocalPropSetCountMode.Random] = GetCountRandom;
+			GetCountMethods[LocalPropSetCountMode.DepthBased] = GetCountDepthBased;
+			GetCountMethods[LocalPropSetCountMode.DepthMultiply] = GetCountDepthMultiply;
 		}
 
 		private static int GetCountRandom(LocalPropSet propSet, RandomStream randomStream, Tile tile)
@@ -89,7 +88,7 @@ namespace DunGen.Project.External.DunGen.Code
 		private static int GetCountDepthMultiply(LocalPropSet propSet, RandomStream randomStream, Tile tile)
 		{
 			float curveValue = Mathf.Clamp(propSet.CountDepthCurve.Evaluate(tile.Placement.NormalizedPathDepth), 0, 1);
-			int count = LocalPropSet.GetCountRandom(propSet, randomStream, tile);
+			int count = GetCountRandom(propSet, randomStream, tile);
 			count = Mathf.RoundToInt(count * curveValue);
 
 			return count;

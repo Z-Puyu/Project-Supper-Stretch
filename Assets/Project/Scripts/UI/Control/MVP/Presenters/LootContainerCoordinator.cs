@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
 using Project.Scripts.Common;
 using Project.Scripts.Items;
 using Project.Scripts.Items.InventorySystem;
 using Project.Scripts.Items.InventorySystem.LootContainers;
 using SaintsField;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Project.Scripts.UI.Control.MVP.Presenters;
 

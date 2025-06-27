@@ -1,5 +1,4 @@
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 
 namespace Project.Scripts.UI.Control.MVP.Interfaces;
 

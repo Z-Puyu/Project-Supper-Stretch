@@ -1,7 +1,6 @@
-﻿using DunGen.Project.External.DunGen.Code;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Project.External.DunGen.Samples.Basic.Scripts
+namespace DunGen.Demo
 {
 	public class AutoDoor : MonoBehaviour
 	{
@@ -25,33 +24,33 @@ namespace Project.External.DunGen.Samples.Basic.Scripts
 
 		private void Start()
 		{
-			this.doorComponent = this.GetComponent<Door>();
-			this.closedPosition = this.Door.transform.localPosition;
+			doorComponent = GetComponent<Door>();
+			closedPosition = Door.transform.localPosition;
 		}
 
 		private void Update()
 		{
-			if (this.currentState == DoorState.Opening || this.currentState == DoorState.Closing)
+			if (currentState == DoorState.Opening || currentState == DoorState.Closing)
 			{
-				Vector3 openPosition = this.closedPosition + this.OpenOffset;
+				Vector3 openPosition = closedPosition + OpenOffset;
 
-				float frameOffset = this.Speed * Time.deltaTime;
+				float frameOffset = Speed * Time.deltaTime;
 
-				if (this.currentState == DoorState.Closing)
+				if (currentState == DoorState.Closing)
 					frameOffset *= -1;
 
-				this.currentFramePosition += frameOffset;
-				this.currentFramePosition = Mathf.Clamp(this.currentFramePosition, 0, 1);
+				currentFramePosition += frameOffset;
+				currentFramePosition = Mathf.Clamp(currentFramePosition, 0, 1);
 
-				this.Door.transform.localPosition = Vector3.Lerp(this.closedPosition, openPosition, this.currentFramePosition);
+				Door.transform.localPosition = Vector3.Lerp(closedPosition, openPosition, currentFramePosition);
 
 				// Finished
-				if (this.currentFramePosition == 1.0f)
-					this.currentState = DoorState.Open;
-				else if (this.currentFramePosition == 0.0f)
+				if (currentFramePosition == 1.0f)
+					currentState = DoorState.Open;
+				else if (currentFramePosition == 0.0f)
 				{
-					this.currentState = DoorState.Closed;
-					this.doorComponent.IsOpen = false;
+					currentState = DoorState.Closed;
+					doorComponent.IsOpen = false;
 				}
 			}
 		}
@@ -64,8 +63,8 @@ namespace Project.External.DunGen.Samples.Basic.Scripts
 			if (playerController == null)
 				return;
 
-			this.currentState = DoorState.Opening;
-			this.doorComponent.IsOpen = true;
+			currentState = DoorState.Opening;
+			doorComponent.IsOpen = true;
 		}
 
 		private void OnTriggerExit(Collider other)
@@ -76,7 +75,7 @@ namespace Project.External.DunGen.Samples.Basic.Scripts
 			if (playerController == null)
 				return;
 
-			this.currentState = DoorState.Closing;
+			currentState = DoorState.Closing;
 		}
 	}
 }

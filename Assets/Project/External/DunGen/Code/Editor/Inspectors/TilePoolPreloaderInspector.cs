@@ -1,11 +1,10 @@
-﻿using DunGen.Project.External.DunGen.Code;
-using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
-using DunGen.Project.External.DunGen.Code.Pooling;
+﻿using DunGen.Graph;
+using DunGen.Pooling;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
+namespace DunGen.Editor.Inspectors
 {
 	[CustomEditor(typeof(TilePoolPreloader))]
 	[CanEditMultipleObjects]
@@ -36,28 +35,28 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 
 		private void OnEnable()
 		{
-			this.entries = this.serializedObject.FindProperty(nameof(TilePoolPreloader.Entries));
+			entries = serializedObject.FindProperty(nameof(TilePoolPreloader.Entries));
 
-			this.reorderableList = new ReorderableList(this.serializedObject, this.entries, true, true, true, true);
+			reorderableList = new ReorderableList(serializedObject, entries, true, true, true, true);
 
-			this.reorderableList.drawHeaderCallback = rect =>
+			reorderableList.drawHeaderCallback = rect =>
 			{
 				EditorGUI.LabelField(rect, Label.ListHeader);
 			};
 
-			this.reorderableList.onAddCallback = list =>
+			reorderableList.onAddCallback = list =>
 			{
-				var newElement = this.entries.GetArrayElementAtIndex(this.entries.arraySize++);
+				var newElement = entries.GetArrayElementAtIndex(entries.arraySize++);
 				var prefabProperty = newElement.FindPropertyRelative(nameof(TilePoolPreloaderEntry.TilePrefab));
 				var countProperty = newElement.FindPropertyRelative(nameof(TilePoolPreloaderEntry.Count));
 
 				prefabProperty.objectReferenceValue = null;
-				countProperty.intValue = TilePoolPreloaderInspector.setAllCountValue;
+				countProperty.intValue = setAllCountValue;
 			};
 
-			this.reorderableList.drawElementCallback = (rect, index, isActive, isFocused) =>
+			reorderableList.drawElementCallback = (rect, index, isActive, isFocused) =>
 			{
-				var element = this.entries.GetArrayElementAtIndex(index);
+				var element = entries.GetArrayElementAtIndex(index);
 				rect.y += 2;
 
 				float countWidth = 100;
@@ -76,7 +75,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 					countProperty.intValue));
 			};
 
-			this.reorderableList.drawNoneElementCallback = rect =>
+			reorderableList.drawNoneElementCallback = rect =>
 			{
 				EditorGUI.LabelField(rect, Label.NoneElement, EditorStyles.centeredGreyMiniLabel);
 			};
@@ -86,46 +85,46 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 		{
 			EditorGUI.BeginDisabledGroup(EditorApplication.isPlayingOrWillChangePlaymode);
 			{
-				this.serializedObject.Update();
+				serializedObject.Update();
 
-				this.DrawListControls();
+				DrawListControls();
 				EditorGUILayout.Space();
-				this.DrawPrefabList();
+				DrawPrefabList();
 				EditorGUILayout.Space();
-				this.DrawSpawnControls();
+				DrawSpawnControls();
 
-				this.serializedObject.ApplyModifiedProperties();
+				serializedObject.ApplyModifiedProperties();
 			}
 			EditorGUI.EndDisabledGroup();
 		}
 
 		private void DrawListControls()
 		{
-			TilePoolPreloaderInspector.showListControls = EditorGUILayout.Foldout(TilePoolPreloaderInspector.showListControls, Label.ListControls, true);
+			showListControls = EditorGUILayout.Foldout(showListControls, Label.ListControls, true);
 
-			if (TilePoolPreloaderInspector.showListControls)
+			if (showListControls)
 			{
 				EditorGUI.indentLevel++;
 
 				// Clear List
 				if (GUILayout.Button(Label.ClearList))
 				{
-					this.entries.ClearArray();
+					entries.ClearArray();
 					GUI.changed = true;
 				}
 
 				// Set all counts controls
 				EditorGUILayout.BeginHorizontal();
 				{
-					TilePoolPreloaderInspector.setAllCountValue = Mathf.Max(1, EditorGUILayout.IntField(Label.SetAllCounts, TilePoolPreloaderInspector.setAllCountValue));
+					setAllCountValue = Mathf.Max(1, EditorGUILayout.IntField(Label.SetAllCounts, setAllCountValue));
 
 					if (GUILayout.Button(Label.ApplyButton, GUILayout.Width(60)))
 					{
-						for (int i = 0; i < this.entries.arraySize; i++)
+						for (int i = 0; i < entries.arraySize; i++)
 						{
-							var element = this.entries.GetArrayElementAtIndex(i);
+							var element = entries.GetArrayElementAtIndex(i);
 							var countProperty = element.FindPropertyRelative(nameof(TilePoolPreloaderEntry.Count));
-							countProperty.intValue = TilePoolPreloaderInspector.setAllCountValue;
+							countProperty.intValue = setAllCountValue;
 						}
 
 						GUI.changed = true;
@@ -141,8 +140,8 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 		private void DrawPrefabList()
 		{
 			// Handle drag and drop
-			Rect dropRect = GUILayoutUtility.GetRect(0, this.reorderableList.GetHeight());
-			this.reorderableList.DoList(dropRect);
+			Rect dropRect = GUILayoutUtility.GetRect(0, reorderableList.GetHeight());
+			reorderableList.DoList(dropRect);
 
 			Event evt = Event.current;
 			switch (evt.type)
@@ -152,14 +151,14 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 					if (!dropRect.Contains(evt.mousePosition))
 						break;
 
-					DragAndDrop.visualMode = this.HasValidDragObject(DragAndDrop.objectReferences) ? DragAndDropVisualMode.Copy : DragAndDropVisualMode.Rejected;
+					DragAndDrop.visualMode = HasValidDragObject(DragAndDrop.objectReferences) ? DragAndDropVisualMode.Copy : DragAndDropVisualMode.Rejected;
 
 					if (evt.type == EventType.DragPerform)
 					{
 						DragAndDrop.AcceptDrag();
 
 						foreach (Object draggedObject in DragAndDrop.objectReferences)
-							this.TryAddDraggedObject(draggedObject);
+							TryAddDraggedObject(draggedObject);
 
 						GUI.changed = true;
 					}
@@ -171,7 +170,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 
 		private void DrawSpawnControls()
 		{
-			var preloader = this.target as TilePoolPreloader;
+			var preloader = target as TilePoolPreloader;
 
 			EditorGUI.BeginDisabledGroup(!preloader.HasSpawnedInstances());
 			{
@@ -232,9 +231,9 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 				return;
 
 			// Check if this tile already exists in the list
-			for (int i = 0; i < this.entries.arraySize; i++)
+			for (int i = 0; i < entries.arraySize; i++)
 			{
-				var element = this.entries.GetArrayElementAtIndex(i);
+				var element = entries.GetArrayElementAtIndex(i);
 				var prefabProperty = element.FindPropertyRelative(nameof(TilePoolPreloaderEntry.TilePrefab));
 				var existingTilePrefab = prefabProperty.objectReferenceValue as Tile;
 
@@ -242,9 +241,9 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 					return; // Tile already exists, skip it
 			}
 
-			this.entries.InsertArrayElementAtIndex(this.entries.arraySize);
+			entries.InsertArrayElementAtIndex(entries.arraySize);
 
-			var newElement = this.entries.GetArrayElementAtIndex(this.entries.arraySize - 1);
+			var newElement = entries.GetArrayElementAtIndex(entries.arraySize - 1);
 			newElement.FindPropertyRelative(nameof(TilePoolPreloaderEntry.TilePrefab)).objectReferenceValue = tilePrefab;
 			newElement.FindPropertyRelative(nameof(TilePoolPreloaderEntry.Count)).intValue = 1;
 		}
@@ -257,7 +256,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 					continue;
 
 				if (entry.Value.TryGetComponent(out Tile tile))
-					this.AddTile(tile);
+					AddTile(tile);
 			}
 		}
 
@@ -266,17 +265,17 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 			// Add regular tile sets
 			foreach (var tileSet in archetype.TileSets)
 				if (tileSet != null)
-					this.AddTileSet(tileSet);
+					AddTileSet(tileSet);
 
 			// Add branch start tile sets
 			foreach (var tileSet in archetype.BranchStartTileSets)
 				if (tileSet != null)
-					this.AddTileSet(tileSet);
+					AddTileSet(tileSet);
 
 			// Add branch end tile sets
 			foreach (var tileSet in archetype.BranchCapTileSets)
 				if (tileSet != null)
-					this.AddTileSet(tileSet);
+					AddTileSet(tileSet);
 		}
 
 		private void AddDungeonFlow(DungeonFlow flow)
@@ -286,7 +285,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 			{
 				foreach(var tileSet in node.TileSets)
 					if(tileSet != null)
-						this.AddTileSet(tileSet);
+						AddTileSet(tileSet);
 			}
 
 			// Add archetypes from lines
@@ -294,14 +293,14 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 			{
 				foreach(var archetype in line.DungeonArchetypes)
 					if (archetype != null)
-						this.AddArchetype(archetype);
+						AddArchetype(archetype);
 			}
 
 			// Add tile sets from injection rules
 			foreach (var injectionRule in flow.TileInjectionRules)
 			{
 				if(injectionRule.TileSet != null)
-					this.AddTileSet(injectionRule.TileSet);
+					AddTileSet(injectionRule.TileSet);
 			}
 		}
 
@@ -314,16 +313,16 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 				bool isPrefab = prefabType == PrefabAssetType.Regular || prefabType == PrefabAssetType.Variant;
 
 				if (isPrefab && gameObject.TryGetComponent<Tile>(out var tile))
-					this.AddTile(tile);
+					AddTile(tile);
 			}
 			// TileSet
 			else if (draggedObject is TileSet tileSet)
-				this.AddTileSet(tileSet);
+				AddTileSet(tileSet);
 			// Archetype
 			else if (draggedObject is DungeonArchetype archetype)
-				this.AddArchetype(archetype);
+				AddArchetype(archetype);
 			else if (draggedObject is DungeonFlow flow)
-				this.AddDungeonFlow(flow);
+				AddDungeonFlow(flow);
 		}
 	}
 }

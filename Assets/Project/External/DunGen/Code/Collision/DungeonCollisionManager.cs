@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using DunGen.Project.External.DunGen.Code.Utility;
 using Unity.Profiling;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code.Collision
+namespace DunGen.Collision
 {
 	public class DungeonCollisionManager
 	{
@@ -28,37 +27,37 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 		/// <param name="dungeonGenerator">The dungeon generator we're initializing for</param>
 		public virtual void Initialize(DungeonGenerator dungeonGenerator)
 		{
-			using(DungeonCollisionManager.initPerfMarker.Auto())
+			using(initPerfMarker.Auto())
 			{
-				this.Clear();
-				this.PreCacheBounds(dungeonGenerator);
-				this.InitializeBroadphase(dungeonGenerator);
+				Clear();
+				PreCacheBounds(dungeonGenerator);
+				InitializeBroadphase(dungeonGenerator);
 			}
 		}
 
 		protected virtual void Clear()
 		{
-			this.tiles.Clear();
-			this.cachedBounds.Clear();
-			this.boundsToCheck.Clear();
+			tiles.Clear();
+			cachedBounds.Clear();
+			boundsToCheck.Clear();
 		}
 
 		protected virtual void PreCacheBounds(DungeonGenerator dungeonGenerator)
 		{
-			using (DungeonCollisionManager.preCachePerfMarker.Auto())
+			using (preCachePerfMarker.Auto())
 			{
-				this.cachedBounds.Clear();
+				cachedBounds.Clear();
 
 				// Cache tiles from other dungeons if we need to avoid collisions with them
-				if (this.Settings.AvoidCollisionsWithOtherDungeons || dungeonGenerator.AttachmentSettings != null)
+				if (Settings.AvoidCollisionsWithOtherDungeons || dungeonGenerator.AttachmentSettings != null)
 				{
 					foreach (var tile in UnityUtil.FindObjectsByType<Tile>())
-						this.cachedBounds.Add(tile.Placement.Bounds);
+						cachedBounds.Add(tile.Placement.Bounds);
 				}
 
 				// Add all additional collision bounds to the cache
-				foreach (var bounds in this.Settings.AdditionalCollisionBounds)
-					this.cachedBounds.Add(bounds);
+				foreach (var bounds in Settings.AdditionalCollisionBounds)
+					cachedBounds.Add(bounds);
 			}
 		}
 
@@ -68,16 +67,16 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 
 			if (broadphaseSettings == null)
 			{
-				this.Broadphase = null;
+				Broadphase = null;
 				return;
 			}
 
-			this.Broadphase = broadphaseSettings.Create();
-			this.Broadphase.Init(broadphaseSettings, dungeonGenerator);
+			Broadphase = broadphaseSettings.Create();
+			Broadphase.Init(broadphaseSettings, dungeonGenerator);
 
 			// Add all cached bounds to the quadtree
-			foreach(var bounds in this.cachedBounds)
-				this.Broadphase.Insert(bounds);
+			foreach(var bounds in cachedBounds)
+				Broadphase.Insert(bounds);
 		}
 
 		/// <summary>
@@ -86,10 +85,10 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 		/// <param name="tile">The tile to add</param>
 		public virtual void AddTile(TileProxy tile)
 		{
-			using(DungeonCollisionManager.addTilePerMarker.Auto())
+			using(addTilePerMarker.Auto())
 			{
-				this.tiles.Add(tile);
-				this.Broadphase?.Insert(tile.Placement.Bounds);
+				tiles.Add(tile);
+				Broadphase?.Insert(tile.Placement.Bounds);
 			}
 		}
 
@@ -99,10 +98,10 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 		/// <param name="tile">The tile to remove</param>
 		public virtual void RemoveTile(TileProxy tile)
 		{
-			using (DungeonCollisionManager.removeTilePerfMarker.Auto())
+			using (removeTilePerfMarker.Auto())
 			{
-				this.tiles.Remove(tile);
-				this.Broadphase?.Remove(tile.Placement.Bounds);
+				tiles.Remove(tile);
+				Broadphase?.Remove(tile.Placement.Bounds);
 			}
 		}
 
@@ -117,22 +116,22 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 		{
 			bool isColliding = false;
 
-			using (DungeonCollisionManager.collisionBroadPhasePerfMarker.Auto())
+			using (collisionBroadPhasePerfMarker.Auto())
 			{
-				this.UpdateBoundsToCheck(prospectiveNewTile, previousTile);
+				UpdateBoundsToCheck(prospectiveNewTile, previousTile);
 			}
 
-			using (DungeonCollisionManager.collisionNarrowPhasePerfMarker.Auto())
+			using (collisionNarrowPhasePerfMarker.Auto())
 			{
 				// Check for collisions with potentially colliding tiles
-				for (int i = 0; i < this.boundsToCheck.Count; i++)
+				for (int i = 0; i < boundsToCheck.Count; i++)
 				{
-					var bounds = this.boundsToCheck[i];
+					var bounds = boundsToCheck[i];
 
 					bool isConnected = previousTile != null && i == 0;
-					float maxOverlap = (isConnected) ? this.Settings.OverlapThreshold : -this.Settings.Padding;
+					float maxOverlap = (isConnected) ? Settings.OverlapThreshold : -Settings.Padding;
 
-					if (this.Settings.DisallowOverhangs && !isConnected)
+					if (Settings.DisallowOverhangs && !isConnected)
 					{
 						if (UnityUtil.AreBoundsOverlappingOrOverhanging(prospectiveNewTile.Placement.Bounds,
 							bounds,
@@ -155,46 +154,46 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 			}
 
 			// Process custom collision predicate if there is one
-			if (this.Settings.AdditionalCollisionsPredicate != null)
-				isColliding = this.Settings.AdditionalCollisionsPredicate(prospectiveNewTile.Placement.Bounds, isColliding);
+			if (Settings.AdditionalCollisionsPredicate != null)
+				isColliding = Settings.AdditionalCollisionsPredicate(prospectiveNewTile.Placement.Bounds, isColliding);
 
 			return isColliding;
 		}
 
 		protected virtual void UpdateBoundsToCheck(TileProxy prospectiveNewTile, TileProxy previousTile)
 		{
-			this.boundsToCheck.Clear();
+			boundsToCheck.Clear();
 
-			if (this.Broadphase != null)
+			if (Broadphase != null)
 			{
-				this.Broadphase.Query(prospectiveNewTile.Placement.Bounds, ref this.boundsToCheck);
+				Broadphase.Query(prospectiveNewTile.Placement.Bounds, ref boundsToCheck);
 
 				// Ensure previous tile bounds is at the front of the list
 				if (previousTile != null)
 				{
 					var previousBounds = previousTile.Placement.Bounds;
-					int existingIndex = this.boundsToCheck.FindIndex(b => b.Equals(previousBounds));
+					int existingIndex = boundsToCheck.FindIndex(b => b.Equals(previousBounds));
 
 					if (existingIndex != -1)
 					{
-						this.boundsToCheck.RemoveAt(existingIndex);
-						this.boundsToCheck.Insert(0, previousBounds);
+						boundsToCheck.RemoveAt(existingIndex);
+						boundsToCheck.Insert(0, previousBounds);
 					}
 					else
-						this.boundsToCheck.Insert(0, previousBounds);
+						boundsToCheck.Insert(0, previousBounds);
 				}
 			}
 			else
 			{
 				// Ensure previous tile bounds is at the front of the list
 				if (previousTile != null)
-					this.boundsToCheck.Add(previousTile.Placement.Bounds);
+					boundsToCheck.Add(previousTile.Placement.Bounds);
 
-				foreach (var tile in this.tiles)
+				foreach (var tile in tiles)
 					if (tile != previousTile)
-						this.boundsToCheck.Add(tile.Placement.Bounds);
+						boundsToCheck.Add(tile.Placement.Bounds);
 
-				this.boundsToCheck.AddRange(this.cachedBounds);
+				boundsToCheck.AddRange(cachedBounds);
 			}
 		}
 	}

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text;
 using Project.Scripts.Common;
 using SaintsField;
 using Project.Scripts.Interaction;
+using Project.Scripts.Util.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
@@ -30,7 +32,6 @@ public class LootContainer : MonoBehaviour {
     [NotNull] private InteractableObject? Interactable { get; set; }
     private Inventory? CurrentInteractorInventory { get; set; }
     
-    [NotNull] 
     [field: SerializeField] 
     public LootTable? LootTable { private get; set; }
     
@@ -59,6 +60,10 @@ public class LootContainer : MonoBehaviour {
     }
 
     private float ComputeTotalWeight(LootDropParameters parameters) {
+        if (!this.LootTable) {
+            return 0;
+        }
+        
         Func<KeyValuePair<ItemData, int>, float>? weightFunction = !this.LootDropConfig 
                 ? null 
                 : loot => this.LootDropConfig.ComputeDropFactor(loot.Key, loot.Value, parameters);
@@ -81,7 +86,7 @@ public class LootContainer : MonoBehaviour {
     }
 
     private void DropRandom(LootDropParameters parameters) {
-        if (this.HasBeenOpenedBefore || this.LootTable.IsEmpty) {
+        if (this.HasBeenOpenedBefore || !this.LootTable || this.LootTable.IsEmpty) {
             return;
         }
         

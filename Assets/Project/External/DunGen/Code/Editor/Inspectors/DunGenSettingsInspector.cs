@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using DunGen.Editor.Windows;
+using System.Collections.Generic;
 using System.Linq;
-using DunGen.Editor.Project.External.DunGen.Code.Editor.Windows;
-using DunGen.Project.External.DunGen.Code;
 using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
+namespace DunGen.Editor.Inspectors
 {
 	[CustomEditor(typeof(DunGenSettings))]
 	public sealed class DunGenSettingsInspector : UnityEditor.Editor
@@ -31,30 +30,30 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 
 		private void OnEnable()
 		{
-			this.ignoreSpriteBounds = this.serializedObject.FindProperty(nameof(DunGenSettings.BoundsCalculationsIgnoreSprites));
-			this.recalculateTileBoundsOnSave = this.serializedObject.FindProperty(nameof(DunGenSettings.RecalculateTileBoundsOnSave));
-			this.broadphaseSettings = this.serializedObject.FindProperty(nameof(DunGenSettings.BroadphaseSettings));
-			this.enableTilePooling = this.serializedObject.FindProperty(nameof(DunGenSettings.EnableTilePooling));
-			this.displayFailureReportWindow = this.serializedObject.FindProperty(nameof(DunGenSettings.DisplayFailureReportWindow));
-			this.checkForUnusedFiles = this.serializedObject.FindProperty(nameof(DunGenSettings.CheckForUnusedFiles));
+			ignoreSpriteBounds = serializedObject.FindProperty(nameof(DunGenSettings.BoundsCalculationsIgnoreSprites));
+			recalculateTileBoundsOnSave = serializedObject.FindProperty(nameof(DunGenSettings.RecalculateTileBoundsOnSave));
+			broadphaseSettings = serializedObject.FindProperty(nameof(DunGenSettings.BroadphaseSettings));
+			enableTilePooling = serializedObject.FindProperty(nameof(DunGenSettings.EnableTilePooling));
+			displayFailureReportWindow = serializedObject.FindProperty(nameof(DunGenSettings.DisplayFailureReportWindow));
+			checkForUnusedFiles = serializedObject.FindProperty(nameof(DunGenSettings.CheckForUnusedFiles));
 		}
 
 		public override void OnInspectorGUI()
 		{
-			this.serializedObject.Update();
+			serializedObject.Update();
 
-			this.DrawGeneralProperties();
+			DrawGeneralProperties();
 			EditorGUILayout.Space();
-			this.DrawOptimizationProperties();
+			DrawOptimizationProperties();
 			EditorGUILayout.Space();
-			this.DrawBoundsProperties();
+			DrawBoundsProperties();
 
-			this.serializedObject.ApplyModifiedProperties();
+			serializedObject.ApplyModifiedProperties();
 		}
 
 		private void DrawGeneralProperties()
 		{
-			var obj = this.target as DunGenSettings;
+			var obj = target as DunGenSettings;
 
 			EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 			{
@@ -64,8 +63,8 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 				EditorGUILayout.ObjectField("Default Socket", obj.DefaultSocket, typeof(DoorwaySocket), false);
 				EditorGUI.EndDisabledGroup();
 
-				EditorGUILayout.PropertyField(this.displayFailureReportWindow, Label.DisplayFailureReportWindow);
-				EditorGUILayout.PropertyField(this.checkForUnusedFiles, Label.CheckForRemovedFiles);
+				EditorGUILayout.PropertyField(displayFailureReportWindow, Label.DisplayFailureReportWindow);
+				EditorGUILayout.PropertyField(checkForUnusedFiles, Label.CheckForRemovedFiles);
 
 				if (GUILayout.Button(Label.CleanDunGenDirectory))
 					DunGenFolderCleaningWindow.CleanDunGenDirectory();
@@ -80,17 +79,17 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 				EditorGUILayout.LabelField("Optimization", EditorStyles.boldLabel);
 
 				// Warn the user about the limitations of the quadtree implementation
-				if (this.broadphaseSettings.managedReferenceFullTypename.ToLower().Contains("quadtree"))
+				if (broadphaseSettings.managedReferenceFullTypename.ToLower().Contains("quadtree"))
 					EditorGUILayout.HelpBox("Quadtree broadphase is experimental and is currently not recommended. Only supports dungeons using the default up vector (Positive Y)", MessageType.Warning);
 
 				EditorGUI.indentLevel++;
-				EditorGUILayout.PropertyField(this.broadphaseSettings, Label.BroadphaseSettings);
+				EditorGUILayout.PropertyField(broadphaseSettings, Label.BroadphaseSettings);
 				EditorGUI.indentLevel--;
 
-				if (this.enableTilePooling.boolValue)
+				if (enableTilePooling.boolValue)
 					EditorGUILayout.HelpBox("Tile pooling requires special attention to how your tiles are structured. Please consult the documentation for more information", MessageType.Warning);
 
-				EditorGUILayout.PropertyField(this.enableTilePooling, Label.TilePooling);
+				EditorGUILayout.PropertyField(enableTilePooling, Label.TilePooling);
 
 			}
 			EditorGUILayout.EndVertical();
@@ -101,8 +100,8 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 			EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 			{
 				EditorGUILayout.LabelField("Tile Bounds", EditorStyles.boldLabel);
-				EditorGUILayout.PropertyField(this.ignoreSpriteBounds, Label.IgnoreSpriteBounds);
-				EditorGUILayout.PropertyField(this.recalculateTileBoundsOnSave, Label.RecalculateTileBoundsOnSave);
+				EditorGUILayout.PropertyField(ignoreSpriteBounds, Label.IgnoreSpriteBounds);
+				EditorGUILayout.PropertyField(recalculateTileBoundsOnSave, Label.RecalculateTileBoundsOnSave);
 
 				EditorGUILayout.Space();
 
@@ -112,12 +111,12 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 				buttonRect.width -= 20;
 
 				if (GUI.Button(buttonRect, "Calculate Missing Tile Bounds"))
-					DunGenSettingsInspector.AskUserToCacheBounds(false);
+					AskUserToCacheBounds(false);
 
 				if (EditorGUI.DropdownButton(dropdownRect, GUIContent.none, FocusType.Passive))
 				{
 					var menu = new GenericMenu();
-					menu.AddItem(new GUIContent("Clear and Recalculate All Tile Bounds"), false, () => DunGenSettingsInspector.AskUserToCacheBounds(true));
+					menu.AddItem(new GUIContent("Clear and Recalculate All Tile Bounds"), false, () => AskUserToCacheBounds(true));
 					menu.DropDown(dropdownRect);
 				}
 			}
@@ -133,7 +132,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 			if (!EditorUtility.DisplayDialog("Calculate Tile Bounds", message, "Yes", "No"))
 				return;
 
-			IEnumerable<Tile> tiles = DunGenSettingsInspector.GetAllTilePrefabs();
+			IEnumerable<Tile> tiles = GetAllTilePrefabs();
 
 			if (!clearExisting)
 				tiles = tiles.Where(t => !t.HasValidBounds);
@@ -142,7 +141,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 				EditorUtility.DisplayDialog("Calculate Tile Bounds", "No tile bounds were missing", "OK");
 			else
 			{
-				int cachedBoundsCount = DunGenSettingsInspector.CacheTileBounds(tiles, clearExisting);
+				int cachedBoundsCount = CacheTileBounds(tiles, clearExisting);
 				EditorUtility.DisplayDialog("Calculate Tile Bounds", $"Recalculated bounds for {cachedBoundsCount} tiles", "OK");
 			}
 		}

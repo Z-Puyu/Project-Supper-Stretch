@@ -1,8 +1,6 @@
-﻿using DunGen.Project.External.DunGen.Code;
-using DunGen.Project.External.DunGen.Code.Utility;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Project.External.DunGen.Samples.Simple_2D.Scripts
+namespace DunGen.Demo2D
 {
 	sealed class PlayerController2D : MonoBehaviour
 	{
@@ -15,23 +13,23 @@ namespace Project.External.DunGen.Samples.Simple_2D.Scripts
 
 		private void Start()
 		{
-			this.collider = this.GetComponent<CircleCollider2D>();
-			this.hitBuffer = new RaycastHit2D[10];
+			collider = GetComponent<CircleCollider2D>();
+			hitBuffer = new RaycastHit2D[10];
 
-			var gen = UnityUtil.FindObjectByType<global::Project.External.DunGen.Samples.Basic.Scripts.Generator>();
-			this.dungeonGenerator = gen.DungeonGenerator.Generator;
+			var gen = UnityUtil.FindObjectByType<DunGen.Demo.Generator>();
+			dungeonGenerator = gen.DungeonGenerator.Generator;
 
-			this.dungeonGenerator.OnGenerationStatusChanged += this.OnGeneratorStatusChanged;
+			dungeonGenerator.OnGenerationStatusChanged += OnGeneratorStatusChanged;
 		}
 
 		private void OnDestroy()
 		{
-			this.dungeonGenerator.OnGenerationStatusChanged -= this.OnGeneratorStatusChanged;
+			dungeonGenerator.OnGenerationStatusChanged -= OnGeneratorStatusChanged;
 		}
 
 		private void OnGeneratorStatusChanged(DungeonGenerator generator, GenerationStatus status)
 		{
-			this.transform.position = Vector3.zero;
+			transform.position = Vector3.zero;
 		}
 
 		private void Update()
@@ -42,18 +40,23 @@ namespace Project.External.DunGen.Samples.Simple_2D.Scripts
 				input.Normalize();
 
 			Vector3 direction = new Vector3(input.x, input.y, 0f);
-			float distance = this.MovementSpeed * Time.deltaTime;
+			float distance = MovementSpeed * Time.deltaTime;
 			Vector3 motion = direction * distance;
 
-			int hitCount = this.collider.Cast(direction, this.hitBuffer, distance);
+			int hitCount = collider.Cast(direction, hitBuffer, distance);
 
-			if (hitCount > 0)
+			for (int i = 0; i < hitCount; i++)
 			{
-				var hit = this.hitBuffer[0];
+				var hit = hitBuffer[i];
+
+				if(hit.collider.isTrigger)
+					continue;
+
 				motion = direction * hit.distance;
+				break;
 			}
 
-			this.transform.position += motion;
+			transform.position += motion;
 		}
 	}
 }

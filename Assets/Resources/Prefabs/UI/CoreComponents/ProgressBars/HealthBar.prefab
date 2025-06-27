@@ -540,7 +540,12 @@ PrefabInstance:
       propertyPath: <Style>k__BackingField
       value: 
       objectReference: {fileID: 11400000, guid: c458155595973e84c9caf8602f6d6bb2, type: 2}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3100811368335104528, guid: 8111e314e766acd4783083b58564af54, type: 3}
+    - {fileID: 5761477413280331177, guid: 8111e314e766acd4783083b58564af54, type: 3}
+    - {fileID: 322666502016435762, guid: 8111e314e766acd4783083b58564af54, type: 3}
+    - {fileID: 3397904918421777847, guid: 8111e314e766acd4783083b58564af54, type: 3}
+    - {fileID: 1550199879407403867, guid: 8111e314e766acd4783083b58564af54, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -571,9 +576,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <View>k__BackingField: {fileID: 8064999022041506648}
-  <Attribute>k__BackingField:
-    <FullName>k__BackingField: CharacterAttribute.Health
-    <Name>k__BackingField: Health
+  <Attribute>k__BackingField: 
+  <Source>k__BackingField: {fileID: 0}
 --- !u!114 &8064999022041506648 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9104897888414146225, guid: 8111e314e766acd4783083b58564af54, type: 3}

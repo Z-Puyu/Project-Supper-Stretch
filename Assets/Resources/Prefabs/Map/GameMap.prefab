@@ -9,9 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4430174135294324258}
-  - component: {fileID: 3872939503836012416}
   - component: {fileID: -7205027608365108340}
-  - component: {fileID: 3176784367414212871}
   m_Layer: 0
   m_Name: GameMap
   m_TagString: Untagged
@@ -35,55 +33,6 @@ Transform:
   - {fileID: 6525701555379875662}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3872939503836012416
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 544687851105093017}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 510e6e61902a25245878393904bd5d0d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Generator:
-    allowImmediateRepeats: 0
-    OverlapThreshold: 0.01
-    Padding: 0
-    DisallowOverhangs: 0
-    AvoidCollisionsWithOtherDungeons: 1
-    Seed: 0
-    ShouldRandomizeSeed: 1
-    MaxAttemptCount: 20
-    UseMaximumPairingAttempts: 0
-    MaxPairingAttempts: 5
-    UpDirection: 2
-    OverrideRepeatMode: 0
-    RepeatMode: 0
-    OverrideAllowTileRotation: 0
-    AllowTileRotation: 0
-    DebugRender: 0
-    LengthMultiplier: 1
-    PlaceTileTriggers: 1
-    TileTriggerLayer: 2
-    GenerateAsynchronously: 1
-    MaxAsyncFrameMilliseconds: 50
-    PauseBetweenRooms: 0
-    RestrictDungeonToBounds: 0
-    TilePlacementBounds:
-      m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 5, y: 5, z: 5}
-    CollisionSettings:
-      DisallowOverhangs: 0
-      OverlapThreshold: 0.01
-      Padding: 0
-      AvoidCollisionsWithOtherDungeons: 1
-    Root: {fileID: 0}
-    DungeonFlow: {fileID: 11400000, guid: fece2649a5d66884397381e65a62920e, type: 2}
-    fileVersion: 2
-  GenerateOnStart: 1
-  Root: {fileID: 1370095269514090419}
 --- !u!114 &-7205027608365108340
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97,33 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <TutorialEnd>k__BackingField: {fileID: 0}
---- !u!114 &3176784367414212871
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 544687851105093017}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f76f356143a516846a54607aa83a9ae8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Priority: 0
-  BakeMode: 1
-  LayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  AddNavMeshLinksBetweenRooms: 1
-  NavMeshAgentTypes:
-  - AgentTypeID: 0
-    AreaTypeID: 0
-    DisableLinkWhenDoorIsClosed: 1
-  NavMeshLinkDistanceFromDoorway: 2.5
-  AutoGenerateFullRebakeSurfaces: 1
-  FullRebakeTargets: []
-  UseAutomaticLinkDistance: 0
-  AutomaticLinkDistanceOffset: 0.1
+  <RuntimeDungeon>k__BackingField: {fileID: 0}
 --- !u!1 &1370095269514090419
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	/// <summary>
 	/// The phase in which to invoke a post-processing step
@@ -26,9 +26,9 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public DungeonGeneratorPostProcessStep(Action<DungeonGenerator> postProcessCallback, int priority, PostProcessPhase phase)
 		{
-			this.PostProcessCallback = postProcessCallback;
-			this.Priority = priority;
-			this.Phase = phase;
+			PostProcessCallback = postProcessCallback;
+			Priority = priority;
+			Phase = phase;
 		}
 	}
 }

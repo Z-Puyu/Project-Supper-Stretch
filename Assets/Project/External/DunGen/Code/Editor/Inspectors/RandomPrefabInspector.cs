@@ -1,10 +1,8 @@
-﻿using System.Linq;
-using DunGen.Editor.Project.External.DunGen.Code.Editor.Utility;
-using DunGen.Project.External.DunGen.Code;
+﻿using UnityEngine;
 using UnityEditor;
-using UnityEngine;
+using System.Linq;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
+namespace DunGen.Editor
 {
 	[CustomEditor(typeof(RandomPrefab))]
 	public class RandomPrefabInspector : UnityEditor.Editor
@@ -27,26 +25,26 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 
 		private void OnEnable()
 		{
-			this.zeroPosition = this.serializedObject.FindProperty("ZeroPosition");
-			this.zeroRotation = this.serializedObject.FindProperty("ZeroRotation");
-			this.props = this.serializedObject.FindProperty("Props");
+			zeroPosition = serializedObject.FindProperty("ZeroPosition");
+			zeroRotation = serializedObject.FindProperty("ZeroRotation");
+			props = serializedObject.FindProperty("Props");
 		}
 
 		public override void OnInspectorGUI()
 		{
-			this.serializedObject.Update();
+			serializedObject.Update();
 
-			EditorGUILayout.PropertyField(this.zeroPosition, Label.ZeroPosition);
-			EditorGUILayout.PropertyField(this.zeroRotation, Label.ZeroRotation);
+			EditorGUILayout.PropertyField(zeroPosition, Label.ZeroPosition);
+			EditorGUILayout.PropertyField(zeroRotation, Label.ZeroRotation);
 
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();
 
-			EditorGUILayout.PropertyField(this.props, Label.Props);
+			EditorGUILayout.PropertyField(props, Label.Props);
 
-			this.HandlePropDragAndDrop(GUILayoutUtility.GetLastRect());
+			HandlePropDragAndDrop(GUILayoutUtility.GetLastRect());
 
-			this.serializedObject.ApplyModifiedProperties();
+			serializedObject.ApplyModifiedProperties();
 		}
 
 		private void HandlePropDragAndDrop(Rect dragTargetRect)
@@ -63,10 +61,10 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 
 					if (evt.type == EventType.DragPerform)
 					{
-						Undo.RecordObject(this.target, "Drag Prop Prefab(s)");
+						Undo.RecordObject(target, "Drag Prop Prefab(s)");
 						DragAndDrop.AcceptDrag();
 
-						var randomPrefabComponent = this.target as RandomPrefab;
+						var randomPrefabComponent = target as RandomPrefab;
 
 						foreach (var dragObject in validGameObjects)
 							randomPrefabComponent.Props.Weights.Add(new GameObjectChance(dragObject));

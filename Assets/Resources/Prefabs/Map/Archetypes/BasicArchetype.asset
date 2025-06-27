@@ -17,18 +17,17 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4e5f24739ad8dd843b3629338fdd9ef3, type: 2}
   BranchStartTileSets: []
   BranchStartType: 0
-  BranchCapTileSets:
-  - {fileID: 11400000, guid: c51608eaa56bf7c49bd008415ae6ac39, type: 2}
+  BranchCapTileSets: []
   BranchCapType: 0
   BranchingDepth:
     Min: 2
-    Max: 4
+    Max: 5
   BranchCount:
     Min: 0
     Max: 2
   StraighteningSettings:
     OverrideStraightenChance: 0
-    StraightenChance: 0
+    StraightenChance: 0.33
     OverrideCanStraightenMainPath: 0
     CanStraightenMainPath: 1
     OverrideCanStraightenBranchPaths: 0

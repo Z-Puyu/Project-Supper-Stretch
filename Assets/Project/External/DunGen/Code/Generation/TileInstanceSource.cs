@@ -1,8 +1,7 @@
-﻿using DunGen.Project.External.DunGen.Code.Pooling;
-using DunGen.Project.External.DunGen.Code.Utility;
+﻿using DunGen.Pooling;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code.Generation
+namespace DunGen.Generation
 {
 	public delegate void TileInstanceSpawnedDelegate(Tile tilePrefab, Tile tileInstance, bool fromPool);
 	public delegate void TileInstanceDespawnedDelegate(Tile tileInstance);
@@ -24,7 +23,7 @@ namespace DunGen.Project.External.DunGen.Code.Generation
 
 		public TileInstanceSource()
 		{
-			this.tilePool = new BucketedObjectPool<Tile, Tile>(
+			tilePool = new BucketedObjectPool<Tile, Tile>(
 				objectFactory: template =>
 				{
 					var tileObj = Object.Instantiate(template);
@@ -50,38 +49,38 @@ namespace DunGen.Project.External.DunGen.Code.Generation
 				return;
 
 			// Try to find a TilePoolPreloader in the scene, and pre-warm the pool with its contents
-			if (this.tilePoolPreloader == null)
-				this.TryPreloadTilePool();
+			if (tilePoolPreloader == null)
+				TryPreloadTilePool();
 
 			// Create a GameObject to parent all pooled tiles to
-			if (this.tilePoolRoot == null)
+			if (tilePoolRoot == null)
 			{
 				var tilePoolObj = new GameObject("Tile Pool");
 				tilePoolObj.SetActive(false);
-				this.tilePoolRoot = tilePoolObj.transform;
+				tilePoolRoot = tilePoolObj.transform;
 			}
 		}
 
 		protected void TryPreloadTilePool()
 		{
-			this.tilePoolPreloader = UnityUtil.FindObjectByType<TilePoolPreloader>();
+			tilePoolPreloader = UnityUtil.FindObjectByType<TilePoolPreloader>();
 
-			if(this.tilePoolPreloader == null)
+			if(tilePoolPreloader == null)
 				return;
 
 			// Make the tile preloader the pool root
-			this.tilePoolPreloader.gameObject.SetActive(false);
-			this.tilePoolRoot = this.tilePoolPreloader.transform;
+			tilePoolPreloader.gameObject.SetActive(false);
+			tilePoolRoot = tilePoolPreloader.transform;
 
 			// Insert each preloaded tile into the correct bucket in the pool
-			foreach (var entry in this.tilePoolPreloader.Entries)
+			foreach (var entry in tilePoolPreloader.Entries)
 			{
 				var prefab = entry.TilePrefab;
 
 				if (prefab == null)
 					continue;
 
-				var instances = this.tilePoolPreloader.GetTileInstancesForPrefab(prefab);
+				var instances = tilePoolPreloader.GetTileInstancesForPrefab(prefab);
 
 				if(instances == null)
 					continue;
@@ -92,7 +91,7 @@ namespace DunGen.Project.External.DunGen.Code.Generation
 					instance.gameObject.SetActive(true);
 
 					instance.RefreshTileEventReceivers();
-					this.tilePool.InsertObject(prefab, instance);
+					tilePool.InsertObject(prefab, instance);
 				}
 			}
 		}
@@ -107,28 +106,28 @@ namespace DunGen.Project.External.DunGen.Code.Generation
 		/// <returns>The spawned tile instance</returns>
 		public virtual Tile SpawnTile(Tile tilePrefab, Vector3 position, Quaternion rotation)
 		{
-			if (this.enableTilePooling)
+			if (enableTilePooling)
 			{
-				bool fromPool = this.tilePool.TryTakeObject(tilePrefab, out var tile);
+				bool fromPool = tilePool.TryTakeObject(tilePrefab, out var tile);
 				var tileTransform = tile.transform;
-				tileTransform.parent = this.dungeonRoot.transform;
+				tileTransform.parent = dungeonRoot.transform;
 				tileTransform.localPosition = position;
 				tileTransform.localRotation = rotation;
 
 				tile.TileSpawned();
-				this.TileInstanceSpawned?.Invoke(tilePrefab, tile, fromPool);
+				TileInstanceSpawned?.Invoke(tilePrefab, tile, fromPool);
 
 				return tile;
 			}
 			else
 			{
-				var tileObj = GameObject.Instantiate(tilePrefab, position, rotation, this.dungeonRoot.transform);
+				var tileObj = GameObject.Instantiate(tilePrefab, position, rotation, dungeonRoot.transform);
 
 				if (tileObj.TryGetComponent<Tile>(out var tile))
 				{
 					tile.RefreshTileEventReceivers();
 					tile.TileSpawned();
-					this.TileInstanceSpawned?.Invoke(tilePrefab, tile, false);
+					TileInstanceSpawned?.Invoke(tilePrefab, tile, false);
 				}
 
 				return tileObj;
@@ -145,15 +144,15 @@ namespace DunGen.Project.External.DunGen.Code.Generation
 			bool returnedToPool = false;
 
 			// Try to return the tile to the pool
-			if (this.enableTilePooling)
+			if (enableTilePooling)
 			{
-				returnedToPool = this.tilePool.ReturnObject(tileInstance);
+				returnedToPool = tilePool.ReturnObject(tileInstance);
 
 				if (returnedToPool)
 				{
-					tileInstance.transform.parent = this.tilePoolRoot;
+					tileInstance.transform.parent = tilePoolRoot;
 					tileInstance.TileDespawned();
-					this.TileInstanceDespawned?.Invoke(tileInstance);
+					TileInstanceDespawned?.Invoke(tileInstance);
 				}
 			}
 
@@ -161,7 +160,7 @@ namespace DunGen.Project.External.DunGen.Code.Generation
 			if (!returnedToPool)
 			{
 				tileInstance.TileDespawned();
-				this.TileInstanceDespawned?.Invoke(tileInstance);
+				TileInstanceDespawned?.Invoke(tileInstance);
 				GameObject.DestroyImmediate(tileInstance.gameObject);
 			}
 		}

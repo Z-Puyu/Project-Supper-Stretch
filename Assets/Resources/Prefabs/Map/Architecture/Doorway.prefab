@@ -10,12 +10,12 @@ GameObject:
   m_Component:
   - component: {fileID: 6442927230215526368}
   - component: {fileID: 3291373233883321939}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Doorway
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6442927230215526368
 Transform:
@@ -45,15 +45,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DoorPrefabPriority: 0
+  AvoidRotatingDoorPrefab: 0
+  DoorPrefabPositionOffset: {x: 0, y: 0, z: 0}
+  DoorPrefabRotationOffset: {x: 0, y: 0, z: 0}
   ConnectorPrefabWeights:
   - GameObject: {fileID: 1357698380446865410, guid: 3168c30b819d1d242907dd3a4264aad3, type: 3}
     Weight: 1
+  ConnectorSceneObjects: []
+  AvoidRotatingBlockerPrefab: 0
+  BlockerPrefabPositionOffset: {x: 0, y: 0, z: 0}
+  BlockerPrefabRotationOffset: {x: 0, y: 0, z: 0}
   BlockerPrefabWeights:
   - GameObject: {fileID: 6139266693591140058, guid: 71064359ac2b0ad4a817a3cb249aaeb9, type: 3}
     Weight: 1
-  AvoidRotatingDoorPrefab: 0
-  AvoidRotatingBlockerPrefab: 0
-  ConnectorSceneObjects: []
   BlockerSceneObjects: []
   Tags:
     Tags: []

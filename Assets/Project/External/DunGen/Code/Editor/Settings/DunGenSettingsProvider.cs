@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using DunGen.Project.External.DunGen.Code;
 using UnityEditor;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Settings
+namespace DunGen.Editor.Settings
 {
 	public static class DunGenSettingsProvider
 	{

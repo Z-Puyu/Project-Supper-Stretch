@@ -13,17 +13,11 @@ MonoBehaviour:
   m_Name: New Player Preset
   m_EditorClassIdentifier: 
   <Attributes>k__BackingField:
-  - <Key>k__BackingField:
-      <FullName>k__BackingField: CharacterAttribute.Health
-      <Name>k__BackingField: Health
+  - <Key>k__BackingField: CharacterAttributes.MaxHealth
     <Value>k__BackingField: 100
-  - <Key>k__BackingField:
-      <FullName>k__BackingField: CharacterAttribute.Sanity
-      <Name>k__BackingField: Sanity
+  - <Key>k__BackingField: CharacterAttributes.Health
     <Value>k__BackingField: 100
-  - <Key>k__BackingField:
-      <FullName>k__BackingField: CharacterAttribute.Satiation
-      <Name>k__BackingField: Satiation
+  - <Key>k__BackingField: CharacterAttributes.Satiation
     <Value>k__BackingField: 100
   <StartingInventory>k__BackingField:
     _keys: []

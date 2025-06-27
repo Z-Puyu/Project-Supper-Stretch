@@ -1,4 +1,5 @@
 ﻿using System;
+using Project.Scripts.Common;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -6,19 +7,22 @@ namespace Project.Scripts.Items.Equipments;
 
 public class EquipmentSocket : MonoBehaviour, IComparable<EquipmentSocket> {
     [field: SerializeField] public EquipmentSlot Slot { get; private set; }
+    public Item? EquippedItem { get; private set; }
     public GameObject? Equipment { get; private set; }
     
     public bool IsAvailable => !this.Equipment;
 
-    public void Attach(GameObject? equipment) {
+    public void Attach(in Item item, in GameObject? equipment) {
         if (!this.IsAvailable) {
-            this.Detach();
+            Logging.Error($"Socket {this.name} is not available.", this);
+            return;
         }
         
         if (!equipment) {
-            equipment = new GameObject("Placeholder Equipment Model");
+            this.Equipment = new GameObject("Placeholder Equipment Model");
         }
         
+        this.EquippedItem = item;
         this.Equipment = Object.Instantiate(equipment, this.transform);
     }
     
@@ -29,10 +33,6 @@ public class EquipmentSocket : MonoBehaviour, IComparable<EquipmentSocket> {
         
         Object.Destroy(this.Equipment);
         this.Equipment = null;
-    }
-
-    public bool Fits(Item equipment) {
-        return equipment.Slot.HasFlag(this.Slot);
     }
 
     public int CompareTo(EquipmentSocket other) {

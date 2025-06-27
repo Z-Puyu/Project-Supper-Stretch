@@ -1,16 +1,15 @@
-﻿using System;
+﻿using DunGen.Tags;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using DunGen.Project.External.DunGen.Code.Tags;
-using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	public sealed class DoorwayProxy
 	{
-		public bool Used { get { return this.ConnectedDoorway != null; } }
+		public bool Used { get { return ConnectedDoorway != null; } }
 		public TileProxy TileProxy { get; private set; }
 		public int Index { get; private set; }
 		public DoorwaySocket Socket { get; private set; }
@@ -18,32 +17,32 @@ namespace DunGen.Project.External.DunGen.Code
 		public Vector3 LocalPosition { get; private set; }
 		public Quaternion LocalRotation { get; private set; }
 		public DoorwayProxy ConnectedDoorway { get; private set; }
-		public Vector3 Forward { get { return (this.TileProxy.Placement.Rotation * this.LocalRotation) * Vector3.forward; } }
-		public Vector3 Up { get { return (this.TileProxy.Placement.Rotation * this.LocalRotation) * Vector3.up; } }
-		public Vector3 Position { get { return this.TileProxy.Placement.Transform.MultiplyPoint(this.LocalPosition); } }
+		public Vector3 Forward { get { return (TileProxy.Placement.Rotation * LocalRotation) * Vector3.forward; } }
+		public Vector3 Up { get { return (TileProxy.Placement.Rotation * LocalRotation) * Vector3.up; } }
+		public Vector3 Position { get { return TileProxy.Placement.Transform.MultiplyPoint(LocalPosition); } }
 		public TagContainer Tags { get; private set; }
 		public bool IsDisabled { get; internal set; }
 
 
 		public DoorwayProxy(TileProxy tileProxy, DoorwayProxy other)
 		{
-			this.TileProxy = tileProxy;
-			this.Index = other.Index;
-			this.Socket = other.Socket;
-			this.DoorwayComponent = other.DoorwayComponent;
-			this.LocalPosition = other.LocalPosition;
-			this.LocalRotation = other.LocalRotation;
-			this.Tags = new TagContainer(other.Tags);
+			TileProxy = tileProxy;
+			Index = other.Index;
+			Socket = other.Socket;
+			DoorwayComponent = other.DoorwayComponent;
+			LocalPosition = other.LocalPosition;
+			LocalRotation = other.LocalRotation;
+			Tags = new TagContainer(other.Tags);
 		}
 
 		public DoorwayProxy(TileProxy tileProxy, int index, Doorway doorwayComponent, Vector3 localPosition, Quaternion localRotation)
 		{
-			this.TileProxy = tileProxy;
-			this.Index = index;
-			this.Socket = doorwayComponent.Socket;
-			this.DoorwayComponent = doorwayComponent;
-			this.LocalPosition = localPosition;
-			this.LocalRotation = localRotation;
+			TileProxy = tileProxy;
+			Index = index;
+			Socket = doorwayComponent.Socket;
+			DoorwayComponent = doorwayComponent;
+			LocalPosition = localPosition;
+			LocalRotation = localRotation;
 		}
 
 		public static void Connect(DoorwayProxy a, DoorwayProxy b)
@@ -57,11 +56,11 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public void Disconnect()
 		{
-			if (this.ConnectedDoorway == null)
+			if (ConnectedDoorway == null)
 				return;
 
-			this.ConnectedDoorway.ConnectedDoorway = null;
-			this.ConnectedDoorway = null;
+			ConnectedDoorway.ConnectedDoorway = null;
+			ConnectedDoorway = null;
 		}
 	}
 
@@ -73,8 +72,8 @@ namespace DunGen.Project.External.DunGen.Code
 		public List<DoorwayProxy> Entrances { get; private set; }
 		public List<DoorwayProxy> Exits { get; private set; }
 		public ReadOnlyCollection<DoorwayProxy> Doorways { get; private set; }
-		public IEnumerable<DoorwayProxy> UsedDoorways { get { return this.doorways.Where(d => d.Used); } }
-		public IEnumerable<DoorwayProxy> UnusedDoorways { get { return this.doorways.Where(d => !d.Used); } }
+		public IEnumerable<DoorwayProxy> UsedDoorways { get { return doorways.Where(d => d.Used); } }
+		public IEnumerable<DoorwayProxy> UnusedDoorways { get { return doorways.Where(d => !d.Used); } }
 		public TagContainer Tags { get; private set; }
 
 		private readonly List<DoorwayProxy> doorways = new List<DoorwayProxy>();
@@ -82,26 +81,26 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public TileProxy(TileProxy existingTile)
 		{
-			this.Prefab = existingTile.Prefab;
-			this.PrefabTile = existingTile.PrefabTile;
-			this.Placement = new TilePlacementData(existingTile.Placement);
-			this.Tags = new TagContainer(existingTile.Tags);
+			Prefab = existingTile.Prefab;
+			PrefabTile = existingTile.PrefabTile;
+			Placement = new TilePlacementData(existingTile.Placement);
+			Tags = new TagContainer(existingTile.Tags);
 
 			// Copy proxy doorways
-			this.Doorways = new ReadOnlyCollection<DoorwayProxy>(this.doorways);
-			this.Entrances = new List<DoorwayProxy>(existingTile.Entrances.Count);
-			this.Exits = new List<DoorwayProxy>(existingTile.Exits.Count);
+			Doorways = new ReadOnlyCollection<DoorwayProxy>(doorways);
+			Entrances = new List<DoorwayProxy>(existingTile.Entrances.Count);
+			Exits = new List<DoorwayProxy>(existingTile.Exits.Count);
 
 			foreach(var existingDoorway in existingTile.doorways)
 			{
 				var doorway = new DoorwayProxy(this, existingDoorway);
-				this.doorways.Add(doorway);
+				doorways.Add(doorway);
 
 				if (existingTile.Entrances.Contains(existingDoorway))
-					this.Entrances.Add(doorway);
+					Entrances.Add(doorway);
 
 				if(existingTile.Exits.Contains(existingDoorway))
-					this.Exits.Add(doorway);
+					Exits.Add(doorway);
 			}
 		}
 
@@ -110,19 +109,19 @@ namespace DunGen.Project.External.DunGen.Code
 			prefab.transform.localPosition = Vector3.zero;
 			prefab.transform.localRotation = Quaternion.identity;
 
-			this.Prefab = prefab;
-			this.PrefabTile = prefab.GetComponent<Tile>();
+			Prefab = prefab;
+			PrefabTile = prefab.GetComponent<Tile>();
 
-			if (this.PrefabTile == null)
-				this.PrefabTile = prefab.AddComponent<Tile>();
+			if (PrefabTile == null)
+				PrefabTile = prefab.AddComponent<Tile>();
 
-			this.Placement = new TilePlacementData();
-			this.Tags = new TagContainer(this.PrefabTile.Tags);
+			Placement = new TilePlacementData();
+			Tags = new TagContainer(PrefabTile.Tags);
 
 			// Add proxy doorways
-			this.Doorways = new ReadOnlyCollection<DoorwayProxy>(this.doorways);
-			this.Entrances = new List<DoorwayProxy>();
-			this.Exits = new List<DoorwayProxy>();
+			Doorways = new ReadOnlyCollection<DoorwayProxy>(doorways);
+			Entrances = new List<DoorwayProxy>();
+			Exits = new List<DoorwayProxy>();
 
 			var allDoorways = prefab.GetComponentsInChildren<Doorway>();
 
@@ -134,41 +133,41 @@ namespace DunGen.Project.External.DunGen.Code
 				Quaternion localRotation = doorway.transform.rotation;
 
 				var proxyDoorway = new DoorwayProxy(this, i, doorway, localPosition, localRotation);
-				this.doorways.Add(proxyDoorway);
+				doorways.Add(proxyDoorway);
 
-				if (this.PrefabTile.Entrances.Contains(doorway))
-					this.Entrances.Add(proxyDoorway);
-				if (this.PrefabTile.Exits.Contains(doorway))
-					this.Exits.Add(proxyDoorway);
+				if (PrefabTile.Entrances.Contains(doorway))
+					Entrances.Add(proxyDoorway);
+				if (PrefabTile.Exits.Contains(doorway))
+					Exits.Add(proxyDoorway);
 
 				if (allowedDoorwayPredicate != null && !allowedDoorwayPredicate(doorway, i))
 					proxyDoorway.IsDisabled = true;
 			}
 
 			// Calculate bounds if missing
-			if (!this.PrefabTile.HasValidBounds)
-				this.PrefabTile.RecalculateBounds();
+			if (!PrefabTile.HasValidBounds)
+				PrefabTile.RecalculateBounds();
 
-			this.Placement.LocalBounds = this.PrefabTile.Placement.LocalBounds;
+			Placement.LocalBounds = PrefabTile.Placement.LocalBounds;
 		}
 
 		public void PositionBySocket(DoorwayProxy myDoorway, DoorwayProxy otherDoorway)
 		{
 			Quaternion targetRotation = Quaternion.LookRotation(-otherDoorway.Forward, otherDoorway.Up);
-			this.Placement.Rotation = targetRotation * Quaternion.Inverse(Quaternion.Inverse(this.Placement.Rotation) * (this.Placement.Rotation * myDoorway.LocalRotation));
+			Placement.Rotation = targetRotation * Quaternion.Inverse(Quaternion.Inverse(Placement.Rotation) * (Placement.Rotation * myDoorway.LocalRotation));
 
 			Vector3 targetPosition = otherDoorway.Position;
-			this.Placement.Position = targetPosition - (myDoorway.Position - this.Placement.Position);
+			Placement.Position = targetPosition - (myDoorway.Position - Placement.Position);
 		}
 
 		public bool IsOverlapping(TileProxy other, float maxOverlap)
 		{
-			return UnityUtil.AreBoundsOverlapping(this.Placement.Bounds, other.Placement.Bounds, maxOverlap);
+			return UnityUtil.AreBoundsOverlapping(Placement.Bounds, other.Placement.Bounds, maxOverlap);
 		}
 
 		public bool IsOverlappingOrOverhanging(TileProxy other, AxisDirection upDirection, float maxOverlap)
 		{
-			return UnityUtil.AreBoundsOverlappingOrOverhanging(this.Placement.Bounds, other.Placement.Bounds, upDirection, maxOverlap);
+			return UnityUtil.AreBoundsOverlappingOrOverhanging(Placement.Bounds, other.Placement.Bounds, upDirection, maxOverlap);
 		}
 	}
 }

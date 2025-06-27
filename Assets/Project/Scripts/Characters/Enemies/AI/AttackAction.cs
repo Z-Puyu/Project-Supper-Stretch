@@ -1,5 +1,5 @@
 using System;
-using Project.Scripts.Characters.CharacterControl.Combat;
+using Project.Scripts.Characters.Combat;
 using Unity.Behavior;
 using Unity.Properties;
 using UnityEngine;
@@ -14,18 +14,18 @@ public partial class AttackAction : Action {
     [SerializeReference] public BlackboardVariable<GameObject> Target;
 
     private bool IsAttacking { get; set; }
-    private ComboAttack? ComboAttack { get; set; }
+    private Combatant? ComboAttack { get; set; }
 
-    private void FinishAttack() {
+    /*private void FinishAttack() {
         this.IsAttacking = false;
-    }
+    }*/
     
     protected override Status OnStart() {
         base.OnStart();
         this.IsAttacking = true;
-        this.ComboAttack = this.Agent.Value.GetComponent<ComboAttack>();
+        this.ComboAttack = this.Agent.Value.GetComponent<Combatant>();
         this.ComboAttack.CommitRandomStage();
-        this.ComboAttack.OnAttackCommitted += this.FinishAttack;
+        // this.ComboAttack.OnAttackCommitted += this.FinishAttack;
         return Status.Success;
     }
     
@@ -36,6 +36,6 @@ public partial class AttackAction : Action {
 
     protected override void OnEnd() {
         base.OnEnd();
-        this.ComboAttack!.OnAttackCommitted -= this.FinishAttack;
+        // this.ComboAttack!.OnAttackCommitted -= this.FinishAttack;
     }
 }

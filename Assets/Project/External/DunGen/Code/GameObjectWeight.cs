@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	[Serializable]
 	public sealed class GameObjectWeight
@@ -16,8 +16,8 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public GameObjectWeight(GameObject gameObject, float weight = 1f)
 		{
-			this.GameObject = gameObject;
-			this.Weight = weight;
+			GameObject = gameObject;
+			Weight = weight;
 		}
 	}
 }

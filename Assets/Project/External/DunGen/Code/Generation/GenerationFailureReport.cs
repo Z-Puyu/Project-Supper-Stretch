@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DunGen.Project.External.DunGen.Code.Generation
+namespace DunGen.Generation
 {
 	public class GenerationFailureReport
 	{
@@ -10,8 +10,8 @@ namespace DunGen.Project.External.DunGen.Code.Generation
 
 		public GenerationFailureReport(int maxRetryAttempts, List<TilePlacementResult> tilePlacementResults)
 		{
-			this.MaxRetryAttempts = maxRetryAttempts;
-			this.TilePlacementResults = tilePlacementResults;
+			MaxRetryAttempts = maxRetryAttempts;
+			TilePlacementResults = tilePlacementResults;
 		}
 	}
 }

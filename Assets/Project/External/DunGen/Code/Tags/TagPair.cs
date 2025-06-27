@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DunGen.Project.External.DunGen.Code.Tags
+namespace DunGen.Tags
 {
 	[Serializable]
 	public sealed class TagPair
@@ -15,21 +15,21 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 
 		public TagPair(Tag a, Tag b)
 		{
-			this.TagA = a;
-			this.TagB = b;
+			TagA = a;
+			TagB = b;
 		}
 
 		public override string ToString()
 		{
-			return string.Format("{0} <-> {1}", this.TagA.Name, this.TagB.Name);
+			return string.Format("{0} <-> {1}", TagA.Name, TagB.Name);
 		}
 
 		public bool Matches(Tag a, Tag b, bool twoWay)
 		{
 			if (twoWay)
-				return (a == this.TagA && b == this.TagB) || (a == this.TagB && b == this.TagA);
+				return (a == TagA && b == TagB) || (a == TagB && b == TagA);
 			else
-				return a == this.TagA && b == this.TagB;
+				return a == TagA && b == TagB;
 		}
 	}
 }

@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using Project.Scripts.Common;
+using SaintsField;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Project.Scripts.Items.Equipments;
 
@@ -11,8 +11,10 @@ public class EquipmentSystem : MonoBehaviour {
     private Dictionary<Item, EquipmentSocket> EquipmentLookup { get; init; } = [];
     private List<EquipmentSocket> EquipmentSockets { get; set; } = [];
     
-    public event UnityAction<GameObject?> OnEquip = delegate { };
-    public event UnityAction<GameObject?> OnUnequip = delegate { };
+    [field: SerializeField] private Animator? Animator { get; set; }
+    
+    [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Bool)]
+    private int DrawWeaponCondition { get; set; }
 
     private void Awake() {
         this.GetComponentsInChildren(this.EquipmentSockets);
@@ -22,45 +24,41 @@ public class EquipmentSystem : MonoBehaviour {
         this.EquipmentSockets.Sort();
     }
 
-    /// <summary>
-    /// Finds the first socket that fits the given equipment.
-    /// </summary>
-    /// <param name="equipment">The equipment.</param>
-    /// <param name="socket">The first empty socket. If none of the sockets is empty,
-    /// this is the first socket with a suitable slot.</param>
-    /// <returns>True if an empty suitable socket is found.</returns>
-    /// <exception cref="ArgumentException">Thrown when none of the sockets has a matching equipment slot.</exception>
-    private bool FindSlot(Item equipment, out EquipmentSocket socket) {
-        EquipmentSocket[] sockets = this.EquipmentSockets.Where(socket => socket.Fits(equipment)).ToArray();
+    public bool Equip(Item equipment, GameObject model, EquipmentSlot slot, out EquipmentSocket socket) {
+        EquipmentSocket[] sockets = this.EquipmentSockets.Where(socket => slot.HasFlag(socket.Slot)).ToArray();
         if (!sockets.Any()) {
-            throw new ArgumentException($"No socket fits {equipment}");
+            Logging.Error($"{this.gameObject.name} has no socket with slot {slot}", this);
+            socket = this.EquipmentSockets[0];
+            return false;       
         }
         
-        EquipmentSocket? s = sockets.FirstOrDefault(socket => socket.IsAvailable);
-        if (!s) {
+        EquipmentSocket? available = sockets.FirstOrDefault(socket => socket.IsAvailable);
+        if (!available) {
             socket = sockets[0];
-            return false;
+            return false;       
         }
         
-        socket = s;
+        available.Attach(equipment, model);
+        this.EquipmentLookup[equipment] = available;
+        socket = available;
+        if (equipment.Type.HasFlag(ItemFlag.Weapon) && this.Animator) {
+            this.Animator.SetBool(this.DrawWeaponCondition, true);
+        }
+        
         return true;
     }
 
-    public void Equip(Item equipment) {
-        if (!this.FindSlot(equipment, out EquipmentSocket socket)) {
-            socket.Detach();
+    public bool Unequip(in Item equipment) {
+        if (!this.EquipmentLookup.TryGetValue(equipment, out EquipmentSocket socket)) {
+            return false;
         }
         
-        Debug.Log($"{this.gameObject} equips {equipment} to {socket}");
-        socket.Attach(equipment.Model);
-        this.EquipmentLookup[equipment] = socket;
-        this.OnEquip.Invoke(equipment.Model);
-    }
-
-    public void Unequip(Item equipment) {
-        Debug.Log($"{this.gameObject} unequips {equipment} from {this.EquipmentLookup[equipment]}");
-        this.EquipmentLookup[equipment].Detach();
+        socket.Detach();
         this.EquipmentLookup.Remove(equipment);
-        this.OnUnequip.Invoke(equipment.Model);
+        if (equipment.Type.HasFlag(ItemFlag.Weapon) && this.Animator) {
+            this.Animator.SetBool(this.DrawWeaponCondition, false);
+        }
+        
+        return true;
     }
 }

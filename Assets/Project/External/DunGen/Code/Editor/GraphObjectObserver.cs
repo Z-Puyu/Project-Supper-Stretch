@@ -1,8 +1,8 @@
-﻿using System;
-using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
+﻿using DunGen.Graph;
+using System;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor
+namespace DunGen.Editor
 {
 	/**
 	 * For simplicity, I wanted to use Unity's inspector to edit the graph objects but didn't want to
@@ -17,13 +17,13 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor
 		public DungeonFlow Flow { get; set; }
 		public GraphNode Node
 		{
-			get => this.node;
-			private set => this.node = value;
+			get => node;
+			private set => node = value;
 		}
 		public GraphLine Line
 		{
-			get => this.line;
-			private set => this.line = value;
+			get => line;
+			private set => line = value;
 		}
 
 		[SerializeField]
@@ -34,14 +34,14 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor
 
 		public void Inspect(GraphNode node)
 		{
-			this.Node = node;
-			this.Line = null;
+			Node = node;
+			Line = null;
 		}
 
 		public void Inspect(GraphLine line)
 		{
-			this.Line = line;
-			this.Node = null;
+			Line = line;
+			Node = null;
 		}
 	}
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	/// <summary>
 	/// A set of tiles with weights to be picked from at random
@@ -17,13 +17,13 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public void AddTile(GameObject tilePrefab, float mainPathWeight, float branchPathWeight)
 		{
-			this.TileWeights.Weights.Add(new GameObjectChance(tilePrefab, mainPathWeight, branchPathWeight, this));
+			TileWeights.Weights.Add(new GameObjectChance(tilePrefab, mainPathWeight, branchPathWeight, this));
 		}
 
 		public void AddTiles(IEnumerable<GameObject> tilePrefab, float mainPathWeight, float branchPathWeight)
 		{
 			foreach (var tile in tilePrefab)
-				this.AddTile(tile, mainPathWeight, branchPathWeight);
+				AddTile(tile, mainPathWeight, branchPathWeight);
 		}
 	}
 }

@@ -1,9 +1,9 @@
-﻿using System.Linq;
-using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
+﻿using DunGen.Graph;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
+namespace DunGen.Editor
 {
 	public sealed class DungeonFlowEditorWindow : EditorWindow
 	{
@@ -62,59 +62,59 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 
 		private bool IsInitialised()
 		{
-			return DungeonFlowEditorWindow.boxStyle != null && DungeonFlowEditorWindow.whitePixel != null;
+			return boxStyle != null && whitePixel != null;
 		}
 
 		private void Init()
 		{
-			this.minSize = new Vector2(470, 150);
+			minSize = new Vector2(470, 150);
 
-			DungeonFlowEditorWindow.whitePixel = new Texture2D(1, 1, TextureFormat.RGB24, false);
-			DungeonFlowEditorWindow.whitePixel.SetPixel(0, 0, Color.white);
-			DungeonFlowEditorWindow.whitePixel.Apply();
+			whitePixel = new Texture2D(1, 1, TextureFormat.RGB24, false);
+			whitePixel.SetPixel(0, 0, Color.white);
+			whitePixel.Apply();
 
-			DungeonFlowEditorWindow.boxStyle = new GUIStyle(GUI.skin.box);
-			DungeonFlowEditorWindow.boxStyle.normal.background = DungeonFlowEditorWindow.whitePixel;
+			boxStyle = new GUIStyle(GUI.skin.box);
+			boxStyle.normal.background = whitePixel;
 
-			if (this.Flow != null)
+			if (Flow != null)
 			{
-				foreach (var node in this.Flow.Nodes)
-					node.Graph = this.Flow;
-				foreach (var line in this.Flow.Lines)
-					line.Graph = this.Flow;
+				foreach (var node in Flow.Nodes)
+					node.Graph = Flow;
+				foreach (var line in Flow.Lines)
+					line.Graph = Flow;
 			}
 		}
 
 		public void OnGUI()
 		{
-			if (!this.IsInitialised())
-				this.Init();
+			if (!IsInitialised())
+				Init();
 
-			if (this.Flow == null)
+			if (Flow == null)
 			{
-				this.Flow = (DungeonFlow)EditorGUILayout.ObjectField(this.Flow, typeof(DungeonFlow), false);
+				Flow = (DungeonFlow)EditorGUILayout.ObjectField(Flow, typeof(DungeonFlow), false);
 				return;
 			}
 
-			this.DrawNodes();
-			this.DrawLines();
+			DrawNodes();
+			DrawLines();
 
-			this.HandleInput();
+			HandleInput();
 
 			if (GUI.changed)
-				EditorUtility.SetDirty(this.Flow);
+				EditorUtility.SetDirty(Flow);
 		}
 
 		private void OnInspectorUpdate()
 		{
-			this.Repaint();
+			Repaint();
 		}
 
 		private float GetNormalizedPositionOnGraph(Vector2 screenPosition)
 		{
-			float width = this.position.width - (DungeonFlowEditorWindow.HorizontalMargin + DungeonFlowEditorWindow.NodeWidth / 2) * 2;
+			float width = position.width - (HorizontalMargin + NodeWidth / 2) * 2;
 
-			float linePosition = screenPosition.x - (DungeonFlowEditorWindow.HorizontalMargin + DungeonFlowEditorWindow.NodeWidth / 2);
+			float linePosition = screenPosition.x - (HorizontalMargin + NodeWidth / 2);
 			return Mathf.Clamp(linePosition / width, 0, 1);
 		}
 
@@ -122,10 +122,10 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 		{
 			var evt = Event.current;
 
-			int boundaryIndex = this.GetLineBoundaryAtPoint(evt.mousePosition);
+			int boundaryIndex = GetLineBoundaryAtPoint(evt.mousePosition);
 
 			// Change cursor if hovering over a boundary
-			if (boundaryIndex != -1 && !this.isDraggingLineBoundary)
+			if (boundaryIndex != -1 && !isDraggingLineBoundary)
 				EditorGUIUtility.AddCursorRect(new Rect(evt.mousePosition.x - 10, evt.mousePosition.y - 10, 20, 20), MouseCursor.ResizeHorizontal);
 
 			if (evt.isMouse && evt.button == 0)
@@ -137,24 +137,24 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 						// Drag a line boundary
 						if (boundaryIndex != -1)
 						{
-							this.draggingLineBoundaryIndex = boundaryIndex;
-							this.isDraggingLineBoundary = true;
+							draggingLineBoundaryIndex = boundaryIndex;
+							isDraggingLineBoundary = true;
 							evt.Use();
 							return;
 						}
 
 						// Drag a node
-						var node = this.GetNodeAtPoint(evt.mousePosition);
+						var node = GetNodeAtPoint(evt.mousePosition);
 
 						if (node != null && node.NodeType == NodeType.Normal)
 						{
-							this.draggingNode = node;
-							this.isDraggingNode = true;
+							draggingNode = node;
+							isDraggingNode = true;
 
-							this.Select(node);
+							Select(node);
 						}
 
-						this.isMouseDown = true;
+						isMouseDown = true;
 						evt.Use();
 
 						break;
@@ -162,35 +162,35 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 					case EventType.MouseUp:
 
 						// Stop dragging line boundary
-						if (this.isDraggingLineBoundary)
+						if (isDraggingLineBoundary)
 						{
-							this.isDraggingLineBoundary = false;
-							this.draggingLineBoundaryIndex = -1;
+							isDraggingLineBoundary = false;
+							draggingLineBoundaryIndex = -1;
 							evt.Use();
 							return;
 						}
 
-						if (!this.isDraggingNode)
-							this.TrySelectGraphObject(evt.mousePosition);
+						if (!isDraggingNode)
+							TrySelectGraphObject(evt.mousePosition);
 
-						this.isMouseDown = false;
-						this.draggingNode = null;
-						this.isDraggingNode = false;
+						isMouseDown = false;
+						draggingNode = null;
+						isDraggingNode = false;
 
 						evt.Use();
 						break;
 
 					case EventType.MouseDrag:
 
-						if (this.isDraggingLineBoundary && this.draggingLineBoundaryIndex != -1)
+						if (isDraggingLineBoundary && draggingLineBoundaryIndex != -1)
 						{
 							// Calculate new normalized position
-							float width = this.position.width - (DungeonFlowEditorWindow.HorizontalMargin + DungeonFlowEditorWindow.NodeWidth / 2) * 2;
-							float mouseNorm = Mathf.Clamp((evt.mousePosition.x - (DungeonFlowEditorWindow.HorizontalMargin + DungeonFlowEditorWindow.NodeWidth / 2)) / width, 0f, 1f);
+							float width = position.width - (HorizontalMargin + NodeWidth / 2) * 2;
+							float mouseNorm = Mathf.Clamp((evt.mousePosition.x - (HorizontalMargin + NodeWidth / 2)) / width, 0f, 1f);
 
 							// Get the two lines
-							var leftLine = this.Flow.Lines[this.draggingLineBoundaryIndex];
-							var rightLine = this.Flow.Lines[this.draggingLineBoundaryIndex + 1];
+							var leftLine = Flow.Lines[draggingLineBoundaryIndex];
+							var rightLine = Flow.Lines[draggingLineBoundaryIndex + 1];
 
 							// The left boundary of the left line
 							float leftEdge = leftLine.Position;
@@ -209,18 +209,18 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 							rightLine.Position = mouseNorm;
 							rightLine.Length = newRightLength;
 
-							this.Repaint();
+							Repaint();
 							evt.Use();
 							return;
 						}
 
-						if (this.isMouseDown && !this.isDraggingNode && this.draggingNode != null)
-							this.isDraggingNode = true;
+						if (isMouseDown && !isDraggingNode && draggingNode != null)
+							isDraggingNode = true;
 
-						if (this.isDraggingNode)
+						if (isDraggingNode)
 						{
-							this.draggingNode.Position = this.GetNormalizedPositionOnGraph(evt.mousePosition);
-							this.Repaint();
+							draggingNode.Position = GetNormalizedPositionOnGraph(evt.mousePosition);
+							Repaint();
 						}
 
 						evt.Use();
@@ -232,27 +232,27 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 			{
 				bool hasOpenedContextMenu = false;
 
-				for (int i = this.Flow.Nodes.Count - 1; i >= 0; i--)
+				for (int i = Flow.Nodes.Count - 1; i >= 0; i--)
 				{
-					var node = this.Flow.Nodes[i];
+					var node = Flow.Nodes[i];
 
-					if (this.GetNodeBounds(node).Contains(evt.mousePosition))
+					if (GetNodeBounds(node).Contains(evt.mousePosition))
 					{
-						this.HandleNodeContextMenu(node);
+						HandleNodeContextMenu(node);
 						hasOpenedContextMenu = true;
-						this.contextMenuPosition = evt.mousePosition;
+						contextMenuPosition = evt.mousePosition;
 						break;
 					}
 				}
 
 				if (!hasOpenedContextMenu)
 				{
-					foreach (var line in this.Flow.Lines)
-						if (this.GetLineBounds(line).Contains(evt.mousePosition))
+					foreach (var line in Flow.Lines)
+						if (GetLineBounds(line).Contains(evt.mousePosition))
 						{
-							this.HandleLineContextMenu(line);
+							HandleLineContextMenu(line);
 							hasOpenedContextMenu = true;
-							this.contextMenuPosition = evt.mousePosition;
+							contextMenuPosition = evt.mousePosition;
 							break;
 						}
 				}
@@ -264,16 +264,16 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 		private int GetLineBoundaryAtPoint(Vector2 mousePosition)
 		{
 			// Returns the index of the boundary between two lines if the mouse is near it, otherwise -1
-			float width = this.position.width - (DungeonFlowEditorWindow.HorizontalMargin + DungeonFlowEditorWindow.NodeWidth / 2) * 2;
-			float centreY = this.position.center.y - this.position.y;
-			float top = centreY - (DungeonFlowEditorWindow.LineThickness / 2);
+			float width = position.width - (HorizontalMargin + NodeWidth / 2) * 2;
+			float centreY = position.center.y - position.y;
+			float top = centreY - (LineThickness / 2);
 
-			float currentX = DungeonFlowEditorWindow.HorizontalMargin + DungeonFlowEditorWindow.NodeWidth / 2;
+			float currentX = HorizontalMargin + NodeWidth / 2;
 
-			for (int i = 0; i < this.Flow.Lines.Count - 1; i++)
+			for (int i = 0; i < Flow.Lines.Count - 1; i++)
 			{
-				currentX += this.Flow.Lines[i].Length * width;
-				Rect grabRect = new Rect(currentX - DungeonFlowEditorWindow.LineBoundaryGrabWidth / 2, top, DungeonFlowEditorWindow.LineBoundaryGrabWidth, DungeonFlowEditorWindow.LineThickness);
+				currentX += Flow.Lines[i].Length * width;
+				Rect grabRect = new Rect(currentX - LineBoundaryGrabWidth / 2, top, LineBoundaryGrabWidth, LineThickness);
 
 				if (grabRect.Contains(mousePosition))
 					return i;
@@ -286,13 +286,13 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 
 		private void HandleNodeContextMenu(GraphNode node)
 		{
-			this.contextMenuNode = node;
-			this.contextMenuLine = null;
+			contextMenuNode = node;
+			contextMenuLine = null;
 
 			var menu = new GenericMenu();
 
 			if (node.NodeType == NodeType.Normal)
-				menu.AddItem(new GUIContent("Delete " + (string.IsNullOrEmpty(node.Label) ? "Node" : node.Label)), false, this.NodeContextMenuCallback, GraphContextCommand.Delete);
+				menu.AddItem(new GUIContent("Delete " + (string.IsNullOrEmpty(node.Label) ? "Node" : node.Label)), false, NodeContextMenuCallback, GraphContextCommand.Delete);
 
 			menu.ShowAsContext();
 		}
@@ -304,8 +304,8 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 			switch (cmd)
 			{
 				case GraphContextCommand.Delete:
-					if (this.contextMenuNode.NodeType == NodeType.Normal)
-						this.Flow.Nodes.Remove(this.contextMenuNode);
+					if (contextMenuNode.NodeType == NodeType.Normal)
+						Flow.Nodes.Remove(contextMenuNode);
 					break;
 			}
 		}
@@ -316,16 +316,16 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 
 		private void HandleLineContextMenu(GraphLine line)
 		{
-			this.contextMenuLine = line;
-			this.contextMenuNode = null;
+			contextMenuLine = line;
+			contextMenuNode = null;
 
 			var menu = new GenericMenu();
 
-			menu.AddItem(new GUIContent("Add Node Here"), false, this.LineContextMenuCallback, GraphContextCommand.AddNode);
-			menu.AddItem(new GUIContent("Split Segment"), false, this.LineContextMenuCallback, GraphContextCommand.SplitLine);
+			menu.AddItem(new GUIContent("Add Node Here"), false, LineContextMenuCallback, GraphContextCommand.AddNode);
+			menu.AddItem(new GUIContent("Split Segment"), false, LineContextMenuCallback, GraphContextCommand.SplitLine);
 
-			if (this.Flow.Lines.Count > 1)
-				menu.AddItem(new GUIContent("Delete Segment"), false, this.LineContextMenuCallback, GraphContextCommand.Delete);
+			if (Flow.Lines.Count > 1)
+				menu.AddItem(new GUIContent("Delete Segment"), false, LineContextMenuCallback, GraphContextCommand.Delete);
 
 			menu.ShowAsContext();
 		}
@@ -338,30 +338,30 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 			{
 				case GraphContextCommand.AddNode:
 					{
-						GraphNode node = new GraphNode(this.Flow);
+						GraphNode node = new GraphNode(Flow);
 						node.Label = "New Node";
-						node.Position = this.GetNormalizedPositionOnGraph(this.contextMenuPosition);
-						this.Flow.Nodes.Add(node);
+						node.Position = GetNormalizedPositionOnGraph(contextMenuPosition);
+						Flow.Nodes.Add(node);
 
 						break;
 					}
 				case GraphContextCommand.Delete:
 					{
-						if (this.Flow.Lines.Count > 1)
+						if (Flow.Lines.Count > 1)
 						{
-							int lineIndex = this.Flow.Lines.IndexOf(this.contextMenuLine);
-							this.Flow.Lines.RemoveAt(lineIndex);
+							int lineIndex = Flow.Lines.IndexOf(contextMenuLine);
+							Flow.Lines.RemoveAt(lineIndex);
 
 							if (lineIndex == 0)
 							{
-								var replacementLine = this.Flow.Lines[0];
+								var replacementLine = Flow.Lines[0];
 								replacementLine.Position = 0;
-								replacementLine.Length += this.contextMenuLine.Length;
+								replacementLine.Length += contextMenuLine.Length;
 							}
 							else
 							{
-								var replacementLine = this.Flow.Lines[lineIndex - 1];
-								replacementLine.Length += this.contextMenuLine.Length;
+								var replacementLine = Flow.Lines[lineIndex - 1];
+								replacementLine.Length += contextMenuLine.Length;
 							}
 						}
 
@@ -369,27 +369,27 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 					}
 				case GraphContextCommand.SplitLine:
 					{
-						float position = this.GetNormalizedPositionOnGraph(this.contextMenuPosition);
-						float originalLength = this.contextMenuLine.Length;
+						float position = GetNormalizedPositionOnGraph(contextMenuPosition);
+						float originalLength = contextMenuLine.Length;
 
-						int index = this.Flow.Lines.IndexOf(this.contextMenuLine);
+						int index = Flow.Lines.IndexOf(contextMenuLine);
 						float totalLength = 0;
 
 						for (int i = 0; i < index; i++)
-							totalLength += this.Flow.Lines[i].Length;
+							totalLength += Flow.Lines[i].Length;
 
-						this.contextMenuLine.Length = position - totalLength;
+						contextMenuLine.Length = position - totalLength;
 
 
-						GraphLine newSegment = new GraphLine(this.Flow);
+						GraphLine newSegment = new GraphLine(Flow);
 
-						foreach (var dungeonArchetype in this.contextMenuLine.DungeonArchetypes)
+						foreach (var dungeonArchetype in contextMenuLine.DungeonArchetypes)
 							newSegment.DungeonArchetypes.Add(dungeonArchetype);
 
 						newSegment.Position = position;
-						newSegment.Length = originalLength - this.contextMenuLine.Length;
+						newSegment.Length = originalLength - contextMenuLine.Length;
 
-						this.Flow.Lines.Insert(index + 1, newSegment);
+						Flow.Lines.Insert(index + 1, newSegment);
 
 						break;
 					}
@@ -400,19 +400,19 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 
 		private bool TrySelectGraphObject(Vector2 mousePosition)
 		{
-			var node = this.GetNodeAtPoint(mousePosition);
+			var node = GetNodeAtPoint(mousePosition);
 
 			if (node != null)
 			{
-				this.Select(node);
+				Select(node);
 				return true;
 			}
 
-			var line = this.GetLineAtPoint(mousePosition);
+			var line = GetLineAtPoint(mousePosition);
 
 			if (line != null)
 			{
-				this.Select(line);
+				Select(line);
 				return true;
 			}
 
@@ -421,49 +421,49 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 
 		private void Select(GraphNode node)
 		{
-			this.selectedNode = node;
-			this.selectedLine = null;
-			this.CreateInspectorInstance();
-			this.inspector.Inspect(node);
+			selectedNode = node;
+			selectedLine = null;
+			CreateInspectorInstance();
+			inspector.Inspect(node);
 
-			Selection.activeObject = this.inspector;
-			EditorUtility.SetDirty(this.inspector);
+			Selection.activeObject = inspector;
+			EditorUtility.SetDirty(inspector);
 		}
 
 		private void Select(GraphLine line)
 		{
-			this.selectedLine = line;
-			this.selectedNode = null;
-			this.CreateInspectorInstance();
-			this.inspector.Inspect(line);
+			selectedLine = line;
+			selectedNode = null;
+			CreateInspectorInstance();
+			inspector.Inspect(line);
 
-			Selection.activeObject = this.inspector;
-			EditorUtility.SetDirty(this.inspector);
+			Selection.activeObject = inspector;
+			EditorUtility.SetDirty(inspector);
 		}
 
 		private void CreateInspectorInstance()
 		{
-			if (this.inspector != null)
+			if (inspector != null)
 			{
-				if(Selection.activeObject == this.inspector)
+				if(Selection.activeObject == inspector)
 					Selection.activeObject = null;
 
-				Object.DestroyImmediate(this.inspector);
-				this.inspector = null;
+				DestroyImmediate(inspector);
+				inspector = null;
 			}
 
-			this.inspector = ScriptableObject.CreateInstance<GraphObjectObserver>();
-			this.inspector.Flow = this.Flow;
+			inspector = ScriptableObject.CreateInstance<GraphObjectObserver>();
+			inspector.Flow = Flow;
 		}
 
 		private GraphNode GetNodeAtPoint(Vector2 screenPosition)
 		{
 			// Loop through nodes backwards to prioritise nodes other than the Start & Goal nodes
-			for (int i = this.Flow.Nodes.Count - 1; i >= 0; i--)
+			for (int i = Flow.Nodes.Count - 1; i >= 0; i--)
 			{
-				var node = this.Flow.Nodes[i];
+				var node = Flow.Nodes[i];
 
-				if (this.GetNodeBounds(node).Contains(screenPosition))
+				if (GetNodeBounds(node).Contains(screenPosition))
 					return node;
 			}
 
@@ -472,8 +472,8 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 
 		private GraphLine GetLineAtPoint(Vector2 screenPosition)
 		{
-			foreach (var line in this.Flow.Lines)
-				if (this.GetLineBounds(line).Contains(screenPosition))
+			foreach (var line in Flow.Lines)
+				if (GetLineBounds(line).Contains(screenPosition))
 					return line;
 
 			return null;
@@ -481,22 +481,22 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 
 		private void DrawLines()
 		{
-			for (int i = 0; i < this.Flow.Lines.Count; i++)
+			for (int i = 0; i < Flow.Lines.Count; i++)
 			{
-				var line = this.Flow.Lines[i];
-				var rect = this.GetLineBounds(line);
+				var line = Flow.Lines[i];
+				var rect = GetLineBounds(line);
 
 				// Draw selected border if this line is selected
-				if (line == this.selectedLine)
+				if (line == selectedLine)
 				{
-					GUI.color = DungeonFlowEditorWindow.SelectedBorderColour;
-					GUI.Box(this.ExpandRectCentered(rect, DungeonFlowEditorWindow.SelectedBorderThickness), "", DungeonFlowEditorWindow.boxStyle);
+					GUI.color = SelectedBorderColour;
+					GUI.Box(ExpandRectCentered(rect, SelectedBorderThickness), "", boxStyle);
 				}
 
-				GUI.color = DungeonFlowEditorWindow.BorderColour;
-				GUI.Box(this.ExpandRectCentered(rect, DungeonFlowEditorWindow.BorderThickness), "", DungeonFlowEditorWindow.boxStyle);
-				GUI.color = DungeonFlowEditorWindow.LineColour;
-				GUI.Box(rect, "", DungeonFlowEditorWindow.boxStyle);
+				GUI.color = BorderColour;
+				GUI.Box(ExpandRectCentered(rect, BorderThickness), "", boxStyle);
+				GUI.color = LineColour;
+				GUI.Box(rect, "", boxStyle);
 			}
 		}
 
@@ -505,21 +505,21 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 			var originalContentColour = GUI.contentColor;
 			GUI.contentColor = Color.black;
 
-			foreach (var node in this.Flow.Nodes.OrderBy(x => x.NodeType == NodeType.Normal))
+			foreach (var node in Flow.Nodes.OrderBy(x => x.NodeType == NodeType.Normal))
 			{
-				var rect = this.GetNodeBounds(node);
+				var rect = GetNodeBounds(node);
 
 				// Draw selected border if this node is selected
-				if (node == this.selectedNode)
+				if (node == selectedNode)
 				{
-					GUI.color = DungeonFlowEditorWindow.SelectedBorderColour;
-					GUI.Box(this.ExpandRectCentered(rect, DungeonFlowEditorWindow.SelectedBorderThickness), "", DungeonFlowEditorWindow.boxStyle);
+					GUI.color = SelectedBorderColour;
+					GUI.Box(ExpandRectCentered(rect, SelectedBorderThickness), "", boxStyle);
 				}
 
-				GUI.color = DungeonFlowEditorWindow.BorderColour;
-				GUI.Box(this.ExpandRectCentered(rect, DungeonFlowEditorWindow.BorderThickness), "", DungeonFlowEditorWindow.boxStyle);
-				GUI.color = (node.NodeType == NodeType.Start) ? DungeonFlowEditorWindow.StartNodeColour : (node.NodeType == NodeType.Goal) ? DungeonFlowEditorWindow.GoalNodeColour : DungeonFlowEditorWindow.NodeColour;
-				GUI.Box(rect, node.Label, DungeonFlowEditorWindow.boxStyle);
+				GUI.color = BorderColour;
+				GUI.Box(ExpandRectCentered(rect, BorderThickness), "", boxStyle);
+				GUI.color = (node.NodeType == NodeType.Start) ? StartNodeColour : (node.NodeType == NodeType.Goal) ? GoalNodeColour : NodeColour;
+				GUI.Box(rect, node.Label, boxStyle);
 			}
 
 			GUI.contentColor = originalContentColour;
@@ -532,29 +532,29 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 
 		private Rect GetLineBounds(GraphLine line)
 		{
-			float center = this.position.center.y - this.position.y;
-			float top = center - (DungeonFlowEditorWindow.LineThickness / 2);
-			float width = this.position.width - (DungeonFlowEditorWindow.HorizontalMargin + DungeonFlowEditorWindow.NodeWidth / 2) * 2;
+			float center = position.center.y - position.y;
+			float top = center - (LineThickness / 2);
+			float width = position.width - (HorizontalMargin + NodeWidth / 2) * 2;
 
-			float left = (DungeonFlowEditorWindow.HorizontalMargin + DungeonFlowEditorWindow.NodeWidth / 2) + line.Position * width;
-			return new Rect(left, top, line.Length * width, DungeonFlowEditorWindow.LineThickness);
+			float left = (HorizontalMargin + NodeWidth / 2) + line.Position * width;
+			return new Rect(left, top, line.Length * width, LineThickness);
 		}
 
 		private Rect GetNodeBounds(GraphNode node)
 		{
-			float top = DungeonFlowEditorWindow.VerticalMargin;
-			float width = this.position.width - (DungeonFlowEditorWindow.HorizontalMargin + DungeonFlowEditorWindow.NodeWidth / 2) * 2;
-			float height = this.position.height - DungeonFlowEditorWindow.VerticalMargin * 2;
+			float top = VerticalMargin;
+			float width = position.width - (HorizontalMargin + NodeWidth / 2) * 2;
+			float height = position.height - VerticalMargin * 2;
 
 			if (node.NodeType == NodeType.Normal)
 			{
-				float offset = (this.position.height - DungeonFlowEditorWindow.VerticalMargin * 2) / 4;
+				float offset = (position.height - VerticalMargin * 2) / 4;
 				top += offset;
 				height -= offset * 2;
 			}
 
-			float left = (DungeonFlowEditorWindow.HorizontalMargin + DungeonFlowEditorWindow.NodeWidth / 2) + node.Position * width - DungeonFlowEditorWindow.NodeWidth / 2;
-			return new Rect(left, top, DungeonFlowEditorWindow.NodeWidth, height);
+			float left = (HorizontalMargin + NodeWidth / 2) + node.Position * width - NodeWidth / 2;
+			return new Rect(left, top, NodeWidth, height);
 		}
 
 		#region Static Methods

@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using DunGen.Project.External.DunGen.Code;
 using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor
+namespace DunGen.Editor
 {
 	public static class TileAssetProcessor
 	{
@@ -15,9 +14,9 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor
 		[InitializeOnLoadMethod]
 		private static void ResetStatics()
 		{
-			TileAssetProcessor.isProcessing = false;
-			TileAssetProcessor.tilesToProcess.Clear();
-			TileAssetProcessor.tileScriptPath = null;
+			isProcessing = false;
+			tilesToProcess.Clear();
+			tileScriptPath = null;
 		}
 
 		private static void FindTileScriptPath()
@@ -35,7 +34,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor
 					// Check if this MonoScript represents a DunGen Tile
 					if (monoScript.GetClass() == typeof(Tile))
 					{
-						TileAssetProcessor.tileScriptPath = path;
+						tileScriptPath = path;
 						break;
 					}
 				}
@@ -49,14 +48,14 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor
 				if (!DunGenSettings.Instance.RecalculateTileBoundsOnSave)
 					return paths;
 
-				if (TileAssetProcessor.isProcessing)
+				if (isProcessing)
 					return paths;
 
 				// Cache path to the Tile script for quick lookup later
-				if (TileAssetProcessor.tileScriptPath == null)
-					TileAssetProcessor.FindTileScriptPath();
+				if (tileScriptPath == null)
+					FindTileScriptPath();
 
-				TileAssetProcessor.isProcessing = true;
+				isProcessing = true;
 
 				foreach (var path in paths)
 				{
@@ -67,7 +66,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor
 					// Check dependencies as a quick way to see if the prefab has a Tile component
 					var dependencies = AssetDatabase.GetDependencies(path, true);
 
-					if (!dependencies.Contains(TileAssetProcessor.tileScriptPath))
+					if (!dependencies.Contains(tileScriptPath))
 						continue;
 
 					// Load the prefab
@@ -78,7 +77,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor
 
 					// If it has a Tile component at the root, add it to the list for later processing
 					if (prefab.TryGetComponent<Tile>(out var _))
-						TileAssetProcessor.tilesToProcess.Add(path);
+						tilesToProcess.Add(path);
 				}
 
 				return paths;
@@ -90,7 +89,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor
 			static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
 			{
 				// Nothing to process
-				if (!TileAssetProcessor.isProcessing || TileAssetProcessor.tilesToProcess.Count == 0)
+				if (!isProcessing || tilesToProcess.Count == 0)
 					return;
 
 				try
@@ -100,7 +99,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor
 					importedAssets.CopyTo(allAssets, 0);
 					movedAssets.CopyTo(allAssets, importedAssets.Length);
 
-					foreach (var path in TileAssetProcessor.tilesToProcess)
+					foreach (var path in tilesToProcess)
 					{
 						var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
 
@@ -135,8 +134,8 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor
 				}
 				finally
 				{
-					TileAssetProcessor.tilesToProcess.Clear();
-					TileAssetProcessor.isProcessing = false;
+					tilesToProcess.Clear();
+					isProcessing = false;
 				}
 			}
 		}

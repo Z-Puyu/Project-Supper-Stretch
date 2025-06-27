@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
+
 using Random = UnityEngine.Random;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	[Serializable]
 	[CreateAssetMenu(menuName = "DunGen/Key Manager", order = 700)]
@@ -16,10 +16,10 @@ namespace DunGen.Project.External.DunGen.Code
 		{
 			get
 			{
-				if (this.keysReadOnly == null)
-					this.keysReadOnly = new ReadOnlyCollection<Key>(this.keys);
+				if (keysReadOnly == null)
+					keysReadOnly = new ReadOnlyCollection<Key>(keys);
 
-				return this.keysReadOnly;
+				return keysReadOnly;
 			}
 		}
 
@@ -31,38 +31,38 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public Key CreateKey()
 		{
-			Key key = new Key(this.GetNextAvailableID());
-			key.Name = UnityUtil.GetUniqueName("New Key", this.keys.Select(x => x.Name));
+			Key key = new Key(GetNextAvailableID());
+			key.Name = UnityUtil.GetUniqueName("New Key", keys.Select(x => x.Name));
 			key.Colour = new Color(Random.value, Random.value, Random.value);
 
-			this.keys.Add(key);
+			keys.Add(key);
 
 			return key;
 		}
 
 		public void DeleteKey(int index)
 		{
-			this.keys.RemoveAt(index);
+			keys.RemoveAt(index);
 		}
 
 		public Key GetKeyByID(int id)
 		{
-			return this.keys.Where(x => { return x.ID == id; }).FirstOrDefault();
+			return keys.Where(x => { return x.ID == id; }).FirstOrDefault();
 		}
 
 		public Key GetKeyByName(string name)
 		{
-			return this.keys.Where(x => { return x.Name == name; }).FirstOrDefault();
+			return keys.Where(x => { return x.Name == name; }).FirstOrDefault();
 		}
 
 		public bool RenameKey(int index, string newName)
 		{
-			if(this.keys[index].Name == newName)
+			if(keys[index].Name == newName)
 				return false;
 
-			newName = UnityUtil.GetUniqueName(newName, this.keys.Select(x => x.Name));
+			newName = UnityUtil.GetUniqueName(newName, keys.Select(x => x.Name));
 
-			this.keys[index].Name = newName;
+			keys[index].Name = newName;
 			return true;
 		}
 
@@ -70,7 +70,7 @@ namespace DunGen.Project.External.DunGen.Code
 		{
 			int nextID = 0;
 
-			foreach(var key in this.keys.OrderBy(x => x.ID))
+			foreach(var key in keys.OrderBy(x => x.ID))
 			{
 				if(key.ID >= nextID)
 					nextID = key.ID + 1;

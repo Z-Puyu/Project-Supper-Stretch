@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common.Input;
-using Project.Scripts.Player;
 using UnityEngine;
 
 namespace Project.Scripts.Interaction;

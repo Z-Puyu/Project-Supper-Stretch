@@ -1,5 +1,4 @@
-﻿using Project.Scripts.Characters.CharacterControl;
-using Project.Scripts.Items.InventorySystem.LootContainers;
+﻿using Project.Scripts.Items.InventorySystem.LootContainers;
 using UnityEngine;
 
 namespace Project.Scripts.Characters.Enemies;

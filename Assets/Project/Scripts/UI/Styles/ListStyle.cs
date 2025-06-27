@@ -1,5 +1,4 @@
-﻿using Flexalon.Runtime.Core;
-using SaintsField;
+﻿using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.UI.Styles;
@@ -12,5 +11,4 @@ public class ListStyle : FlexStyle {
     public float Spacing { get; private set; }
     
     [field: SerializeField] public bool StretchEntries { get; private set; } = true;
-    [field: SerializeField] public Align EntryAlignment { get; private set; } = Align.Center;
 }

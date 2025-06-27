@@ -30,7 +30,8 @@ namespace SaintsField.Editor
 
         private ToolbarSearchField _toolbarSearchField;
 
-        private IReadOnlyList<ISaintsRenderer> _renderersUIToolkit = Array.Empty<ISaintsRenderer>();
+        private IReadOnlyList<ISaintsRenderer> _hasElementRenderersUIToolkit = Array.Empty<ISaintsRenderer>();
+        private IReadOnlyList<ISaintsRenderer> _allRenderersUIToolkit = Array.Empty<ISaintsRenderer>();
 
         public override VisualElement CreateInspectorGUI()
         {
@@ -113,11 +114,11 @@ namespace SaintsField.Editor
 
             // Debug.Log($"ser={serializedObject.targetObject}, target={target}");
 
-            IReadOnlyList<ISaintsRenderer> renderers = Setup(Array.Empty<string>(), serializedObject, this, targets);
+            _allRenderersUIToolkit = Setup(Array.Empty<string>(), serializedObject, this, targets);
 
             // Debug.Log($"renderers.Count={renderers.Count}");
             List<ISaintsRenderer> usedRenderers = new List<ISaintsRenderer>();
-            foreach (ISaintsRenderer saintsRenderer in renderers)
+            foreach (ISaintsRenderer saintsRenderer in _allRenderersUIToolkit)
             {
                 // Debug.Log($"renderer={saintsRenderer}");
                 VisualElement ve = saintsRenderer.CreateVisualElement();
@@ -128,7 +129,7 @@ namespace SaintsField.Editor
                 }
             }
 
-            _renderersUIToolkit = usedRenderers;
+            _hasElementRenderersUIToolkit = usedRenderers;
 
             // root.Add(CreateVisualElement(renderers));
 
@@ -155,9 +156,17 @@ namespace SaintsField.Editor
             return root;
         }
 
+        private void OnDestroyUIToolkit()
+        {
+            foreach (ISaintsRenderer saintsRenderer in _allRenderersUIToolkit)
+            {
+                saintsRenderer.OnDestroy();
+            }
+        }
+
         private void OnSearchUIToolkit(string search)
         {
-            foreach (ISaintsRenderer saintsRenderer in _renderersUIToolkit)
+            foreach (ISaintsRenderer saintsRenderer in _hasElementRenderersUIToolkit)
             {
                 saintsRenderer.OnSearchField(search);
             }
@@ -171,7 +180,6 @@ namespace SaintsField.Editor
                 _toolbarSearchField.parent.Focus();
                 _toolbarSearchField.value = "";
             }
-
         }
     }
 }

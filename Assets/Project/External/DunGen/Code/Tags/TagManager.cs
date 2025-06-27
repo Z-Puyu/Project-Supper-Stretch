@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code.Tags
+namespace DunGen.Tags
 {
 	[Serializable]
 	public sealed class TagManager : ISerializationCallbackReceiver
 	{
-		public int TagCount { get { return this.tags.Count; } }
+		public int TagCount { get { return tags.Count; } }
 
 		private Dictionary<int, string> tags = new Dictionary<int, string>();
 
@@ -26,7 +26,7 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 		public string TryGetNameFromID(int id)
 		{
 			string name = null;
-			this.tags.TryGetValue(id, out name);
+			tags.TryGetValue(id, out name);
 
 			return name;
 		}
@@ -39,7 +39,7 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 		/// <returns>True if the tag exists</returns>
 		public bool TagExists(string name, out int id)
 		{
-			foreach(var pair in this.tags)
+			foreach(var pair in tags)
 			{
 				if(pair.Value == name)
 				{
@@ -62,7 +62,7 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 		{
 			string existingName;
 
-			if (!this.tags.TryGetValue(id, out existingName))
+			if (!tags.TryGetValue(id, out existingName))
 				return false;
 
 			if (existingName == newName)
@@ -70,10 +70,10 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 
 			int existingTagID;
 
-			if (this.TagExists(newName, out existingTagID))
+			if (TagExists(newName, out existingTagID))
 				return false;
 
-			this.tags[id] = newName;
+			tags[id] = newName;
 			return true;
 		}
 
@@ -84,13 +84,13 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 		/// <returns>The ID of the new tag</returns>
 		public int AddTag(string tagName)
 		{
-			tagName = this.GetUnusedTagName(tagName);
+			tagName = GetUnusedTagName(tagName);
 			int newID = 0;
 
-			foreach (var id in this.tags.Keys)
+			foreach (var id in tags.Keys)
 				newID = Mathf.Max(newID, id + 1);
 
-			this.tags[newID] = tagName;
+			tags[newID] = tagName;
 			return newID;
 		}
 
@@ -104,7 +104,7 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 		{
 			bool nameExists = false;
 
-			foreach (var pair in this.tags)
+			foreach (var pair in tags)
 			{
 				if (pair.Value == desiredTagName)
 				{
@@ -122,7 +122,7 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 
 			int existingTagID;
 
-			while (this.TagExists(newTagName, out existingTagID))
+			while (TagExists(newTagName, out existingTagID))
 			{
 				newTagName = desiredTagName + " " + affix;
 				affix++;
@@ -138,10 +138,10 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 		/// <returns>True if the tag was successfuly removed</returns>
 		public bool RemoveTag(int id)
 		{
-			if (!this.tags.ContainsKey(id))
+			if (!tags.ContainsKey(id))
 				return false;
 
-			this.tags.Remove(id);
+			tags.Remove(id);
 			return true;
 		}
 
@@ -151,10 +151,10 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 		/// <returns>The ID of every available tag</returns>
 		public int[] GetTagIDs()
 		{
-			var tagIDs = new int[this.tags.Count];
+			var tagIDs = new int[tags.Count];
 			int index = 0;
 
-			foreach (var id in this.tags.Keys)
+			foreach (var id in tags.Keys)
 			{
 				tagIDs[index] = id;
 				index++;
@@ -168,24 +168,24 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 
 		public void OnAfterDeserialize()
 		{
-			this.tags = new Dictionary<int, string>();
+			tags = new Dictionary<int, string>();
 
-			for (int i = 0; i < this.keys.Count; i++)
-				this.tags[this.keys[i]] = this.values[i];
+			for (int i = 0; i < keys.Count; i++)
+				tags[keys[i]] = values[i];
 
-			this.keys.Clear();
-			this.values.Clear();
+			keys.Clear();
+			values.Clear();
 		}
 
 		public void OnBeforeSerialize()
 		{
-			this.keys = new List<int>();
-			this.values = new List<string>();
+			keys = new List<int>();
+			values = new List<string>();
 
-			foreach(var pair in this.tags)
+			foreach(var pair in tags)
 			{
-				this.keys.Add(pair.Key);
-				this.values.Add(pair.Value);
+				keys.Add(pair.Key);
+				values.Add(pair.Value);
 			}	
 		}
 

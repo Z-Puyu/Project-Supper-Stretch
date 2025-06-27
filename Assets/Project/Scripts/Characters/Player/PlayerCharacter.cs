@@ -1,22 +1,24 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Project.Scripts.Characters.CharacterControl;
-using Project.Scripts.Characters.CharacterControl.Combat;
+using DunGen;
 using Project.Scripts.Characters.Enemies;
 using Project.Scripts.Common;
 using Project.Scripts.Common.Input;
 using Project.Scripts.Interaction;
 using Project.Scripts.Items;
 using Project.Scripts.Items.Equipments;
-using Project.Scripts.Player;
 using Project.Scripts.Util.Linq;
 using UnityEngine;
+using UnityEngine.Events;
+using Object = UnityEngine.Object;
 
 namespace Project.Scripts.Characters.Player;
 
 [RequireComponent(typeof(Interactor), typeof(EquipmentSystem), typeof(ExperienceSystem))]
 public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
+    public static event UnityAction OnDungeonLevelCleared = delegate { }; 
+    
     [NotNull] public InputActions? InputActions { get; private set; }
     [NotNull] private Interactor? Interactor { get; set; }
     [NotNull] private EquipmentSystem? EquipmentSystem { get; set; }
@@ -51,6 +53,7 @@ public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
         GameEvents.OnPlay += exitUI;
         this.InputActions.Player.Enable();
         GameCharacter<Enemy>.OnDeath += this.OnFindDeadEnemy;
+        this.GetComponent<DungenCharacter>().OnTileChanged += PlayerCharacter.OnEnterDungeonRoom;
         return;
 
         void enterUI() {
@@ -61,6 +64,12 @@ public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
         void exitUI() {
             this.InputActions.UI.Disable();
             this.InputActions.Player.Enable();
+        }
+    }
+
+    private static void OnEnterDungeonRoom(DungenCharacter character, Tile from, Tile to) {
+        if (to.Dungeon && to.Dungeon.MainPathTiles[^1] == to) {
+            PlayerCharacter.OnDungeonLevelCleared.Invoke();
         }
     }
 

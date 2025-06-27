@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code.Utility
+namespace DunGen
 {
 	[AttributeUsage(AttributeTargets.Field)]
 	public class SubclassSelectorAttribute : PropertyAttribute { }

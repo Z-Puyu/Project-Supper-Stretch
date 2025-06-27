@@ -1,10 +1,9 @@
-﻿using System;
+﻿using UnityEngine;
 using System.Text;
-using DunGen.Project.External.DunGen.Code;
-using DunGen.Project.External.DunGen.Code.Analysis;
-using UnityEngine;
+using System;
+using DunGen.Analysis;
 
-namespace Project.External.DunGen.Samples.Basic.Scripts
+namespace DunGen.Demo
 {
 	public class Generator : MonoBehaviour
 	{
@@ -21,11 +20,11 @@ namespace Project.External.DunGen.Samples.Basic.Scripts
 
 		private void Start()
 		{
-			if(this.DungeonGenerator == null)
-				this.DungeonGenerator = this.GetComponentInChildren<RuntimeDungeon>();
+			if(DungeonGenerator == null)
+				DungeonGenerator = GetComponentInChildren<RuntimeDungeon>();
 
-			this.DungeonGenerator.Generator.OnGenerationStatusChanged += this.OnGenerationStatusChanged;
-			this.GenerateRandom();
+			DungeonGenerator.Generator.OnGenerationStatusChanged += OnGenerationStatusChanged;
+			GenerateRandom();
 		}
 
 		private void OnGenerationStatusChanged(DungeonGenerator generator, GenerationStatus status)
@@ -40,104 +39,104 @@ namespace Project.External.DunGen.Samples.Basic.Scripts
 			}
 
 
-			this.infoText.Length = 0;
+			infoText.Length = 0;
 
 			if (status != GenerationStatus.Complete)
 			{
 				if (status == GenerationStatus.Failed)
-					this.infoText.Append("Generation Failed");
+					infoText.Append("Generation Failed");
 				else if (status == GenerationStatus.NotStarted)
 				{
 				}
 				else
-					this.infoText.Append($"Generating ({status})...");
+					infoText.Append($"Generating ({status})...");
 
 				return;
 			}
 
-			this.infoText.AppendLine("Seed: " + generator.ChosenSeed);
-			this.infoText.AppendLine();
-			this.infoText.Append("## TIME TAKEN ##");
+			infoText.AppendLine("Seed: " + generator.ChosenSeed);
+			infoText.AppendLine();
+			infoText.Append("## TIME TAKEN ##");
 
 			foreach (var step in GenerationAnalysis.MeasurableSteps)
 			{
 				float generationTime = generator.GenerationStats.GetGenerationStepTime(step);
-				AddEntry(this.infoText, step.ToString(), $"{generationTime:0.00} ms ({generationTime / generator.GenerationStats.TotalTime:P0})");
+				AddEntry(infoText, step.ToString(), $"{generationTime:0.00} ms ({generationTime / generator.GenerationStats.TotalTime:P0})");
 			}
 
-			this.infoText.Append("\n\t-------------------------------------------------------");
-			AddEntry(this.infoText, "Total", $"{generator.GenerationStats.TotalTime:0.00} ms");
+			infoText.Append("\n\t-------------------------------------------------------");
+			AddEntry(infoText, "Total", $"{generator.GenerationStats.TotalTime:0.00} ms");
 
-			this.infoText.AppendLine();
-			this.infoText.AppendLine();
+			infoText.AppendLine();
+			infoText.AppendLine();
 
-			this.infoText.AppendLine("## ROOM COUNT ##");
-			this.infoText.Append($"\n\tMain Path: {generator.GenerationStats.MainPathRoomCount}");
-			this.infoText.Append($"\n\tBranch Paths: {generator.GenerationStats.BranchPathRoomCount}");
-			this.infoText.Append("\n\t-------------------");
-			this.infoText.Append($"\n\tTotal: {generator.GenerationStats.TotalRoomCount}");
+			infoText.AppendLine("## ROOM COUNT ##");
+			infoText.Append($"\n\tMain Path: {generator.GenerationStats.MainPathRoomCount}");
+			infoText.Append($"\n\tBranch Paths: {generator.GenerationStats.BranchPathRoomCount}");
+			infoText.Append("\n\t-------------------");
+			infoText.Append($"\n\tTotal: {generator.GenerationStats.TotalRoomCount}");
 
-			this.infoText.AppendLine();
+			infoText.AppendLine();
 
-			this.infoText.Append($"\n\tRetry Count: {generator.GenerationStats.TotalRetries}");
+			infoText.Append($"\n\tRetry Count: {generator.GenerationStats.TotalRetries}");
 
-			this.infoText.AppendLine();
-			this.infoText.AppendLine();
+			infoText.AppendLine();
+			infoText.AppendLine();
 
-			this.infoText.AppendLine("Press 'F1' to toggle this information");
-			this.infoText.AppendLine("Press 'R' to generate a new layout");
+			infoText.AppendLine("Press 'F1' to toggle this information");
+			infoText.AppendLine("Press 'R' to generate a new layout");
 
-			if(this.GetAdditionalText != null)
-				this.GetAdditionalText(this.infoText);
+			if(GetAdditionalText != null)
+				GetAdditionalText(infoText);
 		}
 
 		public void GenerateRandom()
 		{
-			this.DungeonGenerator.Generate();
+			DungeonGenerator.Generate();
 		}
 
 		private void Update()
 		{
-			this.timeSinceLastPress += Time.deltaTime;
+			timeSinceLastPress += Time.deltaTime;
 
 			if (Input.GetKeyDown(KeyCode.R))
 			{
-				this.timeSinceLastPress = 0;
-				this.isKeyDown = true;
+				timeSinceLastPress = 0;
+				isKeyDown = true;
 
-				this.GenerateRandom();
+				GenerateRandom();
 			}
 
 			if (Input.GetKeyUp(KeyCode.R))
 			{
-				this.isKeyDown = false;
-				this.allowHold = false;
+				isKeyDown = false;
+				allowHold = false;
 			}
 
-			if (!this.allowHold && this.isKeyDown && this.timeSinceLastPress >= this.keypressDelay)
+			if (!allowHold && isKeyDown && timeSinceLastPress >= keypressDelay)
 			{
-				this.allowHold = true;
-				this.timeSinceLastPress = 0;
+				allowHold = true;
+				timeSinceLastPress = 0;
 			}
 
 
-			if (this.allowHold && Input.GetKey(KeyCode.R))
+			if (allowHold && Input.GetKey(KeyCode.R))
 			{
-				if (this.timeSinceLastPress >= this.keypressDelay)
+				if (timeSinceLastPress >= keypressDelay)
 				{
-					this.GenerateRandom();
-					this.timeSinceLastPress = 0;
+					GenerateRandom();
+					timeSinceLastPress = 0;
 				}
 			}
 
 			if (Input.GetKeyDown(KeyCode.F1))
-				this.showStats = !this.showStats;
+				showStats = !showStats;
 		}
 
 		private void OnGUI()
 		{
-			if (this.showStats)
-				GUILayout.Label(this.infoText.ToString());
+			if (showStats)
+				GUILayout.Label(infoText.ToString());
 		}
 	}
 }

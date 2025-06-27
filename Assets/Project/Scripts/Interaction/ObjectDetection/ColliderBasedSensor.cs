@@ -25,10 +25,4 @@ public class ColliderBasedSensor : Sensor {
         this.RegisteredTargets.Remove(other);
         this.LoseTarget(other);
     }
-
-    private void OntriggerStay(Collider other) {
-        if (this.RegisteredTargets.Add(other)) {
-            this.Detected(other);
-        }
-    }
 }

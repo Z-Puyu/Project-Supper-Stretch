@@ -16,14 +16,15 @@ public record class AttributeBasedModifier {
     [field: SerializeField] private ModifierType Type { get; set; } = ModifierType.FinalOffset;
     
     [field: SerializeField, AdvancedDropdown(nameof(this.AllTargets))] 
-    private string Target { get; set; }
+    private string Target { get; set; } = string.Empty;
     
     [field: SerializeField] private DataSource SourceAttributes { get; set; } = DataSource.Instigator;
     
     [field: SerializeField, AdvancedDropdown(nameof(this.AllSources))] 
-    private string ValueSource { get; set; }
+    private string ValueSource { get; set; } = string.Empty;
     
     [field: SerializeField] private float Coefficient { get; set; } = 1;
+    [field: SerializeField] private int Duration { get; set; }
     
     private AdvancedDropdownList<string> AllTargets => ObjectCache<AttributeDefinition>.Instance.Objects.AllTags();
 
@@ -35,6 +36,8 @@ public record class AttributeBasedModifier {
             DataSource.Instigator => instigator.ReadCurrent(this.ValueSource),
             var _ => throw new ArgumentOutOfRangeException()
         };
-        return Modifier.Of(value, this.Target, this.Type);
+        return this.Duration != 0
+                ? Modifier.Of(value, this.Target, this.Type, this.Duration)
+                : Modifier.Once(value, this.Target, this.Type);
     }
 }

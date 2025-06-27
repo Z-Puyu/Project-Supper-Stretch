@@ -1,4 +1,4 @@
-﻿namespace DunGen.Project.External.DunGen.Code.Graph
+﻿namespace DunGen
 {
     public abstract class DungeonGraphObject
     {

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using UnityEditor;
 
@@ -13,7 +14,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
         {
         }
 
-        public AbsRenderer MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
+        public IEnumerable<AbsRenderer> MakeRenderer(SerializedObject serializedObject, SaintsFieldWithInfo fieldWithInfo)
         {
             return SaintsEditor.HelperMakeRenderer(serializedObject, fieldWithInfo);
         }

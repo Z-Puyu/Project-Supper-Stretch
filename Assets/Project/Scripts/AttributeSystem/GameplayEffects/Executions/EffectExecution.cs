@@ -45,6 +45,7 @@ public abstract class EffectExecution {
     /// <param name="target">The target of the gameplay effect.</param>
     /// <param name="args">The arguments used to invoke the gameplay effect.</param>
     /// <param name="outcome">The modifiers produced by the gameplay effect.</param>
+    /// <param name="level">The level of the gameplay effect.</param>
     /// <returns>The result of the gameplay effect invocation.</returns>
     public GameplayEffectExecutionResult Execute(AttributeSet target, GameplayEffectExecutionArgs args, out IEnumerable<Modifier> outcome, float level = 1) {
         if (!this.HasNeverExecuted) {

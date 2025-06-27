@@ -32,7 +32,8 @@ MonoBehaviour:
         <Priority>k__BackingField: 0
         <Flags>k__BackingField: 2
         <Icon>k__BackingField: {fileID: 1744151977, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
-        <Subtypes>k__BackingField: []
+        <Subtypes>k__BackingField:
+        - rid: 1548064584585445866
     - rid: 1548064550727712769
       type: {class: ItemType, ns: Project.Scripts.Items.Definitions, asm: Project.Scripts.Items}
       data:
@@ -82,4 +83,14 @@ MonoBehaviour:
         <Priority>k__BackingField: 5
         <Flags>k__BackingField: 16
         <Icon>k__BackingField: {fileID: -1005278575, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
+        <Subtypes>k__BackingField: []
+    - rid: 1548064584585445866
+      type: {class: ItemType, ns: Project.Scripts.Items.Definitions, asm: Project.Scripts.Items}
+      data:
+        <Namespace>k__BackingField: Items
+        <Path>k__BackingField: Equipment.Weapon
+        <Tag>k__BackingField: Weapon
+        <Priority>k__BackingField: 0
+        <Flags>k__BackingField: 34
+        <Icon>k__BackingField: {fileID: 1744151977, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
         <Subtypes>k__BackingField: []

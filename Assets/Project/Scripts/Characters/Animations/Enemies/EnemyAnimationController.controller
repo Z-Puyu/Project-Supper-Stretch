@@ -83,7 +83,7 @@ AnimatorStateMachine:
     m_Position: {x: 160, y: 210, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 2210291392914384354}
-    m_Position: {x: 310, y: -40, z: 0}
+    m_Position: {x: 370, y: -60, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -5575259517826292414}
     m_Position: {x: 500, y: 110, z: 0}
@@ -466,7 +466,7 @@ AnimatorStateTransition:
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 2210291392914384354}
   m_Solo: 0
-  m_Mute: 0
+  m_Mute: 1
   m_IsExit: 0
   serializedVersion: 3
   m_TransitionDuration: 0.25
@@ -514,7 +514,7 @@ BlendTree:
   m_Name: Grounded Animation
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: 7400012, guid: ce65fa103f0e84b4289374b2a4bf93f8, type: 3}
+    m_Motion: {fileID: 7400000, guid: aa92e6af035791846960729505b412a0, type: 2}
     m_Threshold: 0
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
@@ -522,7 +522,7 @@ BlendTree:
     m_DirectBlendParameter: Speed
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 7400004, guid: ce65fa103f0e84b4289374b2a4bf93f8, type: 3}
+    m_Motion: {fileID: 7400000, guid: 691c8574488114c45b35a47ed38f2f3b, type: 2}
     m_Threshold: 1
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
@@ -530,7 +530,7 @@ BlendTree:
     m_DirectBlendParameter: 
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 7400002, guid: ce65fa103f0e84b4289374b2a4bf93f8, type: 3}
+    m_Motion: {fileID: 7400000, guid: 669c758db0310714d8d7dab0fd0fb0e9, type: 2}
     m_Threshold: 2
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1

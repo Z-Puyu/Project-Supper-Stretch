@@ -1,10 +1,8 @@
 ﻿using System.Linq;
-using DunGen.Editor.Project.External.DunGen.Code.Editor.Utility;
-using DunGen.Project.External.DunGen.Code;
 using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
+namespace DunGen.Editor
 {
 	[CustomEditor(typeof(LocalPropSet))]
 	[CanEditMultipleObjects]
@@ -30,18 +28,18 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 
 		private void OnEnable()
 		{
-			this.countMode = this.serializedObject.FindProperty("CountMode");
-			this.propCount = this.serializedObject.FindProperty("PropCount");
-			this.countDepthCurve = this.serializedObject.FindProperty("CountDepthCurve");
-			this.props = this.serializedObject.FindProperty("Props");
+			countMode = serializedObject.FindProperty("CountMode");
+			propCount = serializedObject.FindProperty("PropCount");
+			countDepthCurve = serializedObject.FindProperty("CountDepthCurve");
+			props = serializedObject.FindProperty("Props");
 		}
 
 		public override void OnInspectorGUI()
 		{
-			var propSet = this.target as LocalPropSet;
+			var propSet = target as LocalPropSet;
 
-			this.serializedObject.Update();
-			EditorGUILayout.PropertyField(this.countMode, Label.CountMode);
+			serializedObject.Update();
+			EditorGUILayout.PropertyField(countMode, Label.CountMode);
 
 			string countModeHelpText = "";
 			switch (propSet.CountMode)
@@ -64,15 +62,15 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 
 			EditorGUILayout.HelpBox(countModeHelpText, MessageType.Info);
 
-			EditorGUILayout.PropertyField(this.propCount, Label.PropCount);
+			EditorGUILayout.PropertyField(propCount, Label.PropCount);
 
 			if (propSet.CountMode == LocalPropSetCountMode.DepthBased || propSet.CountMode == LocalPropSetCountMode.DepthMultiply)
-				EditorGUILayout.CurveField(this.countDepthCurve, Color.white, new Rect(0, 0, 1, 1), Label.CountDepthCurve);
+				EditorGUILayout.CurveField(countDepthCurve, Color.white, new Rect(0, 0, 1, 1), Label.CountDepthCurve);
 
 			EditorGUILayout.Space();
-			EditorGUILayout.PropertyField(this.props, Label.Props);
+			EditorGUILayout.PropertyField(props, Label.Props);
 
-			this.HandlePropDragAndDrop(GUILayoutUtility.GetLastRect());
+			HandlePropDragAndDrop(GUILayoutUtility.GetLastRect());
 
 			if (GUILayout.Button("Add Selected Props"))
 			{
@@ -87,7 +85,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 				Undo.FlushUndoRecordObjects();
 			}
 
-			this.serializedObject.ApplyModifiedProperties();
+			serializedObject.ApplyModifiedProperties();
 		}
 
 		private void HandlePropDragAndDrop(Rect dragTargetRect)
@@ -104,10 +102,10 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 
 					if (evt.type == EventType.DragPerform)
 					{
-						Undo.RecordObject(this.target, "Drag Prop(s)");
+						Undo.RecordObject(target, "Drag Prop(s)");
 						DragAndDrop.AcceptDrag();
 
-						var propSet = this.target as LocalPropSet;
+						var propSet = target as LocalPropSet;
 
 						foreach (var dragObject in validGameObjects)
 							propSet.Props.Weights.Add(new GameObjectChance(dragObject));

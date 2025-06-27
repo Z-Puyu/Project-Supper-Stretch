@@ -1,12 +1,12 @@
 ﻿#if UNITY_NAVIGATION_COMPONENTS
+using DunGen.Editor;
 using System.Collections.Generic;
-using DunGen.Editor.Project.External.DunGen.Code.Editor.Utility;
 using Unity.AI.Navigation.Editor;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace Project.External.DunGen.Integration.Unity_NavMesh.Editor
+namespace DunGen.Adapters
 {
 	[CustomEditor(typeof(UnityNavMeshAdapter))]
 	public class UnityNavMeshAdapterInspector : UnityEditor.Editor
@@ -49,89 +49,89 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh.Editor
 
 		private void OnEnable()
 		{
-			this.priorityProp = this.serializedObject.FindProperty(nameof(UnityNavMeshAdapter.Priority));
-			this.bakeModeProp = this.serializedObject.FindProperty(nameof(UnityNavMeshAdapter.BakeMode));
-			this.layerMaskProp = this.serializedObject.FindProperty(nameof(UnityNavMeshAdapter.LayerMask));
-			this.addNavMeshLinksBetweenRoomsProp = this.serializedObject.FindProperty(nameof(UnityNavMeshAdapter.AddNavMeshLinksBetweenRooms));
-			this.navMeshAgentTypesProp = this.serializedObject.FindProperty(nameof(UnityNavMeshAdapter.NavMeshAgentTypes));
-			this.navMeshLinkDistanceFromDoorwayProp = this.serializedObject.FindProperty(nameof(UnityNavMeshAdapter.NavMeshLinkDistanceFromDoorway));
-			this.autoGenerateFullRebakeSurfacesProp = this.serializedObject.FindProperty(nameof(UnityNavMeshAdapter.AutoGenerateFullRebakeSurfaces));
-			this.useAutomaticLinkDistanceProp = this.serializedObject.FindProperty(nameof(UnityNavMeshAdapter.UseAutomaticLinkDistance));
-			this.automaticLinkDistanceOffsetProp = this.serializedObject.FindProperty(nameof(UnityNavMeshAdapter.AutomaticLinkDistanceOffset));
+			priorityProp = serializedObject.FindProperty(nameof(UnityNavMeshAdapter.Priority));
+			bakeModeProp = serializedObject.FindProperty(nameof(UnityNavMeshAdapter.BakeMode));
+			layerMaskProp = serializedObject.FindProperty(nameof(UnityNavMeshAdapter.LayerMask));
+			addNavMeshLinksBetweenRoomsProp = serializedObject.FindProperty(nameof(UnityNavMeshAdapter.AddNavMeshLinksBetweenRooms));
+			navMeshAgentTypesProp = serializedObject.FindProperty(nameof(UnityNavMeshAdapter.NavMeshAgentTypes));
+			navMeshLinkDistanceFromDoorwayProp = serializedObject.FindProperty(nameof(UnityNavMeshAdapter.NavMeshLinkDistanceFromDoorway));
+			autoGenerateFullRebakeSurfacesProp = serializedObject.FindProperty(nameof(UnityNavMeshAdapter.AutoGenerateFullRebakeSurfaces));
+			useAutomaticLinkDistanceProp = serializedObject.FindProperty(nameof(UnityNavMeshAdapter.UseAutomaticLinkDistance));
+			automaticLinkDistanceOffsetProp = serializedObject.FindProperty(nameof(UnityNavMeshAdapter.AutomaticLinkDistanceOffset));
 
-			this.fullRebakeTargetsList = new ReorderableList(this.serializedObject, this.serializedObject.FindProperty("FullRebakeTargets"), true, true, true, true);
-			this.fullRebakeTargetsList.drawElementCallback = this.DrawFullRebakeTargetsEntry;
-			this.fullRebakeTargetsList.drawHeaderCallback = (rect) => EditorGUI.LabelField(rect, UnityNavMeshAdapterInspector.fullRebakeTargetsLabel);
+			fullRebakeTargetsList = new ReorderableList(serializedObject, serializedObject.FindProperty("FullRebakeTargets"), true, true, true, true);
+			fullRebakeTargetsList.drawElementCallback = DrawFullRebakeTargetsEntry;
+			fullRebakeTargetsList.drawHeaderCallback = (rect) => EditorGUI.LabelField(rect, fullRebakeTargetsLabel);
 		}
 
 		public override void OnInspectorGUI()
 		{
-			var data = this.target as UnityNavMeshAdapter;
+			var data = target as UnityNavMeshAdapter;
 			if (data == null)
 				return;
 
-			this.serializedObject.Update();
+			serializedObject.Update();
 
 
 			EditorGUILayout.Space();
-			EditorGUILayout.PropertyField(this.priorityProp, InspectorConstants.AdapterPriorityLabel);
-			EditorGUILayout.PropertyField(this.bakeModeProp, UnityNavMeshAdapterInspector.bakeModeLabel);
+			EditorGUILayout.PropertyField(priorityProp, InspectorConstants.AdapterPriorityLabel);
+			EditorGUILayout.PropertyField(bakeModeProp, bakeModeLabel);
 
 			// Show layer mask here unless this is a full rebake or pre-baked only
 			if (data.BakeMode != UnityNavMeshAdapter.RuntimeNavMeshBakeMode.FullDungeonBake && data.BakeMode != UnityNavMeshAdapter.RuntimeNavMeshBakeMode.PreBakedOnly)
-				EditorGUILayout.PropertyField(this.layerMaskProp, UnityNavMeshAdapterInspector.layerMaskLabel);
+				EditorGUILayout.PropertyField(layerMaskProp, layerMaskLabel);
 
 			string bakeModeHelpLabel;
-			if (UnityNavMeshAdapterInspector.bakeModeHelpLabels.TryGetValue((UnityNavMeshAdapter.RuntimeNavMeshBakeMode)this.bakeModeProp.enumValueIndex, out bakeModeHelpLabel))
+			if (bakeModeHelpLabels.TryGetValue((UnityNavMeshAdapter.RuntimeNavMeshBakeMode)bakeModeProp.enumValueIndex, out bakeModeHelpLabel))
 				EditorGUILayout.HelpBox(bakeModeHelpLabel, MessageType.Info, true);
 
 			EditorGUILayout.Space();
 
 			if (data.BakeMode == UnityNavMeshAdapter.RuntimeNavMeshBakeMode.FullDungeonBake)
 			{
-				EditorGUILayout.PropertyField(this.autoGenerateFullRebakeSurfacesProp, UnityNavMeshAdapterInspector.autoGenerateFullRebakeSurfacesLabel);
+				EditorGUILayout.PropertyField(autoGenerateFullRebakeSurfacesProp, autoGenerateFullRebakeSurfacesLabel);
 
 				EditorGUI.BeginDisabledGroup(!data.AutoGenerateFullRebakeSurfaces);
-				EditorGUILayout.PropertyField(this.layerMaskProp, UnityNavMeshAdapterInspector.layerMaskLabel);
+				EditorGUILayout.PropertyField(layerMaskProp, layerMaskLabel);
 				EditorGUI.EndDisabledGroup();
 
 				EditorGUI.BeginDisabledGroup(data.AutoGenerateFullRebakeSurfaces);
-				this.fullRebakeTargetsList.DoLayoutList();
+				fullRebakeTargetsList.DoLayoutList();
 				EditorGUI.EndDisabledGroup();
 			}
 
-			EditorGUI.BeginDisabledGroup(this.bakeModeProp.enumValueIndex == (int)UnityNavMeshAdapter.RuntimeNavMeshBakeMode.FullDungeonBake);
-			this.DrawLinksGUI();
+			EditorGUI.BeginDisabledGroup(bakeModeProp.enumValueIndex == (int)UnityNavMeshAdapter.RuntimeNavMeshBakeMode.FullDungeonBake);
+			DrawLinksGUI();
 			EditorGUI.EndDisabledGroup();
 
-			this.serializedObject.ApplyModifiedProperties();
+			serializedObject.ApplyModifiedProperties();
 		}
 
 		private void DrawFullRebakeTargetsEntry(Rect rect, int index, bool isActive, bool isFocused)
 		{
-			var element = this.fullRebakeTargetsList.serializedProperty.GetArrayElementAtIndex(index);
+			var element = fullRebakeTargetsList.serializedProperty.GetArrayElementAtIndex(index);
 			EditorGUI.PropertyField(rect, element);
 		}
 
 		private void DrawLinksGUI()
 		{
-			this.addNavMeshLinksBetweenRoomsProp.isExpanded = EditorGUILayout.Foldout(this.addNavMeshLinksBetweenRoomsProp.isExpanded, "Room Links");
+			addNavMeshLinksBetweenRoomsProp.isExpanded = EditorGUILayout.Foldout(addNavMeshLinksBetweenRoomsProp.isExpanded, "Room Links");
 
-			if (this.addNavMeshLinksBetweenRoomsProp.isExpanded)
+			if (addNavMeshLinksBetweenRoomsProp.isExpanded)
 			{
 				EditorGUILayout.BeginVertical("box");
 				EditorGUI.indentLevel++;
 
-				EditorGUILayout.PropertyField(this.addNavMeshLinksBetweenRoomsProp, UnityNavMeshAdapterInspector.addNavMeshLinksBetweenRoomsLabel);
+				EditorGUILayout.PropertyField(addNavMeshLinksBetweenRoomsProp, addNavMeshLinksBetweenRoomsLabel);
 
-				using (new EditorGUI.DisabledScope(!this.addNavMeshLinksBetweenRoomsProp.boolValue))
+				using (new EditorGUI.DisabledScope(!addNavMeshLinksBetweenRoomsProp.boolValue))
 				{
-					EditorGUILayout.PropertyField(this.useAutomaticLinkDistanceProp, UnityNavMeshAdapterInspector.useAutomaticLinkDistanceLabel);
+					EditorGUILayout.PropertyField(useAutomaticLinkDistanceProp, useAutomaticLinkDistanceLabel);
 
-					if (this.useAutomaticLinkDistanceProp.boolValue)
-						EditorGUILayout.PropertyField(this.automaticLinkDistanceOffsetProp, UnityNavMeshAdapterInspector.automaticLinkDistanceOffsetLabel);
+					if (useAutomaticLinkDistanceProp.boolValue)
+						EditorGUILayout.PropertyField(automaticLinkDistanceOffsetProp, automaticLinkDistanceOffsetLabel);
 					else
-						EditorGUILayout.PropertyField(this.navMeshLinkDistanceFromDoorwayProp, UnityNavMeshAdapterInspector.navMeshLinkDistanceFromDoorwayLabel);
+						EditorGUILayout.PropertyField(navMeshLinkDistanceFromDoorwayProp, navMeshLinkDistanceFromDoorwayLabel);
 
 					EditorGUILayout.Space();
 					EditorGUILayout.Space();
@@ -139,37 +139,37 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh.Editor
 					EditorGUILayout.BeginVertical("box");
 					EditorGUILayout.BeginHorizontal();
 
-					EditorGUILayout.LabelField(UnityNavMeshAdapterInspector.navMeshAgentTypesLabel);
+					EditorGUILayout.LabelField(navMeshAgentTypesLabel);
 
 					if (GUILayout.Button("Add New"))
-						this.navMeshAgentTypesProp.InsertArrayElementAtIndex(this.navMeshAgentTypesProp.arraySize);
+						navMeshAgentTypesProp.InsertArrayElementAtIndex(navMeshAgentTypesProp.arraySize);
 
 					EditorGUILayout.EndHorizontal();
 
 					int indexToRemove = -1;
-					for (int i = 0; i < this.navMeshAgentTypesProp.arraySize; i++)
+					for (int i = 0; i < navMeshAgentTypesProp.arraySize; i++)
 					{
 						EditorGUILayout.BeginVertical("box");
 
 						if (GUILayout.Button("x", EditorStyles.miniButton, GUILayout.Width(18)))
 							indexToRemove = i;
 
-						var elementProp = this.navMeshAgentTypesProp.GetArrayElementAtIndex(i);
+						var elementProp = navMeshAgentTypesProp.GetArrayElementAtIndex(i);
 						var agentTypeID = elementProp.FindPropertyRelative("AgentTypeID");
 						var areaTypeID = elementProp.FindPropertyRelative("AreaTypeID");
 						var disableWhenDoorIsClosed = elementProp.FindPropertyRelative("DisableLinkWhenDoorIsClosed");
 
 						NavMeshComponentsGUIUtility.AgentTypePopup("Agent Type", agentTypeID);
 						NavMeshComponentsGUIUtility.AreaPopup("Area", areaTypeID);
-						EditorGUILayout.PropertyField(disableWhenDoorIsClosed, UnityNavMeshAdapterInspector.disableLinkWhenDoorIsClosedLabel);
+						EditorGUILayout.PropertyField(disableWhenDoorIsClosed, disableLinkWhenDoorIsClosedLabel);
 
 						EditorGUILayout.EndVertical();
 					}
 
 					EditorGUILayout.EndVertical();
 
-					if (indexToRemove >= 0 && indexToRemove < this.navMeshAgentTypesProp.arraySize)
-						this.navMeshAgentTypesProp.DeleteArrayElementAtIndex(indexToRemove);
+					if (indexToRemove >= 0 && indexToRemove < navMeshAgentTypesProp.arraySize)
+						navMeshAgentTypesProp.DeleteArrayElementAtIndex(indexToRemove);
 				}
 
 				EditorGUI.indentLevel--;

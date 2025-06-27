@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Editor;
-using Project.Scripts.AttributeSystem.Attributes;
-using Project.Scripts.AttributeSystem.Attributes.Definitions;
-using Project.Scripts.AttributeSystem.GameplayEffects;
-using Project.Scripts.AttributeSystem.GameplayEffects.Executions;
 using Project.Scripts.AttributeSystem.Modifiers;
 using Project.Scripts.Common;
 using Project.Scripts.Common.GameplayTags;
-using Project.Scripts.Items.Definitions;
 using SaintsField;
 using UnityEngine;
 
@@ -18,21 +12,19 @@ namespace Project.Scripts.Items.CraftingSystem;
 
 [DisallowMultipleComponent]
 public class Workbench : MonoBehaviour {
-    private Recipe? Recipe { get; set; }
-    private float CraftTime { get; set; }
+    public (Item? ingredient, bool isRemoved) LastOperation { get; private set; } = (null, false);
+    public Recipe? Recipe { get; private set; }
+    public float Cost { get; set; }
     
-    [field: SerializeField, AdvancedDropdown(nameof(this.AllItemTypes))] 
-    private ItemType ProductItemType { get; set; }
+    [field: SerializeField, AdvancedDropdown(nameof(this.AllSchemes))] 
+    private List<string> Schemes { get; set; } = [];
     
-    [field: SerializeField, AdvancedDropdown(nameof(this.AllItemTypes))] 
-    private ItemType IngredientItemType { get; set; }
-    
-    [field: SerializeField] private List<CookingMethod> CookingMethods { get; set; } = [];
-    [field: SerializeField] public int MaxMainIngredients { get; private set; } = 3;
-    [field: SerializeField] public int MaxSpices { get; private set; } = 2;
-    [field: SerializeField] public int MaxAdditives { get; private set; } = 2;
+    [field: SerializeReference] 
+    private ItemProducer? Producer { get; set; }
 
-    private AdvancedDropdownList<ItemType> AllItemTypes => ObjectCache<ItemDefinition>.Instance.Objects.LeafNodes();
+    public Dictionary<Modifier, int> Modifiers { get; init; } = [];
+    
+    private AdvancedDropdownList<string> AllSchemes => ObjectCache<SchemeDefinition>.Instance.Objects.LeafTags();
     
     public event Action<int, Item> OnCraft = delegate { };
     public event Action<int, Recipe> OnRecipeChanged = delegate { };
@@ -41,70 +33,81 @@ public class Workbench : MonoBehaviour {
         this.NewSession();
     }
 
-    public void NewSession() {
-        this.Recipe = new Recipe(this.ProductItemType, this.IngredientItemType);
+    private void NewSession() {
+        this.Recipe = new Recipe();
     }
 
-    public void Craft() {
-        if (this.Recipe is null) {
-            Logging.Error("No recipe to craft.", this);
-            return;
-        }
-
-        this.OnCraft.Invoke(Mathf.FloorToInt(this.CraftTime), this.Recipe.Cook());
-        this.NewSession();
-    }
-
-    public void ChangeCookingMethod(int idx) {
-        if (this.Recipe is null) {
-            Logging.Error("No recipe to change cooking method.", this);
+    public void Put(Item ingredient) {
+        if (!ingredient.Type.HasFlag(ItemFlag.CraftingMaterial)) {
+            Logging.Error($"{ingredient} is not a crafting material", this);
             return;
         }
         
-        CookingMethod? current = this.Recipe.CookingMethod;
-        CookingMethod next = this.CookingMethods[idx];
+        this.Recipe?.AddIngredient(ingredient);
+        this.LastOperation = (ingredient, false);
+        ingredient.Process(this);
+    }
+
+    public void Remove(Item ingredient) {
+        if (!ingredient.Type.HasFlag(ItemFlag.CraftingMaterial)) {
+            Logging.Error($"{ingredient} is not a crafting material", this);
+            return;
+        }
+        
+        this.Recipe?.RemoveIngredient(ingredient);
+        this.LastOperation = (ingredient, true);
+        ingredient.Process(this);
+    }
+
+    public bool TryProduce(out Item item) {
+        if (this.Recipe is null) {
+            Logging.Error("No recipe to craft.", this);
+            item = Item.New("", "", 0);
+            return false;
+        }
+        
+        if (this.Producer is null || this.Recipe is null) {
+            Logging.Error("No producer or recipe to produce.", this);
+            item = Item.New("", "", 0);
+            return false;
+        }
+        
+        item = this.Producer.Produce(this.Recipe, this.Modifiers.Select(pair => pair.Key * pair.Value));
+        return true;
+    }
+
+    public void Craft() {
+        if (!this.TryProduce(out Item product)) {
+            return;
+        }
+        
+        this.OnCraft.Invoke(0, product);
+        this.NewSession();
+    }
+
+    public void ChangeScheme(int idx) {
+        if (this.Recipe is null) {
+            Logging.Error("No recipe to change scheme.", this);
+            return;
+        }
+        
+        Scheme? current = this.Recipe.Scheme;
+        Scheme? next = this.Schemes[idx].Definition<SchemeDefinition, Scheme>();
         if (current == next) {
             return;
         }
 
-        if (current) {
-            this.CraftTime -= current.BaseCraftTime;
+        if (next is null) {
+            Logging.Error($"No scheme with tag {this.Schemes[idx]}", this);
+            return;
+        }
+
+        if (current is not null) {
+            this.Cost -= current.BaseCraftCost;
         }
         
-        this.CraftTime += this.CookingMethods[idx].BaseCraftTime;
-        this.Recipe.SwitchMethod(current, next);
-        this.OnRecipeChanged.Invoke(Mathf.FloorToInt(this.CraftTime), this.Recipe);
-    }
-    
-    public void AddIngredient(Item item) {
-        if (!item.Type.Flags.HasFlag(ItemFlag.CraftingMaterial)) {
-            Logging.Error($"{item} is not a food ingredient", this);
-            return;
-        }
-
-        if (this.Recipe is null) {
-            Logging.Error("No recipe to add ingredient.", this);
-            return;
-        }
-
-        this.CraftTime += item.CraftTime;
-        this.Recipe.AddIngredient(item);
-        this.OnRecipeChanged.Invoke(Mathf.FloorToInt(this.CraftTime), this.Recipe);
-    }
-
-    public void RemoveIngredient(Item item) {
-        if (!item.Type.Flags.HasFlag(ItemFlag.CraftingMaterial)) {
-            Logging.Error($"{item} is not a food ingredient", this);
-            return;
-        }
-
-        if (this.Recipe is null) {
-            Logging.Error("No recipe to remove ingredient.", this);
-            return;
-        }
-        
-        this.CraftTime -= item.CraftTime;
-        this.Recipe.RemoveIngredient(item);
-        this.OnRecipeChanged.Invoke(Mathf.FloorToInt(this.CraftTime), this.Recipe);
+        this.Cost += next.BaseCraftCost;
+        int cost = this.Recipe.IsEmpty ? 0 : Mathf.Max(1, Mathf.FloorToInt(this.Cost));
+        this.OnRecipeChanged.Invoke(cost, this.Recipe);
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace DunGen.Project.External.DunGen.Code.Tags
+namespace DunGen.Tags
 {
 	[Serializable]
 	public sealed class TagContainer : IEnumerable<Tag>
@@ -20,18 +20,18 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 				return;
 
 			foreach (var tag in other.Tags)
-				this.Tags.Add(new Tag(tag.ID));
+				Tags.Add(new Tag(tag.ID));
 		}
 
 		public bool HasTag(Tag tag)
 		{
-			return this.Tags.Contains(tag);
+			return Tags.Contains(tag);
 		}
 
 		public bool HasAnyTag(params Tag[] tags)
 		{
 			foreach (var tag in tags)
-				if (this.HasTag(tag))
+				if (HasTag(tag))
 					return true;
 
 			return false;
@@ -40,7 +40,7 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 		public bool HasAnyTag(TagContainer tags)
 		{
 			foreach (var tag in tags)
-				if (this.HasTag(tag))
+				if (HasTag(tag))
 					return true;
 
 			return false;
@@ -52,7 +52,7 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 
 			foreach (var tag in tags)
 			{
-				if (!this.HasTag(tag))
+				if (!HasTag(tag))
 				{
 					hasAllTags = false;
 					break;
@@ -68,7 +68,7 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 
 			foreach (var tag in tags)
 			{
-				if (!this.HasTag(tag))
+				if (!HasTag(tag))
 				{
 					hasAllTags = false;
 					break;
@@ -82,12 +82,12 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 
 		public IEnumerator<Tag> GetEnumerator()
 		{
-			return this.Tags.GetEnumerator();
+			return Tags.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return this.Tags.GetEnumerator();
+			return Tags.GetEnumerator();
 		}
 
 		#endregion

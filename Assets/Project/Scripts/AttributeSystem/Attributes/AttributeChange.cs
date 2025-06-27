@@ -1,5 +1,3 @@
-using Project.Scripts.AttributeSystem.Attributes.Definitions;
-
 namespace Project.Scripts.AttributeSystem.Attributes;
 
 public readonly record struct AttributeChange(

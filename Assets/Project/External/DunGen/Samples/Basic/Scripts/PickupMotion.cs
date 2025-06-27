@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Project.External.DunGen.Samples.Basic.Scripts
+namespace DunGen.Demo
 {
 	public class PickupMotion : MonoBehaviour
 	{
@@ -13,11 +13,11 @@ namespace Project.External.DunGen.Samples.Basic.Scripts
 
 		protected virtual void Update()
 		{
-			this.transform.position -= this.positionOffset;
-			this.positionOffset = this.transform.up * Mathf.Sin(Time.time * this.BobSpeed) * this.BobDistance;
-			this.transform.position += this.positionOffset;
+			transform.position -= positionOffset;
+			positionOffset = transform.up * Mathf.Sin(Time.time * BobSpeed) * BobDistance;
+			transform.position += positionOffset;
 
-			this.transform.rotation *= Quaternion.AngleAxis(this.SpinSpeed * Time.deltaTime, this.transform.up);
+			transform.rotation *= Quaternion.AngleAxis(SpinSpeed * Time.deltaTime, transform.up);
 		}
 	}
 }

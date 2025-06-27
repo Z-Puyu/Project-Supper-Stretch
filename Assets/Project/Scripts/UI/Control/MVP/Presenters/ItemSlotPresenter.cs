@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using Editor;
-using Project.Scripts.Common;
 using Project.Scripts.Common.GameplayTags;
 using Project.Scripts.Items;
 using Project.Scripts.Items.Definitions;
@@ -16,9 +13,9 @@ namespace Project.Scripts.UI.Control.MVP.Presenters;
 [RequireComponent(typeof(ItemSlotView))]
 public class ItemSlotPresenter : UIPresenter<Item, ItemSlotView>, IDropHandler {
     [field: SerializeField, AdvancedDropdown(nameof(this.AllItemTypes))]  
-    private ItemType IngredientType { get; set; }
+    private string IngredientType { get; set; } = string.Empty;
 
-    private AdvancedDropdownList<ItemType> AllItemTypes => ObjectCache<ItemDefinition>.Instance.Objects.AllNodes();
+    private AdvancedDropdownList<string> AllItemTypes => ObjectCache<ItemDefinition>.Instance.Objects.AllTags();
     
     private event UnityAction OnItemRemoved = delegate { };
     public event UnityAction<Item> OnItemReturned = delegate { };

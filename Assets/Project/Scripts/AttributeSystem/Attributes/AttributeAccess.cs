@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using SaintsField;
 using UnityEngine;
 
@@ -40,11 +39,6 @@ public class AttributeAccess : MonoBehaviour, IAttributeReader {
     }
     
     public int ReadMax(string attribute) {
-        Attribute value = this.Read(attribute);
-        if (value.Cap == string.Empty) {
-            return value.HardLimit >= 0 ? value.HardLimit : int.MaxValue;
-        }
-        
-        return this.ReadCurrent(value.Cap);
+        return this.Source.ReadMax(attribute);
     }
 }

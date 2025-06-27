@@ -1,6 +1,6 @@
-﻿using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
+﻿using DunGen.Graph;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Validation
+namespace DunGen.Editor.Validation
 {
 	public interface IValidationRule
 	{

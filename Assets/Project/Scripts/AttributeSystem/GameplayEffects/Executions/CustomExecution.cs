@@ -1,6 +1,4 @@
 using System;
-using Project.Scripts.AttributeSystem.Attributes.Definitions;
-using UnityEngine;
 
 namespace Project.Scripts.AttributeSystem.GameplayEffects.Executions;
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code.Pooling
+namespace DunGen.Pooling
 {
 	[Serializable]
 	public sealed class TilePoolPreloaderEntry
@@ -37,14 +37,14 @@ namespace DunGen.Project.External.DunGen.Code.Pooling
 
 		public void ClearSpawnedInstances()
 		{
-			foreach(var entry in this.spawnedTileInstances)
+			foreach(var entry in spawnedTileInstances)
 			{
 				foreach (var instance in entry.Instances)
 					if(instance != null)
 						DestroyImmediate(instance.gameObject);
 			}
 
-			this.spawnedTileInstances.Clear();
+			spawnedTileInstances.Clear();
 		}
 
 		public IEnumerable<Tile> GetTileInstancesForPrefab(Tile prefab)
@@ -52,7 +52,7 @@ namespace DunGen.Project.External.DunGen.Code.Pooling
 			if (prefab == null)
 				return null;
 
-			var entry = this.spawnedTileInstances.Find(x => x.TilePrefab == prefab);
+			var entry = spawnedTileInstances.Find(x => x.TilePrefab == prefab);
 
 			if (entry != null)
 				return entry.Instances;
@@ -60,15 +60,15 @@ namespace DunGen.Project.External.DunGen.Code.Pooling
 			return null;
 		}
 
-		public bool HasSpawnedInstances() => this.spawnedTileInstances.Count > 0;
+		public bool HasSpawnedInstances() => spawnedTileInstances.Count > 0;
 
 		public void RefreshTileInstances()
 		{
 			// Remove instances for tiles we're no longer interested in
-			for (int i = this.spawnedTileInstances.Count - 1; i >= 0; i--)
+			for (int i = spawnedTileInstances.Count - 1; i >= 0; i--)
 			{
-				var entry = this.spawnedTileInstances[i];
-				bool shouldExist = entry.TilePrefab != null && this.Entries.Exists(x => x.TilePrefab == entry.TilePrefab);
+				var entry = spawnedTileInstances[i];
+				bool shouldExist = entry.TilePrefab != null && Entries.Exists(x => x.TilePrefab == entry.TilePrefab);
 
 				if (!shouldExist)
 				{
@@ -76,22 +76,22 @@ namespace DunGen.Project.External.DunGen.Code.Pooling
 						if (instance != null)
 							DestroyImmediate(instance.gameObject);
 
-					this.spawnedTileInstances.RemoveAt(i);
+					spawnedTileInstances.RemoveAt(i);
 				}
 			}
 
 			// Add or update instances for tiles we're interested in
-			foreach (var entry in this.Entries)
+			foreach (var entry in Entries)
 			{
 				if(entry.TilePrefab == null)
 					continue;
 
-				var spawnedTileInstance = this.spawnedTileInstances.Find(x => x.TilePrefab == entry.TilePrefab);
+				var spawnedTileInstance = spawnedTileInstances.Find(x => x.TilePrefab == entry.TilePrefab);
 
 				if (spawnedTileInstance == null)
 				{
 					spawnedTileInstance = new SpawnedTileInstances { TilePrefab = entry.TilePrefab };
-					this.spawnedTileInstances.Add(spawnedTileInstance);
+					spawnedTileInstances.Add(spawnedTileInstance);
 				}
 
 				// Clear invalid instances
@@ -106,7 +106,7 @@ namespace DunGen.Project.External.DunGen.Code.Pooling
 
 					for (int i = 0; i < instancesToCreate; i++)
 					{
-						var instance = Instantiate(entry.TilePrefab, this.transform);
+						var instance = Instantiate(entry.TilePrefab, transform);
 						instance.gameObject.SetActive(false);
 						spawnedTileInstance.Instances.Add(instance);
 					}

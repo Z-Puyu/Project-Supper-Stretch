@@ -1796,19 +1796,6 @@
 <li>Useful for visualizing the generated layout structure and debugging path generation.</li>
 </ul>
 </li>
-<li>
-<p><strong>Place Tile Triggers:</strong></p>
-<ul>
-<li>If checked, DunGen will automatically add a Box Collider component (set as a Trigger) to the root of each placed Tile prefab. These triggers encompass the bounds of the tile.</li>
-<li>Can be used in conjunction with the <a href="../advanced-features/character-component.html">DunGen Character Component</a> or your own scripts to detect when an object enters/exits a specific tile area.</li>
-</ul>
-</li>
-<li>
-<p><strong>Trigger Layer:</strong></p>
-<ul>
-<li>Specifies the physics layer on which the auto-generated <code>Tile Triggers</code> (if enabled above) should be placed.</li>
-</ul>
-</li>
 </ul>
 <hr />
 <h3 id="asynchronous-generation">Asynchronous Generation</h3>
@@ -1841,6 +1828,19 @@
 <h3 id="collision">Collision</h3>
 <p>Settings controlling how tiles interact spatially.</p>
 <ul>
+<li>
+<p><strong>Trigger Placement:</strong></p>
+<ul>
+<li>If enabled, DunGen will automatically add a <code>BoxCollider</code> (or <code>BoxCollider2D</code>) component as a trigger to the root of each placed Tile prefab. These triggers encompass the bounds of the tile. This should be set to match the type of dungeon you're making (2D or 3D).</li>
+<li>Can be used in conjunction with the <a href="../advanced-features/character-component.html">DunGen Character Component</a> or your own scripts to detect when an object enters/exits a specific tile area.</li>
+</ul>
+</li>
+<li>
+<p><strong>Trigger Layer:</strong></p>
+<ul>
+<li>Specifies the physics layer on which the auto-generated <code>Tile Triggers</code> (if enabled above) should be placed.</li>
+</ul>
+</li>
 <li>
 <p><strong>Overlap Threshold:</strong></p>
 <ul>

@@ -1,9 +1,7 @@
-﻿using DunGen.Editor.Project.External.DunGen.Code.Editor.Utility;
-using DunGen.Project.External.DunGen.Code;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
+namespace DunGen.Editor
 {
 	[CustomEditor(typeof(DungeonArchetype))]
 	public sealed class DungeonArchetypeInspector : UnityEditor.Editor
@@ -31,57 +29,57 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 
 		public override void OnInspectorGUI()
 		{
-			DungeonArchetype archetype = this.target as DungeonArchetype;
+			DungeonArchetype archetype = target as DungeonArchetype;
 
 			if (archetype == null)
 				return;
 
-			this.serializedObject.Update();
+			serializedObject.Update();
 
 			// General Section
 			EditorGUILayout.BeginVertical("box");
 			{
-				EditorGUILayout.LabelField(DungeonArchetypeInspector.GeneralHeader, EditorStyles.boldLabel);
-				EditorUtil.DrawIntRange(DungeonArchetypeInspector.BranchingDepthLabel, archetype.BranchingDepth);
-				EditorUtil.DrawIntRange(DungeonArchetypeInspector.BranchCountLabel, archetype.BranchCount);
-				archetype.Unique = EditorGUILayout.Toggle(DungeonArchetypeInspector.UniqueLabel, archetype.Unique);
+				EditorGUILayout.LabelField(GeneralHeader, EditorStyles.boldLabel);
+				EditorUtil.DrawIntRange(BranchingDepthLabel, archetype.BranchingDepth);
+				EditorUtil.DrawIntRange(BranchCountLabel, archetype.BranchCount);
+				archetype.Unique = EditorGUILayout.Toggle(UniqueLabel, archetype.Unique);
 			}
 			EditorGUILayout.EndVertical();
 
 			// Straightening Section
 			EditorGUILayout.BeginVertical("box");
 			{
-				EditorGUILayout.LabelField(DungeonArchetypeInspector.PathStraighteningHeader, EditorStyles.boldLabel);
-				EditorUtil.DrawStraightenSettingsWithOverrides(this.serializedObject.FindProperty(nameof(DungeonArchetype.StraighteningSettings)), true);
+				EditorGUILayout.LabelField(PathStraighteningHeader, EditorStyles.boldLabel);
+				EditorUtil.DrawStraightenSettingsWithOverrides(serializedObject.FindProperty(nameof(DungeonArchetype.StraighteningSettings)), true);
 			}
 			EditorGUILayout.EndVertical();
 
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();
 
-			EditorUtil.DrawObjectList(DungeonArchetypeInspector.TileSetsHeader, archetype.TileSets, GameObjectSelectionTypes.Prefab, this.target);
+			EditorUtil.DrawObjectList(TileSetsHeader, archetype.TileSets, GameObjectSelectionTypes.Prefab, target);
 
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();
 
-			this.DrawBranchStartTilesEditor(archetype);
+			DrawBranchStartTilesEditor(archetype);
 			EditorGUILayout.Space();
-			this.DrawBranchCapTilesEditor(archetype);
+			DrawBranchCapTilesEditor(archetype);
 
 			if (GUI.changed)
 				EditorUtility.SetDirty(archetype);
 
-			this.serializedObject.ApplyModifiedProperties();
+			serializedObject.ApplyModifiedProperties();
 		}
 
 		private void DrawBranchStartTilesEditor(DungeonArchetype archetype)
 		{
 			EditorGUILayout.BeginVertical("box");
-			EditorGUILayout.LabelField(DungeonArchetypeInspector.BranchStartTilesHeader, EditorStyles.boldLabel);
+			EditorGUILayout.LabelField(BranchStartTilesHeader, EditorStyles.boldLabel);
 			EditorGUILayout.HelpBox("Specific tiles can be set to appear at the beginning of branch paths. The type can be used to control if these tiles are used \"instead of\" or \"as well as\" the standard tile sets listed above", MessageType.Info);
 
-			archetype.BranchStartType = (BranchCapType)EditorGUILayout.EnumPopup(DungeonArchetypeInspector.BranchStartTypeLabel, archetype.BranchStartType);
-			EditorUtil.DrawObjectList(DungeonArchetypeInspector.BranchStartTileSetsLabel, archetype.BranchStartTileSets, GameObjectSelectionTypes.Prefab, this.target);
+			archetype.BranchStartType = (BranchCapType)EditorGUILayout.EnumPopup(BranchStartTypeLabel, archetype.BranchStartType);
+			EditorUtil.DrawObjectList(BranchStartTileSetsLabel, archetype.BranchStartTileSets, GameObjectSelectionTypes.Prefab, target);
 
 			EditorGUILayout.EndVertical();
 		}
@@ -89,11 +87,11 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 		private void DrawBranchCapTilesEditor(DungeonArchetype archetype)
 		{
 			EditorGUILayout.BeginVertical("box");
-			EditorGUILayout.LabelField(DungeonArchetypeInspector.BranchCapTilesHeader, EditorStyles.boldLabel);
+			EditorGUILayout.LabelField(BranchCapTilesHeader, EditorStyles.boldLabel);
 			EditorGUILayout.HelpBox("Specific tiles can be set to appear at the end of branch paths. The cap type can be used to control if these tiles are used \"instead of\" or \"as well as\" the standard tile sets listed above", MessageType.Info);
 
-			archetype.BranchCapType = (BranchCapType)EditorGUILayout.EnumPopup(DungeonArchetypeInspector.BranchCapTypeLabel, archetype.BranchCapType);
-			EditorUtil.DrawObjectList(DungeonArchetypeInspector.BranchCapTileSetsLabel, archetype.BranchCapTileSets, GameObjectSelectionTypes.Prefab, this.target);
+			archetype.BranchCapType = (BranchCapType)EditorGUILayout.EnumPopup(BranchCapTypeLabel, archetype.BranchCapType);
+			EditorUtil.DrawObjectList(BranchCapTileSetsLabel, archetype.BranchCapTileSets, GameObjectSelectionTypes.Prefab, target);
 
 			EditorGUILayout.EndVertical();
 		}

@@ -1,8 +1,7 @@
-﻿using DunGen.Project.External.DunGen.Code;
+﻿using UnityEngine;
 using UnityEditor;
-using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
+namespace DunGen.Editor
 {
 	[CustomEditor(typeof(GlobalProp))]
 	[CanEditMultipleObjects]
@@ -29,30 +28,30 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 
 		private void OnEnable()
 		{
-			this.propGroupID = this.serializedObject.FindProperty("PropGroupID");
-			this.mainPathWeight = this.serializedObject.FindProperty("MainPathWeight");
-			this.branchPathWeight = this.serializedObject.FindProperty("BranchPathWeight");
-			this.depthWeightScale = this.serializedObject.FindProperty("DepthWeightScale");
+			propGroupID = serializedObject.FindProperty("PropGroupID");
+			mainPathWeight = serializedObject.FindProperty("MainPathWeight");
+			branchPathWeight = serializedObject.FindProperty("BranchPathWeight");
+			depthWeightScale = serializedObject.FindProperty("DepthWeightScale");
 		}
 
 		public override void OnInspectorGUI()
         {
-			this.serializedObject.Update();
+			serializedObject.Update();
 
-			EditorGUILayout.PropertyField(this.propGroupID, Label.PropGroupID);
+			EditorGUILayout.PropertyField(propGroupID, Label.PropGroupID);
 
             GUILayout.BeginVertical("box");
 
 			EditorGUILayout.LabelField(Label.WeightsHeader, EditorStyles.boldLabel);
 
-			EditorGUILayout.PropertyField(this.mainPathWeight, Label.MainPathWeight);
-			EditorGUILayout.PropertyField(this.branchPathWeight, Label.BranchPathWeight);
+			EditorGUILayout.PropertyField(mainPathWeight, Label.MainPathWeight);
+			EditorGUILayout.PropertyField(branchPathWeight, Label.BranchPathWeight);
 
-            EditorGUILayout.CurveField(this.depthWeightScale, Color.white, new Rect(0, 0, 1, 1), Label.DepthWeightScale);
+            EditorGUILayout.CurveField(depthWeightScale, Color.white, new Rect(0, 0, 1, 1), Label.DepthWeightScale);
 
             GUILayout.EndVertical();
 
-			this.serializedObject.ApplyModifiedProperties();
+			serializedObject.ApplyModifiedProperties();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace DunGen.Editor.Project.External.DunGen.Code.Editor
+﻿namespace DunGen.Editor
 {
 	internal class GenerationFailureWindow
 	{

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	public abstract class TilePlacementResult
 	{
@@ -38,7 +38,7 @@ namespace DunGen.Project.External.DunGen.Code
 		public TileTemplatePlacementResult(TileProxy tileTemplate)
 		{
 			if (tileTemplate != null)
-				this.TileTemplatePrefab = tileTemplate.Prefab;
+				TileTemplatePrefab = tileTemplate.Prefab;
 		}
 	}
 
@@ -99,7 +99,7 @@ namespace DunGen.Project.External.DunGen.Code
 		public NoMatchingDoorwayPlacementResult(TileProxy fromTile)
 		{
 			if (fromTile != null)
-				this.FromTilePrefab = fromTile.Prefab;
+				FromTilePrefab = fromTile.Prefab;
 		}
 	}
 

@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.Characters;
@@ -16,8 +14,8 @@ public class Ragdoll : MonoBehaviour {
     private void Awake() {
         this.GetComponentsInChildren(this.Joints);
         this.Joints.ForEach(register);
-        this.BodyParts.ForEach(body => body.isKinematic = false);
-        this.Colliders.ForEach(c => c.enabled = true);
+        this.BodyParts.ForEach(body => body.isKinematic = true);
+        this.Colliders.ForEach(c => c.enabled = false);
         if (!this.Animator) {
             this.Animator = this.GetComponentInChildren<Animator>();
         }
@@ -35,14 +33,14 @@ public class Ragdoll : MonoBehaviour {
     }
 
     private void OnEnable() {
-        this.BodyParts.ForEach(body => body.isKinematic = true);
-        this.Colliders.ForEach(c => c.enabled = false);
+        this.BodyParts.ForEach(body => body.isKinematic = false);
+        this.Colliders.ForEach(c => c.enabled = true);
         this.Animator.enabled = false;
     }
     
     private void OnDisable() {
-        this.BodyParts.ForEach(body => body.isKinematic = false);
-        this.Colliders.ForEach(c => c.enabled = true);
+        this.BodyParts.ForEach(body => body.isKinematic = true);
+        this.Colliders.ForEach(c => c.enabled = false);
         this.Animator.enabled = true;
     }
 }

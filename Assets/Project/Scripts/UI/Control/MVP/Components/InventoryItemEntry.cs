@@ -1,13 +1,9 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
-using Project.Scripts.Common;
-using Project.Scripts.Items;
 using Project.Scripts.Items.Definitions;
 using Project.Scripts.UI.Control.MVP.Interfaces;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Project.Scripts.UI.Control.MVP.Components;
@@ -38,5 +34,11 @@ public class InventoryItemEntry : ListEntry, ISelectable {
     public override void Clear() {
         this.Nameplate.text = string.Empty;
         this.TypeTag.sprite = null;
+    }
+
+    public override void OnRemove() {
+        base.OnRemove();
+        this.OnSelected = delegate { };
+        this.OnDeselected = delegate { };
     }
 }

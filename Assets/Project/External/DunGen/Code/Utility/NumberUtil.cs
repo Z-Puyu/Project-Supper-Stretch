@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code.Utility
+namespace DunGen
 {
 	public static class NumberUtil
 	{

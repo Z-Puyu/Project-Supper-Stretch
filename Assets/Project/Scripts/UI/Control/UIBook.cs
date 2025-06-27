@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using Project.Scripts.Common;
 using Project.Scripts.Common.Input;
-using Project.Scripts.Player;
 using Project.Scripts.UI.Control.MVP;
-using Project.Scripts.UI.Control.MVP.Interfaces;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Project.Scripts.UI.Control;
 
@@ -23,7 +20,7 @@ public class UIBook : MonoBehaviour, IUserInterface {
 
     public void AddNewPage(UIPage page) {
         if (this.Pages.ContainsValue(page)) {
-            Debug.LogWarning($"Page {page} already exists.");
+            Logging.Warn($"Page {page} already exists.", this);
             return;
         }
 
@@ -32,6 +29,7 @@ public class UIBook : MonoBehaviour, IUserInterface {
         }
         
         this.Pages.Add(page.MainPresenter.GetType(), page);
+        page.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -41,7 +39,7 @@ public class UIBook : MonoBehaviour, IUserInterface {
     /// <typeparam name="U">The presenter's type.</typeparam>
     public void Refresh<U>(IPresentable data) where U : IPresenter {
         if (!this.Pages.TryGetValue(typeof(U), out UIPage page)) {
-            Debug.LogError($"No page found for UI component {typeof(U)}");
+            Logging.Error($"No page found for UI component {typeof(U)}", this);
             return;
         }
         
@@ -55,7 +53,7 @@ public class UIBook : MonoBehaviour, IUserInterface {
     /// <typeparam name="U">The presenter's type.</typeparam>
     public void Open<U>(IPresentable data) where U : IPresenter {
         if (!this.Pages.TryGetValue(typeof(U), out UIPage page)) {
-            Debug.LogError($"No page found for UI component {typeof(U)}");
+            Logging.Error($"No page found for UI component {typeof(U)}", this);
             return;
         }
 
@@ -64,6 +62,7 @@ public class UIBook : MonoBehaviour, IUserInterface {
             return;
         }
         
+        page.Canvas.sortingOrder = this.History.Count;
         page.Open();
         page.Refresh(data);
         this.History.Push(page);

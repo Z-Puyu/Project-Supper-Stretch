@@ -8,5 +8,7 @@ public enum ItemFlag {
     Equipable = 1 << 1,
     CraftingMaterial = 1 << 2,
     Currency = 1 << 3,
-    Miscellaneous = 1 << 4
+    Miscellaneous = 1 << 4,
+    Weapon = 1 << 5,
+    Armor = 1 << 6
 }

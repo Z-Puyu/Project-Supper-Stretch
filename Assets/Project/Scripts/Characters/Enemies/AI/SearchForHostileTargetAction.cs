@@ -10,22 +10,22 @@ namespace Project.Scripts.Characters.Enemies.AI;
 [Serializable, GeneratePropertyBag]
 [NodeDescription(
     name: "SearchForHostileTarget", 
-    story: "[Agent] searches for a hostile [Target]", 
-    category: "Action/Enemy AI", 
+    story: "[Agent] searches for a hostile [Target] with [Sensor]", 
+    category: "Action", 
     id: "d49fee93c09e8ffb504f1592345580ff")]
 public partial class SearchForHostileTargetAction : Action {
     [SerializeReference] public BlackboardVariable<GameObject> Agent;
     [SerializeReference] public BlackboardVariable<GameObject?> Target;
+    [SerializeReference] public BlackboardVariable<Sensor> Sensor;
     
     private void SpotHostileTarget(Collider target) {
         this.Target.Value = target.gameObject;
-        Debug.Log($"Spotted hostile target {this.Target.Value}!");
+        Debug.Log($"{this.Sensor.Name} spotted hostile target {this.Target.Value}!");
     }
 
     protected override Status OnStart() {
-        Sensor sensor = this.Agent.Value.GetComponentInChildren<Sensor>();
-        sensor.OnDetection += this.SpotHostileTarget;
-        sensor.OnLostSight += this.ResetTarget;
+        this.Sensor.Value.OnDetection += this.SpotHostileTarget;
+        this.Sensor.Value.OnLostSight += this.ResetTarget;
         return Status.Running;
     }
 

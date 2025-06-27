@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Project.Scripts.Characters.Enemies;
 using Project.Scripts.GameManagement;
-using Project.Scripts.Util.Linq;
 using Project.Scripts.Util.Singleton;
 using UnityEngine;
 
@@ -28,7 +26,7 @@ public class WorldSpaceWidget : MonoBehaviour {
         }
     }
 
-    private void Update() {
+    private void LateUpdate() {
         if (!this.IsBillboard || !this.Widget.gameObject.activeInHierarchy) {
             return;
         }

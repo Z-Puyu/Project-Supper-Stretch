@@ -16,11 +16,5 @@ public class PlayerHUD : MonoBehaviour {
         this.Player = Singleton<GameInstance>.Instance.PlayerInstance;
         AttributeSet attributeSet = this.Player.GetComponent<AttributeSet>();
         this.AttributeBars.ForEach(bar => bar.Present(attributeSet));
-        attributeSet.OnAttributeChanged += handleAttributeChange;
-        return;
-
-        void handleAttributeChange(AttributeChange change) {
-            this.AttributeBars.ForEach(bar => bar.Present(change));
-        }
     }
 }

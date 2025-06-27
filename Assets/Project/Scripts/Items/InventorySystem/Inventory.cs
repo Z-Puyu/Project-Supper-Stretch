@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Project.Scripts.AttributeSystem.Attributes;
-using Project.Scripts.AttributeSystem.GameplayEffects;
-using Project.Scripts.AttributeSystem.GameplayEffects.Executions;
 using Project.Scripts.Common;
 using Project.Scripts.Common.Input;
-using Project.Scripts.Items.Definitions;
-using Project.Scripts.Player;
+using Project.Scripts.Items.Equipments;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -17,35 +14,21 @@ namespace Project.Scripts.Items.InventorySystem;
 
 [DisallowMultipleComponent]
 public class Inventory : MonoBehaviour, IPresentable, IPlayerControllable {
-    [field: SerializeField] private GameplayEffect? OnUseItemEffect { get; set; }
-    
     public static event UnityAction<Inventory> OnOpen = delegate { };
     
-    private Dictionary<string, Dictionary<Item, int>> Items { get; init; } = [];
+    public Dictionary<Item, int> Items { get; private init; } = [];
     
     public event UnityAction<Inventory, KeyValuePair<Item, int>> OnInventoryChanged = delegate { };
 
     public int this[Item item] => this.Count(item);
-    public IDictionary<Item, int> this[string type] => this.All(type);
     public IEnumerable<KeyValuePair<Item, int>> this[Predicate<Item> predicate] => this.All(predicate);
-    public IEnumerable<KeyValuePair<Item, int>> AllItems => this.Items.Values.SelectMany(storage => storage);
-
-    private IDictionary<Item, int> All(string type) {
-        return this.Items.TryGetValue(type, out Dictionary<Item, int> items) ? items : [];
-    }
 
     private IEnumerable<KeyValuePair<Item, int>> All(Predicate<Item> predicate) {
-        return this.AllItems.Where(entry => predicate.Invoke(entry.Key));
+        return this.Items.Where(entry => predicate.Invoke(entry.Key));
     }
 
     private int Count(Item item) {
-        return this.Items.TryGetValue(item.Type, out Dictionary<Item, int> items)
-                ? items.GetValueOrDefault(item, 0)
-                : 0;
-    }
-
-    public int Count(string type) {
-        return this.All(type).Values.Sum();
+        return this.Items.GetValueOrDefault(item, 0);
     }
 
     public int Count(Predicate<Item> predicate) {
@@ -53,50 +36,39 @@ public class Inventory : MonoBehaviour, IPresentable, IPlayerControllable {
     }
 
     public void Add(in Item item, int copies = 1) {
-        int current = copies;
-        if (this.Items.TryGetValue(item.Type, out Dictionary<Item, int> items)) {
-            if (!items.TryAdd(item, copies)) {
-                items[item] += copies;
-                current = items[item];
-            }
-        } else {
-            this.Items.Add(item.Type, new Dictionary<Item, int> { { item, copies } });
+        if (!this.Items.TryAdd(item, copies)) {
+            this.Items[item] += copies;
         }
         
-        this.OnInventoryChanged.Invoke(this, new KeyValuePair<Item, int>(item, current));
+        this.OnInventoryChanged.Invoke(this, new KeyValuePair<Item, int>(item, this.Items[item]));
     }
 
     public void Apply(in Item item) {
-        if (!this.Items.TryGetValue(item.Type, out Dictionary<Item, int> items) ||
-            !items.TryGetValue(item, out int count) || count <= 0) {
+        if (!this.Items.TryGetValue(item, out int count) || count <= 0) {
             throw new ArgumentException($"No {item} in inventory.");
         }
-        
-        if (!this.OnUseItemEffect) {
-            item.TryEquip(this.gameObject);
-        } else if (this.TryGetComponent(out AttributeSet self)) {
-            GameplayEffectExecutionArgs args = GameplayEffectExecutionArgs.Builder.From(self)
-                                                                          .WithCustomModifiers(item.Properties)
-                                                                          .OfLevel(item.IsEquipped ? -1 : 1).Build();
-            self.AddEffect(this.OnUseItemEffect, args, onComplete: item.TryEquip);
-        }
 
-        if (item.Type.Flags.HasFlag(ItemFlag.Consumable)) {
-            this.Remove(item);
+        if (this.TryGetComponent(out EquipmentSystem equipments)) {
+            item.Process(equipments);
         }
+        
+        if (this.TryGetComponent(out AttributeSet target)) {
+            item.Process(target);
+        }
+        
+        item.Process(this);
     }
 
     public bool Remove(in Item item, int copies = 1) {
-        if (!this.Items.TryGetValue(item.Type, out Dictionary<Item, int> items) ||
-            !items.TryGetValue(item, out int count) || count < copies) {
+        if (!this.Items.TryGetValue(item, out int count) || count < copies) {
             return false;
         }
 
         int remaining = count - copies;
         if (remaining <= 0) {
-            items.Remove(item);
+            this.Items.Remove(item);
         } else {
-            items[item] = remaining;
+            this.Items[item] = remaining;
         }
             
         this.OnInventoryChanged.Invoke(this, new KeyValuePair<Item, int>(item, remaining));
@@ -113,7 +85,7 @@ public class Inventory : MonoBehaviour, IPresentable, IPlayerControllable {
 
     public override string ToString() {
         StringBuilder sb = new StringBuilder($"{this.gameObject.name}'s Inventory:", this.Items.Count);
-        foreach (KeyValuePair<Item, int> entry in this.AllItems) {
+        foreach (KeyValuePair<Item, int> entry in this.Items) {
             sb.AppendLine($"- {entry.Key} × {entry.Value}");
         }
 

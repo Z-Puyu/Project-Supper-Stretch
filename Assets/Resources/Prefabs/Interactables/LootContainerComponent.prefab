@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90e9f8317ba5479baa4c5d0447be5a54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <OnUseItemEffect>k__BackingField: {fileID: 0}
 --- !u!114 &2097338763269009328
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -60,7 +61,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c68e89f02d9c496eb603d7347f520fa9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Detector>k__BackingField: {fileID: 0}
+  <Detector>k__BackingField: {fileID: 244426518028746057}
   <Prompt>k__BackingField: Scrap
   <ShouldDestroyAfterInteraction>k__BackingField: 0
   <PromptWidget>k__BackingField: {fileID: 2691321055872477340}
@@ -305,15 +306,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4671950940653984538, guid: 76ae0912c74589a4d9cbd228d15ceaf6, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4671950940653984538, guid: 76ae0912c74589a4d9cbd228d15ceaf6, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4671950940653984538, guid: 76ae0912c74589a4d9cbd228d15ceaf6, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4671950940653984538, guid: 76ae0912c74589a4d9cbd228d15ceaf6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -555,7 +556,15 @@ PrefabInstance:
       propertyPath: RotatedAndScaledBounds.m_Extent.y
       value: 13.41
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5858661967319085465, guid: 76ae0912c74589a4d9cbd228d15ceaf6, type: 3}
+    - {fileID: 5134570613587372871, guid: 76ae0912c74589a4d9cbd228d15ceaf6, type: 3}
+    - {fileID: 9048002904638589007, guid: 76ae0912c74589a4d9cbd228d15ceaf6, type: 3}
+    - {fileID: 7835655409970161090, guid: 76ae0912c74589a4d9cbd228d15ceaf6, type: 3}
+    - {fileID: 8776140045136915143, guid: 76ae0912c74589a4d9cbd228d15ceaf6, type: 3}
+    - {fileID: 2963817515793936388, guid: 76ae0912c74589a4d9cbd228d15ceaf6, type: 3}
+    - {fileID: 7435931591912274022, guid: 76ae0912c74589a4d9cbd228d15ceaf6, type: 3}
+    - {fileID: 3894505774855952285, guid: 76ae0912c74589a4d9cbd228d15ceaf6, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -631,6 +640,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6669006c49a2ba2418e0cf80f0b86589, type: 3}
+--- !u!114 &244426518028746057 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5314123877934736831, guid: 6669006c49a2ba2418e0cf80f0b86589, type: 3}
+  m_PrefabInstance: {fileID: 5394167888425867510}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e8918cfe72e4c57a97b356f22bc87bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &5300119174131352095 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 240416273449048809, guid: 6669006c49a2ba2418e0cf80f0b86589, type: 3}

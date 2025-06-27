@@ -1,13 +1,12 @@
-﻿using System;
+﻿using DunGen.Pooling;
+using DunGen.Tags;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using DunGen.Project.External.DunGen.Code.Pooling;
-using DunGen.Project.External.DunGen.Code.Tags;
-using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	[AddComponentMenu("DunGen/Tile")]
 	public class Tile : MonoBehaviour, ISerializationCallbackReceiver
@@ -84,15 +83,15 @@ namespace DunGen.Project.External.DunGen.Code
 		/// The calculated world-space bounds of this Tile
 		/// </summary>
 		[HideInInspector]
-		public Bounds Bounds { get { return this.transform.TransformBounds(this.Placement.LocalBounds); } }
+		public Bounds Bounds { get { return transform.TransformBounds(Placement.LocalBounds); } }
 
 		/// <summary>
 		/// Information about the tile's position in the generated dungeon
 		/// </summary>
 		public TilePlacementData Placement
 		{
-			get { return this.placement; }
-			internal set { this.placement = value; }
+			get { return placement; }
+			internal set { placement = value; }
 		}
 		/// <summary>
 		/// The dungeon that this tile belongs to
@@ -103,7 +102,7 @@ namespace DunGen.Project.External.DunGen.Code
 		public List<Doorway> UsedDoorways = new List<Doorway>();
 		public List<Doorway> UnusedDoorways = new List<Doorway>();
 		public GameObject Prefab { get; internal set; }
-		public bool HasValidBounds => this.Placement != null && this.Placement.LocalBounds.extents.sqrMagnitude > 0f;
+		public bool HasValidBounds => Placement != null && Placement.LocalBounds.extents.sqrMagnitude > 0f;
 
 		[SerializeField]
 		private TilePlacementData placement;
@@ -111,45 +110,60 @@ namespace DunGen.Project.External.DunGen.Code
 		private int fileVersion;
 
 		private BoxCollider triggerVolume;
+		private BoxCollider2D triggerVolume2D;
+
 		private readonly List<ITileSpawnEventReceiver> spawnEventReceivers = new List<ITileSpawnEventReceiver>();
+
 
 		public void RefreshTileEventReceivers()
 		{
-			this.spawnEventReceivers.Clear();
-			this.GetComponentsInChildren(true, this.spawnEventReceivers);
+			spawnEventReceivers.Clear();
+			GetComponentsInChildren(true, spawnEventReceivers);
 		}
 
 		internal void TileSpawned()
 		{
-			foreach (var receiver in this.spawnEventReceivers)
+			foreach (var receiver in spawnEventReceivers)
 				receiver.OnTileSpawned(this);
 		}
 
 		internal void TileDespawned()
 		{
-			this.Dungeon = null;
+			Dungeon = null;
 
-			foreach (var doorway in this.AllDoorways)
+			foreach (var doorway in AllDoorways)
 				doorway.ResetInstanceData();
 
-			this.placement.SetPositionAndRotation(Vector2.zero, Quaternion.identity);
+			placement.SetPositionAndRotation(Vector2.zero, Quaternion.identity);
 
-			this.UsedDoorways.Clear();
-			this.UnusedDoorways.Clear();
+			UsedDoorways.Clear();
+			UnusedDoorways.Clear();
 
-			foreach(var receiver in this.spawnEventReceivers)
+			foreach(var receiver in spawnEventReceivers)
 				receiver.OnTileDespawned(this);
 		}
 
-		internal void AddTriggerVolume()
+		internal void AddTriggerVolume(bool use2dCollider)
 		{
-			if(this.triggerVolume != null)
-				return;
+			if (use2dCollider)
+			{
+				if (triggerVolume2D == null)
+					triggerVolume2D = gameObject.AddComponent<BoxCollider2D>();
 
-			this.triggerVolume = this.gameObject.AddComponent<BoxCollider>();
-			this.triggerVolume.center = this.Placement.LocalBounds.center;
-			this.triggerVolume.size = this.Placement.LocalBounds.size;
-			this.triggerVolume.isTrigger = true;
+				triggerVolume2D.offset = Placement.LocalBounds.center;
+				triggerVolume2D.size = Placement.LocalBounds.size;
+				triggerVolume2D.isTrigger = true;
+			}
+			else
+			{
+				if(triggerVolume == null)
+					triggerVolume = gameObject.AddComponent<BoxCollider>();
+
+				triggerVolume.center = Placement.LocalBounds.center;
+				triggerVolume.size = Placement.LocalBounds.size;
+				triggerVolume.isTrigger = true;
+			}
+
 		}
 
 		private void OnTriggerEnter(Collider other)
@@ -157,13 +171,28 @@ namespace DunGen.Project.External.DunGen.Code
 			if (other == null)
 				return;
 
-			var character = other.gameObject.GetComponent<DungenCharacter>();
+			if (other.gameObject.TryGetComponent<DungenCharacter>(out var character))
+				character.OnTileEntered(this);
+		}
 
-			if (character != null)
+		private void OnTriggerEnter2D(Collider2D other)
+		{
+			if (other == null)
+				return;
+
+			if (other.gameObject.TryGetComponent<DungenCharacter>(out var character))
 				character.OnTileEntered(this);
 		}
 
 		private void OnTriggerExit(Collider other)
+		{
+			if (other == null)
+				return;
+
+			if (other.gameObject.TryGetComponent<DungenCharacter>(out var character))
+				character.OnTileExited(this);
+		}
+		private void OnTriggerExit2D(Collider2D other)
 		{
 			if (other == null)
 				return;
@@ -177,10 +206,10 @@ namespace DunGen.Project.External.DunGen.Code
 			Gizmos.color = Color.red;
 			Bounds? bounds = null;
 
-			if (this.OverrideAutomaticTileBounds)
-				bounds = this.transform.TransformBounds(this.TileBoundsOverride);
-			else if (this.placement != null)
-				bounds = this.Bounds;
+			if (OverrideAutomaticTileBounds)
+				bounds = transform.TransformBounds(TileBoundsOverride);
+			else if (placement != null)
+				bounds = Bounds;
 
 			if (bounds.HasValue)
 				Gizmos.DrawWireCube(bounds.Value.center, bounds.Value.size);
@@ -188,12 +217,12 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public IEnumerable<Tile> GetAdjacentTiles()
 		{
-			return this.UsedDoorways.Select(x => x.ConnectedDoorway.Tile).Distinct();
+			return UsedDoorways.Select(x => x.ConnectedDoorway.Tile).Distinct();
 		}
 
 		public bool IsAdjacentTo(Tile other)
 		{
-			foreach (var door in this.UsedDoorways)
+			foreach (var door in UsedDoorways)
 				if (door.ConnectedDoorway.Tile == other)
 					return true;
 
@@ -202,18 +231,18 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public Doorway GetEntranceDoorway()
 		{
-			foreach (var doorway in this.UsedDoorways)
+			foreach (var doorway in UsedDoorways)
 			{
 				var connectedTile = doorway.ConnectedDoorway.Tile;
 
-				if (this.Placement.IsOnMainPath)
+				if (Placement.IsOnMainPath)
 				{
-					if (connectedTile.Placement.IsOnMainPath && this.Placement.PathDepth > connectedTile.Placement.PathDepth)
+					if (connectedTile.Placement.IsOnMainPath && Placement.PathDepth > connectedTile.Placement.PathDepth)
 						return doorway;
 				}
 				else
 				{
-					if (connectedTile.Placement.IsOnMainPath || this.Placement.Depth > connectedTile.Placement.Depth)
+					if (connectedTile.Placement.IsOnMainPath || Placement.Depth > connectedTile.Placement.Depth)
 						return doorway;
 				}
 			}
@@ -223,18 +252,18 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public Doorway GetExitDoorway()
 		{
-			foreach (var doorway in this.UsedDoorways)
+			foreach (var doorway in UsedDoorways)
 			{
 				var connectedTile = doorway.ConnectedDoorway.Tile;
 
-				if (this.Placement.IsOnMainPath)
+				if (Placement.IsOnMainPath)
 				{
-					if (connectedTile.Placement.IsOnMainPath && this.Placement.PathDepth < connectedTile.Placement.PathDepth)
+					if (connectedTile.Placement.IsOnMainPath && Placement.PathDepth < connectedTile.Placement.PathDepth)
 						return doorway;
 				}
 				else
 				{
-					if (!connectedTile.Placement.IsOnMainPath && this.Placement.Depth < connectedTile.Placement.Depth)
+					if (!connectedTile.Placement.IsOnMainPath && Placement.Depth < connectedTile.Placement.Depth)
 						return doorway;
 				}
 			}
@@ -248,33 +277,33 @@ namespace DunGen.Project.External.DunGen.Code
 		/// <returns>True if the bounds changed when recalculated</returns>
 		public bool RecalculateBounds()
 		{
-			if (this.Placement == null)
-				this.Placement = new TilePlacementData();
+			if (Placement == null)
+				Placement = new TilePlacementData();
 
-			var oldBounds = this.Placement.LocalBounds;
+			var oldBounds = Placement.LocalBounds;
 
-			if (this.OverrideAutomaticTileBounds)
-				this.Placement.LocalBounds = this.TileBoundsOverride;
+			if (OverrideAutomaticTileBounds)
+				Placement.LocalBounds = TileBoundsOverride;
 			else
 			{
-				var tileBounds = UnityUtil.CalculateObjectBounds(this.gameObject,
+				var tileBounds = UnityUtil.CalculateObjectBounds(gameObject,
 					false,
 					DunGenSettings.Instance.BoundsCalculationsIgnoreSprites,
 					true);
 
-				tileBounds = UnityUtil.CondenseBounds(tileBounds, this.GetComponentsInChildren<Doorway>(true));
+				tileBounds = UnityUtil.CondenseBounds(tileBounds, GetComponentsInChildren<Doorway>(true));
 
 				// Convert tileBounds to local space
-				tileBounds = this.transform.InverseTransformBounds(tileBounds);
-				this.Placement.LocalBounds = tileBounds;
+				tileBounds = transform.InverseTransformBounds(tileBounds);
+				Placement.LocalBounds = tileBounds;
 			}
 
-			var bounds = this.Placement.LocalBounds;
+			var bounds = Placement.LocalBounds;
 			bool haveBoundsChanged = bounds != oldBounds;
 
 			// Let the user know that the tile's bounds are invalid
 			if (bounds.size.x <= 0f || bounds.size.y <= 0f || bounds.size.z <= 0f)
-				Debug.LogError(string.Format("Tile prefab '{0}' has automatic bounds that are zero or negative in size. The bounding volume for this tile will need to be manually defined.", this.gameObject), this.gameObject);
+				Debug.LogError(string.Format("Tile prefab '{0}' has automatic bounds that are zero or negative in size. The bounding volume for this tile will need to be manually defined.", gameObject), gameObject);
 
 			//if (haveBoundsChanged)
 			//	Debug.Log($"Updated bounds for '{gameObject.name}'");
@@ -289,17 +318,17 @@ namespace DunGen.Project.External.DunGen.Code
 			if (otherTile == null)
 				return;
 
-			if(this.Placement == null)
-				this.Placement = new TilePlacementData();
+			if(Placement == null)
+				Placement = new TilePlacementData();
 
-			this.Placement.LocalBounds = otherTile.Placement.LocalBounds;
+			Placement.LocalBounds = otherTile.Placement.LocalBounds;
 		}
 
 		#region ISerializationCallbackReceiver Implementation
 
 		public void OnBeforeSerialize()
 		{
-			this.fileVersion = Tile.CurrentFileVersion;
+			fileVersion = CurrentFileVersion;
 		}
 
 		public void OnAfterDeserialize()
@@ -307,26 +336,26 @@ namespace DunGen.Project.External.DunGen.Code
 #pragma warning disable 618
 
 			// AllowImmediateRepeats (bool) -> TileRepeatMode (enum)
-			if (this.fileVersion < 1)
-				this.RepeatMode = (this.allowImmediateRepeats) ? TileRepeatMode.Allow : TileRepeatMode.DisallowImmediate;
+			if (fileVersion < 1)
+				RepeatMode = (allowImmediateRepeats) ? TileRepeatMode.Allow : TileRepeatMode.DisallowImmediate;
 
 			// Converted individual Entrance and Exit doorways to collections
-			if (this.fileVersion < 2)
+			if (fileVersion < 2)
 			{
-				if (this.Entrances == null)
-					this.Entrances = new List<Doorway>();
+				if (Entrances == null)
+					Entrances = new List<Doorway>();
 
-				if (this.Exits == null)
-					this.Exits = new List<Doorway>();
+				if (Exits == null)
+					Exits = new List<Doorway>();
 
-				if (this.Entrance != null)
-					this.Entrances.Add(this.Entrance);
+				if (Entrance != null)
+					Entrances.Add(Entrance);
 
-				if(this.Exit != null)
-					this.Exits.Add(this.Exit);
+				if(Exit != null)
+					Exits.Add(Exit);
 
-				this.Entrance = null;
-				this.Exit = null;
+				Entrance = null;
+				Exit = null;
 			}
 
 #pragma warning restore 618

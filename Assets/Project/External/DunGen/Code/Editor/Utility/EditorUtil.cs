@@ -3,12 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DunGen.Project.External.DunGen.Code;
-using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
+namespace DunGen.Editor
 {
 	public static class EditorUtil
 	{
@@ -94,7 +92,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
 
 			if (evt.type == EventType.DragUpdated || evt.type == EventType.DragPerform)
 			{
-				var validDraggingObjects = EditorUtil.GetValidGameObjects(DragAndDrop.objectReferences, allowSceneObjects, allowAssetObjects);
+				var validDraggingObjects = GetValidGameObjects(DragAndDrop.objectReferences, allowSceneObjects, allowAssetObjects);
 
 				if (dragTargetRect.Contains(evt.mousePosition) && validDraggingObjects.Any())
 				{
@@ -135,7 +133,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
 		/// <param name="range">The range to modify</param>
 		public static void DrawIntRange(string name, IntRange range)
 		{
-			EditorUtil.DrawIntRange(new GUIContent(name), range);
+			DrawIntRange(new GUIContent(name), range);
 		}
 
 		/// <summary>
@@ -157,45 +155,6 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
 		}
 
 		/// <summary>
-		/// Draws a min/max slider representing a float range
-		/// </summary>
-		/// <param name="name">A descriptive label</param>
-		/// <param name="range">The range value</param>
-		/// <param name="limitMin">The lowest value of the slider</param>
-		/// <param name="limitMax">The highest value of the slider</param>
-		public static void DrawLimitedFloatRange(string name, FloatRange range, float limitMin = 0, float limitMax = 1)
-		{
-			float min = range.Min;
-			float max = range.Max;
-
-			EditorUtil.DrawLimitedFloatRange(name, ref min, ref max, limitMin, limitMax);
-
-			range.Min = min;
-			range.Max = max;
-		}
-
-		/// <summary>
-		/// Draws a min/max slider representing a float range
-		/// </summary>
-		/// <param name="name">A descriptive label</param>
-		/// <param name="min">The current minimum value</param>
-		/// <param name="max">The current maximum value</param>
-		/// <param name="limitMin">The lowest value of the slider</param>
-		/// <param name="limitMax">The highest value of the slider</param>
-		public static void DrawLimitedFloatRange(string name, ref float min, ref float max, float limitMin, float limitMax)
-		{
-			EditorGUILayout.Space();
-			EditorGUILayout.LabelField(name);
-
-			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.MinMaxSlider(ref min, ref max, limitMin, limitMax);
-			min = EditorGUILayout.FloatField(min, GUILayout.Width(50));
-			max = EditorGUILayout.FloatField(max, GUILayout.Width(50));
-
-			EditorGUILayout.EndHorizontal();
-		}
-
-		/// <summary>
 		/// Draws the GUI for a list of Unity.Object. Allows users to add/remove/modify a specific type
 		/// deriving from Unity.Object (such as GameObject, or a Component type)
 		/// </summary>
@@ -205,7 +164,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
 		/// <typeparam name="T">The type of object in the list</typeparam>
 		public static void DrawObjectList<T>(string header, IList<T> objects, GameObjectSelectionTypes allowedSelectionTypes, UnityEngine.Object owningObject) where T : UnityEngine.Object
 		{
-			EditorUtil.DrawObjectList(new GUIContent(header), objects, allowedSelectionTypes, owningObject);
+			DrawObjectList(new GUIContent(header), objects, allowedSelectionTypes, owningObject);
 		}
 
 		/// <summary>
@@ -304,7 +263,22 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
 			}
 		}
 
-		public static void DrawKey(GUIContent label, KeyManager manager, ref int keyID)
+		public static void DrawKey(Rect position, GUIContent label, KeyManager manager, ref int keyID)
+		{
+			if (manager == null)
+				EditorGUI.LabelField(position, "<Missing Key Manager>");
+			else
+			{
+				string[] keyNames = manager.Keys.Select(x => x.Name).ToArray();
+				GUIContent[] keyLabels = keyNames.Select(x => new GUIContent(x)).ToArray();
+
+				var key = manager.GetKeyByID(keyID);
+				int nameIndex = EditorGUI.Popup(position, label, Array.IndexOf(keyNames, key.Name), keyLabels);
+				keyID = manager.GetKeyByName(keyNames[nameIndex]).ID;
+			}
+		}
+
+		public static void DrawKeyLayout(GUIContent label, KeyManager manager, ref int keyID)
 		{
 			if (manager == null)
 				EditorGUILayout.LabelField("<Missing Key Manager>");
@@ -380,7 +354,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
 			var overrideStraightenChanceProp = straightenSettingsProperty.FindPropertyRelative(nameof(PathStraighteningSettings.OverrideStraightenChance));
 			var straightenChanceProp = straightenSettingsProperty.FindPropertyRelative(nameof(PathStraighteningSettings.StraightenChance));
 
-			EditorUtil.DrawOverrideProperty(overrideStraightenChanceProp, straightenChanceProp, new GUIContent("Straighten Chance", "The chance that the next tile spawned will continue in the same direction as the previous tile"));
+			DrawOverrideProperty(overrideStraightenChanceProp, straightenChanceProp, new GUIContent("Straighten Chance", "The chance that the next tile spawned will continue in the same direction as the previous tile"));
 
 			if (showCheckboxes)
 			{
@@ -390,8 +364,8 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
 				var overrideBranchPathsProp = straightenSettingsProperty.FindPropertyRelative(nameof(PathStraighteningSettings.OverrideCanStraightenBranchPaths));
 				var canStraightenBranchPathsProp = straightenSettingsProperty.FindPropertyRelative(nameof(PathStraighteningSettings.CanStraightenBranchPaths));
 
-				EditorUtil.DrawOverrideProperty(overrideMainPathProp, canStraightenMainPathProp, new GUIContent("Straighten Main Path", "Whether or not the main path should be straightened using StraightenChance"));
-				EditorUtil.DrawOverrideProperty(overrideBranchPathsProp, canStraightenBranchPathsProp, new GUIContent("Straighten Branch Paths", "Whether or not branch paths should be straightened using StraightenChance"));
+				DrawOverrideProperty(overrideMainPathProp, canStraightenMainPathProp, new GUIContent("Straighten Main Path", "Whether or not the main path should be straightened using StraightenChance"));
+				DrawOverrideProperty(overrideBranchPathsProp, canStraightenBranchPathsProp, new GUIContent("Straighten Branch Paths", "Whether or not branch paths should be straightened using StraightenChance"));
 			}
 		}
 
@@ -468,11 +442,11 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
 				{
 					string elementName = element.Substring(0, element.IndexOf("["));
 					int index = int.Parse(element.Substring(element.IndexOf("[")).Replace("[", "").Replace("]", ""));
-					obj = EditorUtil.GetValue(obj, elementName, index);
+					obj = GetValue(obj, elementName, index);
 				}
 				else
 				{
-					obj = EditorUtil.GetValue(obj, element);
+					obj = GetValue(obj, element);
 				}
 			}
 
@@ -506,7 +480,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
 
 		private static object GetValue(object source, string name, int index)
 		{
-			var enumerable = EditorUtil.GetValue(source, name) as IEnumerable;
+			var enumerable = GetValue(source, name) as IEnumerable;
 
 			if (enumerable == null)
 				return null;

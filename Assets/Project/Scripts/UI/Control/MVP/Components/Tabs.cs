@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -6,7 +5,6 @@ using Project.Scripts.Common;
 using Project.Scripts.Util.Linq;
 using SaintsField;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Project.Scripts.UI.Control.MVP.Components;
 

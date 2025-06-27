@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	/// <summary>
 	/// A description of the layout of a dungeon
@@ -64,10 +63,10 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public bool GetHasValidBranchStartTiles()
 		{
-			if (this.BranchStartTileSets.Count == 0)
+			if (BranchStartTileSets.Count == 0)
 				return false;
 
-			foreach (var tileSet in this.BranchStartTileSets)
+			foreach (var tileSet in BranchStartTileSets)
 				if (tileSet.TileWeights.Weights.Count > 0)
 					return true;
 
@@ -76,10 +75,10 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public bool GetHasValidBranchCapTiles()
 		{
-			if (this.BranchCapTileSets.Count == 0)
+			if (BranchCapTileSets.Count == 0)
 				return false;
 
-			foreach (var tileSet in this.BranchCapTileSets)
+			foreach (var tileSet in BranchCapTileSets)
 				if (tileSet.TileWeights.Weights.Count > 0)
 					return true;
 
@@ -100,20 +99,20 @@ namespace DunGen.Project.External.DunGen.Code
 			bool isDirty = false;
 
 			// Upgrade to StraighteningSettings
-			if (this.fileVersion < 1)
+			if (fileVersion < 1)
 			{
-				if (this.StraighteningSettings == null)
-					this.StraighteningSettings = new PathStraighteningSettings();
+				if (StraighteningSettings == null)
+					StraighteningSettings = new PathStraighteningSettings();
 
 #pragma warning disable 0618
-				if (this.StraightenChance > 0.0f)
+				if (StraightenChance > 0.0f)
 				{
-					this.StraighteningSettings.StraightenChance = Mathf.Clamp01(this.StraightenChance);
-					this.StraighteningSettings.OverrideStraightenChance = true;
+					StraighteningSettings.StraightenChance = Mathf.Clamp01(StraightenChance);
+					StraighteningSettings.OverrideStraightenChance = true;
 				}
 #pragma warning restore 0618
 
-				this.fileVersion = 1;
+				fileVersion = 1;
 				isDirty = true;
 			}
 

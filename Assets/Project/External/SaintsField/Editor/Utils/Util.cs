@@ -10,6 +10,7 @@ using UnityEditor.Events;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using Scene = UnityEngine.SceneManagement.Scene;
 
 namespace SaintsField.Editor.Utils
@@ -35,8 +36,21 @@ namespace SaintsField.Editor.Utils
                 }
             }
 
-            T result = (T)EditorGUIUtility.Load(resourcePath);
-            Debug.Assert(result != null, $"{resourcePath} not found in {string.Join(", ", ResourceSearchFolder)}");
+            T result = EditorGUIUtility.Load(resourcePath) as T;
+
+            if (typeof(T) == typeof(Texture2D))
+            {
+                if (!result)
+                {
+                    Texture2D r = EditorGUIUtility.IconContent(resourcePath).image as Texture2D;
+                    if (r)
+                    {
+                        result = r as T;
+                    }
+                }
+            }
+
+            Debug.Assert(result, $"{resourcePath} not found in {string.Join(", ", ResourceSearchFolder)}");
             return result;
         }
 
@@ -528,6 +542,12 @@ namespace SaintsField.Editor.Utils
 
         public static (string error, T result) GetOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
         {
+            if (by.StartsWith(":"))
+            {
+                // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                return GetOfStatic(by.Substring(1), defaultValue,property, memberInfo, target);
+            }
+
             if (target == null)
             {
                 return ("Target is null", defaultValue);
@@ -557,51 +577,13 @@ namespace SaintsField.Editor.Utils
                     {
                         MethodInfo methodInfo = (MethodInfo)fieldOrMethodInfo;
 
-                        object[] passParams;
-                        if (property == null)
+                        (string methodError, object methodReturnValue) = InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target);
+                        if (methodError != "")
                         {
-                            passParams = Array.Empty<object>();
-                        }
-                        else
-                        {
-                            (string error, int arrayIndex, object curValue) = GetValue(property, memberInfo, target);
-                            if (error != "")
-                            {
-                                return (error, defaultValue);
-                            }
-
-                            passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
-                                ? new[]
-                                {
-                                    curValue,
-                                }
-                                : new []
-                                {
-                                    curValue,
-                                    arrayIndex,
-                                });
-
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL_GET_OF
-                            Debug.Log($"#Util# arrayIndex={arrayIndex}, rawValue={rawValue}, curValue={curValue}, fill={string.Join(",", passParams)}");
-#endif
+                            return (methodError, defaultValue);
                         }
 
-                        try
-                        {
-                            genResult = methodInfo.Invoke(target, passParams);
-                        }
-                        catch (TargetInvocationException e)
-                        {
-                            Debug.LogException(e);
-                            Debug.Assert(e.InnerException != null);
-                            return (e.InnerException.Message, defaultValue);
-                        }
-                        catch (Exception e)
-                        {
-                            // _error = e.Message;
-                            Debug.LogException(e);
-                            return (e.Message, defaultValue);
-                        }
+                        genResult = methodReturnValue;
 
                         break;
                     }
@@ -610,36 +592,30 @@ namespace SaintsField.Editor.Utils
                 }
 
                 // Debug.Log($"GetOf {genResult}/{genResult?.GetType()}/{genResult==null}");
+                return ConvertTo(genResult, defaultValue);
+            }
 
-                T finalResult;
-                try
+            return ($"No field or method named `{by}` found on `{target}`", defaultValue);
+        }
+
+        private static (string error, T result) ConvertTo<T>(object genResult, T defaultValue)
+        {
+            T finalResult;
+            try
+            {
+                // finalResult = (T)genResult;
+                finalResult = (T)Convert.ChangeType(genResult, typeof(T));
+            }
+            catch (InvalidCastException)
+            {
+                // Debug.Log($"{genResult}/{genResult.GetType()} -> {typeof(T)}");
+                // Debug.LogException(e);
+                // return (e.Message, defaultValue);
+                if (typeof(T) == typeof(string))
                 {
-                    // finalResult = (T)genResult;
-                    finalResult = (T)Convert.ChangeType(genResult, typeof(T));
+                    finalResult = (T)Convert.ChangeType(genResult == null? "": genResult.ToString(), typeof(T));
                 }
-                catch (InvalidCastException)
-                {
-                    // Debug.Log($"{genResult}/{genResult.GetType()} -> {typeof(T)}");
-                    // Debug.LogException(e);
-                    // return (e.Message, defaultValue);
-                    if (typeof(T) == typeof(string))
-                    {
-                        finalResult = (T)Convert.ChangeType(genResult == null? "": genResult.ToString(), typeof(T));
-                    }
-                    else
-                    {
-                        try
-                        {
-                            finalResult = (T)genResult;
-                        }
-                        catch (InvalidCastException e)
-                        {
-                            Debug.LogException(e);
-                            return (e.Message, defaultValue);
-                        }
-                    }
-                }
-                catch (FormatException)
+                else
                 {
                     try
                     {
@@ -651,11 +627,193 @@ namespace SaintsField.Editor.Utils
                         return (e.Message, defaultValue);
                     }
                 }
-
-                return ("", finalResult);
+            }
+            catch (FormatException)
+            {
+                try
+                {
+                    finalResult = (T)genResult;
+                }
+                catch (InvalidCastException e)
+                {
+                    Debug.LogException(e);
+                    return (e.Message, defaultValue);
+                }
             }
 
-            return ($"No field or method named `{by}` found on `{target}`", defaultValue);
+            return ("", finalResult);
+        }
+
+        private static (string error, object returnValue) InvokeMethodInfo(MethodInfo methodInfo, object defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
+        {
+            object[] passParams;
+            if (property == null || memberInfo == null || target == null)
+            {
+                passParams = Array.Empty<object>();
+            }
+            else
+            {
+                (string error, int arrayIndex, object curValue) = GetValue(property, memberInfo, target);
+                if (error != "")
+                {
+                    return (error, defaultValue);
+                }
+
+                passParams = ReflectUtils.MethodParamsFill(methodInfo.GetParameters(), arrayIndex == -1
+                    ? new[]
+                    {
+                        curValue,
+                    }
+                    : new []
+                    {
+                        curValue,
+                        arrayIndex,
+                    });
+
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_UTIL_GET_OF
+                   Debug.Log($"#Util# arrayIndex={arrayIndex}, rawValue={rawValue}, curValue={curValue}, fill={string.Join(",", passParams)}");
+#endif
+            }
+
+            object genResult;
+            try
+            {
+                genResult = methodInfo.Invoke(target, passParams);
+            }
+            catch (TargetInvocationException e)
+            {
+                Debug.LogException(e);
+                Debug.Assert(e.InnerException != null);
+                return (e.InnerException.Message, defaultValue);
+            }
+            catch (Exception e)
+            {
+                // _error = e.Message;
+                Debug.LogException(e);
+                return (e.Message, defaultValue);
+            }
+
+            return ("", genResult);
+        }
+
+        private static Type FindTypeInAssmbly(Assembly assembly, IReadOnlyList<string> split)
+        {
+            return split.Count > 1
+                ? assembly.GetType(string.Join(".", split), false)
+                : assembly.GetTypes().FirstOrDefault(t => t.Name == split[0]);
+        }
+
+        private static (string error, T result) GetOfStatic<T>(string nameSpaceAndName, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
+        {
+            List<string> split = new List<string>(nameSpaceAndName.Split('.'));
+            int totalLength = split.Count;
+            if (totalLength == 0)
+            {
+                return ($"Static/Const callback must be in form of `Namespace.ClassName.FieldNameOrMethodName` or `ClassName.FieldNameOrMethodName`, get {nameSpaceAndName}", defaultValue);
+            }
+
+            bool fullSearch = totalLength > 1;
+            // Debug.Log(totalLength);
+            if (totalLength == 1)
+            {
+                split.Insert(0, target.GetType().Name);
+                totalLength = 2;
+            }
+
+            string fieldOrMethod = split[totalLength - 1];
+            split.RemoveAt(totalLength - 1);
+            Type type = null;
+            if(target != null)
+            {
+                Assembly assembly = target.GetType().Assembly;
+                type = FindTypeInAssmbly(assembly, split);
+            }
+            if (type == null && fullSearch)
+            {
+                foreach (Assembly searchAssembly in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    type = FindTypeInAssmbly(searchAssembly, split);
+                    if (type != null)
+                    {
+                        break;
+                    }
+                }
+            }
+            if (type == null)
+            {
+                return ($"type name `{string.Join(".", split)}` not found", defaultValue);
+            }
+
+            const BindingFlags bindAttr = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public |
+                                          BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy;
+
+            FieldInfo fieldInfo = type.GetField(fieldOrMethod, bindAttr);
+            if (fieldInfo != null)
+            {
+                object genResult;
+                try
+                {
+                    genResult = fieldInfo.GetValue(null);
+                }
+                catch (Exception e)
+                {
+                    // _error = e.Message;
+#if SAINTSFIELD_DEBUG
+                    Debug.LogException(e);
+#endif
+                    return (e.Message, defaultValue);
+                }
+
+                return ConvertTo(genResult, defaultValue);
+            }
+
+            PropertyInfo propertyInfo = type.GetProperty(fieldOrMethod, bindAttr);
+            if (propertyInfo != null)
+            {
+                object genResult;
+                try
+                {
+                    genResult = propertyInfo.GetValue(null);
+                }
+                catch (Exception e)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogException(e);
+#endif
+                    return (e.Message, defaultValue);
+                }
+
+                return ConvertTo(genResult, defaultValue);
+            }
+
+            MethodInfo[] methodInfos = type.GetMethods(bindAttr);
+            if (methodInfos.Length == 0)
+            {
+#if SAINTSFIELD_DEBUG
+                Debug.LogWarning($"No field, property or method found for {nameSpaceAndName}");
+#endif
+                return ($"No field, property or method found for {nameSpaceAndName}", defaultValue);
+            }
+
+            List<string> errors = new List<string>();
+            foreach (MethodInfo methodInfo in methodInfos)
+            {
+                (string error, object returnValue) = InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target);
+                if (error == "")
+                {
+                    return ConvertTo(returnValue, defaultValue);
+                }
+
+                errors.Add(error);
+            }
+
+            string finalError = string.Join("\n", errors);
+
+#if SAINTSFIELD_DEBUG
+            Debug.LogWarning(finalError);
+#endif
+
+            return (finalError, defaultValue);
         }
 
         public static (string error, T result) GetMethodOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
@@ -667,6 +825,12 @@ namespace SaintsField.Editor.Utils
             if (error != "")
             {
                 return (error, defaultValue);
+            }
+
+            if (by.StartsWith(":"))
+            {
+                // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                return GetOfStatic(by.Substring(1), defaultValue, property, memberInfo, target);
             }
 
             foreach (Type type in ReflectUtils.GetSelfAndBaseTypes(target))
@@ -922,26 +1086,223 @@ namespace SaintsField.Editor.Utils
             return Array.Empty<UnityEngine.Object>();
         }
 
-        private static bool ConditionEditModeChecker(EMode editorMode)
+        private static IEnumerable<int> SplitBits(int value)
         {
-            bool editorRequiresEdit = editorMode.HasFlagFast(EMode.Edit);
-            bool editorRequiresPlay = editorMode.HasFlagFast(EMode.Play);
-            // ReSharper disable once ConvertIfStatementToSwitchStatement
-            if(editorRequiresEdit && editorRequiresPlay)
+            while (value != 0)
             {
-                return true;
+                int lowestBit = value & -value; // Isolate lowest set bit
+                yield return lowestBit;
+                value &= ~lowestBit; // Remove that bit
             }
+        }
 
-            if(!editorRequiresEdit && !editorRequiresPlay)
+        private static IEnumerable<bool> ConditionEditModeChecker(EMode editorMode, SerializedProperty property)
+        {
+            foreach (int splitBit in SplitBits((int)editorMode))
             {
-                return false;
-            }
+                EMode mode = (EMode)splitBit;
+                switch (mode)
+                {
+                    case EMode.Edit:
+                        yield return !EditorApplication.isPlayingOrWillChangePlaymode;
+                        break;
+                    case EMode.Play:
+                        yield return EditorApplication.isPlayingOrWillChangePlaymode;
+                        break;
+                    case EMode.InstanceInScene:
+                    {
+                        UnityEngine.Object obj = property.serializedObject.targetObject;
+                        GameObject go;
+                        if (obj is GameObject objIsGo)
+                        {
+                            go = objIsGo;
+                        }
+                        else if (obj is Component objIsComp)
+                        {
+                            go = objIsComp.gameObject;
+                        }
+                        else
+                        {
+                            yield return false;
+                            break;
+                        }
 
-            return (
-                !editorRequiresEdit || !EditorApplication.isPlaying
-            ) && (
-                !editorRequiresPlay || EditorApplication.isPlaying
-            );
+                        Scene goScene = go.scene;
+                        if (!goScene.IsValid())
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        PrefabInstanceStatus status = PrefabUtility.GetPrefabInstanceStatus(go);
+                        if (status == PrefabInstanceStatus.NotAPrefab)
+                        {
+                            yield return false;
+                            break;
+                        }
+                        PrefabAssetType assetType = PrefabUtility.GetPrefabAssetType(go);
+                        if (assetType == PrefabAssetType.NotAPrefab)
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        IEnumerable<Scene> openedScenes =  Enumerable.Range(0, SceneManager.sceneCount).Select(SceneManager.GetSceneAt);
+                        if (!openedScenes.Contains(goScene))
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        yield return true;
+                        break;
+                    }
+
+                    case EMode.InstanceInPrefab:
+                    {
+                        UnityEngine.Object obj = property.serializedObject.targetObject;
+                        GameObject go;
+                        if (obj is GameObject objIsGo)
+                        {
+                            go = objIsGo;
+                        }
+                        else if (obj is Component objIsComp)
+                        {
+                            go = objIsComp.gameObject;
+                        }
+                        else
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        GameObject parent = go.transform.parent?.gameObject;
+                        if(!parent)
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        PrefabInstanceStatus status = PrefabUtility.GetPrefabInstanceStatus(parent);
+                        if (status == PrefabInstanceStatus.NotAPrefab)
+                        {
+                            yield return false;
+                            break;
+                        }
+                        PrefabAssetType assetType = PrefabUtility.GetPrefabAssetType(parent);
+                        if (assetType == PrefabAssetType.NotAPrefab)
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        yield return true;
+                        break;
+                    }
+                    case EMode.Regular:
+                    {
+                        UnityEngine.Object obj = property.serializedObject.targetObject;
+                        GameObject go;
+                        if (obj is GameObject objIsGo)
+                        {
+                            go = objIsGo;
+                        }
+                        else if (obj is Component objIsComp)
+                        {
+                            go = objIsComp.gameObject;
+                        }
+                        else
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        PrefabAssetType assetType = PrefabUtility.GetPrefabAssetType(go);
+                        // Debug.Log(assetType);
+                        if (assetType != PrefabAssetType.Regular)
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        yield return true;
+                        break;
+                    }
+                    case EMode.Variant:
+                    {
+                        UnityEngine.Object obj = property.serializedObject.targetObject;
+                        GameObject go;
+                        if (obj is GameObject objIsGo)
+                        {
+                            go = objIsGo;
+                        }
+                        else if (obj is Component objIsComp)
+                        {
+                            go = objIsComp.gameObject;
+                        }
+                        else
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        // PrefabInstanceStatus status = PrefabUtility.GetPrefabInstanceStatus(go);
+                        // if (status == PrefabInstanceStatus.NotAPrefab)
+                        // {
+                        //     yield return false;
+                        //     break;
+                        // }
+                        PrefabAssetType assetType = PrefabUtility.GetPrefabAssetType(go);
+
+                        if (assetType != PrefabAssetType.Variant)
+                        {
+                            yield return false;
+                            break;
+                        }
+
+                        yield return true;
+                        break;
+                    }
+
+                    case EMode.NonPrefabInstance:
+                    {
+                        UnityEngine.Object obj = property.serializedObject.targetObject;
+                        GameObject go;
+                        if (obj is GameObject objIsGo)
+                        {
+                            go = objIsGo;
+                        }
+                        else if (obj is Component objIsComp)
+                        {
+                            go = objIsComp.gameObject;
+                        }
+                        else
+                        {
+                            yield return false;
+                            break;
+                        }
+                        PrefabInstanceStatus status = PrefabUtility.GetPrefabInstanceStatus(go);
+                        if (status == PrefabInstanceStatus.NotAPrefab)
+                        {
+                            yield return true;
+                            break;
+                        }
+                        PrefabAssetType assetType = PrefabUtility.GetPrefabAssetType(go);
+                        if (assetType == PrefabAssetType.NotAPrefab)
+                        {
+                            yield return true;
+                            break;
+                        }
+
+                        yield return false;
+                        break;
+                    }
+                    case EMode.PrefabInstance:
+                    case EMode.PrefabAsset:
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(editorMode), editorMode, $"{mode}");
+                }
+            }
         }
 
         public static (IReadOnlyList<string> errors, IReadOnlyList<bool> boolResults) ConditionChecker(IEnumerable<ConditionInfo> conditionInfos, SerializedProperty property, MemberInfo info, object target)
@@ -953,7 +1314,7 @@ namespace SaintsField.Editor.Utils
             {
                 if (conditionInfo.Compare == LogicCompare.EditorMode)
                 {
-                    callbackBoolResults.Add(ConditionEditModeChecker((EMode) conditionInfo.Target));
+                    callbackBoolResults.AddRange(ConditionEditModeChecker((EMode) conditionInfo.Target, property));
                     continue;
                 }
                 // ReSharper disable once UseNegatedPatternInIsExpression

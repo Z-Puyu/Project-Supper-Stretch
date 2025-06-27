@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DunGen.Project.External.DunGen.Code.Analysis
+namespace DunGen.Analysis
 {
 	public class GenerationAnalysis
 	{
@@ -30,20 +30,20 @@ namespace DunGen.Project.External.DunGen.Code.Analysis
 
 		public float AnalysisTime { get; private set; }
 		public int SuccessCount { get; private set; }
-		public float SuccessPercentage { get { return (this.SuccessCount / (float)this.TargetIterationCount) * 100; } }
+		public float SuccessPercentage { get { return (SuccessCount / (float)TargetIterationCount) * 100; } }
 
 		private readonly List<GenerationStats> statsSet = new List<GenerationStats>();
 
 
 		public GenerationAnalysis(int targetIterationCount)
 		{
-			this.TargetIterationCount = targetIterationCount;
-			this.GenerationStepTimes = new Dictionary<GenerationStatus, NumberSetData>();
+			TargetIterationCount = targetIterationCount;
+			GenerationStepTimes = new Dictionary<GenerationStatus, NumberSetData>();
 		}
 
 		public NumberSetData GetGenerationStepData(GenerationStatus step)
 		{
-			if (this.GenerationStepTimes.TryGetValue(step, out var data))
+			if (GenerationStepTimes.TryGetValue(step, out var data))
 				return data;
 			else
 				return new NumberSetData(new float[0]);
@@ -51,37 +51,37 @@ namespace DunGen.Project.External.DunGen.Code.Analysis
 
 		public void Clear()
 		{
-			this.IterationCount = 0;
-			this.AnalysisTime = 0;
-			this.SuccessCount = 0;
-			this.statsSet.Clear();
-			this.GenerationStepTimes.Clear();
+			IterationCount = 0;
+			AnalysisTime = 0;
+			SuccessCount = 0;
+			statsSet.Clear();
+			GenerationStepTimes.Clear();
 		}
 
 		public void Add(GenerationStats stats)
 		{
-			this.statsSet.Add(stats.Clone());
-			this.AnalysisTime += stats.TotalTime;
-			this.IterationCount++;
+			statsSet.Add(stats.Clone());
+			AnalysisTime += stats.TotalTime;
+			IterationCount++;
 		}
 
 		public void IncrementSuccessCount()
 		{
-			this.SuccessCount++;
+			SuccessCount++;
 		}
 
 		public void Analyze()
 		{
-			this.MainPathRoomCount = new NumberSetData(this.statsSet.Select(x => (float)x.MainPathRoomCount));
-			this.BranchPathRoomCount = new NumberSetData(this.statsSet.Select(x => (float)x.BranchPathRoomCount));
-			this.TotalRoomCount = new NumberSetData(this.statsSet.Select(x => (float)x.TotalRoomCount));
-			this.MaxBranchDepth = new NumberSetData(this.statsSet.Select(x => (float)x.MaxBranchDepth));
-			this.TotalRetries = new NumberSetData(this.statsSet.Select(x => (float)x.TotalRetries));
+			MainPathRoomCount = new NumberSetData(statsSet.Select(x => (float)x.MainPathRoomCount));
+			BranchPathRoomCount = new NumberSetData(statsSet.Select(x => (float)x.BranchPathRoomCount));
+			TotalRoomCount = new NumberSetData(statsSet.Select(x => (float)x.TotalRoomCount));
+			MaxBranchDepth = new NumberSetData(statsSet.Select(x => (float)x.MaxBranchDepth));
+			TotalRetries = new NumberSetData(statsSet.Select(x => (float)x.TotalRetries));
 
-			foreach (var step in GenerationAnalysis.MeasurableSteps)
-				this.GenerationStepTimes[step] = new NumberSetData(this.statsSet.Select(x => x.GetGenerationStepTime(step)));
+			foreach (var step in MeasurableSteps)
+				GenerationStepTimes[step] = new NumberSetData(statsSet.Select(x => x.GetGenerationStepTime(step)));
 
-			this.TotalTime = new NumberSetData(this.statsSet.Select(x => x.TotalTime));
+			TotalTime = new NumberSetData(statsSet.Select(x => x.TotalTime));
 		}
 	}
 }

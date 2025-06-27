@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Editor;
-using Project.Scripts.Common;
 using Project.Scripts.Items;
 using Project.Scripts.Items.CraftingSystem;
-using Project.Scripts.Items.Definitions;
 using Project.Scripts.Items.InventorySystem;
 using Project.Scripts.UI.Control.MVP.Components;
-using Project.Scripts.Util.Components;
 using Project.Scripts.Util.Linq;
-using SaintsField;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,6 +18,7 @@ public class CampMenuCoordinator : MonoBehaviour, IPresenter {
     [NotNull] [field: SerializeField] private InventoryListPresenter? InventoryPresenter { get; set; }
     [NotNull] [field: SerializeField] private Button? CookButton { get; set; }
     [NotNull] [field: SerializeField] private RecipePresenter? RecipeDescription { get; set; }
+    [NotNull] [field: SerializeField] private TextView? TimeRemaining { get; set; }
 
     private void Start() {
         foreach (ItemSlotPresenter slot in this.IngredientSlots) {
@@ -33,23 +28,22 @@ public class CampMenuCoordinator : MonoBehaviour, IPresenter {
 
             void handleReturnedItem(Item item) {
                 this.Model.inventory.Add(item);
-                this.Model.workbench.RemoveIngredient(item);
+                this.Model.workbench.Remove(item);
             }
 
             void handleAddedItem(Item item) {
                 this.Model.inventory.Remove(item);
-                this.Model.workbench.AddIngredient(item);
+                this.Model.workbench.Put(item);
             }
         }
 
+        CampFire.OnCampingSituationUpdated += this.Present;
+
         this.CookingMethodOptions.OnSelected += handleSwitchCookingMethod;
-        CampFire.OnCraftStatusChecked += (canCook, _) => this.CookButton.interactable = canCook;
-        CampFire.OnCraftStatusChecked += (_, recipe) => this.RecipeDescription.Present(recipe);
-        CampFire.OnCraftCompleted += t => Logging.Info($"{t} hours remaining", this);
         this.CookButton.onClick.AddListener(this.OnCraftComplete);
         this.CookButton.interactable = false;
         return;
-        void handleSwitchCookingMethod(int idx) => this.Model.workbench.ChangeCookingMethod(idx);
+        void handleSwitchCookingMethod(int idx) => this.Model.workbench.ChangeScheme(idx);
     }
 
     private void OnCraftComplete() {
@@ -68,5 +62,11 @@ public class CampMenuCoordinator : MonoBehaviour, IPresenter {
 
         this.Model = (data.Workbench, data.Inventory);
         this.InventoryPresenter.Present(data.Inventory);
+        this.CookButton.interactable = data.RemainingTime >= data.CraftDuration;
+        this.TimeRemaining.Content = $"Remaining Time: {data.RemainingTime}";
+        this.TimeRemaining.Refresh();
+        if (data.Workbench.Recipe is not null) {
+            this.RecipeDescription.Present(data.Workbench.Recipe);
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace DunGen.Project.External.DunGen.Code.Graph
+﻿namespace DunGen
 {
     public sealed class DungeonGraphConnection : DungeonGraphObject
     {
@@ -11,10 +11,10 @@
 
         public DungeonGraphConnection(DungeonGraphNode a, DungeonGraphNode b, Doorway doorwayA, Doorway doorwayB)
         {
-            this.A = a;
-            this.B = b;
-            this.DoorwayA = doorwayA;
-            this.DoorwayB = doorwayB;
+            A = a;
+            B = b;
+            DoorwayA = doorwayA;
+            DoorwayB = doorwayB;
 
             a.AddConnection(this);
             b.AddConnection(this);

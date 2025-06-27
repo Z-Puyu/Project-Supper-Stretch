@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code.Collision
+namespace DunGen.Collision
 {
 	/// <summary>
 	/// Used to add custom collision detection when deciding where to place tiles

@@ -1,5 +1,3 @@
-using System;
-using Project.Scripts.GameManagement;
 using Project.Scripts.UI.Control.Minimap;
 using Project.Scripts.Util.Singleton;
 using UnityEngine;

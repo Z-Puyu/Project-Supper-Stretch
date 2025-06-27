@@ -1,13 +1,12 @@
-﻿using System;
+﻿using DunGen.Generation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using DunGen.Project.External.DunGen.Code;
-using DunGen.Project.External.DunGen.Code.Generation;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
+namespace DunGen.Editor.Windows
 {
 	public class GenerationFailureWindow : EditorWindow
 	{
@@ -15,7 +14,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 
 		public static void ShowWindow(GenerationFailureReport report)
 		{
-			var window = EditorWindow.GetWindow<GenerationFailureWindow>("Generation Failure Report");
+			var window = GetWindow<GenerationFailureWindow>("Generation Failure Report");
 			window.minSize = new Vector2(400, 300);
 
 			window.GenerationFailureReport = report;
@@ -27,14 +26,14 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 		private static void Initialise()
 		{
 			// Clear and re-register the event handler so we're notified of future generation failures
-			DungeonGenerator.OnGenerationFailureReportProduced -= GenerationFailureWindow.OnGenerationFailureReportProduced;
-			DungeonGenerator.OnGenerationFailureReportProduced += GenerationFailureWindow.OnGenerationFailureReportProduced;
+			DungeonGenerator.OnGenerationFailureReportProduced -= OnGenerationFailureReportProduced;
+			DungeonGenerator.OnGenerationFailureReportProduced += OnGenerationFailureReportProduced;
 		}
 
 		private static void OnGenerationFailureReportProduced(DungeonGenerator generator, GenerationFailureReport report)
 		{
 			if(DunGenSettings.Instance.DisplayFailureReportWindow)
-				GenerationFailureWindow.ShowWindow(report);
+				ShowWindow(report);
 		}
 
 		#endregion
@@ -57,15 +56,15 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 
 		private void OnEnable()
 		{
-			this.CreateUI();
+			CreateUI();
 		}
 
 		private void CreateUI()
 		{
-			var root = this.rootVisualElement;
+			var root = rootVisualElement;
 			root.Clear();
 
-			if (this.GenerationFailureReport == null)
+			if (GenerationFailureReport == null)
 				return;
 
 			// Top panel
@@ -81,7 +80,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 			headerLabel.style.fontSize = 16;
 			topPanel.Add(headerLabel);
 
-			var descriptionLabel = new Label($"The generator failed after {this.GenerationFailureReport.MaxRetryAttempts} attempts. See below for details on each failure type.");
+			var descriptionLabel = new Label($"The generator failed after {GenerationFailureReport.MaxRetryAttempts} attempts. See below for details on each failure type.");
 			descriptionLabel.style.marginTop = 4;
 			descriptionLabel.style.fontSize = 12;
 			descriptionLabel.style.whiteSpace = WhiteSpace.Normal;
@@ -97,38 +96,38 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 			root.Add(mainSplit);
 
 			// Left panel: Failure type list
-			this.leftPanel = new VisualElement();
-			this.leftPanel.style.width = 180;
-			this.leftPanel.style.flexShrink = 0;
-			this.leftPanel.style.marginTop = 8;
-			this.leftPanel.style.marginBottom = 8;
-			this.leftPanel.style.marginRight = 8;
-			this.leftPanel.style.flexDirection = FlexDirection.Column;
-			mainSplit.Add(this.leftPanel);
+			leftPanel = new VisualElement();
+			leftPanel.style.width = 180;
+			leftPanel.style.flexShrink = 0;
+			leftPanel.style.marginTop = 8;
+			leftPanel.style.marginBottom = 8;
+			leftPanel.style.marginRight = 8;
+			leftPanel.style.flexDirection = FlexDirection.Column;
+			mainSplit.Add(leftPanel);
 
 			// Right panel: Details
-			this.rightPanel = new VisualElement();
-			this.rightPanel.style.flexGrow = 1;
-			this.rightPanel.style.marginTop = 8;
-			this.rightPanel.style.marginBottom = 8;
-			this.rightPanel.style.flexDirection = FlexDirection.Column;
-			mainSplit.Add(this.rightPanel);
+			rightPanel = new VisualElement();
+			rightPanel.style.flexGrow = 1;
+			rightPanel.style.marginTop = 8;
+			rightPanel.style.marginBottom = 8;
+			rightPanel.style.flexDirection = FlexDirection.Column;
+			mainSplit.Add(rightPanel);
 
 			// Populate failure type list
-			this.PopulateFailureTypeList();
+			PopulateFailureTypeList();
 		}
 
 		private void PopulateFailureTypeList()
 		{
-			this.leftPanel.Clear();
+			leftPanel.Clear();
 
-			if (this.GenerationFailureReport.TilePlacementResults == null || this.GenerationFailureReport.TilePlacementResults.Count == 0)
+			if (GenerationFailureReport.TilePlacementResults == null || GenerationFailureReport.TilePlacementResults.Count == 0)
 				return;
 
 			// Group by failure type, order so the most common types are first
-			var grouped = this.GenerationFailureReport.TilePlacementResults
-			                  .GroupBy(r => r.GetType())
-			                  .OrderByDescending(g => g.Count());
+			var grouped = GenerationFailureReport.TilePlacementResults
+				.GroupBy(r => r.GetType())
+				.OrderByDescending(g => g.Count());
 
 			foreach (var group in grouped)
 			{
@@ -136,14 +135,14 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 				string displayName = group.First().DisplayName;
 				int count = group.Count();
 
-				GenerationFailureWindow.FailureTypeDescriptions.TryGetValue(type, out string typeDescription);
+				FailureTypeDescriptions.TryGetValue(type, out string typeDescription);
 
 				var button = new Button(() =>
 				{
-					this.currentTypeName = displayName;
-					this.currentTypeDescription = typeDescription;
-					this.currentTypeResults = group.ToList();
-					this.PopulateFailureTypeDetails();
+					currentTypeName = displayName;
+					currentTypeDescription = typeDescription;
+					currentTypeResults = group.ToList();
+					PopulateFailureTypeDetails();
 				})
 				{
 					style =
@@ -178,27 +177,27 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 				button.Add(nameLabel);
 				button.Add(countLabel);
 
-				this.leftPanel.Add(button);
+				leftPanel.Add(button);
 			}
 
 			// Auto-select the first (most common) failure type
 			if (grouped.Any())
 			{
 				var firstFailureTypeEntry = grouped.First();
-				this.currentTypeName = firstFailureTypeEntry.First().DisplayName;
-				this.currentTypeResults = firstFailureTypeEntry.ToList();
+				currentTypeName = firstFailureTypeEntry.First().DisplayName;
+				currentTypeResults = firstFailureTypeEntry.ToList();
 
-				GenerationFailureWindow.FailureTypeDescriptions.TryGetValue(firstFailureTypeEntry.Key, out this.currentTypeDescription);
-				this.PopulateFailureTypeDetails();
+				FailureTypeDescriptions.TryGetValue(firstFailureTypeEntry.Key, out currentTypeDescription);
+				PopulateFailureTypeDetails();
 			}
 		}
 
 		private void PopulateFailureTypeDetails()
 		{
-			this.rightPanel.Clear();
+			rightPanel.Clear();
 
 			// Header
-			var header = new Label(this.currentTypeName)
+			var header = new Label(currentTypeName)
 			{
 				style =
 				{
@@ -208,10 +207,10 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 					marginTop = 2
 				}
 			};
-			this.rightPanel.Add(header);
+			rightPanel.Add(header);
 
 			// Description
-			var description = new Label(this.currentTypeDescription)
+			var description = new Label(currentTypeDescription)
 			{
 				style =
 				{
@@ -220,7 +219,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 					whiteSpace = WhiteSpace.Normal
 				}
 			};
-			this.rightPanel.Add(description);
+			rightPanel.Add(description);
 
 			// Scrollable list of failure instances
 			var scrollView = new ScrollView(ScrollViewMode.Vertical)
@@ -234,11 +233,11 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 			};
 
 			// Group results by the asset that caused the failure (ordered by most common first)
-			var problematicAssets = this.currentTypeResults
-			                            .GroupBy(this.TryGetAssetFromResult)
-			                            .Where(g => g.Key != null)
-			                            .OrderByDescending(g => g.Count())
-			                            .ToList();
+			var problematicAssets = currentTypeResults
+				.GroupBy(TryGetAssetFromResult)
+				.Where(g => g.Key != null)
+				.OrderByDescending(g => g.Count())
+				.ToList();
 
 			foreach (var group in problematicAssets)
 			{
@@ -287,7 +286,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 				scrollView.Add(instanceButton);
 			}
 
-			this.rightPanel.Add(scrollView);
+			rightPanel.Add(scrollView);
 		}
 
 		private UnityEngine.Object TryGetAssetFromResult(TilePlacementResult result)

@@ -12,44 +12,46 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ed4bfbad18b40e7b42737dbd1a6f467, type: 3}
   m_Name: Necrotic Mold
   m_EditorClassIdentifier: 
-  <Type>k__BackingField:
-    <Namespace>k__BackingField: Items
-    <Path>k__BackingField: FoodIngredient
-    <Tag>k__BackingField: FoodIngredient
-    <Priority>k__BackingField: 2
-    <Flags>k__BackingField: 5
-    <Icon>k__BackingField: {fileID: -530572372, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
-    <Subtypes>k__BackingField: []
+  <Type>k__BackingField: Items.FoodIngredient
   <Name>k__BackingField: Necrotic Mold
-  <Model>k__BackingField: {fileID: 0}
   <Worth>k__BackingField: 2
-  <Properties>k__BackingField:
-  - <Key>k__BackingField:
-      <TargetAttribute>k__BackingField: CharacterAttribute.Satiation
-      <Type>k__BackingField: 3
-    <Target>k__BackingField:
-      <FullName>k__BackingField: CharacterAttribute.Satiation
-      <Name>k__BackingField: Satiation
-    <Method>k__BackingField: 3
-    <Value>k__BackingField: 1
-  - <Key>k__BackingField:
-      <TargetAttribute>k__BackingField: CharacterAttribute.Health
-      <Type>k__BackingField: 3
-    <Target>k__BackingField:
-      <FullName>k__BackingField: CharacterAttribute.Health
-      <Name>k__BackingField: Health
-    <Method>k__BackingField: 3
-    <Value>k__BackingField: 1
-  - <Key>k__BackingField:
-      <TargetAttribute>k__BackingField: CharacterAttribute.Toxin
-      <Type>k__BackingField: 3
-    <Target>k__BackingField:
-      <FullName>k__BackingField: CharacterAttribute.Toxin
-      <Name>k__BackingField: Toxin
-    <Method>k__BackingField: 3
-    <Value>k__BackingField: 5
-  <CraftTime>k__BackingField: 0.2
-  <Slot>k__BackingField: 0
+  <ItemProperties>k__BackingField:
+  - rid: 1548064581621383271
+  - rid: 1548064581621383274
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 1548064581621383271
+      type: {class: ConsumablePropertyData, ns: Project.Scripts.Items.Definitions, asm: Project.Scripts.Items}
+      data:
+        <Effects>k__BackingField:
+        - <Target>k__BackingField: CharacterAttributes.Health
+          <Method>k__BackingField: 2
+          <Value>k__BackingField: 1
+          <Duration>k__BackingField: 0
+        - <Target>k__BackingField: CharacterAttributes.Satiation
+          <Method>k__BackingField: 2
+          <Value>k__BackingField: 1
+          <Duration>k__BackingField: 0
+        - <Target>k__BackingField: CharacterAttributes.Toxin
+          <Method>k__BackingField: 2
+          <Value>k__BackingField: 5
+          <Duration>k__BackingField: 0
+        <GameplayEffectOnUse>k__BackingField: {fileID: 11400000, guid: ce5296e21acb56d44a5f82cfc7b53003, type: 2}
+    - rid: 1548064581621383274
+      type: {class: CraftingMaterialPropertyData, ns: Project.Scripts.Items.Definitions, asm: Project.Scripts.Items}
+      data:
+        <Modifiers>k__BackingField:
+        - <Target>k__BackingField: CharacterAttributes.Health
+          <Method>k__BackingField: 0
+          <Value>k__BackingField: 1
+          <Duration>k__BackingField: 0
+        - <Target>k__BackingField: CharacterAttributes.Satiation
+          <Method>k__BackingField: 0
+          <Value>k__BackingField: 1
+          <Duration>k__BackingField: 0
+        - <Target>k__BackingField: CharacterAttributes.Toxin
+          <Method>k__BackingField: 0
+          <Value>k__BackingField: 1
+          <Duration>k__BackingField: 0
+        <Cost>k__BackingField: 0.2

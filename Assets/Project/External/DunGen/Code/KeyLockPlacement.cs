@@ -1,7 +1,6 @@
 using System;
-using DunGen.Project.External.DunGen.Code.Utility;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	[Serializable]
 	public sealed class KeyLockPlacement

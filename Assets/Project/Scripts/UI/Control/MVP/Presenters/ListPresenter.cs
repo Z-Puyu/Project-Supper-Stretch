@@ -2,15 +2,22 @@ using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.UI.Control.MVP.Components;
 using Project.Scripts.UI.Control.MVP.Interfaces;
 using UnityEngine;
+using UnityEngine.Pool;
 using Object = UnityEngine.Object;
 
 namespace Project.Scripts.UI.Control.MVP.Presenters;
 
 public abstract class ListPresenter<M, T, E> : UIPresenter<M, ListView<T>> where E : ListEntry {
     [NotNull] [field: SerializeField] protected E? EntryPrefab { get; private set; }
+    [NotNull] protected ObjectPool<E>? EntryPool { get; private set; }
 
+    protected void Awake() {
+        this.EntryPool = new ObjectPool<E>(() => Object.Instantiate(this.EntryPrefab),
+            actionOnGet: entry => entry.OnRemoved += () => this.EntryPool?.Release(entry), defaultCapacity: 200);
+    }
+    
     private E InstantiateEntry(T data) {
-        E entry = Object.Instantiate(this.EntryPrefab);
+        E entry = this.EntryPool!.Get();
         this.InitialiseEntry(entry, data);
         return entry;
     }

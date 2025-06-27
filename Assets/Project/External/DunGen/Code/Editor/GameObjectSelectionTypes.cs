@@ -1,6 +1,6 @@
 using System;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor
+namespace DunGen
 {
 	[Flags]
 	public enum GameObjectSelectionTypes

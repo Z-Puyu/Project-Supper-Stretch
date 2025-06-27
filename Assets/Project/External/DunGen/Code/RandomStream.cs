@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	public sealed class RandomStream
 	{
@@ -25,48 +25,48 @@ namespace DunGen.Project.External.DunGen.Code
 			int mj, mk;
 
 			int subtraction = (Seed == int.MinValue) ? int.MaxValue : Math.Abs(Seed);
-			mj = RandomStream.seed - subtraction;
-			this.seedArray[55] = mj;
+			mj = seed - subtraction;
+			seedArray[55] = mj;
 			mk = 1;
 
 			for (int i = 1; i < 55; i++)
 			{
 				ii = (21 * i) % 55;
-				this.seedArray[ii] = mk;
+				seedArray[ii] = mk;
 				mk = mj - mk;
 
 				if (mk < 0)
-					mk += RandomStream.maxValue;
+					mk += maxValue;
 
-				mj = this.seedArray[ii];
+				mj = seedArray[ii];
 			}
 
 			for (int k = 1; k < 5; k++)
 			{
 				for (int i = 1; i < 56; i++)
 				{
-					this.seedArray[i] -= this.seedArray[1 + (i + 30) % 55];
+					seedArray[i] -= seedArray[1 + (i + 30) % 55];
 
-					if (this.seedArray[i] < 0)
-						this.seedArray[i] += RandomStream.maxValue;
+					if (seedArray[i] < 0)
+						seedArray[i] += maxValue;
 				}
 			}
 
-			this.iNext = 0;
-			this.iNextP = 21;
+			iNext = 0;
+			iNextP = 21;
 			Seed = 1;
 		}
 
 		private double Sample()
 		{
-			return (this.InternalSample() * (1.0 / RandomStream.maxValue));
+			return (InternalSample() * (1.0 / maxValue));
 		}
 
 		private int InternalSample()
 		{
 			int retVal;
-			int locINext = this.iNext;
-			int locINextp = this.iNextP;
+			int locINext = iNext;
+			int locINextp = iNextP;
 
 			if (++locINext >= 56)
 				locINext = 1;
@@ -74,18 +74,18 @@ namespace DunGen.Project.External.DunGen.Code
 			if (++locINextp >= 56)
 				locINextp = 1;
 
-			retVal = this.seedArray[locINext] - this.seedArray[locINextp];
+			retVal = seedArray[locINext] - seedArray[locINextp];
 
-			if (retVal == RandomStream.maxValue)
+			if (retVal == maxValue)
 				retVal--;
 
 			if (retVal < 0)
-				retVal += RandomStream.maxValue;
+				retVal += maxValue;
 
-			this.seedArray[locINext] = retVal;
+			seedArray[locINext] = retVal;
 
-			this.iNext = locINext;
-			this.iNextP = locINextp;
+			iNext = locINext;
+			iNextP = locINextp;
 
 			return retVal;
 		}
@@ -96,14 +96,14 @@ namespace DunGen.Project.External.DunGen.Code
 		/// <returns>A random integer between 0 (inclusive) and int.MaxValue (exclusive)</returns>
 		public int Next()
 		{
-			return this.InternalSample();
+			return InternalSample();
 		}
 
 		private double GetSampleForLargeRange()
 		{
-			int result = this.InternalSample();
+			int result = InternalSample();
 
-			bool negative = (this.InternalSample() % 2 == 0) ? true : false;
+			bool negative = (InternalSample() % 2 == 0) ? true : false;
 
 			if (negative)
 				result = -result;
@@ -130,9 +130,9 @@ namespace DunGen.Project.External.DunGen.Code
 			long range = (long)maxValue - minValue;
 
 			if (range <= (long)Int32.MaxValue)
-				return ((int)(this.Sample() * range) + minValue);
+				return ((int)(Sample() * range) + minValue);
 			else
-				return (int)((long)(this.GetSampleForLargeRange() * range) + minValue);
+				return (int)((long)(GetSampleForLargeRange() * range) + minValue);
 		}
 
 		/// <summary>
@@ -146,7 +146,7 @@ namespace DunGen.Project.External.DunGen.Code
 			if (maxValue < 0)
 				throw new ArgumentOutOfRangeException("maxValue");
 
-			return (int)(this.Sample() * maxValue);
+			return (int)(Sample() * maxValue);
 		}
 
 		/// <summary>
@@ -155,7 +155,7 @@ namespace DunGen.Project.External.DunGen.Code
 		/// <returns>A random double between 0.0 (inclusive) and 1.0 (exclusive)</returns>
 		public double NextDouble()
 		{
-			return this.Sample();
+			return Sample();
 		}
 
 		/// <summary>
@@ -169,7 +169,7 @@ namespace DunGen.Project.External.DunGen.Code
 				throw new ArgumentNullException("buffer");
 
 			for (int i = 0; i < buffer.Length; i++)
-				buffer[i] = (byte)(this.InternalSample() % (byte.MaxValue + 1));
+				buffer[i] = (byte)(InternalSample() % (byte.MaxValue + 1));
 		}
 	}
 }

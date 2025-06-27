@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2635721408445808256}
-  m_Layer: 8
+  m_Layer: 1
   m_Name: Fire
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -397,6 +397,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 205.38
       objectReference: {fileID: 0}
+    - target: {fileID: 6628614141491472013, guid: 86aa7d9b543c13540aae0d893a27e0c7, type: 3}
+      propertyPath: <DetectionRadius>k__BackingField
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 7752140159444883218, guid: 86aa7d9b543c13540aae0d893a27e0c7, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.064
@@ -569,6 +573,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4681155873369933203, guid: 86aa7d9b543c13540aae0d893a27e0c7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6279697301337702066}
+    - targetCorrespondingSourceObject: {fileID: 4681155873369933203, guid: 86aa7d9b543c13540aae0d893a27e0c7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5088663982949090460}
   m_SourcePrefab: {fileID: 100100000, guid: 86aa7d9b543c13540aae0d893a27e0c7, type: 3}
 --- !u!4 &2168374925268541900 stripped
 Transform:
@@ -592,22 +599,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d9773a61f0548859997db7c63c0807a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <ProductItemType>k__BackingField:
-    <FullName>k__BackingField: Item.Food
-    <Name>k__BackingField: Food
-    <Root>k__BackingField: Item
-  <IngredientItemType>k__BackingField:
-    <FullName>k__BackingField: Item.FoodIngredient
-    <Name>k__BackingField: FoodIngredient
-    <Root>k__BackingField: Item
-  <CookingMethods>k__BackingField:
-  - {fileID: 11400000, guid: 877bb71a77641814fb2a056c55bbe974, type: 2}
-  - {fileID: 11400000, guid: 4e750a408e7239a48a89e7ec2be06cce, type: 2}
-  - {fileID: 11400000, guid: 7e966f82c1957b045955076055ec8866, type: 2}
-  - {fileID: 11400000, guid: 264dd951b0fe5624a99a791c248ec4e0, type: 2}
-  <MaxMainIngredients>k__BackingField: 3
-  <MaxSpices>k__BackingField: 2
-  <MaxAdditives>k__BackingField: 2
+  <Schemes>k__BackingField:
+  - CookingMethods.Salad
+  - CookingMethods.Boiling
+  - CookingMethods.Roasting
+  - CookingMethods.Steaming
+  <Producer>k__BackingField:
+    rid: 1548064563266584741
+  references:
+    version: 2
+    RefIds:
+    - rid: 1548064563266584741
+      type: {class: FoodItemProducer, ns: Project.Scripts.Items.CraftingSystem, asm: Project.Scripts.Items}
+      data:
+        <ItemDefinition>k__BackingField: Items.Food
+        <EffectOnConsume>k__BackingField: {fileID: 11400000, guid: ce5296e21acb56d44a5f82cfc7b53003, type: 2}
 --- !u!114 &6279697301337702066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -621,8 +627,54 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <CampingDuration>k__BackingField: 12
-  <HealthPerHourOfRest>k__BackingField: {x: 5, y: 10}
-  <RestEffect>k__BackingField: {fileID: 0}
+--- !u!114 &5088663982949090460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7074920416976540724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4d7fdc2f82e8404a870095acb8edcad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PropGroupID: 0
+  MainPathWeight: 2
+  BranchPathWeight: 1
+  DepthWeightScale:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.57281315
+      value: 0.6084477
+      inSlope: 1.4681895
+      outSlope: 1.4681895
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &3415841326306662141
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -682,8 +734,37 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 102482, guid: 5384f901620d528498e7930f27d7d8ce, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4055822072853261556}
   m_SourcePrefab: {fileID: 100100000, guid: 5384f901620d528498e7930f27d7d8ce, type: 3}
+--- !u!1 &3415841326306559663 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 102482, guid: 5384f901620d528498e7930f27d7d8ce, type: 3}
+  m_PrefabInstance: {fileID: 3415841326306662141}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &4055822072853261556
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3415841326306559663}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 5, y: 2, z: 5}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!4 &3415841326306691019 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 495926, guid: 5384f901620d528498e7930f27d7d8ce, type: 3}
@@ -697,6 +778,46 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2635721408445808256}
     m_Modifications:
+    - target: {fileID: 519550835277708759, guid: e01f2e62cf41a3449be2dade3b2c2d79, type: 3}
+      propertyPath: m_Layer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1932411756463893127, guid: e01f2e62cf41a3449be2dade3b2c2d79, type: 3}
+      propertyPath: m_Layer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2404483870345227846, guid: e01f2e62cf41a3449be2dade3b2c2d79, type: 3}
+      propertyPath: m_Layer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5713748837716941429, guid: e01f2e62cf41a3449be2dade3b2c2d79, type: 3}
+      propertyPath: m_Layer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6243088127918362860, guid: e01f2e62cf41a3449be2dade3b2c2d79, type: 3}
+      propertyPath: m_Layer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6517319500779485329, guid: e01f2e62cf41a3449be2dade3b2c2d79, type: 3}
+      propertyPath: m_Layer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6633717568016401733, guid: e01f2e62cf41a3449be2dade3b2c2d79, type: 3}
+      propertyPath: m_Layer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7821040938812409357, guid: e01f2e62cf41a3449be2dade3b2c2d79, type: 3}
+      propertyPath: m_Layer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7866806859602904384, guid: e01f2e62cf41a3449be2dade3b2c2d79, type: 3}
+      propertyPath: m_Layer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7903113946656752408, guid: e01f2e62cf41a3449be2dade3b2c2d79, type: 3}
+      propertyPath: m_Layer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8295591563862043288, guid: e01f2e62cf41a3449be2dade3b2c2d79, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.5
@@ -757,6 +878,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: VFX_Fire_01_Medium_Smoke
       objectReference: {fileID: 0}
+    - target: {fileID: 8295591563862043295, guid: e01f2e62cf41a3449be2dade3b2c2d79, type: 3}
+      propertyPath: m_Layer
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -775,9 +900,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2635721408445808256}
     m_Modifications:
+    - target: {fileID: 3805284707568768353, guid: 9f90aa15c6b14234ea7247f33f09e816, type: 3}
+      propertyPath: m_SoftShadowQuality
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 4952131365919966842, guid: 9f90aa15c6b14234ea7247f33f09e816, type: 3}
       propertyPath: m_Name
       value: VFX_Point_Light
+      objectReference: {fileID: 0}
+    - target: {fileID: 4952131365919966842, guid: 9f90aa15c6b14234ea7247f33f09e816, type: 3}
+      propertyPath: m_Layer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6040056879142927025, guid: 9f90aa15c6b14234ea7247f33f09e816, type: 3}
       propertyPath: m_LocalPosition.x
@@ -785,7 +918,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6040056879142927025, guid: 9f90aa15c6b14234ea7247f33f09e816, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.25
+      value: 0.898
       objectReference: {fileID: 0}
     - target: {fileID: 6040056879142927025, guid: 9f90aa15c6b14234ea7247f33f09e816, type: 3}
       propertyPath: m_LocalPosition.z
@@ -828,12 +961,20 @@ PrefabInstance:
       value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 7552325380232887710, guid: 9f90aa15c6b14234ea7247f33f09e816, type: 3}
+      propertyPath: m_Lightmapping
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7552325380232887710, guid: 9f90aa15c6b14234ea7247f33f09e816, type: 3}
       propertyPath: m_Shadows.m_Type
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7552325380232887710, guid: 9f90aa15c6b14234ea7247f33f09e816, type: 3}
       propertyPath: m_ColorTemperature
       value: 1500
+      objectReference: {fileID: 0}
+    - target: {fileID: 7552325380232887710, guid: 9f90aa15c6b14234ea7247f33f09e816, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 2521
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

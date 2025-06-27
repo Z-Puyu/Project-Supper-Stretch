@@ -1,5 +1,4 @@
-﻿using Project.Scripts.AttributeSystem.Attributes.Definitions;
-using SaintsField;
+﻿using SaintsField;
 
 namespace Project.Scripts.AttributeSystem.Attributes;
 

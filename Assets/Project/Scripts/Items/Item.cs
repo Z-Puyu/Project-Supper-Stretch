@@ -1,151 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Project.Scripts.AttributeSystem.Attributes;
-using Project.Scripts.AttributeSystem.GameplayEffects;
-using Project.Scripts.AttributeSystem.GameplayEffects.Executions;
-using Project.Scripts.AttributeSystem.Modifiers;
+using System.Text;
 using Project.Scripts.Common;
+using Project.Scripts.Common.GameplayTags;
 using Project.Scripts.Items.Definitions;
-using Project.Scripts.Items.Equipments;
-using UnityEngine;
+using Project.Scripts.Util.Linq;
 
 namespace Project.Scripts.Items;
 
-public class Item : IComparable<Item>, IEquatable<Item> {
-    private readonly string name = string.Empty;
-    private readonly int worth;
-    private readonly EquipmentSlot slot;
-    private readonly IEnumerable<Modifier> properties = [];
-    
-    private ItemData? Definition { get; init; }
-    private EquipmentSystem? Owner { get; set; }
-    public ItemType Type { get; private init; }
-    public float CraftTime => !this.Definition ? 0 : this.Definition.CraftTime;
-    public EquipmentSlot Slot => !this.Definition ? this.slot : this.Definition.Slot;
-    public string Name => !this.Definition ? this.name : this.Definition.Name;
-    public int Worth => !this.Definition ? this.worth : this.Definition.Worth;
-    public IEnumerable<Modifier> Properties => !this.Definition ? this.properties : this.Definition.Properties;
-    public GameObject? Model => !this.Definition ? null : this.Definition.Model;
-    public bool IsEquipped => this.Owner;
-    
-    private Item(ItemData definition, ItemType type) {
-        this.Definition = definition;
-        this.Type = type;
-    }
-
-    public Item(ItemType type, string name, int worth, IEnumerable<Modifier> properties) {
-        this.Type = type;
-        this.name = name;
-        this.worth = worth;
-        this.properties = properties;
+public sealed record class Item(ItemType Type, string Name, int Worth, ItemProperty[] Properties)
+        : IComparable<Item>, IPresentable {
+    private Item(Item item) {
+        this.Type = item.Type;
+        this.Name = item.Name;
+        this.Worth = item.Worth;
+        this.Properties = item.Properties.Select(property => property with { }).ToArray();
     }
 
     public static Item From(ItemData data) {
-        return new Item(data, data.Type);
+        ItemType? definition = data.Type.Definition<ItemDefinition, ItemType>();
+        if (definition is null) {
+            throw new ArgumentException($"No item definition for {data.Type}.");
+        }
+
+        return new Item(definition, data.Name, data.Worth, data.ItemProperties.Select(p => p.Create()).ToArray());
     }
 
-    private void Equip(GameObject who) {
-        if (!this.Type.Flags.HasFlag(ItemFlag.Equipable)) {
-            return;
+    public static Item New(string type, string name, int worth) {
+        ItemType? definition = type.Definition<ItemDefinition, ItemType>();
+        if (definition is null) {
+            throw new ArgumentException($"No item definition for {type}.");
         }
 
-        if (this.Owner) {
-            Debug.LogWarning($"{this.Name} is already equipped to {this.Owner.transform.root.gameObject.name}");
-        } else if (!who.TryGetComponent(out EquipmentSystem system)) {
-            Debug.LogError($"{who.name} does not have an equipment system.");
-        } else {
-            this.Owner = system;
-            system.Equip(this);
-        }
+        return new Item(definition, name, worth, []);
     }
 
-    private void Unequip(GameObject who) {
-        if (!this.Type.Flags.HasFlag(ItemFlag.Equipable)) {
-            return;
-        }
-
-        if (!this.Owner) {
-            Debug.LogWarning($"{this.Name} is not equipped.");
-        } else if (!who.TryGetComponent(out EquipmentSystem system)) {
-            Debug.LogError($"{who.name} does not have an equipment system.");
-        } else if (system != this.Owner) {
-            Debug.LogWarning($"{this.Name} is not equipped by {who.name}");
-        } else {
-            this.Owner = null;
-            system.Unequip(this);
-        }
+    public Item WithProperty(ItemProperty property) {
+        return this with { Properties = this.Properties.Append(property).ToArray() };
     }
 
-    public void TryEquip(GameObject who) {
-        if (!this.Type.Flags.HasFlag(ItemFlag.Equipable)) {
-            return;
+    public Item WithProperties(IEnumerable<ItemProperty> properties) {
+        return this with { Properties = this.Properties.Concat(properties).ToArray() };
+    }
+
+    public void Process<T>(T target) {
+        this.Properties.OfType<IItemProperty<T>>().ForEach(property => property.Process(this, target));
+    }
+
+    public bool HasProperty<P>(out P? property) where P : class, IItemProperty {
+        property = null;
+        return false;
+    }
+
+    public int CompareTo(Item other) {
+        int priorityComparison = this.Type.Priority.CompareTo(other.Type.Priority);
+        if (priorityComparison != 0) {
+            return priorityComparison;
         }
 
-        if (this.Owner) {
-            this.Unequip(who);
-        } else {
-            this.Equip(who);
-        }
+        int nameComparison = string.CompareOrdinal(this.Name, other.Name);
+        return nameComparison == 0 ? this.Worth.CompareTo(other.Worth) : nameComparison;
+    }
+
+    public bool Equals(Item? other) {
+        return other is not null && this.Type == other.Type && this.Name == other.Name && this.Worth == other.Worth &&
+               this.Properties.SequenceEqual(other.Properties);
+    }
+
+    public override int GetHashCode() {
+        HashCode hash = new HashCode();
+        this.Properties.ForEach(hash.Add);
+        return HashCode.Combine(this.Type, this.Name, this.Worth, hash.ToHashCode());
     }
 
     public override string ToString() {
         return this.Name;
     }
 
-    public int CompareTo(Item? other) {
-        if (this.Equals(other)) {
-            return 0;
-        }
-
-        if (other is null) {
-            return 1;
-        }
-
-        int typeComparison = this.Type.Priority.CompareTo(other.Type.Priority);
-        if (typeComparison != 0) {
-            return typeComparison;
-        }
-
-        int nameComparison = string.Compare(this.Name, other.Name, StringComparison.Ordinal);
-        if (nameComparison != 0) {
-            return nameComparison;
-        }
-
-        int worthComparison = this.Worth.CompareTo(other.Worth);
-        return worthComparison != 0 ? worthComparison : this.Slot.CompareTo(other.Slot);
-    }
-
-    public bool Equals(Item? other) {
-        if (other is null) {
-            return false;
-        }
-
-        if (object.ReferenceEquals(this, other)) {
-            return true;
-        }
-
-        if (this.Definition == other.Definition) {
-            return true;
-        }
-
-        return this.Type.Equals(other.Type) && this.name == other.name && this.worth == other.worth &&
-               this.properties.SequenceEqual(other.properties) && this.Model == other.Model;
-    }
-
-    public override bool Equals(object? obj) {
-        if (obj is null) {
-            return false;
-        }
-
-        if (object.ReferenceEquals(this, obj)) {
-            return true;
-        }
-
-        return obj is Item item && this.Equals(item);
-    }
-
-    public override int GetHashCode() {
-        return HashCode.Combine(this.Type.Name, this.Name, this.Worth, this.Properties, this.Model);
+    public string FormatAsText() {
+        StringBuilder sb = new StringBuilder(this.Name);
+        sb.AppendJoin('\n', this.Properties.AsEnumerable());
+        return sb.ToString();
     }
 }

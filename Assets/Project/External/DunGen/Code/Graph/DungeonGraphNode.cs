@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DunGen.Project.External.DunGen.Code.Graph
+namespace DunGen
 {
     public sealed class DungeonGraphNode : DungeonGraphObject
     {
@@ -10,12 +10,12 @@ namespace DunGen.Project.External.DunGen.Code.Graph
 
         public DungeonGraphNode(Tile tile)
         {
-            this.Tile = tile;
+            Tile = tile;
         }
 
         internal void AddConnection(DungeonGraphConnection connection)
         {
-            this.Connections.Add(connection);
+            Connections.Add(connection);
         }
     }
 }

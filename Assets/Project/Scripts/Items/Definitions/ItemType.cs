@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Project.Scripts.Common;
 using Project.Scripts.Common.GameplayTags;
 using SaintsField;
 using UnityEngine;
@@ -9,7 +7,7 @@ using UnityEngine;
 namespace Project.Scripts.Items.Definitions;
 
 [Serializable]
-public class ItemType : GameplayTagNode, IEquatable<ItemType> {
+public class ItemType : GameplayTagNode {
     [field: SerializeField] public int Priority { get; private set; }
     
     [field: SerializeField, ShowIf(nameof(this.IsLeaf))] 
@@ -28,18 +26,5 @@ public class ItemType : GameplayTagNode, IEquatable<ItemType> {
     
     protected override void OnRename() {
         this.TracePath<ItemDefinition, ItemType>();
-    }
-
-    public bool Equals(ItemType? other) {
-        if (other is null) {
-            return false;
-        }
-
-        if (object.ReferenceEquals(this, other)) {
-            return true;
-        }
-
-        return base.Equals(other) && this.Priority == other.Priority && this.Flags == other.Flags &&
-               object.Equals(this.Icon, other.Icon) && this.Subtypes.SequenceEqual(other.Subtypes);
     }
 }

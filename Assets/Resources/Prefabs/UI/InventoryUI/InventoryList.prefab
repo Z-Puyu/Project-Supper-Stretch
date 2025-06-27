@@ -37,8 +37,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 507.8, y: -23.41}
-  m_SizeDelta: {x: 1015.6, y: 0}
+  m_AnchoredPosition: {x: 533, y: -23.41}
+  m_SizeDelta: {x: 1066, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &6871532732685590279
 MonoBehaviour:
@@ -796,7 +796,8 @@ PrefabInstance:
       propertyPath: m_ChildControlHeight
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3894505774855952285, guid: bbbe7a194232ada45b9d7016c10e46c6, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 4671950940653984538, guid: bbbe7a194232ada45b9d7016c10e46c6, type: 3}
@@ -844,8 +845,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <View>k__BackingField: {fileID: 6000209833699866892}
   <EntryPrefab>k__BackingField: {fileID: 3810579903356336721, guid: bec6afc2885d1ca4f993fa2b59999e35, type: 3}
-  <RejectedItems>k__BackingField: 
-  <AcceptedItems>k__BackingField: 
+  <RejectedItems>k__BackingField: 0
+  <AcceptedItems>k__BackingField: 0
 --- !u!224 &9001915351467569982 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4671950940653984538, guid: bbbe7a194232ada45b9d7016c10e46c6, type: 3}

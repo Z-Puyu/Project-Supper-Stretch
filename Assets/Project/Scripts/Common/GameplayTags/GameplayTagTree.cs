@@ -20,4 +20,14 @@ public abstract class GameplayTagTree<T> : ScriptableObject where T : GameplayTa
 
         iterator.Exit();
     }
+
+    public bool TryFind(string tag, out T? node) {
+        T? res = null;
+        PreorderIterator<T> iterator = new PreorderIterator<T>(this.Nodes);
+        iterator.ShouldStop = n => n.Name == tag;
+        iterator.OnEnd = n => res = n;
+        this.Traverse(iterator);
+        node = res;
+        return res != null;       
+    }
 }

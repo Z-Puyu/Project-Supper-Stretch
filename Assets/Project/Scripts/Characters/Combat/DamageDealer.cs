@@ -1,0 +1,106 @@
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using Editor;
+using Project.Scripts.AttributeSystem.Attributes;
+using Project.Scripts.AttributeSystem.Attributes.Definitions;
+using Project.Scripts.AttributeSystem.GameplayEffects;
+using Project.Scripts.Common;
+using Project.Scripts.Common.GameplayTags;
+using SaintsField;
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace Project.Scripts.Characters.Combat;
+
+[DisallowMultipleComponent]
+public class DamageDealer : MonoBehaviour {
+    private AdvancedDropdownList<string> AllAttributes => ObjectCache<AttributeDefinition>.Instance.Objects.LeafTags();
+
+    [NotNull] private GameObject? Owner { get; set; }
+    private HitBox? CurrentTarget { get; set; }
+    private bool HasTarget { get; set; }
+
+    [field: SerializeField, Tag]
+    [field: Tooltip("Tags ignored by the damage dealer. The root object's tag is always ignored regardless.")]
+    private List<string> FriendlyTags { get; set; } = [];
+
+    [NotNull]
+    [field: SerializeField, Required]
+    private Collider? TargetDetector { get; set; }
+
+    [field: SerializeField, AdvancedDropdown(nameof(this.AllAttributes))]
+    [field: InfoBox("Which attribute's value to use as a reference for damage calculation?")]
+    private string BaseDamageAttribute { get; set; } = string.Empty;
+
+    [field: InfoBox("Damage calculation requires an attribute reader!", EMessageType.Error, nameof(this.IsInvalid))]
+    private IAttributeReader? AttributeReader { get; set; }
+
+    [NotNull]
+    [field: SerializeField, Required]
+    private GameplayEffect? DamageEffect { get; set; }
+    
+    private Vector3 StartPosition { get; set; }
+
+    private bool IsInvalid => this.GetComponentInParent<IAttributeReader>() == null;
+    
+    public event UnityAction OnBlocked = delegate { };
+    public event UnityAction OnPerfectlyBlocked = delegate { };
+
+    private void Awake() {
+        this.Owner = this.transform.root.gameObject;
+        this.AttributeReader = this.GetComponent<IAttributeReader>();
+        if (this.AttributeReader == null) {
+            Logging.Error($"{this.name} requires an {nameof(IAttributeReader)} to function!", this);
+        }
+    }
+
+    private void OnEnable() {
+        this.TargetDetector.enabled = true;
+    }
+
+    private void OnDisable() {
+        this.TargetDetector.enabled = false;
+        this.HasTarget = false;
+        this.CurrentTarget = null;
+    }
+
+    public void TryPerformHit() {
+        this.enabled = false;
+        if (!this.HasTarget) {
+            return;
+        }
+
+        // The attacker chooses what kind of damage to inflict.
+        this.CurrentTarget!.TakeDamage(new Damage(this.StartPosition, this.DamageEffect, this));
+        this.CurrentTarget = null;
+    }
+
+    public void Blocked() {
+        this.OnBlocked.Invoke();
+        Logging.Info($"Damage by {this.transform.root.name} blocked!", this);
+    }
+
+    private bool IsValidHit(GameObject target, Collider at, out HitBox? hitPoint) {
+        bool isFriendlyTarget = target == this.Owner || target.CompareTag(this.Owner.tag) ||
+                                this.FriendlyTags.Contains(target.tag) ||
+                                target.transform.IsChildOf(this.Owner.transform) ||
+                                this.Owner.transform.IsChildOf(target.transform);
+        if (!isFriendlyTarget && at.TryGetComponent(out hitPoint)) {
+            return true;
+        }
+
+        hitPoint = null;
+        return false;
+    }
+
+    private void OnTriggerEnter(Collider other) {
+        GameObject target = other.transform.root.gameObject;
+        if (!this.IsValidHit(target, other, out HitBox? hitPoint)) {
+            return;
+        }
+
+        this.StartPosition = this.transform.position;
+        this.CurrentTarget = hitPoint;
+        this.HasTarget = true;
+    }
+}

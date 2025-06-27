@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using DunGen.Editor.Validation;
+using DunGen.Graph;
+using System.Collections.Generic;
 using System.Linq;
-using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using Tile = DunGen.Project.External.DunGen.Code.Tile;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Validation.Rules
+namespace DunGen.Assets.DunGen.Code.Editor.Validation.Rules
 {
 	sealed class TileConfigurationRule : IValidationRule
 	{
@@ -16,9 +16,9 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Validation.Rules
 						.Where(t => t != null)
 						.ToArray();
 
-			this.CheckTileComponents(flow, validator, tilePrefabs);
-			this.CheckTilemaps(flow, validator, tilePrefabs);
-			this.CheckTerrains(flow, validator, tilePrefabs);
+			CheckTileComponents(flow, validator, tilePrefabs);
+			CheckTilemaps(flow, validator, tilePrefabs);
+			CheckTerrains(flow, validator, tilePrefabs);
 		}
 
 		// Check to see if all of our tile prefabs have a Tile component

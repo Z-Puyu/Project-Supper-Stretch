@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Project.Scripts.Common;
 using Project.Scripts.Util.Linq;
-using Object = UnityEngine.Object;
 
 namespace Project.Scripts.UI.Control.MVP.Components;
 
@@ -29,7 +27,7 @@ public abstract class ListView<T> : UIView {
     }
 
     public override void Clear() {
-        this.Entries.ForEach(entry => Object.Destroy(entry.gameObject));
+        this.Entries.ForEach(entry => entry.OnRemove());
         this.Entries.Clear();
     }
 }

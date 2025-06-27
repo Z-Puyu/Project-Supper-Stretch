@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Project.Scripts.Characters.CharacterControl.Combat;
+using Project.Scripts.Characters.Combat;
 using Project.Scripts.Characters.Player;
-using Project.Scripts.Common;
 using Project.Scripts.Items.Equipments;
 using SaintsField;
 using UnityEngine;
@@ -13,7 +11,10 @@ namespace Project.Scripts.Characters.Animations;
 public class AttackAnimationEventProxy : MonoBehaviour {
     [NotNull] 
     [field: SerializeField, Required] 
-    private ComboAttack? AttackComposer { get; set; }
+    private Combatant? AttackComposer { get; set; }
+    
+    [field: SerializeField, SaintsDictionary("Slot", "Weapon")] 
+    private SaintsDictionary<EquipmentSlot, DamageDealer> PredefinedWeapons { get; set; } = [];
     
     private Dictionary<EquipmentSlot, EquipmentSocket> EquipmentSockets { get; set; } = [];
     private DamageDealer? CurrentWeapon { get; set; }
@@ -25,11 +26,18 @@ public class AttackAnimationEventProxy : MonoBehaviour {
     }
 
     public void OnAttackStart(EquipmentSlot where) {
+        if (this.PredefinedWeapons.TryGetValue(where, out DamageDealer weapon)) {
+            this.CurrentWeapon = weapon;
+            this.transform.root.GetComponentInChildren<PlayerAudioComponent>().Play(PlayerAudioComponent.Sound.Attack);
+            weapon.enabled = true;
+            return;
+        }
+        
         if (!this.EquipmentSockets.TryGetValue(where, out EquipmentSocket socket) || !socket.Equipment) {
             return;
         }
 
-        if (!socket.Equipment.TryGetComponent(out DamageDealer weapon)) {
+        if (!socket.Equipment.TryGetComponent(out weapon)) {
             return;
         }
 
@@ -44,6 +52,10 @@ public class AttackAnimationEventProxy : MonoBehaviour {
             this.CurrentWeapon = null;
         }
 
-        this.AttackComposer.IsAttacking = false;
+        this.AttackComposer.State = Combatant.Gesture.FinishingAttack;
+    }
+
+    public void OnAttackCompleted() {
+        this.AttackComposer.State = Combatant.Gesture.ConcludingAttack;
     }
 }

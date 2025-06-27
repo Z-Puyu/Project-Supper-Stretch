@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code.Pooling
+namespace DunGen.Pooling
 {
 	/// <summary>
 	/// A simple object pool that groups objects into buckets based on a key
@@ -35,8 +35,8 @@ namespace DunGen.Project.External.DunGen.Code.Pooling
 		/// </summary>
 		public void Clear()
 		{
-			this.buckets.Clear();
-			this.owningBuckets.Clear();
+			buckets.Clear();
+			owningBuckets.Clear();
 		}
 
 		/// <summary>
@@ -46,7 +46,7 @@ namespace DunGen.Project.External.DunGen.Code.Pooling
 		/// <returns>The object returned from the pool</returns>
 		public TObject TakeObject(TKey key)
 		{
-			this.TryTakeObject(key, out var obj);
+			TryTakeObject(key, out var obj);
 			return obj;
 		}
 
@@ -62,8 +62,8 @@ namespace DunGen.Project.External.DunGen.Code.Pooling
 				throw new ArgumentNullException(nameof(key));
 
 			// Create the bucket if it doesn't exist yet
-			if (!this.buckets.TryGetValue(key, out var bucket))
-				bucket = this.InitialiseBucket(key);
+			if (!buckets.TryGetValue(key, out var bucket))
+				bucket = InitialiseBucket(key);
 
 			// Take an object from the bucket if there is one..
 			if (bucket.Count > 0)
@@ -71,14 +71,14 @@ namespace DunGen.Project.External.DunGen.Code.Pooling
 				obj = bucket[bucket.Count - 1];
 				bucket.RemoveAt(bucket.Count - 1);
 
-				this.takeAction?.Invoke(obj);
+				takeAction?.Invoke(obj);
 				return true;
 			}
 			// ..otherwise create a new object
 			else
 			{
-				var newObject = this.objectFactory(key);
-				this.owningBuckets[newObject] = key;
+				var newObject = objectFactory(key);
+				owningBuckets[newObject] = key;
 
 				obj = newObject;
 				return false;
@@ -96,11 +96,11 @@ namespace DunGen.Project.External.DunGen.Code.Pooling
 				return false;
 
 			// Find which bucket owns this object
-			if (!this.owningBuckets.TryGetValue(obj, out var key))
+			if (!owningBuckets.TryGetValue(obj, out var key))
 				return false;
 
-			this.returnAction?.Invoke(obj);
-			this.buckets[key].Add(obj);
+			returnAction?.Invoke(obj);
+			buckets[key].Add(obj);
 
 			return true;
 		}
@@ -116,32 +116,32 @@ namespace DunGen.Project.External.DunGen.Code.Pooling
 			if(key == null || obj == null)
 				return false;
 
-			if (this.owningBuckets.TryGetValue(obj, out var existingKey))
+			if (owningBuckets.TryGetValue(obj, out var existingKey))
 			{
 				Debug.LogError("Tried to 'Insert' an object into the pool that already belongs to it, use ReturnObject() instead");
 				return false;
 			}
 
 			// Create the bucket if it doesn't exist yet
-			if (!this.buckets.TryGetValue(key, out var bucket))
-				bucket = this.InitialiseBucket(key);
+			if (!buckets.TryGetValue(key, out var bucket))
+				bucket = InitialiseBucket(key);
 
-			this.returnAction?.Invoke(obj);
-			this.buckets[key].Add(obj);
-			this.owningBuckets[obj] = key;
+			returnAction?.Invoke(obj);
+			buckets[key].Add(obj);
+			owningBuckets[obj] = key;
 
 			return true;
 		}
 
 		private List<TObject> InitialiseBucket(TKey key)
 		{
-			var bucket = new List<TObject>(this.initialCapacity);
-			this.buckets[key] = bucket;
+			var bucket = new List<TObject>(initialCapacity);
+			buckets[key] = bucket;
 
-			for (int i = 0; i < this.initialCapacity; i++)
+			for (int i = 0; i < initialCapacity; i++)
 			{
-				var newObject = this.objectFactory(key);
-				this.owningBuckets[newObject] = key;
+				var newObject = objectFactory(key);
+				owningBuckets[newObject] = key;
 			}
 
 			return bucket;
@@ -149,7 +149,7 @@ namespace DunGen.Project.External.DunGen.Code.Pooling
 
 		public void DumpPoolInfo(Func<TKey, string> getBucketName = null)
 		{
-			foreach (var pair in this.buckets)
+			foreach (var pair in buckets)
 			{
 				string bucketName = getBucketName?.Invoke(pair.Key) ?? pair.Key.ToString();
 				Debug.Log($"Bucket: {bucketName}, Count: {pair.Value.Count}");

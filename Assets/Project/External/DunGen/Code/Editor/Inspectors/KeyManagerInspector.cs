@@ -1,21 +1,19 @@
-using DunGen.Editor.Project.External.DunGen.Code.Editor.Utility;
-using DunGen.Project.External.DunGen.Code;
 using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
+namespace DunGen.Editor
 {
 	[CustomEditor(typeof(KeyManager))]
 	public sealed class KeyManagerInspector : UnityEditor.Editor
 	{
 		public override void OnInspectorGUI()
 		{
-			KeyManager keyManager = this.target as KeyManager;
+			KeyManager keyManager = target as KeyManager;
 
 			if (keyManager == null)
 				return;
 
-			this.DrawKeyListGUI(keyManager);
+			DrawKeyListGUI(keyManager);
 
 			if (GUI.changed)
 				EditorUtility.SetDirty(keyManager);
