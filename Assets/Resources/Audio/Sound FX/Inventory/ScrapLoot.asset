@@ -1,0 +1,137 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1233149941 &-8966695111258456505
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Gathering Ingredients (7)_{-8966695111258456505}
+  m_AudioClip: {fileID: 8300000, guid: b07abb30ed7c11245a6fc070a387aa11, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-7928819570049893152
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Gathering Ingredients (3)_{-7928819570049893152}
+  m_AudioClip: {fileID: 8300000, guid: 8e28f868be725f749b417fde3b381511, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-6764266148582996879
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Gathering Ingredients (1)_{-6764266148582996879}
+  m_AudioClip: {fileID: 8300000, guid: cff586a6afa2d1c40bc4c3cfcc25d7ed, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-6319292933019229926
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Gathering Ingredients (4)_{-6319292933019229926}
+  m_AudioClip: {fileID: 8300000, guid: c8096bdc07afdb44f85850e30bc52e08, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-5090032137642830850
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Gathering Ingredients (10)_{-5090032137642830850}
+  m_AudioClip: {fileID: 8300000, guid: b6fc95489bb304f4697f3da975e1d23e, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-4357978652312546757
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Gathering Ingredients (2)_{-4357978652312546757}
+  m_AudioClip: {fileID: 8300000, guid: e707eb40d3cad3b4e910f19ff2a02012, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &4165526366807589078
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Gathering Ingredients (6)_{4165526366807589078}
+  m_AudioClip: {fileID: 8300000, guid: d4bde43427f77aa4d8048c119e6840bf, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &6187592699737258536
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Gathering Ingredients (9)_{6187592699737258536}
+  m_AudioClip: {fileID: 8300000, guid: a3ce0b9dc5009ef47b9fd39a34858c47, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1307931743 &6418180475301049370
+AudioRandomContainer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ScrapLoot
+  m_Volume: 0
+  m_Pitch: 0
+  m_AutomaticTriggerTime: 0
+  m_LoopCount: 1
+  m_VolumeRandomizationRange: {x: 0, y: 0}
+  m_PitchRandomizationRange: {x: 0, y: 0}
+  m_AutomaticTriggerTimeRandomizationRange: {x: 0, y: 0}
+  m_LoopCountRandomizationRange: {x: 0, y: 0}
+  m_Elements:
+  - {fileID: -6764266148582996879}
+  - {fileID: -4357978652312546757}
+  - {fileID: -7928819570049893152}
+  - {fileID: -6319292933019229926}
+  - {fileID: 9146970420145143779}
+  - {fileID: 4165526366807589078}
+  - {fileID: -8966695111258456505}
+  - {fileID: 8023640038220498794}
+  - {fileID: 6187592699737258536}
+  - {fileID: -5090032137642830850}
+  m_AvoidRepeatingLast: 0
+  m_PlaybackMode: 2
+  m_TriggerMode: 0
+  m_AutomaticTriggerMode: 1
+  m_LoopMode: 2
+  m_VolumeRandomizationEnabled: 0
+  m_PitchRandomizationEnabled: 0
+  m_AutomaticTriggerTimeRandomizationEnabled: 0
+  m_LoopCountRandomizationEnabled: 0
+--- !u!1233149941 &8023640038220498794
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Gathering Ingredients (8)_{8023640038220498794}
+  m_AudioClip: {fileID: 8300000, guid: fe27a84f5d7df9a4e96f19726c1e0ae3, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &9146970420145143779
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Gathering Ingredients (5)_{9146970420145143779}
+  m_AudioClip: {fileID: 8300000, guid: fde8e95ea0ec35843abeac0751decce4, type: 3}
+  m_Volume: 0
+  m_Enabled: 1

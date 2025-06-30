@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text;
 using Project.Scripts.AttributeSystem.Modifiers;
 using Project.Scripts.Items.CraftingSystem;
 using Project.Scripts.Util.Linq;
@@ -44,8 +45,18 @@ public sealed record class CraftingMaterialProperty(Modifier[] Modifiers, float 
         }
     }
 
+    public override string FormatAsText(ModifierLocalisationMapping mapping) {
+        return new StringBuilder()
+               .AppendLine($"Cooking time: {this.Cost:+#;-#;+#}")
+               .AppendJoin('\n', $"{this.Modifiers.Select(modifier => modifier.FormatAsText(mapping))}")
+               .ToString();
+    }
+
     public override string FormatAsText() {
-        return $"Cooking time: {this.Cost:+#;-#;+#}\n{string.Join('\n', this.Modifiers)}";
+        return new StringBuilder()
+               .AppendLine($"Cooking time: {this.Cost:+#;-#;+#}")
+               .AppendJoin('\n', $"{this.Modifiers.Select(modifier => modifier.FormatAsText())}")
+               .ToString();
     }
     
     public bool Equals(CraftingMaterialProperty? other) {

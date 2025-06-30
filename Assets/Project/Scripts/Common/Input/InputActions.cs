@@ -173,6 +173,24 @@ namespace Project.Scripts.Common.Input
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OpenPauseMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""4553d004-0f57-40ab-a627-cec43d6756c5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OpenCharacterPanel"",
+                    ""type"": ""Button"",
+                    ""id"": ""fc843216-b95b-4fda-94ac-d1d6ca0dc40d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -316,6 +334,39 @@ namespace Project.Scripts.Common.Input
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Block"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0bde90f9-5981-40dc-9b4c-2294a1e7041e"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenPauseMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""63dddcf9-b274-4d0c-a235-b6869389aaea"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenPauseMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3fe3e57a-18cf-4950-bd3b-96371add5388"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenCharacterPanel"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -871,6 +922,8 @@ namespace Project.Scripts.Common.Input
             m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
             m_Player_OpenInventory = m_Player.FindAction("OpenInventory", throwIfNotFound: true);
             m_Player_Block = m_Player.FindAction("Block", throwIfNotFound: true);
+            m_Player_OpenPauseMenu = m_Player.FindAction("OpenPauseMenu", throwIfNotFound: true);
+            m_Player_OpenCharacterPanel = m_Player.FindAction("OpenCharacterPanel", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -974,6 +1027,8 @@ namespace Project.Scripts.Common.Input
         private readonly InputAction m_Player_Interact;
         private readonly InputAction m_Player_OpenInventory;
         private readonly InputAction m_Player_Block;
+        private readonly InputAction m_Player_OpenPauseMenu;
+        private readonly InputAction m_Player_OpenCharacterPanel;
         /// <summary>
         /// Provides access to input actions defined in input action map "Player".
         /// </summary>
@@ -1021,6 +1076,14 @@ namespace Project.Scripts.Common.Input
             /// Provides access to the underlying input action "Player/Block".
             /// </summary>
             public InputAction @Block => m_Wrapper.m_Player_Block;
+            /// <summary>
+            /// Provides access to the underlying input action "Player/OpenPauseMenu".
+            /// </summary>
+            public InputAction @OpenPauseMenu => m_Wrapper.m_Player_OpenPauseMenu;
+            /// <summary>
+            /// Provides access to the underlying input action "Player/OpenCharacterPanel".
+            /// </summary>
+            public InputAction @OpenCharacterPanel => m_Wrapper.m_Player_OpenCharacterPanel;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -1074,6 +1137,12 @@ namespace Project.Scripts.Common.Input
                 @Block.started += instance.OnBlock;
                 @Block.performed += instance.OnBlock;
                 @Block.canceled += instance.OnBlock;
+                @OpenPauseMenu.started += instance.OnOpenPauseMenu;
+                @OpenPauseMenu.performed += instance.OnOpenPauseMenu;
+                @OpenPauseMenu.canceled += instance.OnOpenPauseMenu;
+                @OpenCharacterPanel.started += instance.OnOpenCharacterPanel;
+                @OpenCharacterPanel.performed += instance.OnOpenCharacterPanel;
+                @OpenCharacterPanel.canceled += instance.OnOpenCharacterPanel;
             }
 
             /// <summary>
@@ -1112,6 +1181,12 @@ namespace Project.Scripts.Common.Input
                 @Block.started -= instance.OnBlock;
                 @Block.performed -= instance.OnBlock;
                 @Block.canceled -= instance.OnBlock;
+                @OpenPauseMenu.started -= instance.OnOpenPauseMenu;
+                @OpenPauseMenu.performed -= instance.OnOpenPauseMenu;
+                @OpenPauseMenu.canceled -= instance.OnOpenPauseMenu;
+                @OpenCharacterPanel.started -= instance.OnOpenCharacterPanel;
+                @OpenCharacterPanel.performed -= instance.OnOpenCharacterPanel;
+                @OpenCharacterPanel.canceled -= instance.OnOpenCharacterPanel;
             }
 
             /// <summary>
@@ -1421,6 +1496,20 @@ namespace Project.Scripts.Common.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnBlock(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "OpenPauseMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnOpenPauseMenu(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "OpenCharacterPanel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnOpenCharacterPanel(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

@@ -11,6 +11,7 @@ namespace Project.Scripts.AttributeSystem.Attributes.Definitions;
 public class AttributeType : GameplayTagNode {
     public enum ClampPolicy { None, CapByAttribute, CapByValue }
     
+    [field: SerializeField] private string DisplayName { get; set; } = string.Empty;
     [field: SerializeReference] private List<AttributeType> SubAttributes { get; set; } = [];
     
     public override IList<GameplayTagNode> Children => [..this.SubAttributes];
@@ -24,11 +25,16 @@ public class AttributeType : GameplayTagNode {
     [field: SerializeField, ShowIf(nameof(this.HowToClamp), ClampPolicy.CapByValue)]
     public int MaxValue { get; set; }
     
+    [field: SerializeField] public bool AllowNegative { get; set; }
     [field: SerializeField] public bool BehaveLikeHealth { get; set; }
 
     private AdvancedDropdownList<string> AllAttributes => ObjectCache<AttributeDefinition>.Instance.Objects.AllTags();
 
     protected override void OnRename() {
         this.TracePath<AttributeDefinition, AttributeType>();
+    }
+    
+    public override string ToString() {
+        return this.DisplayName;
     }
 }

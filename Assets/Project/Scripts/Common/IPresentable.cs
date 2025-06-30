@@ -5,5 +5,5 @@ public interface IPresentable {
 }
 
 public interface IPresentable<in T> where T : class {
-    public abstract string FormatAsText(T? reference = null);   
+    public abstract string FormatAsText(T reference);   
 }

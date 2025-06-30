@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.AttributeSystem.GameplayEffects;
 using Project.Scripts.AttributeSystem.Modifiers;
@@ -17,28 +18,49 @@ public class FoodItemProducer : ItemProducer {
             throw new ArgumentException("EffectOnConsume is not set");
         }
 
-        List<Modifier> transformed = [];
-        foreach (Modifier modifier in modifiers) {
+        List<Modifier> list = modifiers.ToList();
+        Dictionary<AttributeType, Dictionary<int, float>> transformed = [];
+        Dictionary<AttributeType, float> scalers = [];
+        foreach (Modifier modifier in list.Where(modifier => modifier.Type != ModifierType.Multiplier)) {
             AttributeType? type = modifier.Target.Definition<AttributeDefinition, AttributeType>();
             if (type is null) {
                 throw new ArgumentException($"{modifier.Target} is not an attribute");       
             }
 
-            switch (modifier.Type) {
-                case ModifierType.Multiplier:
-                    transformed.Add(modifier);
-                    break;
-                case ModifierType.BaseOffset:
-                    transformed.Add(type.BehaveLikeHealth
-                            ? modifier with { Key = modifier.Key with { Type = ModifierType.FinalOffset } }
-                            : modifier);
-                    break;
-                default:
-                    throw new ArgumentException($"{modifier.Type} is not a valid modifier type");
+            if (transformed.TryGetValue(type, out Dictionary<int, float> record)) {
+                if (record.ContainsKey(modifier.Duration)) {
+                    record[modifier.Duration] += modifier.Value;
+                } else {
+                    record.Add(modifier.Duration, modifier.Value);
+                }
+            } else {
+                transformed.Add(type, new Dictionary<int, float> { { modifier.Duration, modifier.Value } });       
             }
         }
 
+        foreach (Modifier modifier in list.Where(modifier => modifier.Type == ModifierType.Multiplier)) {
+            AttributeType? type = modifier.Target.Definition<AttributeDefinition, AttributeType>();
+            if (type is null) {
+                throw new ArgumentException($"{modifier.Target} is not an attribute");       
+            }
+
+            if (scalers.TryGetValue(type, out float value)) {
+                scalers[type] += modifier.Value;
+            } else {
+                scalers.Add(type, modifier.Value);       
+            }
+        }
+        
+        List<Modifier> transformedModifiers = [];
+        foreach (KeyValuePair<AttributeType, Dictionary<int, float>> pair in transformed) {
+            foreach (KeyValuePair<int, float> entry in pair.Value) {
+                float scaler = Mathf.Max(0, (100 + scalers.GetValueOrDefault(pair.Key, 0)) / 100);
+                transformedModifiers.Add(Modifier.Of(entry.Value * scaler, pair.Key.Name,
+                    pair.Key.BehaveLikeHealth ? ModifierType.FinalOffset : ModifierType.BaseOffset, entry.Key));
+            }
+        }
+        
         return recipe.Cook(this.ItemDefinition)
-                     .WithProperty(new ConsumableProperty(transformed.ToArray(), this.EffectOnConsume));
+                     .WithProperty(new ConsumableProperty(transformedModifiers.ToArray(), this.EffectOnConsume));
     }
 }

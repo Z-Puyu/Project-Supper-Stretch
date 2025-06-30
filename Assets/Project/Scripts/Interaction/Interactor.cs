@@ -1,27 +1,41 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common.Input;
 using UnityEngine;
+using UnityEngine.VFX;
 
 namespace Project.Scripts.Interaction;
 
-[DisallowMultipleComponent]
+[DisallowMultipleComponent, RequireComponent(typeof(SphereCollider))]
 public class Interactor : MonoBehaviour, IPlayerControllable {
-    [NotNull]
-    private Transform? CameraTransform { get; set; }
-
+    [NotNull] private Transform? CameraTransform { get; set; }
     private InteractableObject? CurrentTarget { get; set; }
     private HashSet<InteractableObject> TargetsInRange { get; init; } = [];
-    
-    [field: SerializeField]
-    private float InteractionRange { get; set; } = 3;
-    
-    [field: SerializeField]
-    private float InteractionAngularRange { get; set; } = 45;
+    [field: SerializeField] private float InteractionAngularRange { get; set; } = 45;
 
     private void Start() {
         this.CameraTransform = Camera.main!.transform;
         InteractableObject.OnDestroyed += this.Remove;
+    }
+
+    private void OnTriggerEnter(Collider other) {
+        if (other.TryGetComponent(out InteractableObject interactable)) {
+            this.TargetsInRange.Add(interactable);
+        }
+    }
+
+    private void OnTriggerExit(Collider other) {
+        if (!other.TryGetComponent(out InteractableObject target)) {
+            return;
+        }
+        
+        if (this.CurrentTarget == target) {
+            this.CurrentTarget.Deactivate();
+            this.CurrentTarget = null;
+        }
+        
+        this.TargetsInRange.Remove(target);
     }
 
     public void Interact() {
@@ -32,11 +46,7 @@ public class Interactor : MonoBehaviour, IPlayerControllable {
         this.CurrentTarget.Interact(this);
     }
 
-    public void Add(InteractableObject target) {
-        this.TargetsInRange.Add(target);
-    }
-
-    public void Remove(InteractableObject target) {
+    private void Remove(InteractableObject target) {
         if (this.CurrentTarget == target) {
             this.CurrentTarget = null;
         }
@@ -49,17 +59,14 @@ public class Interactor : MonoBehaviour, IPlayerControllable {
         target = null;
         bool isFound = false;
         foreach (InteractableObject interactable in this.TargetsInRange) {
-            float distance = Vector3.Distance(interactable.transform.position, this.transform.position);
-            if (distance > this.InteractionRange) {
-                continue;
-            }
-            
-            Vector3 direction = interactable.transform.position - this.CameraTransform.position;
-            float angle = Vector3.Angle(this.CameraTransform.forward, direction);
+            Vector3 position = interactable.transform.position;
+            Vector3 direction = position - this.CameraTransform.position;
+            float angle = Vector3.SignedAngle(this.CameraTransform.forward, direction, this.transform.up);
             if (angle > this.InteractionAngularRange || angle < -this.InteractionAngularRange) {
                 continue;
             }
             
+            float distance = Vector3.Distance(position, this.transform.position);
             if (distance >= minDistance) {
                 continue;
             }
@@ -87,11 +94,7 @@ public class Interactor : MonoBehaviour, IPlayerControllable {
             return;
         }
 
-        if (this.CurrentTarget) {
-            if (this.CurrentTarget == target) {
-                return;
-            }
-            
+        if (this.CurrentTarget && this.CurrentTarget != target) {
             this.CurrentTarget.Deactivate();
         }
         

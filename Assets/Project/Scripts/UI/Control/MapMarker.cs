@@ -11,13 +11,17 @@ public class MapMarker : MonoBehaviour {
     private Vector3 InitialForwardDirection { get; set; }
 
     private void Start() {
+        if (this.IsStatic) {
+            this.transform.forward = Vector3.forward;
+        }
+        
         this.InitialForwardDirection = this.transform.forward;
     }
 
     private void Update() {
         if (this.IsStatic) {
             Vector3 forward = Singleton<MinimapCamera>.Instance.transform.up;
-            this.transform.LookAt(forward with { x = -forward.x });
+            this.transform.LookAt(-forward);
         } else {
             this.transform.forward = Singleton<MinimapCamera>.Instance.transform.forward;
         }

@@ -26,8 +26,12 @@ public sealed record class ConsumableProperty(Modifier[] Effects, GameplayEffect
         target.Remove(item);
     }
 
+    public override string FormatAsText(ModifierLocalisationMapping mapping) {
+        return string.Join('\n', this.Effects.Select(effect => effect.FormatAsText(mapping)));
+    }
+
     public override string FormatAsText() {
-        return string.Join('\n', this.Effects);
+        return string.Join('\n', this.Effects.Select(effect => effect.FormatAsText()));       
     }
 
     public bool Equals(ConsumableProperty? other) {

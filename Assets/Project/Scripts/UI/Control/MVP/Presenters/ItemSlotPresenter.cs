@@ -24,12 +24,20 @@ public class ItemSlotPresenter : UIPresenter<Item, ItemSlotView>, IDropHandler {
     protected override void UpdateView(Item model) {
         if (this.TryGetComponent(out DragAndDrop dragAndDrop)) {
             dragAndDrop.OnDragged += drag;
+            dragAndDrop.OnDropped += this.Erase;
         }
 
         this.View.ItemName = model.Name;
         this.OnItemRemoved = () => this.OnItemReturned.Invoke(model);
         return;
         void drag(DragPreview preview) => preview.Initialise(model);
+    }
+
+    private void Erase() {
+        this.View.Clear();
+        this.View.Refresh();
+        this.OnItemRemoved.Invoke();
+        this.OnItemRemoved = delegate { };
     }
 
     public void OnDrop(PointerEventData eventData) {
@@ -40,7 +48,7 @@ public class ItemSlotPresenter : UIPresenter<Item, ItemSlotView>, IDropHandler {
         DragPreview preview = dropped.DragPreview!;
         if (preview.Payload is Item item && item.Type == this.IngredientType) {
             if (!this.View.IsEmpty) {
-                this.OnItemRemoved.Invoke();
+                this.Erase();
             } 
             
             this.Present(item);

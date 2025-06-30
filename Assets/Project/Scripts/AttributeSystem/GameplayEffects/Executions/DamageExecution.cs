@@ -34,15 +34,17 @@ public class DamageExecution : CustomExecution {
 
         int damage = args.Instigator.ReadCurrent(this.BaseDamageType);
         int defence = target.ReadCurrent(this.DefenceType);
-        damage = Mathf.Max(0, damage - defence);
+        damage = Mathf.Max(1, damage - defence);
         List<Modifier> modifiers = [Modifier.Once(-damage, this.TargetAttribute, ModifierType.FinalOffset)];
         foreach (ModifierReaction r in this.ElementalEffects) {
             int extra = args.Instigator.ReadCurrent(r.Reacting);
-            float effect = r.Scale * target.ReadCurrent(r.ReactTo);
-            extra = Mathf.CeilToInt(Mathf.Max(0, extra * (100 - effect) / 100));
-            if (extra > 0) {
-                modifiers.Add(Modifier.Once(-extra, this.TargetAttribute, ModifierType.FinalOffset));
+            if (extra <= 0) {
+                continue;
             }
+            
+            float effect = r.Scale * target.ReadCurrent(r.ReactTo);
+            extra = Mathf.CeilToInt(Mathf.Max(1, extra * (100 - effect) / 100));
+            modifiers.Add(Modifier.Once(-extra, this.TargetAttribute, ModifierType.FinalOffset));
         }
         
         return modifiers;

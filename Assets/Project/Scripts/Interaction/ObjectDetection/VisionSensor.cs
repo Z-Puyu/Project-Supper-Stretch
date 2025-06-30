@@ -59,12 +59,16 @@ public class VisionSensor : RadiusBasedSensor {
         return true;
     }
 
-    protected override void OnTriggerEnter(Collider other) {
-        if (!this.IsValidTarget(other) || !this.Discovered(other)) {
-            return;      
+    protected override bool IsValidTarget(Collider other) {
+        if (!base.IsValidTarget(other)) {
+            return false;       
         }
 
-        base.OnTriggerEnter(other);
+        if (this.TargetsInRange.Contains(other) || this.EscapingTargets.Contains(other)) {
+            return true;
+        }
+        
+        return this.Discovered(other);       
     }
 
     protected override void OnTriggerExit(Collider other) {
@@ -77,12 +81,12 @@ public class VisionSensor : RadiusBasedSensor {
             return;
         }
         
-        if (this.TargetsInRange.Contains(other)) {
+        if (this.TargetsInRange.Contains(other) || this.EscapingTargets.Contains(other)) {
             return;
         }
 
-        if (this.IsValidTarget(other) && this.Discovered(other)) {
-            this.Detected(other);
+        if (this.IsValidTarget(other)) {
+            this.Detect(other);
         }
     }
 
@@ -99,7 +103,7 @@ public class VisionSensor : RadiusBasedSensor {
             }
 
             this.LostTargets.Add(target);
-            this.LoseTarget(target);
+            this.Forget(target);
         }
         
         this.NextScanTime = Time.time + this.UpdateInterval;

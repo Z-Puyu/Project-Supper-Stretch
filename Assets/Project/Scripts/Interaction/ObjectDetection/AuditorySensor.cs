@@ -10,45 +10,36 @@ public class AuditorySensor : RadiusBasedSensor {
     [field: SerializeField] private float UpdateInterval { get; set; } = 0.5f;
     private float NextScanTime { get; set; }
     
-    private Transform? TargetRoot { get; set; }
-    private bool HasHeard { get; set; }
+    private Collider? LastHeardTarget { get; set; }
 
     private void Start() {
         this.NextScanTime = Time.time + this.UpdateInterval;       
     }
 
-    private void Listen() {
-        if (this.HasHeard || !this.TargetRoot) {
-            return;
+    protected override bool IsValidTarget(Collider other) {
+        if (!base.IsValidTarget(other)) {
+            return false;       
         }
         
-        float dist = Vector3.Distance(this.TargetRoot.position, this.transform.position);
+        if (other == this.LastHeardTarget) {
+            return true;
+        }
+        
+        float dist = Vector3.Distance(other.transform.root.position, this.transform.position);
         float chance = this.VolumeCurve.Evaluate(dist / this.DetectionRadius);
-        this.HasHeard = UnityEngine.Random.Range(0, 1) < chance;
+        if (UnityEngine.Random.Range(0, 1) >= chance) {
+            return false;
+        }
+
+        this.LastHeardTarget = other;
+        return true;
     }
 
-    protected override void OnTriggerEnter(Collider other) {
-        if (!this.IsValidTarget(other)) {
-            return;       
+    protected override void Unregister(Collider other) {
+        base.Unregister(other);
+        if (other == this.LastHeardTarget) {
+            this.LastHeardTarget = null;
         }
-        
-        this.TargetRoot = other.transform.root;
-        this.Listen();
-        if (!this.HasHeard) {
-            return;
-        }
-        
-        base.OnTriggerEnter(other);
-    }
-
-    protected override void OnTriggerExit(Collider other) {
-        if (!this.IsValidTarget(other)) {
-            return;       
-        }
-        
-        this.TargetRoot = null;
-        this.HasHeard = false;
-        base.OnTriggerExit(other);       
     }
 
     private void OnTriggerStay(Collider other) {
@@ -57,14 +48,8 @@ public class AuditorySensor : RadiusBasedSensor {
         }
         
         this.NextScanTime = Time.time + this.UpdateInterval;
-        if (!this.IsValidTarget(other)) {
-            return;       
-        }
-        
-        if (!this.HasHeard) {
-            this.Listen();
-        } else {
-            this.Detected(other);
+        if (this.IsValidTarget(other)) {
+            this.Detect(other);
         }
     }
 }

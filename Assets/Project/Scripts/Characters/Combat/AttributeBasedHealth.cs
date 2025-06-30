@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
+using Project.Scripts.AttributeSystem.GameplayEffects;
 using Project.Scripts.AttributeSystem.GameplayEffects.Executions;
 using Project.Scripts.Common;
 using SaintsField;
@@ -13,14 +14,15 @@ public class AttributeBasedHealth : Health {
     [field: SerializeField, Required] 
     private AttributeSet? AttributeSet { get; set; }
 
-    [field: SerializeField, AdvancedDropdown(nameof(this.AllAttributes))] 
+    [field: SerializeField, HideIf(nameof(this.AttributeSet), null), AdvancedDropdown(nameof(this.AllAttributes))] 
     private string HealthAttribute { get; set; } = string.Empty;
     
     private string MaxHealthAttribute { get; set; } = string.Empty;
 
     protected override bool IsAttributeBased => true;
 
-    private AdvancedDropdownList<string> AllAttributes => this.GetComponent<AttributeSet>().AllAccessibleAttributes;
+    private AdvancedDropdownList<string> AllAttributes =>
+            this.AttributeSet ? this.AttributeSet.AllAccessibleAttributes : [];
 
     protected override void Start() {
         base.Start();
@@ -37,7 +39,7 @@ public class AttributeBasedHealth : Health {
         }
     }
 
-    public void Initialise() {
+    public override void Initialise() {
         if (this.AttributeSet.Defined[this.HealthAttribute].HowToClamp == AttributeType.ClampPolicy.CapByAttribute) {
             this.MaxHealthAttribute = this.AttributeSet.Defined[this.HealthAttribute].Cap;
         }

@@ -1,5 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using Project.Scripts.Characters;
 using Project.Scripts.Characters.Player;
+using Project.Scripts.Common;
 using Project.Scripts.Map;
 using Project.Scripts.Util.Linq;
 using SaintsField.Playa;
@@ -65,17 +68,15 @@ public class GameInstance : Singleton<GameInstance> {
 
     private void InstantiateObjects() {
         this.LoadingScreenInstance.FlashHintText("Creating Objects...");
-        this.StartingMap = Object.Instantiate(this.MapGenerator);
         Object.Instantiate(this.MainCamera);
         this.Eyes = Camera.main!.transform;
         this.VirtualCamera = Object.Instantiate(this.CinemachineCamera);
+        this.StartingMap = Object.Instantiate(this.MapGenerator);
         this.PlayerInstance = Object.Instantiate(this.Player).GetComponent<PlayerCharacter>();
     }
 
     private void InitialiseObjects() {
         this.LoadingScreenInstance.FlashHintText("Initialising Objects...");
-        this.VirtualCamera!.Target.TrackingTarget =
-                this.PlayerInstance.GetComponentInChildren<CameraTarget>().transform;
     }
     
     private void InitialiseLevel() {
@@ -86,14 +87,19 @@ public class GameInstance : Singleton<GameInstance> {
 
     private void BeginGame() {
         this.LoadingScreenInstance.FlashHintText("Enabling Scripts...");
-        Transform player = this.PlayerInstance.transform;
+        Object.FindObjectsByType<GameCharacter>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+              .ForEach(character => character.transform.SetParent(null));
         Object.FindObjectsByType<NavMeshAgent>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
               .ForEach(agent => agent.enabled = true);
         Object.FindObjectsByType<BehaviorGraphAgent>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
               .ForEach(agent => agent.enabled = true);
         PlayerCharacter.OnDungeonLevelCleared += this.StartingMap.Generate;
-        player.rotation = Quaternion.identity;
-        player.position = Vector3.zero;
-        this.LoadingScreenInstance.gameObject.SetActive(false);
+        this.VirtualCamera!.Target.TrackingTarget =
+                this.PlayerInstance.GetComponentInChildren<CameraTarget>().transform;
+        LeanTween.alphaCanvas(this.LoadingScreenInstance.GetComponent<CanvasGroup>(), 0, 2f)
+                 .setOnComplete(() => {
+                     this.LoadingScreenInstance.gameObject.SetActive(false);
+                     this.PlayerInstance.EnableInput();
+                 });
     }
 }

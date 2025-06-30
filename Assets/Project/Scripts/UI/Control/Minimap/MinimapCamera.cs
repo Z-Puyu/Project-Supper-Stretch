@@ -10,7 +10,6 @@ public class MinimapCamera : Singleton<MinimapCamera> {
     private float NextLevel { get; set; }
     private float PreviousLevel { get; set; }
     [field: SerializeField] private float HeightDivision { get; set; } = 4;
-    [field: SerializeField] private MapMarker? PlayerMarker { get; set; }
     [NotNull] private Transform? PlayerTransform { get; set; }
     [NotNull] private Transform? CameraTransform { get; set; }
 
@@ -40,9 +39,5 @@ public class MinimapCamera : Singleton<MinimapCamera> {
         }
         
         this.CameraTransform.position = this.CameraTransform.position with { y = this.CurrentHeight };
-        
-        if (this.PlayerMarker) {
-            this.PlayerMarker.transform.position = this.CameraTransform.position - new Vector3(0, 0.02f, 0);
-        }
     }
 }

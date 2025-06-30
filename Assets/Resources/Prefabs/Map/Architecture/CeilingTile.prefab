@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 275812304372715741}
   - component: {fileID: 768329473885700421}
   - component: {fileID: 9091395624900147187}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2643393599352495174}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: CeilingTile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -173,12 +173,20 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6059918480998257895, guid: fdf354fed63a4fa4abc726588180a9e7, type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 6059918480998257895, guid: fdf354fed63a4fa4abc726588180a9e7, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 7390808559935878910, guid: fdf354fed63a4fa4abc726588180a9e7, type: 3}
       propertyPath: m_Name
       value: MinimapTile
+      objectReference: {fileID: 0}
+    - target: {fileID: 7390808559935878910, guid: fdf354fed63a4fa4abc726588180a9e7, type: 3}
+      propertyPath: m_Layer
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 7390808559935878910, guid: fdf354fed63a4fa4abc726588180a9e7, type: 3}
       propertyPath: m_IsActive
@@ -277,6 +285,10 @@ PrefabInstance:
     - target: {fileID: 4202724668555032227, guid: f96442df40a0bf74bbd6431cf2ee05d9, type: 3}
       propertyPath: m_Name
       value: Tile_B
+      objectReference: {fileID: 0}
+    - target: {fileID: 4202724668555032227, guid: f96442df40a0bf74bbd6431cf2ee05d9, type: 3}
+      propertyPath: m_Layer
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 4202724668555032227, guid: f96442df40a0bf74bbd6431cf2ee05d9, type: 3}
       propertyPath: m_StaticEditorFlags

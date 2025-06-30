@@ -15,27 +15,20 @@ public partial class AttackAction : Action {
 
     private bool IsAttacking { get; set; }
     private Combatant? ComboAttack { get; set; }
-
-    /*private void FinishAttack() {
-        this.IsAttacking = false;
-    }*/
+    private CharacterAudio? Audio { get; set; }
     
     protected override Status OnStart() {
         base.OnStart();
         this.IsAttacking = true;
-        this.ComboAttack = this.Agent.Value.GetComponent<Combatant>();
+        this.ComboAttack = this.Agent.Value.GetComponentInChildren<Combatant>();
+        this.Audio = this.Agent.Value.GetComponentInChildren<CharacterAudio>();
+        this.Audio.Play(CharacterAudio.Sound.Attack);
         this.ComboAttack.CommitRandomStage();
-        // this.ComboAttack.OnAttackCommitted += this.FinishAttack;
         return Status.Success;
     }
     
     protected override Status OnUpdate() {
         base.OnUpdate();
         return this.IsAttacking ? Status.Running : Status.Success;
-    }
-
-    protected override void OnEnd() {
-        base.OnEnd();
-        // this.ComboAttack!.OnAttackCommitted -= this.FinishAttack;
     }
 }

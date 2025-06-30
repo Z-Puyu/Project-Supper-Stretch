@@ -1,25 +1,35 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using Project.Scripts.Common;
 using Project.Scripts.Common.Input;
+using Project.Scripts.Items;
+using Project.Scripts.Items.Equipments;
+using Project.Scripts.Util.Linq;
 using SaintsField;
 using UnityEngine;
+using UnityEngine.Events;
 using InputActions = Project.Scripts.Common.Input.InputActions;
+using Random = UnityEngine.Random;
 
 namespace Project.Scripts.Characters.Combat;
 
 [DisallowMultipleComponent]
 public class Combatant : MonoBehaviour, IPlayerControllable {
-    public enum Gesture {
+    private enum Gesture {
         Idle,
-        PreparingAttack,
-        Attacking,
-        FinishingAttack,
-        ConcludingAttack,
-        Blocking
+        PreAttack,
+        InAttack,
+        PostAttack,
+        Defensive
     }
     
     [NotNull]
     [field: SerializeField]
     private Animator? Animator { get; set; }
+    
+    [NotNull] [field: SerializeField] private EquipmentSet? EquipmentSet { get; set; }
     
     [field: SerializeField, MinValue(0)] private int ComboLength { get; set; } = 3;
     
@@ -32,12 +42,14 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Bool)]
     private int AnimatorBlockingStateParameter { get; set; }
     
-    public Gesture State { private get; set; } = Gesture.Idle;
+    private Gesture State { get; set; } = Gesture.Idle;
     private int CurrentStage { get; set; }
-    private bool CanAttack => this.State is not (Gesture.PreparingAttack or Gesture.Attacking or Gesture.Blocking);
+    private bool CanAttack => this.State is Gesture.Idle or Gesture.PostAttack or Gesture.InAttack;
     
+    public event UnityAction OnAttackStarted = delegate { };
+    public event UnityAction OnAttackEnded = delegate { };
+
     private void CommitStage(int stage) {
-        this.State = Gesture.Attacking;
         this.Animator.SetInteger(this.AnimatorComboCounter, stage);
         this.Animator.SetTrigger(this.AnimatorAttackTrigger);
     }
@@ -50,6 +62,7 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
             return;
         }
         
+        this.State = Gesture.PreAttack;
         this.CommitStage(Random.Range(1, this.ComboLength + 1));
     }
 
@@ -57,12 +70,23 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     /// Commit the next attack animation.
     /// </summary>
     public void CommitNextStage() {
-        if (!this.CanAttack) {
+        if (!this.CanAttack || !this.EquipmentSet.HasAny<DamageDealer>()) {
             return;
         }
         
+        this.State = Gesture.PreAttack;
         this.CommitStage(this.CurrentStage % this.ComboLength + 1);
         this.CurrentStage += 1;
+        this.OnAttackStarted.Invoke();
+    }
+    
+    public void RegisterStage() {
+        this.State = Gesture.InAttack;
+    }
+
+    public void ConcludeStage() {
+        this.State = Gesture.PostAttack;
+        this.OnAttackEnded.Invoke();
     }
 
     /// <summary>
@@ -75,13 +99,23 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     }
 
     private void ToggleBlocking(bool isBlocking) {
-        if (this.State is not (Gesture.Idle or Gesture.ConcludingAttack or Gesture.Blocking)) {
+        if (this.State is Gesture.PreAttack) {
+            return;
+        }
+        
+        if (!this.EquipmentSet.HasAny(out BlockingZone? shield)) {
             return;
         }
         
         this.EndCombo();
-        this.State = isBlocking ? Gesture.Blocking : Gesture.Idle;
-        this.Animator.SetBool(this.AnimatorBlockingStateParameter, isBlocking);
+        this.State = isBlocking ? Gesture.Defensive : Gesture.Idle;
+        if (this.AnimatorBlockingStateParameter == 0) {
+            Logging.Warn($"No blocking animation defined for {this.name}", this);
+        } else {
+            this.Animator.SetBool(this.AnimatorBlockingStateParameter, isBlocking);
+        }
+        
+        shield!.enabled = isBlocking;
     }
 
     public void BindInput(InputActions actions) {

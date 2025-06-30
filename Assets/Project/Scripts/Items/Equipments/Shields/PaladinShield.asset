@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ed4bfbad18b40e7b42737dbd1a6f467, type: 3}
+  m_Name: PaladinShield
+  m_EditorClassIdentifier: 
+  <Type>k__BackingField: Items.Equipment.Shield
+  <Name>k__BackingField: Paladin Shield
+  <Worth>k__BackingField: 1500
+  <ItemProperties>k__BackingField:
+  - rid: 1548064635607581080
+  references:
+    version: 2
+    RefIds:
+    - rid: 1548064635607581080
+      type: {class: EquipmentPropertyData, ns: Project.Scripts.Items.Definitions, asm: Project.Scripts.Items}
+      data:
+        <Slot>k__BackingField: 2
+        <Model>k__BackingField: {fileID: 4290182301935832156, guid: 07eea654e70e8a6429def9e9f768a065, type: 3}
+        <Modifiers>k__BackingField:
+        - <Target>k__BackingField: CharacterAttributes.Defence
+          <Method>k__BackingField: 0
+          <Value>k__BackingField: 60
+          <Duration>k__BackingField: 0
+        - <Target>k__BackingField: CharacterAttributes.ElementalResistance.Dark
+          <Method>k__BackingField: 0
+          <Value>k__BackingField: 50
+          <Duration>k__BackingField: 0
+        - <Target>k__BackingField: CharacterAttributes.ElementalResistance.Divine
+          <Method>k__BackingField: 0
+          <Value>k__BackingField: 50
+          <Duration>k__BackingField: 0
+        <GameplayEffectOnEquip>k__BackingField: {fileID: 11400000, guid: a791516ee26493349945b327e2209ea2, type: 2}
+        <GameplayEffectOnUnequip>k__BackingField: {fileID: 11400000, guid: eb0c522c5acc67c4e83321b389fa29bf, type: 2}

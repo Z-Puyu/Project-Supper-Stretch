@@ -1,3 +1,4 @@
+using Project.Scripts.Characters.Enemies;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -14,7 +15,15 @@ public class ExperienceSystem : MonoBehaviour {
     public int XpToNextLevel { get; set; }
 
     private void Start() {
+        GameCharacter<Enemy>.OnDeath += this.CheckDeadEnemy;
         this.XpToNextLevel = Mathf.FloorToInt(this.LevellingCurve.Evaluate(this.CurrentLevel));
+    }
+
+    private void CheckDeadEnemy(Enemy enemy, GameObject? killer) {
+        if (killer && killer.TryGetComponent(out GameCharacter character) &&
+            this.transform.IsChildOf(character.transform)) {
+            this.AddExperience(enemy.Experience);
+        }
     }
 
     public void AddExperience(int experience) {

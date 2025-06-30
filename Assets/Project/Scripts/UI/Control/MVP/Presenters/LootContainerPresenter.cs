@@ -9,6 +9,10 @@ public class LootContainerPresenter : InventoryListPresenter {
     public event UnityAction<Item, int> OnItemTaken = delegate { }; 
     
     protected override void Select(KeyValuePair<Item, int> entry) {
+        if (this.SelectSound) {
+            this.SelectSound.Play();
+        }
+        
         this.OnItemTaken.Invoke(entry.Key, entry.Value);
     }
 

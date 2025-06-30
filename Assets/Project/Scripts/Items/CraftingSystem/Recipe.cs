@@ -12,7 +12,7 @@ public class Recipe {
             ? string.Empty
             : this.Scheme.FormatName(this.Ingredients);
     
-    public bool IsEmpty => !this.Ingredients.Any();
+    public bool IsEmpty => !this.Ingredients.Any() || this.Scheme is null;
 
     public void AddIngredient(Item item) {
         this.Ingredients.Add(item);

@@ -1,5 +1,6 @@
 using System;
 using Project.Scripts.Interaction.ObjectDetection;
+using Project.Scripts.Util.Components;
 using Unity.Behavior;
 using Unity.Properties;
 using UnityEngine;
@@ -17,15 +18,18 @@ public partial class SearchForHostileTargetAction : Action {
     [SerializeReference] public BlackboardVariable<GameObject> Agent;
     [SerializeReference] public BlackboardVariable<GameObject?> Target;
     [SerializeReference] public BlackboardVariable<Sensor> Sensor;
+    private CharacterAudio? Audio { get; set; }
     
     private void SpotHostileTarget(Collider target) {
         this.Target.Value = target.gameObject;
-        Debug.Log($"{this.Sensor.Name} spotted hostile target {this.Target.Value}!");
+        this.Audio.IfPresent(component => component.Play(CharacterAudio.Sound.BattleCry));
+        Debug.Log($"{this.Sensor.Value.transform.root.name} spotted hostile target {this.Target.Value}!");
     }
 
     protected override Status OnStart() {
-        this.Sensor.Value.OnDetection += this.SpotHostileTarget;
-        this.Sensor.Value.OnLostSight += this.ResetTarget;
+        this.Audio = this.Agent.Value.GetComponent<CharacterAudio>();
+        this.Sensor.Value.OnDetected += this.SpotHostileTarget;
+        this.Sensor.Value.OnTargetLost += this.ResetTarget;
         return Status.Running;
     }
 

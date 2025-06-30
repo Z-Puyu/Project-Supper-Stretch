@@ -2,12 +2,15 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DunGen;
+using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.Characters.Enemies;
 using Project.Scripts.Common;
 using Project.Scripts.Common.Input;
 using Project.Scripts.Interaction;
 using Project.Scripts.Items;
 using Project.Scripts.Items.Equipments;
+using Project.Scripts.Items.InventorySystem;
+using Project.Scripts.Util.Components;
 using Project.Scripts.Util.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -15,14 +18,10 @@ using Object = UnityEngine.Object;
 
 namespace Project.Scripts.Characters.Player;
 
-[RequireComponent(typeof(Interactor), typeof(EquipmentSystem), typeof(ExperienceSystem))]
 public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
     public static event UnityAction OnDungeonLevelCleared = delegate { }; 
     
     [NotNull] public InputActions? InputActions { get; private set; }
-    [NotNull] private Interactor? Interactor { get; set; }
-    [NotNull] private EquipmentSystem? EquipmentSystem { get; set; }
-    [NotNull] private ExperienceSystem? ExperienceSystem { get; set; }
     [NotNull] [field: SerializeField] private PlayerMovement? Movement { get; set; }
 
     #region Debug
@@ -34,25 +33,27 @@ public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
     protected override void Awake() {
         base.Awake();
         this.InputActions = new InputActions();
-        this.Interactor = this.GetComponent<Interactor>();
-        this.EquipmentSystem = this.GetComponent<EquipmentSystem>();
-        this.ExperienceSystem = this.GetComponent<ExperienceSystem>();
     }
 
-    protected override void Start() {
-        base.Start();
-        foreach (KeyValuePair<ItemData, int> entry in this.CharacterData.StartingInventory) {
-            this.Inventory.Add(Item.From(entry.Key), entry.Value);
-        }
-        
+    public void EnableInput() {
+        this.InputActions.Player.OpenPauseMenu.performed += _ => GameEvents.UI.OnOpenPauseMenu.Invoke();
         this.GetComponentsInChildren<IPlayerControllable>().ForEach(control => control.BindInput(this.InputActions));
         Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None)
               .OfType<IUserInterface>()
               .ForEach(control => control.BindInput(this.InputActions));
+    }
+
+    protected override void Start() {
+        base.Start();
+        if (this.HasChildComponent(out Inventory inventory)) {
+            foreach (KeyValuePair<ItemData, int> entry in this.CharacterData.StartingInventory) {
+                inventory!.Add(Item.From(entry.Key), entry.Value);
+            }
+        }
+        
         GameEvents.OnPause += enterUI;
         GameEvents.OnPlay += exitUI;
         this.InputActions.Player.Enable();
-        GameCharacter<Enemy>.OnDeath += this.OnFindDeadEnemy;
         this.GetComponent<DungenCharacter>().OnTileChanged += PlayerCharacter.OnEnterDungeonRoom;
         return;
 
@@ -67,15 +68,16 @@ public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
         }
     }
 
-    private static void OnEnterDungeonRoom(DungenCharacter character, Tile from, Tile to) {
-        if (to.Dungeon && to.Dungeon.MainPathTiles[^1] == to) {
-            PlayerCharacter.OnDungeonLevelCleared.Invoke();
+    protected override void OnHitFeedback(int severity) {
+        base.OnHitFeedback(severity);
+        if (this.Animator) {
+            this.Animator.SetInteger(this.HitFeedbackAnimationParameter, severity);
         }
     }
 
-    private void OnFindDeadEnemy(Enemy corpse, GameObject? killer) {
-        if (killer == this.gameObject) {
-            this.ExperienceSystem.AddExperience(corpse.Experience);
+    private static void OnEnterDungeonRoom(DungenCharacter character, Tile from, Tile to) {
+        if (to.Dungeon && to.Dungeon.MainPathTiles[^1] == to) {
+            PlayerCharacter.OnDungeonLevelCleared.Invoke();
         }
     }
 
@@ -85,6 +87,7 @@ public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
             return;
         }
         
+        this.InputActions.Player.Disable();
         base.DyingFrom(source);
     }
 }

@@ -7,6 +7,7 @@ using Project.Scripts.AttributeSystem.Modifiers;
 using Project.Scripts.Items.Equipments;
 using Project.Scripts.Util.Linq;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace Project.Scripts.Items;
 
@@ -16,7 +17,7 @@ public sealed record class EquipmentProperty(
     Modifier[] Modifiers,
     GameplayEffect GameplayEffectOnEquip,
     GameplayEffect GameplayEffectOnUnequip
-) : ItemProperty, IItemProperty<EquipmentSystem> {
+) : ItemProperty, IItemProperty<EquipmentSet> {
     private EquipmentProperty(EquipmentProperty property) : base(property) {
         this.Slot = property.Slot;
         this.Model = property.Model;
@@ -25,43 +26,29 @@ public sealed record class EquipmentProperty(
         this.GameplayEffectOnUnequip = property.GameplayEffectOnUnequip;
     }
     
-    public void Process(in Item item, EquipmentSystem target) {
-        if (target.Unequip(item)) {
-            this.Undo(target.gameObject);
-        } else if (target.Equip(item, this.Model, this.Slot, out EquipmentSocket socket)) {
-            this.Apply(target.gameObject);
-        } else if (!this.Slot.HasFlag(socket.Slot)) {
-            throw new ArgumentException($"No available slot for {item.Name} in {target.gameObject.name}");
-        } else if (socket.EquippedItem?.HasProperty(out EquipmentProperty? equipment) ?? false) {
-            equipment?.Undo(target.gameObject);
-            target.Unequip(socket.EquippedItem);
-            target.Equip(item, this.Model, this.Slot, out EquipmentSocket _);
-        }
-    }
-
-    private void Undo(GameObject obj) {
-        if (!obj.TryGetComponent(out AttributeSet target)) {
+    public void Process(in Item item, EquipmentSet target) {
+        if (target.Unequip(item, this) || target.Equip(item, this, out EquipmentSocket socket)) {
             return;
         }
 
-        GameplayEffectExecutionArgs args =
-                GameplayEffectExecutionArgs.Builder.From(target)
-                                           .WithCustomModifiers(this.Modifiers.Select(m => -m)).Build();
-        target.AddEffect(this.GameplayEffectOnUnequip, args);
-    }
-
-    private void Apply(GameObject obj) {
-        if (!obj.TryGetComponent(out AttributeSet target)) {
-            return;
+        if (!this.Slot.HasFlag(socket.Slot)) {
+            throw new ArgumentException($"No available slot for {item.Name} in {target.name}");
         }
 
-        GameplayEffectExecutionArgs args = 
-                GameplayEffectExecutionArgs.Builder.From(target).WithCustomModifiers(this.Modifiers).Build();
-        target.AddEffect(this.GameplayEffectOnEquip, args);
+        if (!(socket.EquippedItem?.HasProperty(out EquipmentProperty? equipment) ?? false)) {
+            throw new ArgumentException($"{socket} is not holding a valid equipment");
+        }
+
+        target.Unequip(socket.EquippedItem, equipment!);
+        target.Equip(item, this, out EquipmentSocket _);
+    }
+
+    public override string FormatAsText(ModifierLocalisationMapping mapping) {
+        return string.Join('\n', this.Modifiers.Select(modifier => modifier.FormatAsText(mapping)));
     }
 
     public override string FormatAsText() {
-        return string.Join('\n', this.Modifiers);
+        return string.Join('\n', this.Modifiers.Select(modifier => modifier.FormatAsText()));       
     }
 
     public bool Equals(EquipmentProperty? other) {

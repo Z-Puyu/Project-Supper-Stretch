@@ -3,6 +3,7 @@ using Object = UnityEngine.Object;
 
 namespace Project.Scripts.Util.Singleton;
 
+[DisallowMultipleComponent]
 public class Singleton<T> : MonoBehaviour where T : Component {
     private static T? instance;
     

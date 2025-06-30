@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 240416273449048809}
   - component: {fileID: 5314123877934736831}
-  m_Layer: 0
+  m_Layer: 18
   m_Name: InteractableObjectSensor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -46,9 +46,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <WatchedTags>k__BackingField:
   - Player
+  <ToggleActivationByDetection>k__BackingField: []
   <DetectionRadius>k__BackingField: 3
-  <RequireLineOfSight>k__BackingField: 0
-  <LayerMask>k__BackingField:
-    serializedVersion: 2
-    m_Bits: 0
   <GizmosColor>k__BackingField: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}

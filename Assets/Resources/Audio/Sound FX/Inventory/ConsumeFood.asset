@@ -1,0 +1,148 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1233149941 &-8281587389907202827
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Use - Heavy Bite 4_{-8281587389907202827}
+  m_AudioClip: {fileID: 8300000, guid: 2a7ce7487f90289419a557883a4cf0bb, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-4754548809226126425
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Use - Basic 2_{-4754548809226126425}
+  m_AudioClip: {fileID: 8300000, guid: b6cdfcf1bcd1afc4c81eb23ebe5e247e, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-4649597780016677299
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Use - Heavy Bite 5_{-4649597780016677299}
+  m_AudioClip: {fileID: 8300000, guid: 6bab76446f030c944b9503bf70cab76e, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-1805384191855243910
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Use - Heavy Bite 2_{-1805384191855243910}
+  m_AudioClip: {fileID: 8300000, guid: cffd14a604a9c9644b8bf6f85386eb47, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &430425955964137723
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Use - Heavy Bite 7_{430425955964137723}
+  m_AudioClip: {fileID: 8300000, guid: 8632cb326d34ff349bf7bb8f5fbefb1b, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &1595645652113878259
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Use - Heavy Bite 1_{1595645652113878259}
+  m_AudioClip: {fileID: 8300000, guid: fe438a26dd6f0ee46889aa369a322009, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &2649105031728645083
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Use - Basic 3_{2649105031728645083}
+  m_AudioClip: {fileID: 8300000, guid: 2f3527dc0a12c8f4f8e8931e5a4be578, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &4157163973684396994
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Use - Basic 1_{4157163973684396994}
+  m_AudioClip: {fileID: 8300000, guid: 9d5e8af95df7da04d9b2079f7408fca1, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1307931743 &6418180475301049370
+AudioRandomContainer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ConsumeFood
+  m_Volume: 0
+  m_Pitch: 0
+  m_AutomaticTriggerTime: 0
+  m_LoopCount: 1
+  m_VolumeRandomizationRange: {x: 0, y: 0}
+  m_PitchRandomizationRange: {x: 0, y: 0}
+  m_AutomaticTriggerTimeRandomizationRange: {x: 0, y: 0}
+  m_LoopCountRandomizationRange: {x: 0, y: 0}
+  m_Elements:
+  - {fileID: 1595645652113878259}
+  - {fileID: -1805384191855243910}
+  - {fileID: 8876260194564097295}
+  - {fileID: -8281587389907202827}
+  - {fileID: -4649597780016677299}
+  - {fileID: 7071731922281792612}
+  - {fileID: 430425955964137723}
+  - {fileID: 6883151649768964545}
+  - {fileID: 4157163973684396994}
+  - {fileID: -4754548809226126425}
+  - {fileID: 2649105031728645083}
+  m_AvoidRepeatingLast: 0
+  m_PlaybackMode: 2
+  m_TriggerMode: 0
+  m_AutomaticTriggerMode: 1
+  m_LoopMode: 2
+  m_VolumeRandomizationEnabled: 0
+  m_PitchRandomizationEnabled: 0
+  m_AutomaticTriggerTimeRandomizationEnabled: 0
+  m_LoopCountRandomizationEnabled: 0
+--- !u!1233149941 &6883151649768964545
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Use - Basic 4_{6883151649768964545}
+  m_AudioClip: {fileID: 8300000, guid: fc4cfc267b8f4d444b41d1d279bac6bd, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &7071731922281792612
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Use - Heavy Bite 6_{7071731922281792612}
+  m_AudioClip: {fileID: 8300000, guid: 0429820f328ddd040899d5c8171a06a6, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &8876260194564097295
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Use - Heavy Bite 3_{8876260194564097295}
+  m_AudioClip: {fileID: 8300000, guid: af8d0f4136a4f9545b0658c9339a16fc, type: 3}
+  m_Volume: 0
+  m_Enabled: 1

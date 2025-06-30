@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Project.Scripts.AttributeSystem.Modifiers;
 using Project.Scripts.Common.GameplayTags;
@@ -22,12 +23,14 @@ public class Scheme : GameplayTagNode {
 
     public string FormatName(List<Item> ingredients) {
         string name = this.PossibleProductNames[Random.Range(0, this.PossibleProductNames.Count)];
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < ingredients.Count - 1; i += 1) {
-            sb.Append($"{ingredients[i].Name}, ");
+        if (ingredients.Count == 1) {
+            return $"{ingredients[0].Name} {name}";
         }
         
-        sb.Append($"and {ingredients[^1].Name}");
+        StringBuilder sb = new StringBuilder();
+        sb.AppendJoin(", ", ingredients.Take(ingredients.Count - 1).Select(ingredient => ingredient.Name))
+          .Append(ingredients.Count > 2 ? ", " : " ")
+          .Append($"and {ingredients[^1].Name}");
         return $"{sb} {name}";
     }
 

@@ -6,6 +6,7 @@ using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.Common;
 using Project.Scripts.Common.Input;
 using Project.Scripts.Items.Equipments;
+using Project.Scripts.Util.Components;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -16,15 +17,29 @@ namespace Project.Scripts.Items.InventorySystem;
 public class Inventory : MonoBehaviour, IPresentable, IPlayerControllable {
     public static event UnityAction<Inventory> OnOpen = delegate { };
     
+    [field: SerializeField] private EquipmentSet? EquipmentComponent { get; set; }
+    [field: SerializeField] private AttributeSet? AttributeSetComponent { get; set; }
     public Dictionary<Item, int> Items { get; private init; } = [];
     
     public event UnityAction<Inventory, KeyValuePair<Item, int>> OnInventoryChanged = delegate { };
+    public event UnityAction<Item> OnItemApplied = delegate { };
+    public event UnityAction OnItemConsumed = delegate { };
 
     public int this[Item item] => this.Count(item);
     public IEnumerable<KeyValuePair<Item, int>> this[Predicate<Item> predicate] => this.All(predicate);
 
     private IEnumerable<KeyValuePair<Item, int>> All(Predicate<Item> predicate) {
         return this.Items.Where(entry => predicate.Invoke(entry.Key));
+    }
+
+    private void Start() {
+        if (this.EquipmentComponent) {
+            this.OnItemApplied += item => item.Process(this.EquipmentComponent);
+        }
+
+        if (this.AttributeSetComponent) {
+            this.OnItemApplied += item => item.Process(this.AttributeSetComponent);
+        }
     }
 
     private int Count(Item item) {
@@ -43,17 +58,14 @@ public class Inventory : MonoBehaviour, IPresentable, IPlayerControllable {
         this.OnInventoryChanged.Invoke(this, new KeyValuePair<Item, int>(item, this.Items[item]));
     }
 
-    public void Apply(in Item item) {
+    public void Apply(Item item) {
         if (!this.Items.TryGetValue(item, out int count) || count <= 0) {
             throw new ArgumentException($"No {item} in inventory.");
         }
-
-        if (this.TryGetComponent(out EquipmentSystem equipments)) {
-            item.Process(equipments);
-        }
         
-        if (this.TryGetComponent(out AttributeSet target)) {
-            item.Process(target);
+        this.OnItemApplied.Invoke(item);
+        if (item.Type.HasFlag(ItemFlag.Consumable)) {
+            this.OnItemConsumed.Invoke();
         }
         
         item.Process(this);

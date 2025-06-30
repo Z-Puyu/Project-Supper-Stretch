@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common;
 using Project.Scripts.UI.Control.MVP;
 using UnityEngine;
@@ -27,7 +28,7 @@ public class UIPage : MonoBehaviour {
     public void Open() {
         this.IsOpen = true;
         this.gameObject.SetActive(true);
-        Time.timeScale = 0;
+        //Time.timeScale = 0;
         this.CanvasGroup.blocksRaycasts = true;
         UIPage.OnActivated.Invoke();
     }
@@ -36,7 +37,7 @@ public class UIPage : MonoBehaviour {
         this.CanvasGroup.blocksRaycasts = false;
         this.IsOpen = false;
         this.gameObject.SetActive(false);
-        Time.timeScale = 1;
+        //Time.timeScale = 1;
         UIPage.OnDeactivated.Invoke();
     }
 

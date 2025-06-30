@@ -1,5 +1,12 @@
 fileFormatVersion: 2
 guid: 9cd122ff12ccf224e91cce0facd2138f
+AssetOrigin:
+  serializedVersion: 1
+  productId: 288783
+  packageName: RPG_Animations_Pack_FREE
+  packageVersion: 1.2
+  assetPath: Assets/Project/External/DoubleL/One Hand Up/Movement/Walk/Base/OneHand_Up_Walk_F_L90_A.fbx
+  uploadId: 758198
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -16,8 +23,6 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -55,7 +60,95 @@ ModelImporter:
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves: []
+      curves:
+      - name: Footsteps
+        curve:
+          serializedVersion: 2
+          curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: 0
+            outSlope: -5.4347825
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.184
+            value: 0
+            inSlope: -5.4347825
+            outSlope: -15.151515
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 0.25
+            value: -1
+            inSlope: -15.151515
+            outSlope: 5.464481
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 0.433
+            value: 0
+            inSlope: 5.464481
+            outSlope: 14.925373
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 0.5
+            value: 1
+            inSlope: 14.925373
+            outSlope: -5.434782
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 0.684
+            value: 0
+            inSlope: -5.434782
+            outSlope: -15.151519
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 0.75
+            value: -1
+            inSlope: -15.151519
+            outSlope: 5.434782
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 0.934
+            value: 0
+            inSlope: 5.434782
+            outSlope: 15.151519
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 15.151519
+            outSlope: 0
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          preInfinity: 3
+          postInfinity: 3
+          rotationOrder: 4
       events: []
       transformMask: []
       maskType: 3
@@ -601,8 +694,7 @@ ModelImporter:
     - name: Left_LowerArm
       parentName: Left_UpperArm
       position: {x: -2.8421706e-16, y: 0.28508067, z: 0}
-      rotation: {x: -0.00000010350328, y: 0.000000059034495, z: 0.000000004190944,
-        w: 1}
+      rotation: {x: -0.00000010350328, y: 0.000000059034495, z: 0.000000004190944, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Left_Hand
       parentName: Left_LowerArm
@@ -622,8 +714,7 @@ ModelImporter:
     - name: Left_PinkyDistal
       parentName: Left_PinkyIntermediate
       position: {x: -3.5527133e-17, y: 0.020224448, z: -7.1054265e-17}
-      rotation: {x: -0.0000005078378, y: -0.000000046617288, z: -0.000000059604613,
-        w: 1}
+      rotation: {x: -0.0000005078378, y: -0.000000046617288, z: -0.000000059604613, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Left_PinkyDistalEnd
       parentName: Left_PinkyDistal
@@ -643,8 +734,7 @@ ModelImporter:
     - name: Left_RingDistal
       parentName: Left_RingIntermediate
       position: {x: 1.7763566e-17, y: 0.027115494, z: -1.065814e-16}
-      rotation: {x: -0.00000013218654, y: -0.00000007938125, z: 0.00000014901163,
-        w: 1}
+      rotation: {x: -0.00000013218654, y: -0.00000007938125, z: 0.00000014901163, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Left_RingDistalEnd
       parentName: Left_RingDistal
@@ -659,14 +749,12 @@ ModelImporter:
     - name: Left_MiddleIntermediate
       parentName: Left_MiddleProximal
       position: {x: 2.7261607e-16, y: 0.051279362, z: 5.988264e-17}
-      rotation: {x: -0.0000003486978, y: 0.0000000029442397, z: -0.000000059604638,
-        w: 1}
+      rotation: {x: -0.0000003486978, y: 0.0000000029442397, z: -0.000000059604638, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Left_MiddleDistal
       parentName: Left_MiddleIntermediate
       position: {x: -7.199101e-17, y: 0.028284006, z: -4.93648e-17}
-      rotation: {x: -0.000000029553037, y: -0.000000068252824, z: 0.00000010430812,
-        w: 1}
+      rotation: {x: -0.000000029553037, y: -0.000000068252824, z: 0.00000010430812, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Left_MiddleDistalEnd
       parentName: Left_MiddleDistal
@@ -686,8 +774,7 @@ ModelImporter:
     - name: Left_IndexDistal
       parentName: Left_IndexIntermediate
       position: {x: -8.20111e-16, y: 0.02513925, z: -4.317065e-16}
-      rotation: {x: -0.00000026693957, y: -0.000000028706186, z: -0.00000005960464,
-        w: 1}
+      rotation: {x: -0.00000026693957, y: -0.000000028706186, z: -0.00000005960464, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Left_IndexDistalEnd
       parentName: Left_IndexDistal
@@ -782,8 +869,7 @@ ModelImporter:
     - name: Right_MiddleIntermediate
       parentName: Right_MiddleProximal
       position: {x: 0.000000014272595, y: -0.051275954, z: 0.0000009747695}
-      rotation: {x: -0.000010002656, y: -0.000000023653612, z: -0.00000008940671,
-        w: 1}
+      rotation: {x: -0.000010002656, y: -0.000000023653612, z: -0.00000008940671, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Right_MiddleDistal
       parentName: Right_MiddleIntermediate
@@ -907,8 +993,7 @@ ModelImporter:
     hasTranslationDoF: 1
     hasExtraRoot: 0
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 3955de6a24970f840996fe77051507ee,
-    type: 3}
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 3955de6a24970f840996fe77051507ee, type: 3}
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 3
   humanoidOversampling: 1
@@ -920,10 +1005,3 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 288783
-  packageName: RPG_Animations_Pack_FREE
-  packageVersion: 1.2
-  assetPath: Assets/Project/External/DoubleL/One Hand Up/Movement/Walk/Base/OneHand_Up_Walk_F_L90_A.fbx
-  uploadId: 758198

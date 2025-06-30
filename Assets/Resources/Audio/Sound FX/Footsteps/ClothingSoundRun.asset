@@ -1,0 +1,137 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1233149941 &-7052851893630187377
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Pants_RUN_01_{-7052851893630187377}
+  m_AudioClip: {fileID: 8300000, guid: 2e0f57e16a71f8744911e75551a814f9, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-5857922979288918733
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Shirt_RUN_01_{-5857922979288918733}
+  m_AudioClip: {fileID: 8300000, guid: 04bc594f197b91a4093dae52b4b6a944, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-4524323143653922016
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Leather_001_{-4524323143653922016}
+  m_AudioClip: {fileID: 8300000, guid: effbfe38cf37c7745a9b24e4af219074, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-1164622653140187156
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Denim_RUN_01_{-1164622653140187156}
+  m_AudioClip: {fileID: 8300000, guid: bd2ef9f9ca6f1c2408aec0d49a98b20d, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-1056616753444221908
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Shirt_RUN_02_{-1056616753444221908}
+  m_AudioClip: {fileID: 8300000, guid: 301cf7d3139f3494eab5b23bd0d15cfd, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-630657345970988519
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Pants_RUN_02_{-630657345970988519}
+  m_AudioClip: {fileID: 8300000, guid: f15388c5e6a414b46adc61a08ae99498, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &2660302399241200674
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Army_RUN_02_{2660302399241200674}
+  m_AudioClip: {fileID: 8300000, guid: 75d62241ed09df4439d4f05d2e5bbee6, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &6212872439034707184
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Denim_RUN_02_{6212872439034707184}
+  m_AudioClip: {fileID: 8300000, guid: 9fbc25c492bf14847abf8799a3aab266, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1307931743 &6418180475301049370
+AudioRandomContainer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ClothingSoundRun
+  m_Volume: 0
+  m_Pitch: 0
+  m_AutomaticTriggerTime: 0
+  m_LoopCount: 1
+  m_VolumeRandomizationRange: {x: 0, y: 0}
+  m_PitchRandomizationRange: {x: 0, y: 0}
+  m_AutomaticTriggerTimeRandomizationRange: {x: 0, y: 0}
+  m_LoopCountRandomizationRange: {x: 0, y: 0}
+  m_Elements:
+  - {fileID: 8482549608313286723}
+  - {fileID: 2660302399241200674}
+  - {fileID: -1164622653140187156}
+  - {fileID: 6212872439034707184}
+  - {fileID: -4524323143653922016}
+  - {fileID: 6782036324533412101}
+  - {fileID: -7052851893630187377}
+  - {fileID: -630657345970988519}
+  - {fileID: -5857922979288918733}
+  - {fileID: -1056616753444221908}
+  m_AvoidRepeatingLast: 0
+  m_PlaybackMode: 0
+  m_TriggerMode: 0
+  m_AutomaticTriggerMode: 1
+  m_LoopMode: 2
+  m_VolumeRandomizationEnabled: 0
+  m_PitchRandomizationEnabled: 0
+  m_AutomaticTriggerTimeRandomizationEnabled: 0
+  m_LoopCountRandomizationEnabled: 0
+--- !u!1233149941 &6782036324533412101
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Leather_002_{6782036324533412101}
+  m_AudioClip: {fileID: 8300000, guid: 627a0965b3932be489b1cba639940de7, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &8482549608313286723
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Army_RUN_01_{8482549608313286723}
+  m_AudioClip: {fileID: 8300000, guid: 898dd668711f9074b8bdb77b95ba88a2, type: 3}
+  m_Volume: 0
+  m_Enabled: 1

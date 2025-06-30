@@ -1,0 +1,82 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1233149941 &-7705270352989760713
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Crafting (1)_{-7705270352989760713}
+  m_AudioClip: {fileID: 8300000, guid: 69d40fe371868884a93d3582cabeb2f9, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-611928636164677968
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Crafting (5)_{-611928636164677968}
+  m_AudioClip: {fileID: 8300000, guid: 0b981c09ca2f5c54e9c54a26c35fd03a, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &3155623892537854993
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Crafting (3)_{3155623892537854993}
+  m_AudioClip: {fileID: 8300000, guid: b55736a12abc286458aa257ddf295cb5, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &3523759753534556344
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Crafting (4)_{3523759753534556344}
+  m_AudioClip: {fileID: 8300000, guid: 955e44dd3a83e3d4588c73623439e8f1, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &4964405102248556605
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Food Crafting (2)_{4964405102248556605}
+  m_AudioClip: {fileID: 8300000, guid: 04f0962f3cdfdac4d816e47758b6deff, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1307931743 &6418180475301049370
+AudioRandomContainer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: CraftFood
+  m_Volume: 0
+  m_Pitch: 0
+  m_AutomaticTriggerTime: 0
+  m_LoopCount: 1
+  m_VolumeRandomizationRange: {x: 0, y: 0}
+  m_PitchRandomizationRange: {x: 0, y: 0}
+  m_AutomaticTriggerTimeRandomizationRange: {x: 0, y: 0}
+  m_LoopCountRandomizationRange: {x: 0, y: 0}
+  m_Elements:
+  - {fileID: -7705270352989760713}
+  - {fileID: 4964405102248556605}
+  - {fileID: 3155623892537854993}
+  - {fileID: 3523759753534556344}
+  - {fileID: -611928636164677968}
+  m_AvoidRepeatingLast: 0
+  m_PlaybackMode: 2
+  m_TriggerMode: 0
+  m_AutomaticTriggerMode: 0
+  m_LoopMode: 2
+  m_VolumeRandomizationEnabled: 0
+  m_PitchRandomizationEnabled: 0
+  m_AutomaticTriggerTimeRandomizationEnabled: 0
+  m_LoopCountRandomizationEnabled: 0

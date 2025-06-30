@@ -1,0 +1,126 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1233149941 &-9221552617903946921
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: WAV_Nightfall_{-9221552617903946921}
+  m_AudioClip: {fileID: 8300000, guid: 7ceb9d48d14f30d48adf878eb2ac7427, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-7085464634869312658
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: WAV_Bonfires_{-7085464634869312658}
+  m_AudioClip: {fileID: 8300000, guid: 5295b2ed59eccb04aa3338cf0289c85f, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-6348337428842934671
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: WAV_Necrons_Tower_{-6348337428842934671}
+  m_AudioClip: {fileID: 8300000, guid: 631f3c53e0fe4a7469ea1a83ce915301, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-3223462418349907734
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: WAV_Ruins_In_The_Deep_{-3223462418349907734}
+  m_AudioClip: {fileID: 8300000, guid: d0defdaacb037d349b4dc186eb0c7544, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-559082543484667631
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: WAV_Voices_From_The_Grove_{-559082543484667631}
+  m_AudioClip: {fileID: 8300000, guid: 2dc23088afed41043a6f745880b355b9, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &2089584621771998284
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: WAV_Tyrants_Lament_{2089584621771998284}
+  m_AudioClip: {fileID: 8300000, guid: a091acf243181c345920dd90ccbe1363, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &2559556324094415174
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: WAV_Cursemark_{2559556324094415174}
+  m_AudioClip: {fileID: 8300000, guid: 4cd81290d05ee624985e02fe1a5f3d03, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &3381965080618577636
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: WAV_Temple_Of_Illas_{3381965080618577636}
+  m_AudioClip: {fileID: 8300000, guid: b103e5e40866a79459e242ba6357dab0, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1307931743 &6418180475301049370
+AudioRandomContainer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: BackgroundTracks
+  m_Volume: 0
+  m_Pitch: 0
+  m_AutomaticTriggerTime: 0.01
+  m_LoopCount: 1
+  m_VolumeRandomizationRange: {x: 0, y: 0}
+  m_PitchRandomizationRange: {x: 0, y: 0}
+  m_AutomaticTriggerTimeRandomizationRange: {x: 0, y: 0}
+  m_LoopCountRandomizationRange: {x: 0, y: 0}
+  m_Elements:
+  - {fileID: 2559556324094415174}
+  - {fileID: -7085464634869312658}
+  - {fileID: 8852253104209973878}
+  - {fileID: -6348337428842934671}
+  - {fileID: -9221552617903946921}
+  - {fileID: -3223462418349907734}
+  - {fileID: 3381965080618577636}
+  - {fileID: 2089584621771998284}
+  - {fileID: -559082543484667631}
+  m_AvoidRepeatingLast: 0
+  m_PlaybackMode: 1
+  m_TriggerMode: 1
+  m_AutomaticTriggerMode: 1
+  m_LoopMode: 0
+  m_VolumeRandomizationEnabled: 0
+  m_PitchRandomizationEnabled: 0
+  m_AutomaticTriggerTimeRandomizationEnabled: 0
+  m_LoopCountRandomizationEnabled: 0
+--- !u!1233149941 &8852253104209973878
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: WAV_Mistridden_Woods_{8852253104209973878}
+  m_AudioClip: {fileID: 8300000, guid: 2cebef9710bbc634893ed7e02247d1fa, type: 3}
+  m_Volume: 0
+  m_Enabled: 1

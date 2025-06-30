@@ -14,7 +14,7 @@ public class PlayerHUD : MonoBehaviour {
 
     private void Start() {
         this.Player = Singleton<GameInstance>.Instance.PlayerInstance;
-        AttributeSet attributeSet = this.Player.GetComponent<AttributeSet>();
+        AttributeSet attributeSet = this.Player.GetComponentInChildren<AttributeSet>();
         this.AttributeBars.ForEach(bar => bar.Present(attributeSet));
     }
 }

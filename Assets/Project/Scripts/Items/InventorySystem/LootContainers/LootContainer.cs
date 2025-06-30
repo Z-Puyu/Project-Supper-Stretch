@@ -6,6 +6,7 @@ using System.Text;
 using Project.Scripts.Common;
 using SaintsField;
 using Project.Scripts.Interaction;
+using Project.Scripts.Util.Components;
 using Project.Scripts.Util.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -13,7 +14,7 @@ using Random = UnityEngine.Random;
 
 namespace Project.Scripts.Items.InventorySystem.LootContainers;
 
-[DisallowMultipleComponent, RequireComponent(typeof(Inventory), typeof(InteractableObject))]
+[DisallowMultipleComponent, RequireComponent(typeof(InteractableObject))]
 public class LootContainer : MonoBehaviour {
     public sealed record class UIData(Inventory Loot, Inventory Inventory) : IPresentable {
         public string FormatAsText() {
@@ -28,35 +29,51 @@ public class LootContainer : MonoBehaviour {
     
     public static event UnityAction<UIData> OnOpen = delegate { };
     
-    [NotNull] private Inventory? Inventory { get; set; }
+    [field: SerializeField] private Inventory? OwnerInventory { get; set; }
+    
+    [NotNull] 
+    [field: SerializeField, Required] 
+    private Inventory? LocalInventory { get; set; }
+    
     [NotNull] private InteractableObject? Interactable { get; set; }
     private Inventory? CurrentInteractorInventory { get; set; }
     
-    [field: SerializeField] 
-    public LootTable? LootTable { private get; set; }
+    [field: SerializeField] private LootTable? LootTable { get; set; }
     
     [field: SerializeField] public LootDropConfig? LootDropConfig { private get; set; }
     
     [field: SerializeField, MinMaxSlider(1, 20)] 
     private Vector2Int DropAmount { get; set; } = new Vector2Int(1, 5);
     
-    /*private List<Item> AlwaysDrop { get; init; } = [];
-    private List<Item> GuaranteedToExistAtLeastOne { get; init; } = [];*/
-    
     private bool HasBeenOpenedBefore { get; set; }
 
     private void Awake() {
-        this.Inventory = this.GetComponent<Inventory>();
+        if (!this.LocalInventory) {
+            this.LocalInventory = this.GetComponentInChildren<Inventory>();
+        }
+        
         this.Interactable = this.GetComponent<InteractableObject>();
     }
 
     private void Start() {
+        if (this.OwnerInventory) {
+            foreach ((Item item, int count) in this.OwnerInventory.Items) {
+                this.Inject(item, count);    
+            }
+        }
+        
         // TODO: Implement concrete loot drop parameters.
         this.Interactable.OnInteraction += this.Open;
     }
 
     public void Inject(Item item, int count) {
-        this.Inventory.Add(item, count);
+        this.LocalInventory.Add(item, count);
+    }
+
+    public void Inject(LootTable table) {
+        if (!this.LootTable) {
+            this.LootTable = table;
+        }
     }
 
     private float ComputeTotalWeight(LootDropParameters parameters) {
@@ -75,19 +92,23 @@ public class LootContainer : MonoBehaviour {
             this.DropRandom(new LootDropParameters());
         }
 
-        this.CurrentInteractorInventory = interactor.GetComponent<Inventory>();
+        this.CurrentInteractorInventory = interactor.GetSiblingComponent<Inventory>();
         // Toggle UI event only when the interactor is the player.
         if (!interactor.gameObject.CompareTag("Player")) {
             return;
         }
 
-        Debug.Log($"Open loot container {this.Inventory}");
-        LootContainer.OnOpen.Invoke(new UIData(this.Inventory, interactor.GetComponent<Inventory>()));
+        Debug.Log($"Open loot container {this.LocalInventory}");
+        LootContainer.OnOpen.Invoke(new UIData(this.LocalInventory, this.CurrentInteractorInventory));
     }
 
     private void DropRandom(LootDropParameters parameters) {
         if (this.HasBeenOpenedBefore || !this.LootTable || this.LootTable.IsEmpty) {
             return;
+        }
+
+        foreach (ItemData item in this.LootTable.AlwaysDrop) {
+            this.LocalInventory.Add(Item.From(item));    
         }
         
         int count = Random.Range(this.DropAmount.x, this.DropAmount.y + 1);
@@ -101,7 +122,7 @@ public class LootContainer : MonoBehaviour {
                     continue;
                 }
 
-                this.Inventory.Add(Item.From(item));
+                this.LocalInventory.Add(Item.From(item));
                 break;
             }
         }

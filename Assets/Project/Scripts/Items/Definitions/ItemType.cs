@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Project.Scripts.Common.GameplayTags;
 using SaintsField;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace Project.Scripts.Items.Definitions;
 
@@ -14,10 +15,7 @@ public class ItemType : GameplayTagNode {
     public ItemFlag Flags { get; private set; }
     
     [field: SerializeField] public Sprite? Icon { get; private set; }    
-    
-    [field: SerializeReference] 
-    private List<ItemType> Subtypes { get; set; } = [];
-
+    [field: SerializeReference] private List<ItemType> Subtypes { get; set; } = [];
     public override IList<GameplayTagNode> Children => [..this.Subtypes];
 
     public bool HasFlag(ItemFlag flag) {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Project.Scripts.AttributeSystem.Modifiers;
 using Project.Scripts.Common;
 using Project.Scripts.Common.GameplayTags;
 using Project.Scripts.Items.Definitions;
@@ -10,7 +11,9 @@ using Project.Scripts.Util.Linq;
 namespace Project.Scripts.Items;
 
 public sealed record class Item(ItemType Type, string Name, int Worth, ItemProperty[] Properties)
-        : IComparable<Item>, IPresentable {
+        : IComparable<Item>, IPresentable<ModifierLocalisationMapping>, IPresentable {
+    public bool IsEquipped { get; set; }
+    
     private Item(Item item) {
         this.Type = item.Type;
         this.Name = item.Name;
@@ -79,8 +82,14 @@ public sealed record class Item(ItemType Type, string Name, int Worth, ItemPrope
     }
 
     public string FormatAsText() {
-        StringBuilder sb = new StringBuilder(this.Name);
-        sb.AppendJoin('\n', this.Properties.AsEnumerable());
+        StringBuilder sb = new StringBuilder(this.Name).AppendLine();
+        sb.AppendJoin('\n', this.Properties.Select(prop => prop.FormatAsText()));
+        return sb.ToString();
+    }
+
+    public string FormatAsText(ModifierLocalisationMapping mapping) {
+        StringBuilder sb = new StringBuilder(this.Name).AppendLine();
+        sb.AppendJoin('\n', this.Properties.Select(prop => prop.FormatAsText(mapping)));
         return sb.ToString();
     }
 }

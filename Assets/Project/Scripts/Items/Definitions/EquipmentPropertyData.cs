@@ -7,6 +7,7 @@ using Project.Scripts.AttributeSystem.Modifiers;
 using Project.Scripts.Items.Equipments;
 using SaintsField;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace Project.Scripts.Items.Definitions;
 
@@ -29,6 +30,7 @@ public class EquipmentPropertyData : IItemPropertyData {
     public GameplayEffect? GameplayEffectOnUnequip { get; private set; }
 
     public ItemProperty Create() {
-        return new EquipmentProperty(this.Slot, this.Model, this.Modifiers.GetModifiers().ToArray(), this.GameplayEffectOnEquip, this.GameplayEffectOnUnequip);       
+        return new EquipmentProperty(this.Slot, this.Model, this.Modifiers.GetModifiers().ToArray(),
+            this.GameplayEffectOnEquip, this.GameplayEffectOnUnequip);
     }
 }

@@ -15,26 +15,22 @@ public class CampMenuCoordinator : MonoBehaviour, IPresenter {
 
     [field: SerializeField] private List<ItemSlotPresenter> IngredientSlots { get; set; } = [];
     [NotNull] [field: SerializeField] private RadioButtons? CookingMethodOptions { get; set; }
-    [NotNull] [field: SerializeField] private InventoryListPresenter? InventoryPresenter { get; set; }
+    [NotNull] [field: SerializeField] private InventoryListPresenter? IngredientInventoryPresenter { get; set; }
+    [NotNull] [field: SerializeField] private InventoryListPresenter? FoodInventoryPresenter { get; set; }
     [NotNull] [field: SerializeField] private Button? CookButton { get; set; }
     [NotNull] [field: SerializeField] private RecipePresenter? RecipeDescription { get; set; }
     [NotNull] [field: SerializeField] private TextView? TimeRemaining { get; set; }
 
+    private Dictionary<int, Item> IndexedIngredients { get; set; } = [];
+
     private void Start() {
         foreach (ItemSlotPresenter slot in this.IngredientSlots) {
-            slot.OnItemReturned += handleReturnedItem;
+            slot.OnItemReturned += handleRemoveItem;
             slot.OnItemAdded += handleAddedItem;
             continue;
 
-            void handleReturnedItem(Item item) {
-                this.Model.inventory.Add(item);
-                this.Model.workbench.Remove(item);
-            }
-
-            void handleAddedItem(Item item) {
-                this.Model.inventory.Remove(item);
-                this.Model.workbench.Put(item);
-            }
+            void handleRemoveItem(Item item) => this.Model.workbench.Remove(item);
+            void handleAddedItem(Item item) => this.Model.workbench.Put(item);
         }
 
         CampFire.OnCampingSituationUpdated += this.Present;
@@ -61,12 +57,13 @@ public class CampMenuCoordinator : MonoBehaviour, IPresenter {
         }
 
         this.Model = (data.Workbench, data.Inventory);
-        this.InventoryPresenter.Present(data.Inventory);
+        this.IngredientInventoryPresenter.Present(data.Inventory);
+        this.FoodInventoryPresenter.Present(data.Inventory);
         this.CookButton.interactable = data.RemainingTime >= data.CraftDuration;
         this.TimeRemaining.Content = $"Remaining Time: {data.RemainingTime}";
         this.TimeRemaining.Refresh();
         if (data.Workbench.Recipe is not null) {
-            this.RecipeDescription.Present(data.Workbench.Recipe);
+            this.RecipeDescription.Present(data);
         }
     }
 }

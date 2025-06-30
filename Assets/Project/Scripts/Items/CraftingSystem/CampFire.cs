@@ -3,6 +3,7 @@ using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.Common;
 using Project.Scripts.Interaction;
 using Project.Scripts.Items.InventorySystem;
+using Project.Scripts.Util.Components;
 using SaintsField;
 using UnityEngine;
 using UnityEngine.Events;
@@ -67,8 +68,8 @@ public class CampFire : MonoBehaviour {
         }
 
         if (!this.HasBeenUsedBefore) {
-            this.PlayerAttributes = interactor.GetComponent<AttributeSet>();
-            this.PlayerInventory = interactor.GetComponent<Inventory>();
+            this.PlayerAttributes = interactor.GetSiblingComponent<AttributeSet>();
+            this.PlayerInventory = interactor.GetSiblingComponent<Inventory>();
             this.HasBeenUsedBefore = true;
         }
         

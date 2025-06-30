@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5753676971727216139}
   - component: {fileID: 549779919471046721}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Collider3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63,7 +63,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9026553889090482623}
   - component: {fileID: 2962428554514033106}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Collider2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -115,7 +115,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7253713497844646588}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: WallWithDoor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -151,7 +151,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3870463647250526214}
   - component: {fileID: 3507934309675423346}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Collider1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -307,6 +307,10 @@ PrefabInstance:
     - target: {fileID: 2287353120183323330, guid: f866648d31fd9494093daef232970acf, type: 3}
       propertyPath: m_Name
       value: Wall_B
+      objectReference: {fileID: 0}
+    - target: {fileID: 2287353120183323330, guid: f866648d31fd9494093daef232970acf, type: 3}
+      propertyPath: m_Layer
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 2287353120183323330, guid: f866648d31fd9494093daef232970acf, type: 3}
       propertyPath: m_StaticEditorFlags

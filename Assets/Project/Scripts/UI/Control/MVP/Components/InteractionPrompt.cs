@@ -17,6 +17,7 @@ public class InteractionPromptView : UIView {
 
     public override void Refresh() {
         this.Text.Content = this.Prompt;
+        this.Text.Refresh();
     }
 
     public override void Clear() {

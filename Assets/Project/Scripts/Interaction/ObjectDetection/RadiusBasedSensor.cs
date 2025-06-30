@@ -26,10 +26,10 @@ public class RadiusBasedSensor : Sensor {
     }
 
     protected virtual void OnTriggerEnter(Collider other) {
-        this.Detected(other);
+        this.Detect(other);
     }
 
     protected virtual void OnTriggerExit(Collider other) {
-        this.LoseTarget(other);
+        this.Forget(other);
     }
 }

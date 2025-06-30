@@ -5,9 +5,9 @@ namespace Project.Scripts.Characters.Animations.StateBehaviours.SetParameterBeha
 
 public class ResetTriggerBehaviour : AnimatorStateBehaviour {
     [field: SerializeField]
-    private List<string> TriggersToResetOnExit { get; set; } = [];
+    private List<string> TriggersToReset { get; set; } = [];
 
     protected override void Execute(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        this.TriggersToResetOnExit.ForEach(animator.ResetTrigger);
+        this.TriggersToReset.ForEach(animator.ResetTrigger);
     }
 }

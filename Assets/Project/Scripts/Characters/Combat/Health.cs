@@ -1,4 +1,5 @@
-﻿using Project.Scripts.Util.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.Util.Linq;
 using SaintsField;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,6 +8,10 @@ namespace Project.Scripts.Characters.Combat;
 
 [DisallowMultipleComponent]
 public abstract class Health : MonoBehaviour {
+    [NotNull] 
+    [field: SerializeField, Required] 
+    private GameObject? Root { get; set; }
+    
     [field: SerializeField, ReadOnly(nameof(this.IsAttributeBased))] 
     protected int Current { get; private set; }
     
@@ -21,8 +26,10 @@ public abstract class Health : MonoBehaviour {
     protected abstract bool IsAttributeBased { get; }
 
     protected virtual void Start() {
-        this.GetComponentsInChildren<HitBox>().ForEach(hitbox => hitbox.OnHit += this.TakeDamage);
+        this.Root.GetComponentsInChildren<HitBox>().ForEach(hitbox => hitbox.OnHit += this.TakeDamage);
     }
+
+    public virtual void Initialise() { }
 
     protected void UpdateHealth(int health) {
         int @new = this.Max >= 0 ? Mathf.Clamp(health, 0, this.Max) : health;
@@ -42,6 +49,10 @@ public abstract class Health : MonoBehaviour {
     protected virtual void TakeDamage(Damage damage, HitBoxTag where = HitBoxTag.Generic) {
         this.LastAttacker = damage.Source ? damage.Source.gameObject : null;
         this.OnDamaged.Invoke(Random.Range(0, 2 * damage.Multiplier / 100));
+    }
+
+    public virtual void TakeDamage(int amount) {
+        this.OnDamaged.Invoke(amount);
     }
 
     public abstract void Heal(int amount, GameObject? source);

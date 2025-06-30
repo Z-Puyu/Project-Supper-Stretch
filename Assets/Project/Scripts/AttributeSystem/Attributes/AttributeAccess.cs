@@ -8,11 +8,11 @@ namespace Project.Scripts.AttributeSystem.Attributes;
 public class AttributeAccess : MonoBehaviour, IAttributeReader {
     [NotNull]
     [field: SerializeField]
-    [field: InfoBox("If unassigned, the component will fetch the closest one in its parents.")]
+    [field: InfoBox("If unassigned, the component will fetch the closest one in the hierarchy of root object.")]
     private AttributeSet? Source { get; set; }
     
     public AdvancedDropdownList<string> AllAccessibleAttributes => !this.Source 
-            ? this.GetComponentInParent<AttributeSet>().AllAccessibleAttributes
+            ? this.transform.root.GetComponentInChildren<AttributeSet>().AllAccessibleAttributes
             : this.Source.AllAccessibleAttributes;
 
     private void Awake() {
@@ -20,9 +20,9 @@ public class AttributeAccess : MonoBehaviour, IAttributeReader {
             return;
         }
 
-        this.Source = this.GetComponentInParent<AttributeSet>();
+        this.Source = this.transform.root.GetComponentInChildren<AttributeSet>();
         if (!this.Source) {
-            throw new InvalidOperationException("No attribute set found in parents.");
+            throw new InvalidOperationException("No attribute set found.");
         }
     }
 
