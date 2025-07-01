@@ -76,7 +76,7 @@ public class Footsteps : AudioPlayer<Footsteps.Mode> {
 
     private void Update() {
         Vector3 position = this.FeetTransform.position;
-        this.CurrentDirection = ((position - this.LastPosition) * 10).normalized;
+        this.CurrentDirection = (position * 10 - this.LastPosition * 10).normalized;
         this.LastPosition = position;
         if (this.IsMuted) {
             return;

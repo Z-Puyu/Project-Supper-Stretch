@@ -11,42 +11,34 @@ namespace Project.Scripts.UI.Control;
 public class WorldSpaceWidget : MonoBehaviour {
     [NotNull]
     [field: SerializeField]
-    private Canvas? Widget { get; set; }
+    private Canvas? Canvas { get; set; }
     
-    [NotNull]
-    [field: SerializeField, Required] 
-    private Transform? Anchor { get; set; }
-    
-    [field: SerializeField] private float Height { get; set; } = 1;
     [field: SerializeField] private bool IsBillboard { get; set; }
 
     protected void Awake() {
-        if (!this.Widget) {
-            this.Widget = this.GetComponentInChildren<Canvas>();
+        if (!this.Canvas) {
+            this.Canvas = this.GetComponentInChildren<Canvas>();
         }
-        
-        if (!this.Anchor) {
-            this.Anchor = this.transform.parent;
-        }
-    }
-
-    private void OnEnable() {
-        this.transform.position = this.Anchor.position + Vector3.up * this.Height;
     }
 
     protected void Start() {
-        if (!this.Widget.worldCamera) {
-            this.Widget.worldCamera = Singleton<GameInstance>.Instance.Eyes.GetComponent<Camera>();
+        if (!this.Canvas.worldCamera) {
+            this.Canvas.worldCamera = Singleton<GameInstance>.Instance.Eyes.GetComponent<Camera>();
         }
     }
 
     private void LateUpdate() {
-        this.transform.position = this.Anchor.position + Vector3.up * this.Height;
-        if (!this.IsBillboard || !this.Widget.gameObject.activeInHierarchy) {
+        if (!this.IsBillboard || !this.Canvas.gameObject.activeInHierarchy) {
             return;
         }
         
         this.transform.LookAt(Singleton<GameInstance>.Instance.Eyes);
         this.transform.Rotate(0, 180, 0);
+    }
+
+    private void OnValidate() {
+        if (!this.Canvas) {
+            this.Canvas = this.GetComponentInChildren<Canvas>();
+        }
     }
 }

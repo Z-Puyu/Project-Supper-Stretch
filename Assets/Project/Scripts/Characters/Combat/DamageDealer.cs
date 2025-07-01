@@ -19,7 +19,7 @@ namespace Project.Scripts.Characters.Combat;
 public class DamageDealer : MonoBehaviour {
     private AdvancedDropdownList<string> AllAttributes => ObjectCache<AttributeDefinition>.Instance.Objects.LeafTags();
     
-    [NotNull] private GameObject? Owner { get; set; }
+    [NotNull] [field: SerializeField] private GameObject? Owner { get; set; }
     private HitBox? CurrentTarget { get; set; }
     private bool HasTarget { get; set; }
 
@@ -52,7 +52,10 @@ public class DamageDealer : MonoBehaviour {
     public event UnityAction OnKnockedBack = delegate { };
 
     private void Awake() {
-        this.Owner = this.transform.root.gameObject;
+        if (!this.Owner) {
+            this.Owner = this.transform.root.gameObject;
+        }
+        
         this.PlayerMovement = this.GetComponentInParent<PlayerMovement>();
         this.AttributeReader = this.GetComponent<IAttributeReader>();
         if (this.AttributeReader == null) {
@@ -61,6 +64,7 @@ public class DamageDealer : MonoBehaviour {
     }
 
     private void Start() {
+        this.TargetDetector.enabled = false;
         this.enabled = false;
     }
 
@@ -75,7 +79,7 @@ public class DamageDealer : MonoBehaviour {
 
     public void TryPerformHit() {
         this.enabled = false;
-        if (!this.HasTarget) {
+        if (!this.HasTarget) { 
             return;
         }
 
@@ -96,6 +100,11 @@ public class DamageDealer : MonoBehaviour {
     }
 
     private bool IsValidHit(GameObject target, Collider at, out HitBox? hitPoint) {
+        bool test1 = target == this.Owner;
+        bool test2 = target.CompareTag(this.Owner.tag);
+        bool test3 = this.FriendlyTags.Contains(target.tag);
+        bool test4 = target.transform.IsChildOf(this.Owner.transform);
+        bool test5 = this.Owner.transform.IsChildOf(target.transform);
         bool isFriendlyTarget = target == this.Owner || target.CompareTag(this.Owner.tag) ||
                                 this.FriendlyTags.Contains(target.tag) ||
                                 target.transform.IsChildOf(this.Owner.transform) ||

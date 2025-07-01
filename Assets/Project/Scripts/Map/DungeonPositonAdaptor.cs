@@ -17,29 +17,27 @@ public class DungeonPositonAdaptor : BaseAdapter {
         this.LastTilePosition = this.LastTile.position;
         this.LastTileRotation = this.LastTile.rotation;
     }
-    
+
     protected override void Run(DungeonGenerator generator) {
         Logging.Info("Re-positioning new dungeon", this);
         if (!this.LastTile) {
             Logging.Error("No last tile to reposition", this);
             return;
         }
-        
+
         this.LastTile.position = this.LastTilePosition;
         this.LastTile.rotation = this.LastTileRotation;
+
         Transform dungeon = generator.Root.transform;
-        Vector3 root = dungeon.position;
-        Transform firstDoor = generator.CurrentDungeon.Connections[0].B.transform;
-        Vector3 start = firstDoor.position;
-        Vector3 toRoot = root - start;
-        generator.CurrentDungeon.AllTiles.ForEach(tile => tile.transform.position += toRoot);
-        Transform lastDoor = generator.CurrentDungeon.Connections[0].A.transform;
-        Vector3 entrance = lastDoor.position;
-        Vector3 toEntrance = entrance - root;
-        dungeon.position = root + toEntrance;
-        dungeon.rotation = firstDoor.rotation;
-        Quaternion.FromToRotation(firstDoor.forward, -lastDoor.forward).ToAngleAxis(out float angle, out Vector3 axis);
-        generator.Root.transform.Rotate(axis, angle);
+        Transform entrance = generator.CurrentDungeon.Connections[0].B.transform;
+        Transform exit = generator.CurrentDungeon.Connections[0].A.transform;
+        
+        Quaternion targetRotation = Quaternion.FromToRotation(entrance.forward, -exit.forward);
+        dungeon.rotation = targetRotation;
+        
+        Vector3 offset = exit.position - entrance.position;
+        dungeon.position = offset;
+        
         this.LastTile.GetComponent<Tile>().RecalculateBounds();
         generator.CurrentDungeon.GetComponentsInChildren<NavMeshLink>().ForEach(link => link.UpdateLink());
     }

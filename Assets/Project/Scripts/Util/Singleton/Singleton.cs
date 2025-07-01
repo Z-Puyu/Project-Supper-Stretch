@@ -41,7 +41,7 @@ public class Singleton<T> : MonoBehaviour where T : Component {
                 Singleton<T>.instance = this as T;
                 Object.DontDestroyOnLoad(this.gameObject);
             } else if (this != Singleton<T>.instance) {
-                Object.Destroy(this.gameObject);
+                Object.Destroy(this);
             }
         } else {
             Singleton<T>.instance = this as T;

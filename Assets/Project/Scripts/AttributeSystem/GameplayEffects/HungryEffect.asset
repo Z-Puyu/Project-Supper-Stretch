@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: HungryEffect
   m_EditorClassIdentifier: 
   <Executor>k__BackingField:
-    rid: 1548064670202462325
-  <HasLevel>k__BackingField: 0
+    rid: 1548064687112323178
+  <HasLevel>k__BackingField: 1
   <LevelEffect>k__BackingField:
     serializedVersion: 2
     m_Curve:
@@ -42,11 +42,15 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 1548064670202462325
+    - rid: 1548064687112323178
       type: {class: ModifierEffectExecution, ns: Project.Scripts.AttributeSystem.GameplayEffects.Executions, asm: Project.Scripts.AttributeSystem}
       data:
         <Modifiers>k__BackingField:
-        - <Target>k__BackingField: CharacterAttributes.Satiation
-          <Method>k__BackingField: 2
-          <Value>k__BackingField: -0.1
-          <Duration>k__BackingField: -1
+        - <Target>k__BackingField: CharacterAttributes.Damage.Physical
+          <Method>k__BackingField: 1
+          <Value>k__BackingField: -15
+          <Duration>k__BackingField: 0
+        - <Target>k__BackingField: CharacterAttributes.Defence
+          <Method>k__BackingField: 1
+          <Value>k__BackingField: -15
+          <Duration>k__BackingField: 0

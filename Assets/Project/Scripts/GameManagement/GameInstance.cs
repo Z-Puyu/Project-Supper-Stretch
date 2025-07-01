@@ -45,9 +45,14 @@ public class GameInstance : Singleton<GameInstance> {
     [NotNull] private GameMap? StartingMap { get; set; }
     private CinemachineCamera? VirtualCamera { get; set; }
     [NotNull] public PlayerCharacter? PlayerInstance { get; private set; }
+    [NotNull] public Transform? PlayerTransform { get; private set; }
     [NotNull] private LoadingScreen? LoadingScreenInstance { get; set; }
     
     private void Start() {
+        this.LoadGame();
+    }
+
+    public void LoadGame() {
         this.ShowLoadingScreen();
         this.InstantiateObjects();
         this.InitialiseObjects();
@@ -71,8 +76,9 @@ public class GameInstance : Singleton<GameInstance> {
         Object.Instantiate(this.MainCamera);
         this.Eyes = Camera.main!.transform;
         this.VirtualCamera = Object.Instantiate(this.CinemachineCamera);
-        this.StartingMap = Object.Instantiate(this.MapGenerator);
         this.PlayerInstance = Object.Instantiate(this.Player).GetComponent<PlayerCharacter>();
+        this.PlayerTransform = this.PlayerInstance.transform;
+        this.StartingMap = Object.Instantiate(this.MapGenerator);
     }
 
     private void InitialiseObjects() {
@@ -87,6 +93,8 @@ public class GameInstance : Singleton<GameInstance> {
 
     private void BeginGame() {
         this.LoadingScreenInstance.FlashHintText("Enabling Scripts...");
+        this.StartingMap.GetComponentsInChildren<GoalPoint>(includeInactive: true)
+            .ForEach(point => point.gameObject.SetActive(true));
         Object.FindObjectsByType<GameCharacter>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
               .ForEach(character => character.transform.SetParent(null));
         Object.FindObjectsByType<NavMeshAgent>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)

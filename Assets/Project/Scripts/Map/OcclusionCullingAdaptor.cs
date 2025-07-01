@@ -7,21 +7,13 @@ using UnityEngine;
 namespace Project.Scripts.Map;
 
 public class OcclusionCullingAdaptor : BaseAdapter {
-    private static IEnumerator BakingCoroutine() {
-        // Ensure all objects are properly set up
-        yield return new WaitForEndOfFrame();
-        
-        // Bake occlusion culling data
-        StaticOcclusionCulling.Compute();
-        
-        while (StaticOcclusionCulling.isRunning) {
-            yield return null;
+    protected override void Run(DungeonGenerator generator) {
+        if (!Camera.main || !Camera.main.TryGetComponent(out OcclusionCulling culling)) {
+            return;
         }
         
-        Debug.Log("Occlusion baking complete!");
-    }
-
-    protected override void Run(DungeonGenerator generator) {
-        this.StartCoroutine(OcclusionCullingAdaptor.BakingCoroutine());
+        foreach (Occludee occludee in generator.CurrentDungeon.GetComponentsInChildren<Occludee>()) {
+            culling.Register(occludee);
+        }
     }
 }

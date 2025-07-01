@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 408f9f789474469ba6666096f229f705, type: 3}
-  m_Name: PoisonedEffect
+  m_Name: DigestionEffect
   m_EditorClassIdentifier: 
   <Executor>k__BackingField:
-    rid: 1548064687112323403
+    rid: 1548064670202462325
   <HasLevel>k__BackingField: 0
   <LevelEffect>k__BackingField:
     serializedVersion: 2
@@ -42,15 +42,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 1548064687112323403
-      type: {class: DynamicModifierEffectExecution, ns: Project.Scripts.AttributeSystem.GameplayEffects.Executions, asm: Project.Scripts.AttributeSystem}
+    - rid: 1548064670202462325
+      type: {class: ModifierEffectExecution, ns: Project.Scripts.AttributeSystem.GameplayEffects.Executions, asm: Project.Scripts.AttributeSystem}
       data:
-        <DefaultModifiers>k__BackingField:
-        - <Target>k__BackingField: CharacterAttributes.Health
-          <Method>k__BackingField: 2
-          <Value>k__BackingField: -5
-          <Duration>k__BackingField: 0
+        <Modifiers>k__BackingField:
         - <Target>k__BackingField: CharacterAttributes.Satiation
           <Method>k__BackingField: 2
-          <Value>k__BackingField: -5
-          <Duration>k__BackingField: 0
+          <Value>k__BackingField: -0.1
+          <Duration>k__BackingField: -1

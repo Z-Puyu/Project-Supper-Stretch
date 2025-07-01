@@ -63,7 +63,7 @@ public abstract class GameCharacter : MonoBehaviour {
     }
 
     protected virtual void OnHitFeedback(int severity) { }
-
+    
     protected virtual void DyingFrom(GameObject? source) {
         Logging.Info($"{this.gameObject.name} killed by {(source ? source.name : "unknown source")}", this);
         this.Animator.SetBool(this.DeathAnimationParameter, true);
@@ -75,13 +75,9 @@ public abstract class GameCharacter : MonoBehaviour {
         this.OnKilled.Invoke();
     }
 
-    protected virtual void OnPause() {
-        this.Animator.enabled = false;
-    }
+    protected virtual void OnPause() { }
 
-    protected virtual void OnPlay() {
-        this.Animator.enabled = true;
-    }
+    protected virtual void OnPlay() { }
 }
 
 public abstract class GameCharacter<C> : GameCharacter where C : CharacterData {

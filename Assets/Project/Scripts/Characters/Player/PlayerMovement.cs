@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Characters.Combat;
+using Project.Scripts.Common;
 using SaintsField;
 using Project.Scripts.Common.Input;
 using Project.Scripts.Util.Components;
@@ -16,9 +17,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerControllable {
     
     private Vector3 damping = Vector3.zero;
     private Vector3 direction = Vector3.zero;
-
-    private Vector3 LastDirection { get; set; }
-    private Vector3 LastMovementData { get; set; }
     
     [NotNull] [field: SerializeField] private CharacterController? Controller { get; set; }
     [NotNull] [field: SerializeField] protected Animator? Animator { get; private set; }
@@ -61,30 +59,24 @@ public class PlayerMovement : MonoBehaviour, IPlayerControllable {
     }
 
     private void Start() {
+        GameEvents.OnPause += this.StopImmediately;
+        GameEvents.OnPlay += this.ResumeMovement;
         this.Animator.applyRootMotion = true;
     }
     
-    /*private void StopImmediately() {
-        this.LastDirection = this.Direction;
-        this.LastMovementData = new Vector3(this.Animator.GetFloat(this.AnimatorParameterForVelocityX),
-            this.Animator.GetFloat(this.AnimatorParameterForVelocityY),
-            this.Animator.GetFloat(this.AnimatorParameterForSpeed));
+    private void StopImmediately() {
         this.Direction = Vector3.zero; // This will stop both movement and rotation :O
         this.IsPaused = true;
         this.Animator.SetFloat(this.AnimatorParameterForSpeed, 0);
         this.Animator.SetFloat(this.AnimatorParameterForVelocityX, 0);
         this.Animator.SetFloat(this.AnimatorParameterForVelocityY, 0);
+        this.enabled = false;
     }
 
     private void ResumeMovement() {
+        this.enabled = true;
         this.IsPaused = false;
-        this.Direction = this.LastDirection;
-        this.Animator.SetFloat(this.AnimatorParameterForSpeed, this.LastMovementData.z);
-        this.Animator.SetFloat(this.AnimatorParameterForVelocityX, this.LastMovementData.x);
-        this.Animator.SetFloat(this.AnimatorParameterForVelocityY, this.LastMovementData.y);
-        this.LastDirection = Vector3.zero;
-        this.LastMovementData = Vector3.zero;
-    }*/
+    }
     
     public virtual void SwitchMode(Mode mode) {
         if (this.Locked || this.MovementMode == mode) {

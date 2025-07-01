@@ -51,21 +51,20 @@ public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
             }
         }
         
-        GameEvents.OnPause += enterUI;
-        GameEvents.OnPlay += exitUI;
         this.InputActions.Player.Enable();
         this.GetComponent<DungenCharacter>().OnTileChanged += PlayerCharacter.OnEnterDungeonRoom;
-        return;
-
-        void enterUI() {
-            this.InputActions.Player.Disable();
-            this.InputActions.UI.Enable();
-        }
-
-        void exitUI() {
-            this.InputActions.UI.Disable();
-            this.InputActions.Player.Enable();
-        }
+    }
+    
+    protected override void OnPause() {
+        base.OnPause();
+        this.InputActions.Player.Disable();
+        this.InputActions.UI.Enable();
+    }
+    
+    protected override void OnPlay() {
+        base.OnPlay();
+        this.InputActions.Player.Enable();
+        this.InputActions.UI.Disable();
     }
 
     protected override void OnHitFeedback(int severity) {
