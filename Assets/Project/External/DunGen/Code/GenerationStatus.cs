@@ -1,4 +1,4 @@
-﻿namespace DunGen.Project.External.DunGen.Code
+﻿namespace DunGen
 {
 	public delegate void GenerationStatusDelegate(DungeonGenerator generator, GenerationStatus status);
 	public delegate void DungeonGenerationDelegate(DungeonGenerator generator);

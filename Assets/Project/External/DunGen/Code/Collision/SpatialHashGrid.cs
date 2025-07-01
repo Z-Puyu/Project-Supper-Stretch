@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code.Collision
+namespace DunGen.Collision
 {
 	/// <summary>
 	/// A generic spatial hash grid that divides space into uniform cells for fast spatial queries.
@@ -32,7 +32,7 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 			this.upAxis = upDirection;
 			
 			// Determine which axes to use for the 2D grid based on up direction
-			this.primaryAxes = this.GetPrimaryAxes(upDirection);
+			this.primaryAxes = GetPrimaryAxes(upDirection);
 		}
 
 		private (int, int) GetPrimaryAxes(AxisDirection upDirection)
@@ -56,8 +56,8 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 		private Vector2 GetGridPosition(Vector3 worldPos)
 		{
 			// Extract the two coordinates for our 2D plane based on the up axis
-			float x = worldPos[this.primaryAxes.Item1];
-			float y = worldPos[this.primaryAxes.Item2];
+			float x = worldPos[primaryAxes.Item1];
+			float y = worldPos[primaryAxes.Item2];
 			return new Vector2(x, y);
 		}
 
@@ -71,25 +71,25 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 		/// </summary>
 		public void Insert(T obj)
 		{
-			Bounds bounds = this.getBounds(obj);
-			Vector2 min = this.GetGridPosition(bounds.min);
-			Vector2 max = this.GetGridPosition(bounds.max);
+			Bounds bounds = getBounds(obj);
+			Vector2 min = GetGridPosition(bounds.min);
+			Vector2 max = GetGridPosition(bounds.max);
 
-			int minX = Mathf.FloorToInt(min.x / this.cellSize);
-			int minY = Mathf.FloorToInt(min.y / this.cellSize);
-			int maxX = Mathf.FloorToInt(max.x / this.cellSize);
-			int maxY = Mathf.FloorToInt(max.y / this.cellSize);
+			int minX = Mathf.FloorToInt(min.x / cellSize);
+			int minY = Mathf.FloorToInt(min.y / cellSize);
+			int maxX = Mathf.FloorToInt(max.x / cellSize);
+			int maxY = Mathf.FloorToInt(max.y / cellSize);
 
 			for (int y = minY; y <= maxY; y++)
 			{
 				for (int x = minX; x <= maxX; x++)
 				{
-					long key = this.GetCellKey(x, y);
+					long key = GetCellKey(x, y);
 
-					if (!this.cells.TryGetValue(key, out List<T> cell))
+					if (!cells.TryGetValue(key, out List<T> cell))
 					{
 						cell = new List<T>();
-						this.cells[key] = cell;
+						cells[key] = cell;
 					}
 
 					cell.Add(obj);
@@ -103,28 +103,28 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 		public bool Remove(T obj)
 		{
 			bool removed = false;
-			Bounds bounds = this.getBounds(obj);
-			Vector2 min = this.GetGridPosition(bounds.min);
-			Vector2 max = this.GetGridPosition(bounds.max);
+			Bounds bounds = getBounds(obj);
+			Vector2 min = GetGridPosition(bounds.min);
+			Vector2 max = GetGridPosition(bounds.max);
 
-			int minX = Mathf.FloorToInt(min.x / this.cellSize);
-			int minY = Mathf.FloorToInt(min.y / this.cellSize);
-			int maxX = Mathf.FloorToInt(max.x / this.cellSize);
-			int maxY = Mathf.FloorToInt(max.y / this.cellSize);
+			int minX = Mathf.FloorToInt(min.x / cellSize);
+			int minY = Mathf.FloorToInt(min.y / cellSize);
+			int maxX = Mathf.FloorToInt(max.x / cellSize);
+			int maxY = Mathf.FloorToInt(max.y / cellSize);
 
 			for (int y = minY; y <= maxY; y++)
 			{
 				for (int x = minX; x <= maxX; x++)
 				{
-					Int64 key = this.GetCellKey(x, y);
-					if (this.cells.TryGetValue(key, out List<T> cell))
+					Int64 key = GetCellKey(x, y);
+					if (cells.TryGetValue(key, out List<T> cell))
 					{
 						if (cell.Remove(obj))
 						{
 							removed = true;
 							if (cell.Count == 0)
 							{
-								this.cells.Remove(key);
+								cells.Remove(key);
 							}
 						}
 					}
@@ -141,25 +141,25 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 			Vector3 queryBoundsMin = queryBounds.min;
 			Vector3 queryBoundsMax = queryBounds.max;
 
-			Vector2 min = this.GetGridPosition(queryBoundsMin);
-			Vector2 max = this.GetGridPosition(queryBoundsMax);
+			Vector2 min = GetGridPosition(queryBoundsMin);
+			Vector2 max = GetGridPosition(queryBoundsMax);
 
-			int minX = Mathf.FloorToInt(min.x / this.cellSize);
-			int minY = Mathf.FloorToInt(min.y / this.cellSize);
-			int maxX = Mathf.FloorToInt(max.x / this.cellSize);
-			int maxY = Mathf.FloorToInt(max.y / this.cellSize);
+			int minX = Mathf.FloorToInt(min.x / cellSize);
+			int minY = Mathf.FloorToInt(min.y / cellSize);
+			int maxX = Mathf.FloorToInt(max.x / cellSize);
+			int maxY = Mathf.FloorToInt(max.y / cellSize);
 
 			for (int y = minY; y <= maxY; y++)
 			{
 				for (int x = minX; x <= maxX; x++)
 				{
-					long key = this.GetCellKey(x, y);
+					long key = GetCellKey(x, y);
 
-					if (this.cells.TryGetValue(key, out List<T> cell))
+					if (cells.TryGetValue(key, out List<T> cell))
 					{
 						foreach (T obj in cell)
 						{
-							var objBounds = this.getBounds(obj);
+							var objBounds = getBounds(obj);
 							Vector3 objBoundsMin = objBounds.min;
 							Vector3 objBoundsMax = objBounds.max;
 
@@ -187,7 +187,7 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 		/// </summary>
 		public void Clear()
 		{
-			this.cells.Clear();
+			cells.Clear();
 		}
 
 		/// <summary>
@@ -198,7 +198,7 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 		{
 			// Get unique cell coordinates to draw grid
 			var cellCoords = new HashSet<(int x, int y)>();
-			foreach (var key in this.cells.Keys)
+			foreach (var key in cells.Keys)
 			{
 				int x = (int)(key >> 32);
 				int y = (int)(key & 0xffffffffL);
@@ -212,18 +212,18 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 				Vector3 max = Vector3.zero;
 
 				// Set the coordinates based on primary axes
-				min[this.primaryAxes.Item1] = coord.x * this.cellSize;
-				min[this.primaryAxes.Item2] = coord.y * this.cellSize;
-				max[this.primaryAxes.Item1] = (coord.x + 1) * this.cellSize;
-				max[this.primaryAxes.Item2] = (coord.y + 1) * this.cellSize;
+				min[primaryAxes.Item1] = coord.x * cellSize;
+				min[primaryAxes.Item2] = coord.y * cellSize;
+				max[primaryAxes.Item1] = (coord.x + 1) * cellSize;
+				max[primaryAxes.Item2] = (coord.y + 1) * cellSize;
 
 				Vector3 p1 = min;
 				Vector3 p2 = min;
-				p2[this.primaryAxes.Item1] = max[this.primaryAxes.Item1];
+				p2[primaryAxes.Item1] = max[primaryAxes.Item1];
 
 				Vector3 p3 = max;
 				Vector3 p4 = max;
-				p4[this.primaryAxes.Item1] = min[this.primaryAxes.Item1];
+				p4[primaryAxes.Item1] = min[primaryAxes.Item1];
 
 				Debug.DrawLine(p1, p2, Color.white, duration);
 				Debug.DrawLine(p2, p3, Color.white, duration);
@@ -233,13 +233,13 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 
 			// Draw object bounds
 			var drawnObjects = new HashSet<T>();
-			foreach (var cellObjects in this.cells.Values)
+			foreach (var cellObjects in cells.Values)
 			{
 				foreach (var obj in cellObjects)
 				{
 					if (drawnObjects.Add(obj)) // Only draw each object once
 					{
-						var bounds = this.getBounds(obj);
+						var bounds = getBounds(obj);
 						Vector3 min = bounds.min;
 						Vector3 max = bounds.max;
 
@@ -250,20 +250,20 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 						Vector3 p4 = Vector3.zero;
 
 						// Set the coordinates for the primary axes
-						p1[this.primaryAxes.Item1] = min[this.primaryAxes.Item1];
-						p1[this.primaryAxes.Item2] = min[this.primaryAxes.Item2];
+						p1[primaryAxes.Item1] = min[primaryAxes.Item1];
+						p1[primaryAxes.Item2] = min[primaryAxes.Item2];
 
-						p2[this.primaryAxes.Item1] = max[this.primaryAxes.Item1];
-						p2[this.primaryAxes.Item2] = min[this.primaryAxes.Item2];
+						p2[primaryAxes.Item1] = max[primaryAxes.Item1];
+						p2[primaryAxes.Item2] = min[primaryAxes.Item2];
 
-						p3[this.primaryAxes.Item1] = max[this.primaryAxes.Item1];
-						p3[this.primaryAxes.Item2] = max[this.primaryAxes.Item2];
+						p3[primaryAxes.Item1] = max[primaryAxes.Item1];
+						p3[primaryAxes.Item2] = max[primaryAxes.Item2];
 
-						p4[this.primaryAxes.Item1] = min[this.primaryAxes.Item1];
-						p4[this.primaryAxes.Item2] = max[this.primaryAxes.Item2];
+						p4[primaryAxes.Item1] = min[primaryAxes.Item1];
+						p4[primaryAxes.Item2] = max[primaryAxes.Item2];
 
 						// Set the up axis coordinate to min for all points
-						int upAxisIndex = (int)(this.upAxis) / 2; // Convert AxisDirection to index (0=X, 1=Y, 2=Z)
+						int upAxisIndex = (int)(upAxis) / 2; // Convert AxisDirection to index (0=X, 1=Y, 2=Z)
 						float upCoord = min[upAxisIndex];
 						p1[upAxisIndex] = upCoord;
 						p2[upAxisIndex] = upCoord;

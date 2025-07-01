@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using DunGen.Project.External.DunGen.Code.Tags;
-using DunGen.Project.External.DunGen.Code.Utility;
+﻿using DunGen.Tags;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	/// <summary>
 	/// A component to handle doorway placement and behaviour
@@ -14,7 +13,7 @@ namespace DunGen.Project.External.DunGen.Code
 	{
 		public const int CurrentFileVersion = 1;
 
-		public bool HasSocketAssigned { get { return this.socket != null; } }
+		public bool HasSocketAssigned { get { return socket != null; } }
 
 		/// <summary>
 		/// The socket this doorway uses. Allows you to use different sized doorways and have them connect correctly
@@ -23,15 +22,15 @@ namespace DunGen.Project.External.DunGen.Code
 		{
 			get
 			{
-				if (this.socket == null)
+				if (socket == null)
 				{
-					if (this.cachedDefaultSocket == null)
-						this.cachedDefaultSocket = DunGenSettings.Instance.DefaultSocket;
+					if (cachedDefaultSocket == null)
+						cachedDefaultSocket = DunGenSettings.Instance.DefaultSocket;
 
-					return this.cachedDefaultSocket;
+					return cachedDefaultSocket;
 				}
 				else
-					return this.socket;
+					return socket;
 			}
 		}
 		/// <summary>
@@ -87,7 +86,7 @@ namespace DunGen.Project.External.DunGen.Code
 		/// <summary>
 		/// The Tile that this doorway belongs to
 		/// </summary>
-		public Tile Tile { get { return this.tile; } internal set { this.tile = value; } }
+		public Tile Tile { get { return tile; } internal set { tile = value; } }
 		/// <summary>
 		/// The ID of the key used to unlock this door
 		/// </summary>
@@ -95,19 +94,19 @@ namespace DunGen.Project.External.DunGen.Code
 		/// <summary>
 		/// Gets the lock status of the door
 		/// </summary>
-		public bool IsLocked { get { return this.LockID.HasValue; } }
+		public bool IsLocked { get { return LockID.HasValue; } }
 		/// <summary>
 		/// Does this doorway have a prefab object placed as a door?
 		/// </summary>
-		public bool HasDoorPrefabInstance { get { return this.doorPrefabInstance != null; } }
+		public bool HasDoorPrefabInstance { get { return doorPrefabInstance != null; } }
 		/// <summary>
 		/// The prefab that has been placed as a door for this doorway
 		/// </summary>
-		public GameObject UsedDoorPrefabInstance { get { return this.doorPrefabInstance; } }
+		public GameObject UsedDoorPrefabInstance { get { return doorPrefabInstance; } }
 		/// <summary>
 		/// The Door component that has been assigned to the door prefab instance (if any)
 		/// </summary>
-		public Door DoorComponent { get { return this.doorComponent; } }
+		public Door DoorComponent { get { return doorComponent; } }
 		/// <summary>
 		/// The dungeon that this doorway belongs to
 		/// </summary>
@@ -115,24 +114,24 @@ namespace DunGen.Project.External.DunGen.Code
 		/// <summary>
 		/// The doorway that this is connected to
 		/// </summary>
-		public Doorway ConnectedDoorway { get { return this.connectedDoorway; } internal set { this.connectedDoorway = value; } }
+		public Doorway ConnectedDoorway { get { return connectedDoorway; } internal set { connectedDoorway = value; } }
 		/// <summary>
 		/// Allows for hiding of any GameObject in the "AddWhenInUse" and "AddWhenNotInUse" lists - used to remove clutter at design-time; should not be used at runtime
 		/// </summary>
 		public bool HideConditionalObjects
 		{
-			get { return this.hideConditionalObjects; }
+			get { return hideConditionalObjects; }
 			set
 			{
-				this.hideConditionalObjects = value;
+				hideConditionalObjects = value;
 
-				foreach (var obj in this.ConnectorSceneObjects)
+				foreach (var obj in ConnectorSceneObjects)
 					if (obj != null)
-						obj.SetActive(!this.hideConditionalObjects);
+						obj.SetActive(!hideConditionalObjects);
 
-				foreach (var obj in this.BlockerSceneObjects)
+				foreach (var obj in BlockerSceneObjects)
 					if (obj != null)
-						obj.SetActive(!this.hideConditionalObjects);
+						obj.SetActive(!hideConditionalObjects);
 			}
 		}
 
@@ -179,8 +178,8 @@ namespace DunGen.Project.External.DunGen.Code
 
 		private void OnValidate()
 		{
-			if (this.socket == null)
-				this.socket = DunGenSettings.Instance.DefaultSocket;
+			if (socket == null)
+				socket = DunGenSettings.Instance.DefaultSocket;
 		}
 
 		internal void SetUsedPrefab(GameObject doorPrefab)
@@ -188,33 +187,33 @@ namespace DunGen.Project.External.DunGen.Code
 			this.doorPrefabInstance = doorPrefab;
 
 			if (doorPrefab != null)
-				this.doorComponent = doorPrefab.GetComponent<Door>();
+				doorComponent = doorPrefab.GetComponent<Door>();
 		}
 
 		internal void RemoveUsedPrefab()
 		{
-			if (this.doorPrefabInstance != null)
-				UnityUtil.Destroy(this.doorPrefabInstance);
+			if (doorPrefabInstance != null)
+				UnityUtil.Destroy(doorPrefabInstance);
 
-			this.doorPrefabInstance = null;
+			doorPrefabInstance = null;
 		}
 
 #if UNITY_EDITOR
 		private void OnDrawGizmos()
 		{
-			if (!this.placedByGenerator)
-				this.DebugDraw();
+			if (!placedByGenerator)
+				DebugDraw();
 		}
 
 		internal void DebugDraw()
 		{
-			Vector2 size = this.Socket.Size;
+			Vector2 size = Socket.Size;
 			Vector2 halfSize = size * 0.5f;
 
 			bool isValidPlacement = true;
 			Color doorwayColour = Color.white;
 
-			isValidPlacement = this.ValidateTransform(out var localTileBounds, out bool isAxisAligned, out bool isEdgePositioned);
+			isValidPlacement = ValidateTransform(out var localTileBounds, out bool isAxisAligned, out bool isEdgePositioned);
 
 			if (isValidPlacement)
 				doorwayColour = EditorConstants.DoorRectColourValid;
@@ -228,20 +227,20 @@ namespace DunGen.Project.External.DunGen.Code
 			float lineLength = Mathf.Min(size.x, size.y);
 
 			Gizmos.color = EditorConstants.DoorDirectionColour;
-			Gizmos.DrawLine(this.transform.position + this.transform.up * halfSize.y, this.transform.position + this.transform.up * halfSize.y + this.transform.forward * lineLength);
+			Gizmos.DrawLine(transform.position + transform.up * halfSize.y, transform.position + transform.up * halfSize.y + transform.forward * lineLength);
 
 
 			// Draw Up Vector
 			Gizmos.color = EditorConstants.DoorUpColour;
-			Gizmos.DrawLine(this.transform.position + this.transform.up * halfSize.y, this.transform.position + this.transform.up * size.y);
+			Gizmos.DrawLine(transform.position + transform.up * halfSize.y, transform.position + transform.up * size.y);
 
 
 			// Draw Rectangle
 			Gizmos.color = doorwayColour;
-			Vector3 topLeft = this.transform.position - (this.transform.right * halfSize.x) + (this.transform.up * size.y);
-			Vector3 topRight = this.transform.position + (this.transform.right * halfSize.x) + (this.transform.up * size.y);
-			Vector3 bottomLeft = this.transform.position - (this.transform.right * halfSize.x);
-			Vector3 bottomRight = this.transform.position + (this.transform.right * halfSize.x);
+			Vector3 topLeft = transform.position - (transform.right * halfSize.x) + (transform.up * size.y);
+			Vector3 topRight = transform.position + (transform.right * halfSize.x) + (transform.up * size.y);
+			Vector3 bottomLeft = transform.position - (transform.right * halfSize.x);
+			Vector3 bottomRight = transform.position + (transform.right * halfSize.x);
 
 			Gizmos.DrawLine(topLeft, topRight);
 			Gizmos.DrawLine(topRight, bottomRight);
@@ -252,15 +251,15 @@ namespace DunGen.Project.External.DunGen.Code
 			// Draw position correction line
 			if (!isValidPlacement)
 			{
-				this.GetTileRoot(out var _, out var tile);
+				GetTileRoot(out var _, out var tile);
 
 				// Projected position is meaningless if the Doorway isn't attached to a Tile
 				if (tile != null)
 				{
-					Vector3 projectedPosition = this.ProjectPositionToTileBounds(localTileBounds);
+					Vector3 projectedPosition = ProjectPositionToTileBounds(localTileBounds);
 
 					Gizmos.color = Color.red;
-					Gizmos.DrawLine(this.transform.position, projectedPosition);
+					Gizmos.DrawLine(transform.position, projectedPosition);
 				}
 			}
 		}
@@ -268,13 +267,13 @@ namespace DunGen.Project.External.DunGen.Code
 
 		private void GetTileRoot(out GameObject tileRoot, out Tile tileComponent)
 		{
-			tileComponent = this.GetComponentInParent<Tile>();
+			tileComponent = GetComponentInParent<Tile>();
 
 #if UNITY_EDITOR
 			// We might need to walk up the transform hierarchy manually
 			if (tileComponent == null)
 			{
-				Transform current = this.transform;
+				Transform current = transform;
 
 				while (current != null)
 				{
@@ -291,12 +290,12 @@ namespace DunGen.Project.External.DunGen.Code
 			if (tileComponent != null)
 				tileRoot = tileComponent.gameObject;
 			else
-				tileRoot = this.transform.root.gameObject;
+				tileRoot = transform.root.gameObject;
 		}
 
 		public bool ValidateTransform(out Bounds localTileBounds, out bool isAxisAligned, out bool isEdgePositioned)
 		{
-			this.GetTileRoot(out var tileRoot, out var tile);
+			GetTileRoot(out var tileRoot, out var tile);
 
 			// The Doorway isn't attached to a Tile, it can never be valid
 			if(tileRoot == null || tile == null)
@@ -315,12 +314,12 @@ namespace DunGen.Project.External.DunGen.Code
 			else
 				localTileBounds = tile.Placement.LocalBounds;
 
-			if (!UnityUtil.IsVectorAxisAligned(this.transform.forward))
+			if (!UnityUtil.IsVectorAxisAligned(transform.forward))
 				isAxisAligned = false;
 
-			Vector3 projectedPosition = this.ProjectPositionToTileBounds(localTileBounds);
+			Vector3 projectedPosition = ProjectPositionToTileBounds(localTileBounds);
 
-			if ((projectedPosition - this.transform.position).magnitude > 0.1f)
+			if ((projectedPosition - transform.position).magnitude > 0.1f)
 				isEdgePositioned = false;
 
 			return isAxisAligned && isEdgePositioned;
@@ -328,30 +327,30 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public void TrySnapToCorrectedTransform()
 		{
-			if (this.ValidateTransform(out var localTileBounds, out _, out _))
+			if (ValidateTransform(out var localTileBounds, out _, out _))
 				return;
 
-			Vector3 correctedForward = UnityUtil.GetCardinalDirection(this.transform.forward, out _);
+			Vector3 correctedForward = UnityUtil.GetCardinalDirection(transform.forward, out _);
 
-			this.transform.forward = correctedForward;
-			this.transform.position = this.ProjectPositionToTileBounds(localTileBounds);
+			transform.forward = correctedForward;
+			transform.position = ProjectPositionToTileBounds(localTileBounds);
 		}
 
 		public Vector3 ProjectPositionToTileBounds(Bounds localTileBounds)
 		{
-			this.GetTileRoot(out var tileRoot, out var tile);
+			GetTileRoot(out var tileRoot, out var tile);
 
 			var worldSpaceBounds = tileRoot.transform.TransformBounds(localTileBounds);
 
-			Vector3 correctedForward = UnityUtil.GetCardinalDirection(this.transform.forward, out var magnitude);
-			Vector3 offsetFromBoundsCenter = this.transform.position - worldSpaceBounds.center;
+			Vector3 correctedForward = UnityUtil.GetCardinalDirection(transform.forward, out var magnitude);
+			Vector3 offsetFromBoundsCenter = transform.position - worldSpaceBounds.center;
 
 			// Calculate correction distance along forward vector (snap to edge)
 			float currentForwardDistance = Vector3.Dot(correctedForward, offsetFromBoundsCenter);
 			float extentForwardDistance = Vector3.Dot(magnitude < 0 ? -correctedForward : correctedForward, worldSpaceBounds.extents);
 			float forwardCorrectionDistance = extentForwardDistance - currentForwardDistance;
 
-			Vector3 targetPosition = this.transform.position;
+			Vector3 targetPosition = transform.position;
 			targetPosition += correctedForward * forwardCorrectionDistance;
 
 			// Once we're positioned on the correct side of the bounding box based on the forward vector
@@ -363,24 +362,24 @@ namespace DunGen.Project.External.DunGen.Code
 
 		internal void ResetInstanceData()
 		{
-			if (this.spawnedBlockerPrefab != null)
-				Object.DestroyImmediate(this.spawnedBlockerPrefab);
+			if (spawnedBlockerPrefab != null)
+				DestroyImmediate(spawnedBlockerPrefab);
 
-			if(this.doorPrefabInstance != null)
-				Object.DestroyImmediate(this.doorPrefabInstance);
+			if(doorPrefabInstance != null)
+				DestroyImmediate(doorPrefabInstance);
 
-			this.connectedDoorway = null;
+			connectedDoorway = null;
 		}
 
 		internal void ProcessDoorwayObjects(bool isDoorwayInUse, RandomStream randomStream)
 		{
-			foreach (var obj in this.BlockerSceneObjects)
+			foreach (var obj in BlockerSceneObjects)
 			{
 				if (obj != null)
 					obj.SetActive(!isDoorwayInUse);
 			}
 
-			foreach (var obj in this.ConnectorSceneObjects)
+			foreach (var obj in ConnectorSceneObjects)
 			{
 				if (obj != null)
 					obj.SetActive(isDoorwayInUse);
@@ -388,23 +387,23 @@ namespace DunGen.Project.External.DunGen.Code
 
 			if (isDoorwayInUse)
 			{
-				if (this.spawnedBlockerPrefab != null)
-					Object.DestroyImmediate(this.spawnedBlockerPrefab);
+				if (spawnedBlockerPrefab != null)
+					DestroyImmediate(spawnedBlockerPrefab);
 			}
 			else
 			{
 				// If there is at least one blocker prefab, select one and spawn it as a child of the doorway
-				if (this.BlockerPrefabWeights.HasAnyViableEntries())
+				if (BlockerPrefabWeights.HasAnyViableEntries())
 				{
-					this.spawnedBlockerPrefab = GameObject.Instantiate(this.BlockerPrefabWeights.GetRandom(randomStream)) as GameObject;
-					this.spawnedBlockerPrefab.transform.parent = this.gameObject.transform;
-					this.spawnedBlockerPrefab.transform.localPosition = this.BlockerPrefabPositionOffset;
-					this.spawnedBlockerPrefab.transform.localScale = Vector3.one;
+					spawnedBlockerPrefab = GameObject.Instantiate(BlockerPrefabWeights.GetRandom(randomStream)) as GameObject;
+					spawnedBlockerPrefab.transform.parent = gameObject.transform;
+					spawnedBlockerPrefab.transform.localPosition = BlockerPrefabPositionOffset;
+					spawnedBlockerPrefab.transform.localScale = Vector3.one;
 
-					if (this.AvoidRotatingBlockerPrefab)
-						this.spawnedBlockerPrefab.transform.rotation = Quaternion.Euler(this.BlockerPrefabRotationOffset);
+					if (AvoidRotatingBlockerPrefab)
+						spawnedBlockerPrefab.transform.rotation = Quaternion.Euler(BlockerPrefabRotationOffset);
 					else
-						this.spawnedBlockerPrefab.transform.localRotation = Quaternion.Euler(this.BlockerPrefabRotationOffset);
+						spawnedBlockerPrefab.transform.localRotation = Quaternion.Euler(BlockerPrefabRotationOffset);
 				}
 			}
 		}
@@ -413,22 +412,22 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public void OnBeforeSerialize()
 		{
-			this.fileVersion = Doorway.CurrentFileVersion;
+			fileVersion = CurrentFileVersion;
 		}
 
 		public void OnAfterDeserialize()
 		{
 			// Convert old object lists to weighted lists
-			if (this.fileVersion < 1)
+			if (fileVersion < 1)
 			{
-				foreach (var obj in this.doorPrefabs_obsolete)
-					this.ConnectorPrefabWeights.Add(new GameObjectWeight(obj));
+				foreach (var obj in doorPrefabs_obsolete)
+					ConnectorPrefabWeights.Add(new GameObjectWeight(obj));
 
-				foreach (var obj in this.blockerPrefabs_obsolete)
-					this.BlockerPrefabWeights.Add(new GameObjectWeight(obj));
+				foreach (var obj in blockerPrefabs_obsolete)
+					BlockerPrefabWeights.Add(new GameObjectWeight(obj));
 
-				this.doorPrefabs_obsolete.Clear();
-				this.blockerPrefabs_obsolete.Clear();
+				doorPrefabs_obsolete.Clear();
+				blockerPrefabs_obsolete.Clear();
 			}
 		}
 

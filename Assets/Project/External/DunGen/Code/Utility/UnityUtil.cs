@@ -4,7 +4,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace DunGen.Project.External.DunGen.Code.Utility
+namespace DunGen
 {
 	public static class UnityUtil
 	{
@@ -16,12 +16,12 @@ namespace DunGen.Project.External.DunGen.Code.Utility
 
 		static UnityUtil()
 		{
-			UnityUtil.FindProBuilderObjectType();
+			FindProBuilderObjectType();
 		}
 
 		public static void FindProBuilderObjectType()
 		{
-			if (UnityUtil.ProBuilderMeshType != null)
+			if (ProBuilderMeshType != null)
 				return;
 
 			// Look through each of the loaded assemblies in our current AppDomain, looking for ProBuilder's pb_Object type
@@ -29,13 +29,13 @@ namespace DunGen.Project.External.DunGen.Code.Utility
 			{
 				if (assembly.FullName.Contains("ProBuilder"))
 				{
-					UnityUtil.ProBuilderMeshType = assembly.GetType("UnityEngine.ProBuilder.ProBuilderMesh");
+					ProBuilderMeshType = assembly.GetType("UnityEngine.ProBuilder.ProBuilderMesh");
 
-					if (UnityUtil.ProBuilderMeshType != null)
+					if (ProBuilderMeshType != null)
 					{
-						UnityUtil.ProBuilderPositionsProperty = UnityUtil.ProBuilderMeshType.GetProperty("positions");
+						ProBuilderPositionsProperty = ProBuilderMeshType.GetProperty("positions");
 
-						if (UnityUtil.ProBuilderPositionsProperty != null)
+						if (ProBuilderPositionsProperty != null)
 							break;
 					}
 				}
@@ -112,7 +112,7 @@ namespace DunGen.Project.External.DunGen.Code.Utility
 			gameObject.layer = layer;
 
 			for (int i = 0; i < gameObject.transform.childCount; i++)
-				UnityUtil.SetLayerRecursive(gameObject.transform.GetChild(i).gameObject, layer);
+				SetLayerRecursive(gameObject.transform.GetChild(i).gameObject, layer);
 		}
 
 		public static void Destroy(UnityEngine.Object obj)
@@ -138,7 +138,7 @@ namespace DunGen.Project.External.DunGen.Code.Utility
 		public static string GetUniqueName(string name, IEnumerable<string> usedNames)
 		{
 			if(string.IsNullOrEmpty(name))
-				return UnityUtil.GetUniqueName("New", usedNames);
+				return GetUniqueName("New", usedNames);
 			
 			string baseName = name;
 			int number = 0;
@@ -158,9 +158,9 @@ namespace DunGen.Project.External.DunGen.Code.Utility
 				if(n == name)
 				{
 					if(hasNumber)
-						return UnityUtil.GetUniqueName(baseName + " " + number.ToString(), usedNames);
+						return GetUniqueName(baseName + " " + number.ToString(), usedNames);
 					else
-						return UnityUtil.GetUniqueName(name + " 2", usedNames);
+						return GetUniqueName(name + " 2", usedNames);
 				}
 			}
 			
@@ -184,17 +184,17 @@ namespace DunGen.Project.External.DunGen.Code.Utility
 
 		public static Bounds CalculateProxyBounds(GameObject prefab, Vector3 upVector)
 		{
-			var bounds = UnityUtil.CalculateObjectBounds(prefab, true, DunGenSettings.Instance.BoundsCalculationsIgnoreSprites);
+			var bounds = CalculateObjectBounds(prefab, true, DunGenSettings.Instance.BoundsCalculationsIgnoreSprites);
 
 			// Since ProBuilder objects don't have a mesh until they're instantiated, we have to calculate the bounds manually
-			if (UnityUtil.ProBuilderMeshType != null && UnityUtil.ProBuilderPositionsProperty != null)
+			if (ProBuilderMeshType != null && ProBuilderPositionsProperty != null)
 			{
-				foreach (var pbMesh in prefab.GetComponentsInChildren(UnityUtil.ProBuilderMeshType))
+				foreach (var pbMesh in prefab.GetComponentsInChildren(ProBuilderMeshType))
 				{
 					Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
 					Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
-					var vertices = (IList<Vector3>)UnityUtil.ProBuilderPositionsProperty.GetValue(pbMesh, null);
+					var vertices = (IList<Vector3>)ProBuilderPositionsProperty.GetValue(pbMesh, null);
 
 					foreach (var vert in vertices)
 					{
@@ -302,7 +302,7 @@ namespace DunGen.Project.External.DunGen.Code.Utility
 		/// <param name="socketB">The socket we want to attach the object to (must not be a child in the object's hierarchy)</param>
 		public static void PositionObjectBySocket(GameObject objectA, GameObject socketA, GameObject socketB)
 		{
-			UnityUtil.PositionObjectBySocket(objectA.transform, socketA.transform, socketB.transform);
+			PositionObjectBySocket(objectA.transform, socketA.transform, socketB.transform);
 		}
 
 		/// <summary>
@@ -340,13 +340,13 @@ namespace DunGen.Project.External.DunGen.Code.Utility
 
 		public static bool AreBoundsOverlapping(Bounds boundsA, Bounds boundsB, float maxOverlap)
 		{
-			Vector3 overlap = UnityUtil.CalculateBoundsOverlap(boundsA, boundsB);
+			Vector3 overlap = CalculateBoundsOverlap(boundsA, boundsB);
 			return Mathf.Min(overlap.x, overlap.y, overlap.z) > maxOverlap;
 		}
 
 		public static bool AreBoundsOverlappingOrOverhanging(Bounds boundsA, Bounds boundsB, AxisDirection upDirection, float maxOverlap)
 		{
-			Vector3 overlaps = UnityUtil.CalculatePerAxisOverlap(boundsB, boundsA);
+			Vector3 overlaps = CalculatePerAxisOverlap(boundsB, boundsA);
 			float overlap;
 
 			// Check for overlaps only along the ground plane, disregarding the up-axis
@@ -456,9 +456,9 @@ namespace DunGen.Project.External.DunGen.Code.Utility
 				Vector3 dir = UnityUtil.GetCardinalDirection(doorway.transform.forward, out magnitude);
 
 				if (magnitude < 0)
-					UnityUtil.SetVector3Masked(ref min, doorway.transform.position, dir);
+					SetVector3Masked(ref min, doorway.transform.position, dir);
 				else
-					UnityUtil.SetVector3Masked(ref max, doorway.transform.position, dir);
+					SetVector3Masked(ref max, doorway.transform.position, dir);
 			}
 
 			Vector3 size = max - min;
@@ -476,7 +476,7 @@ namespace DunGen.Project.External.DunGen.Code.Utility
 			}
 
 			if (obj.transform.parent != null)
-				foreach (var comp in UnityUtil.GetComponentsInParents<T>(obj.transform.parent.gameObject, includeInactive))
+				foreach (var comp in GetComponentsInParents<T>(obj.transform.parent.gameObject, includeInactive))
 					yield return comp;
 		}
 
@@ -489,7 +489,7 @@ namespace DunGen.Project.External.DunGen.Code.Utility
 			}
 
 			if (obj.transform.parent != null)
-				return UnityUtil.GetComponentInParents<T>(obj.transform.parent.gameObject, includeInactive);
+				return GetComponentInParents<T>(obj.transform.parent.gameObject, includeInactive);
 			else
 				return null;
 		}

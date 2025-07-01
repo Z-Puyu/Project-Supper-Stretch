@@ -1,20 +1,19 @@
 ﻿#if UNITY_NAVIGATION_COMPONENTS
-
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using DunGen.Project.External.DunGen.Code;
-using DunGen.Project.External.DunGen.Code.Adapters;
-using DunGen.Project.External.DunGen.Code.Utility;
-using Unity.AI.Navigation;
-using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Linq;
 using UnityEngine.Tilemaps;
+using Unity.AI.Navigation;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.SceneManagement;
+#endif
 
 
-namespace Project.External.DunGen.Integration.Unity_NavMesh
+namespace DunGen.Adapters
 {
 	[AddComponentMenu("DunGen/NavMesh/Unity NavMesh Adapter (2D)")]
 	public class UnityNavMesh2DAdapter : NavMeshAdapter
@@ -39,17 +38,17 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 
 		#region Accessors
 
-		public int AgentTypeID { get { return this.agentTypeID; } set { this.agentTypeID = value; } }
-		public bool OverrideTileSize { get { return this.overrideTileSize; } set { this.overrideTileSize = value; } }
-		public int TileSize { get { return this.tileSize; } set { this.tileSize = value; } }
-		public bool OverrideVoxelSize { get { return this.overrideVoxelSize; } set { this.overrideVoxelSize = value; } }
-		public float VoxelSize { get { return this.voxelSize; } set { this.voxelSize = value; } }
-		public NavMeshData NavMeshData { get { return this.navMeshData; } set { this.navMeshData = value; } }
-		public LayerMask LayerMask { get { return this.layerMask; } set { this.layerMask = value; } }
-		public int DefaultArea { get { return this.defaultArea; } set { this.defaultArea = value; } }
-		public bool IgnoreNavMeshAgent { get { return this.ignoreNavMeshAgent; } set { this.ignoreNavMeshAgent = value; } }
-		public bool IgnoreNavMeshObstacle { get { return this.ignoreNavMeshObstacle; } set { this.ignoreNavMeshObstacle = value; } }
-		public int UnwalkableArea { get { return this.unwalkableArea; } set { this.unwalkableArea = value; } }
+		public int AgentTypeID { get { return agentTypeID; } set { agentTypeID = value; } }
+		public bool OverrideTileSize { get { return overrideTileSize; } set { overrideTileSize = value; } }
+		public int TileSize { get { return tileSize; } set { tileSize = value; } }
+		public bool OverrideVoxelSize { get { return overrideVoxelSize; } set { overrideVoxelSize = value; } }
+		public float VoxelSize { get { return voxelSize; } set { voxelSize = value; } }
+		public NavMeshData NavMeshData { get { return navMeshData; } set { navMeshData = value; } }
+		public LayerMask LayerMask { get { return layerMask; } set { layerMask = value; } }
+		public int DefaultArea { get { return defaultArea; } set { defaultArea = value; } }
+		public bool IgnoreNavMeshAgent { get { return ignoreNavMeshAgent; } set { ignoreNavMeshAgent = value; } }
+		public bool IgnoreNavMeshObstacle { get { return ignoreNavMeshObstacle; } set { ignoreNavMeshObstacle = value; } }
+		public int UnwalkableArea { get { return unwalkableArea; } set { unwalkableArea = value; } }
 
 		#endregion
 
@@ -92,18 +91,18 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 
 		public override void Generate(Dungeon dungeon)
 		{
-			this.BakeNavMesh(dungeon);
+			BakeNavMesh(dungeon);
 
 			// Add links between rooms
-			if (this.AddNavMeshLinksBetweenRooms)
+			if (AddNavMeshLinksBetweenRooms)
 			{
 				foreach (var connection in dungeon.Connections)
-					foreach (var linkInfo in this.NavMeshAgentTypes)
-						this.AddNavMeshLink(connection, linkInfo);
+					foreach (var linkInfo in NavMeshAgentTypes)
+						AddNavMeshLink(connection, linkInfo);
 			}
 
-			if (this.OnProgress != null)
-				this.OnProgress(new NavMeshGenerationProgress() { Description = "Done", Percentage = 1.0f });
+			if (OnProgress != null)
+				OnProgress(new NavMeshGenerationProgress() { Description = "Done", Percentage = 1.0f });
 		}
 
 		protected void AddData()
@@ -116,68 +115,68 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 				return;
 #endif
 
-			if (this.m_NavMeshDataInstance.valid)
+			if (m_NavMeshDataInstance.valid)
 				return;
 
-			if (this.navMeshData != null)
+			if (navMeshData != null)
 			{
-				this.m_NavMeshDataInstance = NavMesh.AddNavMeshData(this.navMeshData, this.transform.position, UnityNavMesh2DAdapter.rotation);
-				this.m_NavMeshDataInstance.owner = this;
+				m_NavMeshDataInstance = NavMesh.AddNavMeshData(navMeshData, transform.position, rotation);
+				m_NavMeshDataInstance.owner = this;
 			}
 		}
 
 		protected void RemoveData()
 		{
-			this.m_NavMeshDataInstance.Remove();
-			this.m_NavMeshDataInstance = new NavMeshDataInstance();
+			m_NavMeshDataInstance.Remove();
+			m_NavMeshDataInstance = new NavMeshDataInstance();
 
-			foreach (var pair in this.cachedSpriteMeshes)
+			foreach (var pair in cachedSpriteMeshes)
 				DestroyImmediate(pair.Value);
 
-			this.cachedSpriteMeshes.Clear();
+			cachedSpriteMeshes.Clear();
 		}
 
 		protected virtual void BakeNavMesh(Dungeon dungeon)
 		{
-			var sources = this.CollectSources();
-			var sourcesBounds = this.CalculateWorldBounds(sources);
+			var sources = CollectSources();
+			var sourcesBounds = CalculateWorldBounds(sources);
 
-			var data = NavMeshBuilder.BuildNavMeshData(this.GetBuildSettings(),
+			var data = NavMeshBuilder.BuildNavMeshData(GetBuildSettings(),
 														sources,
 														sourcesBounds,
-														this.transform.position,
-														UnityNavMesh2DAdapter.rotation);
+														transform.position,
+														rotation);
 
 			if (data != null)
 			{
-				data.name = this.gameObject.name;
-				this.RemoveData();
-				this.navMeshData = data;
-				if (this.isActiveAndEnabled)
-					this.AddData();
+				data.name = gameObject.name;
+				RemoveData();
+				navMeshData = data;
+				if (isActiveAndEnabled)
+					AddData();
 			}
 
-			if (this.OnProgress != null)
-				this.OnProgress(new NavMeshGenerationProgress() { Description = "Done", Percentage = 1.0f });
+			if (OnProgress != null)
+				OnProgress(new NavMeshGenerationProgress() { Description = "Done", Percentage = 1.0f });
 		}
 
 		protected void AppendModifierVolumes(ref List<NavMeshBuildSource> sources)
 		{
 #if UNITY_EDITOR
-			var myStage = StageUtility.GetStageHandle(this.gameObject);
+			var myStage = StageUtility.GetStageHandle(gameObject);
 			if (!myStage.IsValid())
 				return;
 #endif
 			// Modifiers
 			List<NavMeshModifierVolume> modifiers;
-			modifiers = new List<NavMeshModifierVolume>(this.GetComponentsInChildren<NavMeshModifierVolume>());
+			modifiers = new List<NavMeshModifierVolume>(GetComponentsInChildren<NavMeshModifierVolume>());
 			modifiers.RemoveAll(x => !x.isActiveAndEnabled);
 
 			foreach (var m in modifiers)
 			{
-				if ((this.layerMask & (1 << m.gameObject.layer)) == 0)
+				if ((layerMask & (1 << m.gameObject.layer)) == 0)
 					continue;
-				if (!m.AffectsAgentType(this.agentTypeID))
+				if (!m.AffectsAgentType(agentTypeID))
 					continue;
 #if UNITY_EDITOR
 				if (!myStage.Contains(m.gameObject))
@@ -202,15 +201,15 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 			var markups = new List<NavMeshBuildMarkup>();
 
 			List<NavMeshModifier> modifiers;
-			modifiers = new List<NavMeshModifier>(this.GetComponentsInChildren<NavMeshModifier>());
+			modifiers = new List<NavMeshModifier>(GetComponentsInChildren<NavMeshModifier>());
 			modifiers.RemoveAll(x => !x.isActiveAndEnabled);
 
 			foreach (var m in modifiers)
 			{
-				if ((this.layerMask & (1 << m.gameObject.layer)) == 0)
+				if ((layerMask & (1 << m.gameObject.layer)) == 0)
 					continue;
 
-				if (!m.AffectsAgentType(this.agentTypeID))
+				if (!m.AffectsAgentType(agentTypeID))
 					continue;
 
 				var markup = new NavMeshBuildMarkup();
@@ -225,11 +224,11 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 			foreach (var spriteRenderer in UnityUtil.FindObjectsByType<SpriteRenderer>())
 			{
 				var sprite = spriteRenderer.sprite;
-				var mesh = this.GetMesh(sprite);
+				var mesh = GetMesh(sprite);
 
 				if (mesh != null)
 				{
-					int area = ((this.layerMask & (1 << spriteRenderer.gameObject.layer)) == 0) ? this.unwalkableArea : 0;
+					int area = ((layerMask & (1 << spriteRenderer.gameObject.layer)) == 0) ? unwalkableArea : 0;
 
 					sources.Add(new NavMeshBuildSource()
 					{
@@ -264,14 +263,14 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 
 						// Currently assumes ColliderType.Sprite
 						var tile = tilemap.GetTile<UnityEngine.Tilemaps.Tile>(tilePos);
-						var mesh = this.GetMesh(tilemap.GetSprite(tilePos));
+						var mesh = GetMesh(tilemap.GetSprite(tilePos));
 
 						if (mesh != null)
 						{
 							source.transform = Matrix4x4.TRS(tilemap.GetCellCenterWorld(tilePos) - tilemap.layoutGrid.cellGap, tilemap.transform.rotation, tilemap.transform.lossyScale) * tilemap.orientationMatrix * tilemap.GetTransformMatrix(tilePos);
 							source.sourceObject = mesh;
 							source.component = tilemap;
-							source.area = (tile.colliderType == UnityEngine.Tilemaps.Tile.ColliderType.None) ? 0 : this.unwalkableArea;
+							source.area = (tile.colliderType == UnityEngine.Tilemaps.Tile.ColliderType.None) ? 0 : unwalkableArea;
 
 							sources.Add(source);
 						}
@@ -281,13 +280,13 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 
 
 
-			if (this.ignoreNavMeshAgent)
+			if (ignoreNavMeshAgent)
 				sources.RemoveAll((x) => (x.component != null && x.component.gameObject.GetComponent<NavMeshAgent>() != null));
 
-			if (this.ignoreNavMeshObstacle)
+			if (ignoreNavMeshObstacle)
 				sources.RemoveAll((x) => (x.component != null && x.component.gameObject.GetComponent<NavMeshObstacle>() != null));
 
-			this.AppendModifierVolumes(ref sources);
+			AppendModifierVolumes(ref sources);
 
 			return sources;
 		}
@@ -299,7 +298,7 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 
 			Mesh mesh;
 
-			if (!this.cachedSpriteMeshes.TryGetValue(sprite, out mesh))
+			if (!cachedSpriteMeshes.TryGetValue(sprite, out mesh))
 			{
 				mesh = new Mesh
 				{
@@ -311,7 +310,7 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 				mesh.RecalculateNormals();
 				mesh.RecalculateTangents();
 
-				this.cachedSpriteMeshes[sprite] = mesh;
+				cachedSpriteMeshes[sprite] = mesh;
 			}
 
 			return mesh;
@@ -330,8 +329,8 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 			link.agentTypeID = agentLinkInfo.AgentTypeID;
 			link.bidirectional = true;
 			link.area = agentLinkInfo.AreaTypeID;
-			link.startPoint = new Vector3(0, 0, -this.NavMeshLinkDistanceFromDoorway);
-			link.endPoint = new Vector3(0, 0, this.NavMeshLinkDistanceFromDoorway);
+			link.startPoint = new Vector3(0, 0, -NavMeshLinkDistanceFromDoorway);
+			link.endPoint = new Vector3(0, 0, NavMeshLinkDistanceFromDoorway);
 			link.width = linkWidth;
 
 			if (agentLinkInfo.DisableLinkWhenDoorIsClosed)
@@ -352,22 +351,22 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 
 		public NavMeshBuildSettings GetBuildSettings()
 		{
-			var buildSettings = NavMesh.GetSettingsByID(this.agentTypeID);
+			var buildSettings = NavMesh.GetSettingsByID(agentTypeID);
 			if (buildSettings.agentTypeID == -1)
 			{
-				Debug.LogWarning("No build settings for agent type ID " + this.AgentTypeID, this);
-				buildSettings.agentTypeID = this.agentTypeID;
+				Debug.LogWarning("No build settings for agent type ID " + AgentTypeID, this);
+				buildSettings.agentTypeID = agentTypeID;
 			}
 
-			if (this.OverrideTileSize)
+			if (OverrideTileSize)
 			{
 				buildSettings.overrideTileSize = true;
-				buildSettings.tileSize = this.TileSize;
+				buildSettings.tileSize = TileSize;
 			}
-			if (this.OverrideVoxelSize)
+			if (OverrideVoxelSize)
 			{
 				buildSettings.overrideVoxelSize = true;
-				buildSettings.voxelSize = this.VoxelSize;
+				buildSettings.voxelSize = VoxelSize;
 			}
 			return buildSettings;
 		}
@@ -375,7 +374,7 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 		protected Bounds CalculateWorldBounds(List<NavMeshBuildSource> sources)
 		{
 			// Use the unscaled matrix for the NavMeshSurface
-			Matrix4x4 worldToLocal = Matrix4x4.TRS(this.transform.position, UnityNavMesh2DAdapter.rotation, Vector3.one);
+			Matrix4x4 worldToLocal = Matrix4x4.TRS(transform.position, rotation, Vector3.one);
 			worldToLocal = worldToLocal.inverse;
 
 			var result = new Bounds();
@@ -386,21 +385,21 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 					case NavMeshBuildSourceShape.Mesh:
 						{
 							var m = src.sourceObject as Mesh;
-							result.Encapsulate(UnityNavMesh2DAdapter.GetWorldBounds(worldToLocal * src.transform, m.bounds));
+							result.Encapsulate(GetWorldBounds(worldToLocal * src.transform, m.bounds));
 							break;
 						}
 					case NavMeshBuildSourceShape.Terrain:
 						{
 							// Terrain pivot is lower/left corner - shift bounds accordingly
 							var t = src.sourceObject as TerrainData;
-							result.Encapsulate(UnityNavMesh2DAdapter.GetWorldBounds(worldToLocal * src.transform, new Bounds(0.5f * t.size, t.size)));
+							result.Encapsulate(GetWorldBounds(worldToLocal * src.transform, new Bounds(0.5f * t.size, t.size)));
 							break;
 						}
 					case NavMeshBuildSourceShape.Box:
 					case NavMeshBuildSourceShape.Sphere:
 					case NavMeshBuildSourceShape.Capsule:
 					case NavMeshBuildSourceShape.ModifierBox:
-						result.Encapsulate(UnityNavMesh2DAdapter.GetWorldBounds(worldToLocal * src.transform, new Bounds(Vector3.zero, src.size)));
+						result.Encapsulate(GetWorldBounds(worldToLocal * src.transform, new Bounds(Vector3.zero, src.size)));
 						break;
 				}
 			}
@@ -419,9 +418,9 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 
 		static Bounds GetWorldBounds(Matrix4x4 mat, Bounds bounds)
 		{
-			var absAxisX = UnityNavMesh2DAdapter.Abs(mat.MultiplyVector(Vector3.right));
-			var absAxisY = UnityNavMesh2DAdapter.Abs(mat.MultiplyVector(Vector3.up));
-			var absAxisZ = UnityNavMesh2DAdapter.Abs(mat.MultiplyVector(Vector3.forward));
+			var absAxisX = Abs(mat.MultiplyVector(Vector3.right));
+			var absAxisY = Abs(mat.MultiplyVector(Vector3.up));
+			var absAxisZ = Abs(mat.MultiplyVector(Vector3.forward));
 			var worldPosition = mat.MultiplyPoint(bounds.center);
 			var worldSize = absAxisX * bounds.size.x + absAxisY * bounds.size.y + absAxisZ * bounds.size.z;
 			return new Bounds(worldPosition, worldSize);

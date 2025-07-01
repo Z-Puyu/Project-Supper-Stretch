@@ -16,4 +16,6 @@ public record class AttributeInitialisationData {
     public string Key { get; private set; } = string.Empty;
     
     [field: SerializeField] public int Value { get; private set; }
+    
+    public Modifier ModifierForm => Modifier.Once(this.Value, this.Key, ModifierType.BaseOffset);
 }

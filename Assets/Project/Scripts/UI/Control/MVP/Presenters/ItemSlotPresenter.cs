@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using Editor;
-using Project.Scripts.Common;
 using Project.Scripts.Common.GameplayTags;
 using Project.Scripts.Items;
 using Project.Scripts.Items.Definitions;
@@ -16,9 +13,9 @@ namespace Project.Scripts.UI.Control.MVP.Presenters;
 [RequireComponent(typeof(ItemSlotView))]
 public class ItemSlotPresenter : UIPresenter<Item, ItemSlotView>, IDropHandler {
     [field: SerializeField, AdvancedDropdown(nameof(this.AllItemTypes))]  
-    private ItemType IngredientType { get; set; }
+    private string IngredientType { get; set; } = string.Empty;
 
-    private AdvancedDropdownList<ItemType> AllItemTypes => ObjectCache<ItemDefinition>.Instance.Objects.AllNodes();
+    private AdvancedDropdownList<string> AllItemTypes => ObjectCache<ItemDefinition>.Instance.Objects.AllTags();
     
     private event UnityAction OnItemRemoved = delegate { };
     public event UnityAction<Item> OnItemReturned = delegate { };
@@ -27,12 +24,20 @@ public class ItemSlotPresenter : UIPresenter<Item, ItemSlotView>, IDropHandler {
     protected override void UpdateView(Item model) {
         if (this.TryGetComponent(out DragAndDrop dragAndDrop)) {
             dragAndDrop.OnDragged += drag;
+            dragAndDrop.OnDropped += this.Erase;
         }
 
         this.View.ItemName = model.Name;
         this.OnItemRemoved = () => this.OnItemReturned.Invoke(model);
         return;
         void drag(DragPreview preview) => preview.Initialise(model);
+    }
+
+    private void Erase() {
+        this.View.Clear();
+        this.View.Refresh();
+        this.OnItemRemoved.Invoke();
+        this.OnItemRemoved = delegate { };
     }
 
     public void OnDrop(PointerEventData eventData) {
@@ -43,7 +48,7 @@ public class ItemSlotPresenter : UIPresenter<Item, ItemSlotView>, IDropHandler {
         DragPreview preview = dropped.DragPreview!;
         if (preview.Payload is Item item && item.Type == this.IngredientType) {
             if (!this.View.IsEmpty) {
-                this.OnItemRemoved.Invoke();
+                this.Erase();
             } 
             
             this.Present(item);

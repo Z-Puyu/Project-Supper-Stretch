@@ -1,12 +1,11 @@
-﻿using System;
+﻿using DunGen.Tags;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using DunGen.Project.External.DunGen.Code.Tags;
-using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
+namespace DunGen.Graph
 {
 	/// <summary>
 	/// A graph representing the flow of a dungeon
@@ -28,14 +27,14 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 
 			public GlobalPropSettings()
 			{
-				this.ID = 0;
-				this.Count = new IntRange(0, 1);
+				ID = 0;
+				Count = new IntRange(0, 1);
 			}
 
 			public GlobalPropSettings(int id, IntRange count)
 			{
-				this.ID = id;
-				this.Count = count;
+				ID = id;
+				Count = count;
 			}
 		}
 
@@ -169,11 +168,11 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 			normalizedDepth = Mathf.Clamp(normalizedDepth, 0, 1);
 
 			if (normalizedDepth == 0)
-				return this.Lines[0];
+				return Lines[0];
 			else if (normalizedDepth == 1)
-				return this.Lines[this.Lines.Count - 1];
+				return Lines[Lines.Count - 1];
 
-			foreach (var line in this.Lines)
+			foreach (var line in Lines)
 				if (normalizedDepth >= line.Position && normalizedDepth < line.Position + line.Length)
 					return line;
 
@@ -183,17 +182,17 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 
 		public DungeonArchetype[] GetUsedArchetypes()
 		{
-			return this.Lines.SelectMany(x => x.DungeonArchetypes).ToArray();
+			return Lines.SelectMany(x => x.DungeonArchetypes).ToArray();
 		}
 
 		public TileSet[] GetUsedTileSets()
 		{
 			List<TileSet> tileSets = new List<TileSet>();
 
-			foreach (var node in this.Nodes)
+			foreach (var node in Nodes)
 				tileSets.AddRange(node.TileSets);
 
-			foreach(var line in this.Lines)
+			foreach(var line in Lines)
 				foreach (var archetype in line.DungeonArchetypes)
 				{
 					tileSets.AddRange(archetype.TileSets);
@@ -205,38 +204,38 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 
 		public bool ShouldPruneTileWithTags(TagContainer tileTags)
 		{
-			switch (this.BranchTagPruneMode)
+			switch (BranchTagPruneMode)
 			{
 				case BranchPruneMode.AnyTagPresent:
-					return tileTags.HasAnyTag(this.BranchPruneTags.ToArray());
+					return tileTags.HasAnyTag(BranchPruneTags.ToArray());
 
 				case BranchPruneMode.AllTagsMissing:
-					return !tileTags.HasAnyTag(this.BranchPruneTags.ToArray());
+					return !tileTags.HasAnyTag(BranchPruneTags.ToArray());
 
 				default:
-					throw new NotImplementedException(string.Format("BranchPruneMode {0} is not implemented", this.BranchTagPruneMode));
+					throw new NotImplementedException(string.Format("BranchPruneMode {0} is not implemented", BranchTagPruneMode));
 			}
 		}
 
 		public void OnBeforeSerialize()
 		{
-			this.currentFileVersion = DungeonFlow.FileVersion;
+			currentFileVersion = FileVersion;
 		}
 
 		public void OnAfterDeserialize()
 		{
 			// Convert to new format for Global Props
-			if(this.currentFileVersion < 1)
+			if(currentFileVersion < 1)
 			{
-				for (int i = 0; i < this.globalPropGroupID_obsolete.Count; i++)
+				for (int i = 0; i < globalPropGroupID_obsolete.Count; i++)
 				{
-					int id = this.globalPropGroupID_obsolete[i];
-					var count = this.globalPropRanges_obsolete[i];
-					this.GlobalProps.Add(new GlobalPropSettings(id, count));
+					int id = globalPropGroupID_obsolete[i];
+					var count = globalPropRanges_obsolete[i];
+					GlobalProps.Add(new GlobalPropSettings(id, count));
 				}
 
-				this.globalPropGroupID_obsolete.Clear();
-				this.globalPropRanges_obsolete.Clear();
+				globalPropGroupID_obsolete.Clear();
+				globalPropRanges_obsolete.Clear();
 			}
 		}
 
@@ -249,19 +248,19 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 		/// <returns>True if the tiles are allowed to connect</returns>
 		public bool CanTilesConnect(Tile tileA, Tile tileB)
 		{
-			if (this.TileConnectionTags.Count == 0)
+			if (TileConnectionTags.Count == 0)
 				return true;
 
-			switch (this.TileTagConnectionMode)
+			switch (TileTagConnectionMode)
 			{
 				case TagConnectionMode.Accept:
-					return this.HasMatchingTagPair(tileA, tileB);
+					return HasMatchingTagPair(tileA, tileB);
 
 				case TagConnectionMode.Reject:
-					return !this.HasMatchingTagPair(tileA, tileB);
+					return !HasMatchingTagPair(tileA, tileB);
 
 				default:
-					throw new NotImplementedException(string.Format("{0}.{1} is not implemented", typeof(TagConnectionMode).Name, this.TileTagConnectionMode));
+					throw new NotImplementedException(string.Format("{0}.{1} is not implemented", typeof(TagConnectionMode).Name, TileTagConnectionMode));
 			}
 		}
 
@@ -285,12 +284,12 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 			}
 
 			// No custom rules handled this connection, use default behaviour
-			return DoorwaySocket.CanSocketsConnect(connection.PreviousDoorway.DoorwayComponent.Socket, connection.NextDoorway.DoorwayComponent.Socket) && this.CanTilesConnect(connection.PreviousTile.PrefabTile, connection.NextTile.PrefabTile);
+			return DoorwaySocket.CanSocketsConnect(connection.PreviousDoorway.DoorwayComponent.Socket, connection.NextDoorway.DoorwayComponent.Socket) && CanTilesConnect(connection.PreviousTile.PrefabTile, connection.NextTile.PrefabTile);
 		}
 
 		private bool HasMatchingTagPair(Tile tileA, Tile tileB)
 		{
-			foreach(var tagPair in this.TileConnectionTags)
+			foreach(var tagPair in TileConnectionTags)
 			{
 				if ((tileA.Tags.HasTag(tagPair.TagA) && tileB.Tags.HasTag(tagPair.TagB)) ||
 					(tileB.Tags.HasTag(tagPair.TagA) && tileA.Tags.HasTag(tagPair.TagB)))

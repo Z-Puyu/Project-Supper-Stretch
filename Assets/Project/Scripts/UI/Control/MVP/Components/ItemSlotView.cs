@@ -1,16 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Editor;
-using Project.Scripts.Common;
-using Project.Scripts.Items;
-using Project.Scripts.Items.Definitions;
-using Project.Scripts.UI.Control.MVP.Interfaces;
-using SaintsField;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.EventSystems;
 
 namespace Project.Scripts.UI.Control.MVP.Components;
 

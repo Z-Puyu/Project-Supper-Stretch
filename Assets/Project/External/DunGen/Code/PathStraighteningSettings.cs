@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	[Serializable]
 	public class PathStraighteningSettings
@@ -72,9 +72,9 @@ namespace DunGen.Project.External.DunGen.Code
 		{
 			PathStraighteningSettings finalSettings = new PathStraighteningSettings
 			{
-				StraightenChance = PathStraighteningSettings.GetFinalValue(s => s.StraightenChance, s => s.OverrideStraightenChance, settingsHierarchy),
-				CanStraightenMainPath = PathStraighteningSettings.GetFinalValue(s => s.CanStraightenMainPath, s => s.OverrideCanStraightenMainPath, settingsHierarchy),
-				CanStraightenBranchPaths = PathStraighteningSettings.GetFinalValue(s => s.CanStraightenBranchPaths, s => s.OverrideCanStraightenBranchPaths, settingsHierarchy)
+				StraightenChance = GetFinalValue(s => s.StraightenChance, s => s.OverrideStraightenChance, settingsHierarchy),
+				CanStraightenMainPath = GetFinalValue(s => s.CanStraightenMainPath, s => s.OverrideCanStraightenMainPath, settingsHierarchy),
+				CanStraightenBranchPaths = GetFinalValue(s => s.CanStraightenBranchPaths, s => s.OverrideCanStraightenBranchPaths, settingsHierarchy)
 			};
 
 			return finalSettings;

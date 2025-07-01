@@ -1,0 +1,137 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1233149941 &-8703005478200037614
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Denim_JOG_02_{-8703005478200037614}
+  m_AudioClip: {fileID: 8300000, guid: 92a769e1372622e46b1af5d8dcc1b93a, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-8614122608785365194
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Pants_JOG_02_{-8614122608785365194}
+  m_AudioClip: {fileID: 8300000, guid: 9b822d8874a999b41a6fe17385f77838, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-6217787915026361185
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Leather_002_{-6217787915026361185}
+  m_AudioClip: {fileID: 8300000, guid: 627a0965b3932be489b1cba639940de7, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-5773271264713901941
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Leather_001_{-5773271264713901941}
+  m_AudioClip: {fileID: 8300000, guid: effbfe38cf37c7745a9b24e4af219074, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-5366342575125137710
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Army_JOG_02_{-5366342575125137710}
+  m_AudioClip: {fileID: 8300000, guid: 575df315afbbecd47a79a139bf2d49a1, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &2002806504747043263
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Shirt_JOG_01_{2002806504747043263}
+  m_AudioClip: {fileID: 8300000, guid: 6cd995e9f771a364687b34aedcf23835, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &4108594312280550074
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Shirt_JOG_02_{4108594312280550074}
+  m_AudioClip: {fileID: 8300000, guid: 2d51aa84d265fff49ab5ddb033aff086, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &4596593788467736422
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Army_JOG_01_{4596593788467736422}
+  m_AudioClip: {fileID: 8300000, guid: 5517b9253d10afc4da74c55d7f8b00d0, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &6287566598960238140
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Denim_JOG_01_{6287566598960238140}
+  m_AudioClip: {fileID: 8300000, guid: fabe60b849e36bf438c91e349af0b616, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1307931743 &6418180475301049370
+AudioRandomContainer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ClothingSoundWalk
+  m_Volume: 0
+  m_Pitch: 0
+  m_AutomaticTriggerTime: 0
+  m_LoopCount: 1
+  m_VolumeRandomizationRange: {x: 0, y: 0}
+  m_PitchRandomizationRange: {x: 0, y: 0}
+  m_AutomaticTriggerTimeRandomizationRange: {x: 0, y: 0}
+  m_LoopCountRandomizationRange: {x: 0, y: 0}
+  m_Elements:
+  - {fileID: 4596593788467736422}
+  - {fileID: -5366342575125137710}
+  - {fileID: 4108594312280550074}
+  - {fileID: 2002806504747043263}
+  - {fileID: -8614122608785365194}
+  - {fileID: 7486215708298036780}
+  - {fileID: -6217787915026361185}
+  - {fileID: -5773271264713901941}
+  - {fileID: 6287566598960238140}
+  - {fileID: -8703005478200037614}
+  m_AvoidRepeatingLast: 0
+  m_PlaybackMode: 2
+  m_TriggerMode: 0
+  m_AutomaticTriggerMode: 1
+  m_LoopMode: 2
+  m_VolumeRandomizationEnabled: 0
+  m_PitchRandomizationEnabled: 0
+  m_AutomaticTriggerTimeRandomizationEnabled: 0
+  m_LoopCountRandomizationEnabled: 0
+--- !u!1233149941 &7486215708298036780
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Pants_JOG_01_{7486215708298036780}
+  m_AudioClip: {fileID: 8300000, guid: 172973a9803e3ef4f971ca1dc91e3f99, type: 3}
+  m_Volume: 0
+  m_Enabled: 1

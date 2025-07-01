@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code.Collision
+namespace DunGen.Collision
 {
 	[Serializable]
 	[DisplayName("Spatial Hashing")]
@@ -27,7 +27,7 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 			if (!(settings is SpatialHashBroadphaseSettings spatialHashSettings))
 				return;
 
-			this.SpatialHashGrid = new SpatialHashGrid<Bounds>(
+			SpatialHashGrid = new SpatialHashGrid<Bounds>(
 				spatialHashSettings.CellSize,
 				(b) => b,
 				dungeonGenerator.UpDirection);
@@ -35,22 +35,22 @@ namespace DunGen.Project.External.DunGen.Code.Collision
 
 		public void Insert(Bounds bounds)
 		{
-			this.SpatialHashGrid.Insert(bounds);
+			SpatialHashGrid.Insert(bounds);
 		}
 
 		public void Query(Bounds bounds, ref List<Bounds> results)
 		{
-			this.SpatialHashGrid.Query(bounds, ref results);
+			SpatialHashGrid.Query(bounds, ref results);
 		}
 
 		public void Remove(Bounds bounds)
 		{
-			this.SpatialHashGrid.Remove(bounds);
+			SpatialHashGrid.Remove(bounds);
 		}
 
 		public void DrawDebug(float duration = 0)
 		{
-			this.SpatialHashGrid.DrawDebug(duration);
+			SpatialHashGrid.DrawDebug(duration);
 		}
 	}
 }

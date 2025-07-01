@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Editor;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
@@ -35,13 +34,17 @@ public class DamageExecution : CustomExecution {
 
         int damage = args.Instigator.ReadCurrent(this.BaseDamageType);
         int defence = target.ReadCurrent(this.DefenceType);
-        damage = Mathf.Max(0, damage - defence);
-        List<Modifier> modifiers = [Modifier.Of(-damage, this.TargetAttribute, ModifierType.FinalOffset)];
+        damage = Mathf.Max(1, damage - defence);
+        List<Modifier> modifiers = [Modifier.Once(-damage, this.TargetAttribute, ModifierType.FinalOffset)];
         foreach (ModifierReaction r in this.ElementalEffects) {
             int extra = args.Instigator.ReadCurrent(r.Reacting);
+            if (extra <= 0) {
+                continue;
+            }
+            
             float effect = r.Scale * target.ReadCurrent(r.ReactTo);
-            extra = Mathf.CeilToInt(Mathf.Max(0, extra * (100 + effect) / 100));
-            modifiers.Add(Modifier.Of(extra, this.TargetAttribute, ModifierType.FinalOffset));
+            extra = Mathf.CeilToInt(Mathf.Max(1, extra * (100 - effect) / 100));
+            modifiers.Add(Modifier.Once(-extra, this.TargetAttribute, ModifierType.FinalOffset));
         }
         
         return modifiers;

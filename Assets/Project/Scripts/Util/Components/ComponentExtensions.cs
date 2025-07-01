@@ -88,4 +88,12 @@ public static class ComponentExtensions {
     public static T? UserData<T>(this VisualElement ui) where T : class {
         return ui.userData as T;
     }
+    
+    public static T GetSiblingComponent<T>(this Component component) where T : Component {
+        return component.transform.parent.GetComponentInChildren<T>();
+    }
+    
+    public static bool HasChildComponent<T>(this Component root, out T component) where T : Component {
+        return component = root.GetComponentInChildren<T>();
+    }
 }

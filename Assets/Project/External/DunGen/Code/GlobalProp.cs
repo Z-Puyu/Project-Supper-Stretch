@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	[AddComponentMenu("DunGen/Random Props/Global Prop")]
 	public class GlobalProp : MonoBehaviour

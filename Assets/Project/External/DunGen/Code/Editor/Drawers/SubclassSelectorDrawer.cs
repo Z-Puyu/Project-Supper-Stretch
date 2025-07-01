@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers
+namespace DunGen.Editor.Drawers
 {
 	[CustomPropertyDrawer(typeof(SubclassSelectorAttribute))]
 	public class SubclassSelectorDrawer : PropertyDrawer
@@ -17,16 +16,16 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers
 
 		private void Init(SerializedProperty property)
 		{
-			Type baseType = this.fieldInfo.FieldType;
+			Type baseType = fieldInfo.FieldType;
 
 			if (baseType.IsArray || (baseType.IsGenericType && baseType.GetGenericTypeDefinition() == typeof(List<>)))
 				baseType = baseType.GetGenericArguments()[0];
 
-			this.derivedTypes = TypeCache.GetTypesDerivedFrom(baseType)
-			                             .Where(t => !t.IsAbstract)
-			                             .ToList();
+			derivedTypes = TypeCache.GetTypesDerivedFrom(baseType)
+				.Where(t => !t.IsAbstract)
+				.ToList();
 
-			this.initialized = true;
+			initialized = true;
 		}
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -35,18 +34,18 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers
 
 			float lineHeight = EditorGUIUtility.singleLineHeight;
 
-			if (!this.initialized)
-				this.Init(property);
+			if (!initialized)
+				Init(property);
 
 			// Build the list of options
-			string[] options = new string[this.derivedTypes.Count + 1];
+			string[] options = new string[derivedTypes.Count + 1];
 			options[0] = "None";
-			for (int i = 0; i < this.derivedTypes.Count; i++)
+			for (int i = 0; i < derivedTypes.Count; i++)
 			{
-				var displayNameAttribute = this.derivedTypes[i].GetCustomAttribute<DisplayNameAttribute>();
+				var displayNameAttribute = derivedTypes[i].GetCustomAttribute<DisplayNameAttribute>();
 				string displayName = displayNameAttribute != null ?
 					displayNameAttribute.DisplayName :
-					this.derivedTypes[i].Name;
+					derivedTypes[i].Name;
 				options[i + 1] = displayName;
 			}
 
@@ -59,9 +58,9 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers
 				if (split.Length == 2)
 				{
 					string currentTypeName = split[1];
-					for (int i = 0; i < this.derivedTypes.Count; i++)
+					for (int i = 0; i < derivedTypes.Count; i++)
 					{
-						if (this.derivedTypes[i].FullName == currentTypeName)
+						if (derivedTypes[i].FullName == currentTypeName)
 						{
 							selectedIndex = i + 1;
 
@@ -98,7 +97,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers
 				}
 				else
 				{
-					Type newType = this.derivedTypes[newIndex - 1];
+					Type newType = derivedTypes[newIndex - 1];
 					property.managedReferenceValue = Activator.CreateInstance(newType);
 					property.serializedObject.ApplyModifiedProperties();
 				}

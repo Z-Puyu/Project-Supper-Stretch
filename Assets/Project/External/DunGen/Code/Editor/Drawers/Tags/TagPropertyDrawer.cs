@@ -1,11 +1,9 @@
-﻿using DunGen.Editor.Project.External.DunGen.Code.Editor.Utility;
-using DunGen.Editor.Project.External.DunGen.Code.Editor.Windows;
-using DunGen.Project.External.DunGen.Code;
-using DunGen.Project.External.DunGen.Code.Tags;
+﻿using DunGen.Editor.Windows;
+using DunGen.Tags;
 using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers.Tags
+namespace DunGen.Editor.Drawers.Tags
 {
 	[CustomPropertyDrawer(typeof(Tag))]
 	public class TagPropertyDrawer : PropertyDrawer
@@ -19,8 +17,8 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers.Tags
 
 			public MenuItemData(SerializedProperty property, int tagID)
 			{
-				this.Property = property;
-				this.TagID = tagID;
+				Property = property;
+				TagID = tagID;
 			}
 		}
 
@@ -47,9 +45,9 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers.Tags
 			GenericMenu menu = new GenericMenu();
 			
 			foreach(var id in tagManager.GetTagIDs())
-				menu.AddItem(new GUIContent(tagManager.TryGetNameFromID(id)), id == tag.ID, this.OnTagSelected, new MenuItemData(property, id));
+				menu.AddItem(new GUIContent(tagManager.TryGetNameFromID(id)), id == tag.ID, OnTagSelected, new MenuItemData(property, id));
 
-			menu.AddItem(new GUIContent("Open Tag Editor..."), false, this.OnOpenTagWindow);
+			menu.AddItem(new GUIContent("Open Tag Editor..."), false, OnOpenTagWindow);
 			menu.DropDown(rect);
 
 			EditorGUI.EndProperty();

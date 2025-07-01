@@ -1,0 +1,82 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1233149941 &-6948421542947686831
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 03 The Thing In The Pit_{-6948421542947686831}
+  m_AudioClip: {fileID: 8300000, guid: e6fd007742ecaa945a6f4a09b7b5029c, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &193254040289398786
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 02 On a Pale Horse_{193254040289398786}
+  m_AudioClip: {fileID: 8300000, guid: d652a1f0a3ed21e44acc7a38caf6873a, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &1562172791297028518
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 04 Warcry_{1562172791297028518}
+  m_AudioClip: {fileID: 8300000, guid: bfcc3adbc898ab1448476d3570c7d61c, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &4223279733021581360
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 05 Your Life Ends Here_{4223279733021581360}
+  m_AudioClip: {fileID: 8300000, guid: a00047df7aa735443a3d1671acdc64ad, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &4645573028234244696
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 01Run Like Hell Till Dawn_{4645573028234244696}
+  m_AudioClip: {fileID: 8300000, guid: 143db88493d12224f9c4a1482c6260f2, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1307931743 &6418180475301049370
+AudioRandomContainer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: CombatMusic
+  m_Volume: 0
+  m_Pitch: 0
+  m_AutomaticTriggerTime: 0
+  m_LoopCount: 1
+  m_VolumeRandomizationRange: {x: 0, y: 0}
+  m_PitchRandomizationRange: {x: 0, y: 0}
+  m_AutomaticTriggerTimeRandomizationRange: {x: 0, y: 0}
+  m_LoopCountRandomizationRange: {x: 0, y: 0}
+  m_Elements:
+  - {fileID: 4645573028234244696}
+  - {fileID: 193254040289398786}
+  - {fileID: -6948421542947686831}
+  - {fileID: 1562172791297028518}
+  - {fileID: 4223279733021581360}
+  m_AvoidRepeatingLast: 0
+  m_PlaybackMode: 0
+  m_TriggerMode: 1
+  m_AutomaticTriggerMode: 1
+  m_LoopMode: 2
+  m_VolumeRandomizationEnabled: 0
+  m_PitchRandomizationEnabled: 0
+  m_AutomaticTriggerTimeRandomizationEnabled: 0
+  m_LoopCountRandomizationEnabled: 0

@@ -1,4 +1,4 @@
-﻿namespace DunGen.Project.External.DunGen.Code.Pooling
+﻿namespace DunGen.Pooling
 {
 	public interface ITileSpawnEventReceiver
 	{

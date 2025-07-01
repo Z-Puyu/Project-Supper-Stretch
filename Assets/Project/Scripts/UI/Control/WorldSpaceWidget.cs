@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Project.Scripts.Characters.Enemies;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.GameManagement;
-using Project.Scripts.Util.Linq;
 using Project.Scripts.Util.Singleton;
+using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.UI.Control;
@@ -11,29 +11,34 @@ namespace Project.Scripts.UI.Control;
 public class WorldSpaceWidget : MonoBehaviour {
     [NotNull]
     [field: SerializeField]
-    private Canvas? Widget { get; set; }
+    private Canvas? Canvas { get; set; }
     
-    [field: SerializeField]
-    private bool IsBillboard { get; set; }
+    [field: SerializeField] private bool IsBillboard { get; set; }
 
     protected void Awake() {
-        if (!this.Widget) {
-            this.Widget = this.GetComponentInChildren<Canvas>();
+        if (!this.Canvas) {
+            this.Canvas = this.GetComponentInChildren<Canvas>();
         }
     }
 
     protected void Start() {
-        if (!this.Widget.worldCamera) {
-            this.Widget.worldCamera = Singleton<GameInstance>.Instance.Eyes.GetComponent<Camera>();
+        if (!this.Canvas.worldCamera) {
+            this.Canvas.worldCamera = Singleton<GameInstance>.Instance.Eyes.GetComponent<Camera>();
         }
     }
 
-    private void Update() {
-        if (!this.IsBillboard || !this.Widget.gameObject.activeInHierarchy) {
+    private void LateUpdate() {
+        if (!this.IsBillboard || !this.Canvas.gameObject.activeInHierarchy) {
             return;
         }
         
         this.transform.LookAt(Singleton<GameInstance>.Instance.Eyes);
         this.transform.Rotate(0, 180, 0);
+    }
+
+    private void OnValidate() {
+        if (!this.Canvas) {
+            this.Canvas = this.GetComponentInChildren<Canvas>();
+        }
     }
 }

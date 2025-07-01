@@ -1,10 +1,9 @@
+using DunGen.Graph;
 using System.Text;
-using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
-using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
-namespace DunGen.Project.External.DunGen.Code.Analysis
+namespace DunGen.Analysis
 {
 	public delegate void RuntimeAnalyzerDelegate(RuntimeAnalyzer analyzer);
 	public delegate void AnalysisUpdatedDelegate(RuntimeAnalyzer analyzer, GenerationAnalysis analysis, GenerationStats generationStats, int currentIteration, int totalIterations);
@@ -45,7 +44,7 @@ namespace DunGen.Project.External.DunGen.Code.Analysis
 		private bool prevShouldRandomizeSeed;
 		private int targetIterations;
 
-		private int currentIterations { get { return this.targetIterations - this.remainingIterations; } }
+		private int currentIterations { get { return targetIterations - remainingIterations; } }
 		private int remainingIterations;
 		private Stopwatch analysisTime;
 		private bool generateNextFrame;
@@ -55,19 +54,19 @@ namespace DunGen.Project.External.DunGen.Code.Analysis
 
 		private void Start()
 		{
-			if (this.RunOnStart)
-				this.Analyze();
+			if (RunOnStart)
+				Analyze();
 		}
 
 		public void Analyze()
 		{
 			bool isValid = false;
 
-			if (this.DungeonFlow == null)
+			if (DungeonFlow == null)
 				Debug.LogError("No DungeonFlow assigned to analyzer");
-			else if (this.Iterations <= 0)
+			else if (Iterations <= 0)
 				Debug.LogError("Iteration count must be greater than 0");
-			else if (this.MaxFailedAttempts <= 0)
+			else if (MaxFailedAttempts <= 0)
 				Debug.LogError("Max failed attempt count must be greater than 0");
 			else
 				isValid = true;
@@ -75,69 +74,69 @@ namespace DunGen.Project.External.DunGen.Code.Analysis
 			if (!isValid)
 				return;
 
-			RuntimeAnalyzer.AnalysisStarted?.Invoke(this);
-			this.prevShouldRandomizeSeed = this.generator.ShouldRandomizeSeed;
+			AnalysisStarted?.Invoke(this);
+			prevShouldRandomizeSeed = generator.ShouldRandomizeSeed;
 
-			this.generator.IsAnalysis = true;
-			this.generator.DungeonFlow = this.DungeonFlow;
-			this.generator.MaxAttemptCount = this.MaxFailedAttempts;
-			this.generator.ShouldRandomizeSeed = false;
-			this.generator.AllowTilePooling = this.AllowTilePooling;
+			generator.IsAnalysis = true;
+			generator.DungeonFlow = DungeonFlow;
+			generator.MaxAttemptCount = MaxFailedAttempts;
+			generator.ShouldRandomizeSeed = false;
+			generator.AllowTilePooling = AllowTilePooling;
 
-			this.analysis = new GenerationAnalysis(this.Iterations);
-			this.analysisTime = Stopwatch.StartNew();
-			this.remainingIterations = this.targetIterations = this.Iterations;
+			analysis = new GenerationAnalysis(Iterations);
+			analysisTime = Stopwatch.StartNew();
+			remainingIterations = targetIterations = Iterations;
 
-			this.randomStream = new RandomStream(this.Seed);
+			randomStream = new RandomStream(Seed);
 
-			this.generator.OnGenerationStatusChanged += this.OnGenerationStatusChanged;
-			this.GenerateNext();
+			generator.OnGenerationStatusChanged += OnGenerationStatusChanged;
+			GenerateNext();
 		}
 
 		private void GenerateNext()
 		{
-			switch(this.SeedGenerationMode)
+			switch(SeedGenerationMode)
 			{
 				case SeedMode.Random:
-					this.currentSeed = this.randomStream.Next();
+					currentSeed = randomStream.Next();
 					break;
 				case SeedMode.Incremental:
-					this.currentSeed++;
+					currentSeed++;
 					break;
 				case SeedMode.Fixed:
-					this.currentSeed = this.Seed;
+					currentSeed = Seed;
 					break;
 			}
 
-			this.generator.Seed = this.currentSeed;
-			this.generator.Generate();
+			generator.Seed = currentSeed;
+			generator.Generate();
 		}
 
 		private void Update()
 		{
-			if (this.MaximumAnalysisTime > 0 && this.analysisTime.Elapsed.TotalSeconds >= this.MaximumAnalysisTime)
+			if (MaximumAnalysisTime > 0 && analysisTime.Elapsed.TotalSeconds >= MaximumAnalysisTime)
 			{
-				this.remainingIterations = 0;
-				this.finishedEarly = true;
+				remainingIterations = 0;
+				finishedEarly = true;
 			}
 
-			if (this.generateNextFrame)
+			if (generateNextFrame)
 			{
-				this.generateNextFrame = false;
-				this.GenerateNext();
+				generateNextFrame = false;
+				GenerateNext();
 			}
 		}
 
 		private void CompleteAnalysis()
 		{
-			this.analysisTime.Stop();
-			this.analysis.Analyze();
+			analysisTime.Stop();
+			analysis.Analyze();
 
-			if(this.ClearDungeonOnCompletion)
-				UnityUtil.Destroy(this.generator.Root);
+			if(ClearDungeonOnCompletion)
+				UnityUtil.Destroy(generator.Root);
 
-			this.OnAnalysisComplete();
-			RuntimeAnalyzer.AnalysisComplete?.Invoke(this);
+			OnAnalysisComplete();
+			AnalysisComplete?.Invoke(this);
 		}
 
 		private void OnGenerationStatusChanged(DungeonGenerator generator, GenerationStatus status)
@@ -145,20 +144,20 @@ namespace DunGen.Project.External.DunGen.Code.Analysis
 			if (status != GenerationStatus.Complete)
 				return;
 
-			this.analysis.IncrementSuccessCount();
-			this.analysis.Add(generator.GenerationStats);
+			analysis.IncrementSuccessCount();
+			analysis.Add(generator.GenerationStats);
 
-			RuntimeAnalyzer.AnalysisUpdated?.Invoke(this, this.analysis, generator.GenerationStats, this.currentIterations, this.targetIterations);
+			AnalysisUpdated?.Invoke(this, analysis, generator.GenerationStats, currentIterations, targetIterations);
 
-			this.remainingIterations--;
+			remainingIterations--;
 
-			if (this.remainingIterations <= 0)
+			if (remainingIterations <= 0)
 			{
-				generator.OnGenerationStatusChanged -= this.OnGenerationStatusChanged;
-				this.CompleteAnalysis();
+				generator.OnGenerationStatusChanged -= OnGenerationStatusChanged;
+				CompleteAnalysis();
 			}
 			else
-				this.generateNextFrame = true;
+				generateNextFrame = true;
 		}
 
 		private void OnAnalysisComplete()
@@ -171,54 +170,54 @@ namespace DunGen.Project.External.DunGen.Code.Analysis
 				stringBuilder.Append($"\n\t{title}:{spacing}\t{data}");
 			}
 
-			this.generator.ShouldRandomizeSeed = this.prevShouldRandomizeSeed;
-			this.infoText.Length = 0;
+			generator.ShouldRandomizeSeed = prevShouldRandomizeSeed;
+			infoText.Length = 0;
 
-			if (this.finishedEarly)
-				this.infoText.AppendLine("[ Reached maximum analysis time before the target number of iterations was reached ]");
+			if (finishedEarly)
+				infoText.AppendLine("[ Reached maximum analysis time before the target number of iterations was reached ]");
 
-			this.infoText.AppendFormat("Iterations: {0}, Max Failed Attempts: {1}", (this.finishedEarly) ? this.analysis.IterationCount : this.analysis.TargetIterationCount, this.MaxFailedAttempts);
-			this.infoText.AppendFormat("\nTotal Analysis Time: {0:0.00} seconds", this.analysisTime.Elapsed.TotalSeconds);
+			infoText.AppendFormat("Iterations: {0}, Max Failed Attempts: {1}", (finishedEarly) ? analysis.IterationCount : analysis.TargetIterationCount, MaxFailedAttempts);
+			infoText.AppendFormat("\nTotal Analysis Time: {0:0.00} seconds", analysisTime.Elapsed.TotalSeconds);
 			//infoText.AppendFormat("\n\tOf which spent generating dungeons: {0:0.00} seconds", analysis.AnalysisTime / 1000.0f);
-			this.infoText.AppendFormat("\nDungeons successfully generated: {0}% ({1} failed)", Mathf.RoundToInt(this.analysis.SuccessPercentage), this.analysis.TargetIterationCount - this.analysis.SuccessCount);
+			infoText.AppendFormat("\nDungeons successfully generated: {0}% ({1} failed)", Mathf.RoundToInt(analysis.SuccessPercentage), analysis.TargetIterationCount - analysis.SuccessCount);
 
-			this.infoText.AppendLine();
-			this.infoText.AppendLine();
+			infoText.AppendLine();
+			infoText.AppendLine();
 
-			this.infoText.Append("## TIME TAKEN (in milliseconds) ##");
+			infoText.Append("## TIME TAKEN (in milliseconds) ##");
 
 			foreach (var step in GenerationAnalysis.MeasurableSteps)
-				AddInfoEntry(this.infoText, step.ToString(), this.analysis.GetGenerationStepData(step));
+				AddInfoEntry(infoText, step.ToString(), analysis.GetGenerationStepData(step));
 
-			this.infoText.Append("\n\t-------------------------------------------------------");
-			AddInfoEntry(this.infoText, "Total", this.analysis.TotalTime);
+			infoText.Append("\n\t-------------------------------------------------------");
+			AddInfoEntry(infoText, "Total", analysis.TotalTime);
 
-			this.infoText.AppendLine();
-			this.infoText.AppendLine();
+			infoText.AppendLine();
+			infoText.AppendLine();
 
-			this.infoText.AppendLine("## ROOM DATA ##");
-			AddInfoEntry(this.infoText, "Main Path Rooms", this.analysis.MainPathRoomCount);
-			AddInfoEntry(this.infoText, "Branch Path Rooms", this.analysis.BranchPathRoomCount);
-			this.infoText.Append("\n\t-------------------");
-			AddInfoEntry(this.infoText, "Total", this.analysis.TotalRoomCount);
+			infoText.AppendLine("## ROOM DATA ##");
+			AddInfoEntry(infoText, "Main Path Rooms", analysis.MainPathRoomCount);
+			AddInfoEntry(infoText, "Branch Path Rooms", analysis.BranchPathRoomCount);
+			infoText.Append("\n\t-------------------");
+			AddInfoEntry(infoText, "Total", analysis.TotalRoomCount);
 
-			this.infoText.AppendLine();
-			this.infoText.AppendLine();
+			infoText.AppendLine();
+			infoText.AppendLine();
 
-			this.infoText.AppendFormat("Retry Count: {0}", this.analysis.TotalRetries);
+			infoText.AppendFormat("Retry Count: {0}", analysis.TotalRetries);
 		}
 
 		private void OnGUI()
 		{
-			if (this.analysis == null || this.infoText == null || this.infoText.Length == 0)
+			if (analysis == null || infoText == null || infoText.Length == 0)
 			{
-				string failedGenerationsCountText = (this.analysis.SuccessCount < this.analysis.IterationCount) ? ("\nFailed Dungeons: " + (this.analysis.IterationCount - this.analysis.SuccessCount).ToString()) : "";
+				string failedGenerationsCountText = (analysis.SuccessCount < analysis.IterationCount) ? ("\nFailed Dungeons: " + (analysis.IterationCount - analysis.SuccessCount).ToString()) : "";
 
-				GUILayout.Label(string.Format("Analysing... {0} / {1} ({2:0.0}%){3}", this.currentIterations, this.targetIterations, (this.currentIterations / (float)this.targetIterations) * 100, failedGenerationsCountText));
+				GUILayout.Label(string.Format("Analysing... {0} / {1} ({2:0.0}%){3}", currentIterations, targetIterations, (currentIterations / (float)targetIterations) * 100, failedGenerationsCountText));
 				return;
 			}
 
-			GUILayout.Label(this.infoText.ToString());
+			GUILayout.Label(infoText.ToString());
 		}
 	}
 }

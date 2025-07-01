@@ -1,5 +1,5 @@
 using System;
-using Project.Scripts.Characters.CharacterControl.Combat;
+using Project.Scripts.Characters.Combat;
 using Unity.Behavior;
 using Unity.Properties;
 using UnityEngine;
@@ -14,28 +14,21 @@ public partial class AttackAction : Action {
     [SerializeReference] public BlackboardVariable<GameObject> Target;
 
     private bool IsAttacking { get; set; }
-    private ComboAttack? ComboAttack { get; set; }
-
-    private void FinishAttack() {
-        this.IsAttacking = false;
-    }
+    private Combatant? ComboAttack { get; set; }
+    private CharacterAudio? Audio { get; set; }
     
     protected override Status OnStart() {
         base.OnStart();
         this.IsAttacking = true;
-        this.ComboAttack = this.Agent.Value.GetComponent<ComboAttack>();
+        this.ComboAttack = this.Agent.Value.GetComponentInChildren<Combatant>();
+        this.Audio = this.Agent.Value.GetComponentInChildren<CharacterAudio>();
+        this.Audio.Play(CharacterAudio.Sound.Attack);
         this.ComboAttack.CommitRandomStage();
-        this.ComboAttack.OnAttackCommitted += this.FinishAttack;
         return Status.Success;
     }
     
     protected override Status OnUpdate() {
         base.OnUpdate();
         return this.IsAttacking ? Status.Running : Status.Success;
-    }
-
-    protected override void OnEnd() {
-        base.OnEnd();
-        this.ComboAttack!.OnAttackCommitted -= this.FinishAttack;
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DunGen.Project.External.DunGen.Code.Utility
+namespace DunGen
 {
 	/**
      * A series of classes for getting a random value between a given range
@@ -16,21 +16,21 @@ namespace DunGen.Project.External.DunGen.Code.Utility
 		public IntRange() { }
 		public IntRange(int min, int max)
 		{
-			this.Min = min;
-			this.Max = max;
+			Min = min;
+			Max = max;
 		}
 
 		public int GetRandom(RandomStream random)
 		{
-			if (this.Min > this.Max)
-				this.Max = this.Min;
+			if (Min > Max)
+				Max = Min;
 
-			return random.Next(this.Min, this.Max + 1);
+			return random.Next(Min, Max + 1);
 		}
 
 		public override string ToString()
 		{
-			return this.Min + " - " + this.Max;
+			return Min + " - " + Max;
 		}
 	}
 
@@ -44,21 +44,35 @@ namespace DunGen.Project.External.DunGen.Code.Utility
 		public FloatRange() { }
 		public FloatRange(float min, float max)
 		{
-			this.Min = min;
-			this.Max = max;
+			Min = min;
+			Max = max;
 		}
 
 		public float GetRandom(RandomStream random)
 		{
-			if (this.Min > this.Max)
+			if (Min > Max)
 			{
-				float temp = this.Min;
-				this.Min = this.Max;
-				this.Max = temp;
+				float temp = Min;
+				Min = Max;
+				Max = temp;
 			}
 
-			float range = this.Max - this.Min;
-			return this.Min + ((float)random.NextDouble() * range);
+			float range = Max - Min;
+			return Min + ((float)random.NextDouble() * range);
+		}
+	}
+
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+	public sealed class FloatRangeLimitAttribute : Attribute
+	{
+		public float MinLimit { get; private set; }
+		public float MaxLimit { get; private set; }
+
+
+		public FloatRangeLimitAttribute(float minLimit, float maxLimit)
+		{
+			MinLimit = minLimit;
+			MaxLimit = maxLimit;
 		}
 	}
 }

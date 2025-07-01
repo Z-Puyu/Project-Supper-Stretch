@@ -1,71 +1,64 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using Editor;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
+using Project.Scripts.Common;
 using Project.Scripts.Common.GameplayTags;
-using Project.Scripts.Util.Builder;
-using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.AttributeSystem.Modifiers;
 
-[Serializable]
-public record class Modifier {
-    public ModifierKey Key { get; private set; }
-    
-    [field: SerializeField, OnValueChanged(nameof(this.GenerateKey)), AdvancedDropdown(nameof(this.AllTargets))] 
-    public string Target { get; set; } = string.Empty;
-    
-    [field: SerializeField, OnValueChanged(nameof(this.GenerateKey))] 
-    public ModifierType Method { get; set; }
-    
-    [field: SerializeField, OnValueChanged(nameof(this.GenerateKey))] 
-    public float Value { get; set; }
-    
-    public Vector4 VectorForm => this.Method switch {
-        ModifierType.BaseOffset => new Vector4(this.Value, 0, 0, 0),
-        ModifierType.Multiplier => new Vector4(0, this.Value, 0, 0),
-        ModifierType.FinalOffset => new Vector4(0, 0, this.Value, 0),
-        ModifierType.ModifierScaling => new Vector4(0, 0, 0, this.Value),
+public readonly record struct Modifier(ModifierKey Key, float Value, int Duration = 0)
+        : IPresentable<ModifierLocalisationMapping>, IPresentable {
+    public ModifierType Type => this.Key.Type;
+    public string Target => this.Key.Target;
+
+    private string ValueText => this.Type switch {
+        ModifierType.BaseOffset => $"{this.Value:+#;-#;+#}",
+        ModifierType.Multiplier => $"{this.Value:+#;-#;+#}%",
+        ModifierType.FinalOffset => this.Duration > 0
+                ? $"{Mathf.CeilToInt(this.Value / this.Duration):+#;-#;+#}"
+                : $"{this.Value:+#;-#;+#}",
         var _ => throw new ArgumentOutOfRangeException()
     };
-    
-    private AdvancedDropdownList<string> AllTargets => ObjectCache<AttributeDefinition>.Instance.Objects.AllTags();
 
-    public static Modifier Of(float value, string target, ModifierType type) {
-        if (type is ModifierType.Multiplier or ModifierType.ModifierScaling) {
-            value = Mathf.Max(value, -100);       
-        }
-        
-        return new Modifier { Key = new ModifierKey(target, type), Value = value, Target = target, Method = type };
-    }
-    
-    public static IEnumerable<Modifier> Parse(Vector4 code, string target) {
-        if (code == Vector4.zero) {
+    private string TargetName => this.Target.Definition<AttributeDefinition, AttributeType>()?.ToString() ??
+                                 this.Target.Split('.').Last();
+
+    public Vector3 VectorForm => this.Type switch {
+        ModifierType.BaseOffset => new Vector3(this.Value, 0, 0),
+        ModifierType.Multiplier => new Vector3(0, this.Value, 0),
+        ModifierType.FinalOffset => new Vector3(0, 0, this.Value),
+        var _ => Vector3.zero
+    };
+
+    public static Modifier From(ModifierData data) => new Modifier(data.Key, data.Value, data.Duration);
+
+    public static Modifier Once(float value, string target, ModifierType type) =>
+            new Modifier(new ModifierKey(target, type), value);
+
+    public static Modifier Of(float value, string target, ModifierType type, int duration) =>
+            new Modifier(new ModifierKey(target, type), value, duration);
+
+    public static IEnumerable<Modifier> Parse(Vector3 code, string target) {
+        if (code == Vector3.zero) {
             return [];
         }
-        
+
         List<Modifier> modifiers = [];
         if (code.x != 0) {
-            modifiers.Add(Modifier.Of(code.x * code.w, target, ModifierType.BaseOffset));
+            modifiers.Add(Modifier.Once(code.x, target, ModifierType.BaseOffset));
         }
-        
+
         if (code.y != 0) {
-            modifiers.Add(Modifier.Of(code.y * code.w, target, ModifierType.Multiplier));
+            modifiers.Add(Modifier.Once(code.y, target, ModifierType.Multiplier));
         }
-        
+
         if (code.z != 0) {
-            modifiers.Add(Modifier.Of(code.z, target, ModifierType.FinalOffset));
+            modifiers.Add(Modifier.Once(code.z, target, ModifierType.FinalOffset));
         }
-        
+
         return modifiers;
-    }
-    
-    private void GenerateKey() {
-        this.Key = new ModifierKey(this.Target, this.Method);
     }
 
     public IEnumerable<Modifier> Reduce(Dictionary<string, AttributeType> definitions) {
@@ -74,57 +67,84 @@ public record class Modifier {
         }
 
         if (type.IsLeaf) {
-            return [this];
+            return this.Duration switch {
+                0 => [this],
+                > 0 => [this with { Value = this.Value / this.Duration, Duration = 0 }],
+                < 0 => [this with { Duration = 0 }]
+            };
         }
 
+        Modifier self = this;
         return type.Children
                    .Cast<AttributeType>()
-                   .Select(t => this with { Target = t })
+                   .Select(t => self with { Key = self.Key with { Target = t } })
                    .SelectMany(m => m.Reduce(definitions));
     }
 
-    public override string ToString() {
-        StringBuilder sb = new StringBuilder();
-        sb.Append(this.Value.ToString("+#;-#;+#"));
-        if (this.Method == ModifierType.Multiplier) {
-            sb.Append('%');
-        }
+    public string FormatAsText(ModifierLocalisationMapping reference) {
+        string desc = !reference
+                ? $"{this.ValueText} {this.TargetName}"
+                : reference.Map(this).Replace("{value}", this.ValueText);
+        return this.Duration switch {
+            > 0 => this.Type == ModifierType.FinalOffset 
+                    ? $"{desc} per second, for {this.Duration} seconds" 
+                    : $"{desc} for {this.Duration} seconds",
+            < 0 when this.Type != ModifierType.FinalOffset => $"{desc} per second",
+            var _ => desc
+        };
+    }
+    
+    public string FormatAsText() {
+        return this.Duration switch {
+            > 0 => this.Type == ModifierType.FinalOffset 
+                    ? $"{this.ValueText} {this.TargetName} per second, for {this.Duration} seconds" 
+                    : $"{this.ValueText} {this.TargetName} for {this.Duration} seconds",
+            < 0 when this.Type != ModifierType.FinalOffset => $"{this.ValueText} {this.TargetName} per second",
+            var _ => $"{this.ValueText} {this.TargetName}"
+        };
+    }
 
-        return sb.Append(this.Method switch {
-            ModifierType.BaseOffset => " base ",
-            var _ => " "
-        }).Append(this.Target.Split('.')[^1]).ToString();
+    public override string ToString() {
+        return $"{this.Type}: {this.ValueText} {this.TargetName} for {this.Duration} seconds";
     }
 
     public static Modifier operator -(Modifier m) {
-        return Modifier.Of(-m.Value, m.Target, m.Method);
+        return m with { Value = -m.Value };
     }
 
     public static Modifier operator *(Modifier m, float coefficient) {
-        return Modifier.Of(m.Value * coefficient, m.Target, m.Method);
+        return m with { Value = m.Value * coefficient };
     }
-    
+
     public static Modifier operator *(Modifier m, int coefficient) {
-        return Modifier.Of(m.Value * coefficient, m.Target, m.Method);
+        return m with { Value = m.Value * coefficient };
     }
 
     public static Modifier operator +(Modifier m, Modifier other) {
-        if (m.Target != other.Target || m.Method != other.Method) {
-            throw new ArgumentException("Cannot add modifiers with different keys");
+        if (m.Key != other.Key || m.Duration != other.Duration) {
+            throw new ArgumentException("Cannot add modifiers with different keys or durations");
         }
-        
-        return Modifier.Of(m.Value + other.Value, m.Target, m.Method);
-    }
-    
-    public static Modifier operator -(Modifier m, Modifier other) {
-        if (m.Key != other.Key) {
-            throw new ArgumentException("Cannot add modifiers with different keys");
-        }
-        
-        return Modifier.Of(m.Value - other.Value, m.Target, m.Method);
+
+        return m with { Value = m.Value + other.Value };
     }
 
-    public static implicit operator Vector4(Modifier m) {
+    public static Modifier operator -(Modifier m, Modifier other) {
+        if (m.Key != other.Key || m.Duration != other.Duration) {
+            throw new ArgumentException("Cannot add modifiers with different keys or durations");
+        }
+
+        return m with { Value = m.Value - other.Value };
+    }
+
+    public static bool operator ==(Modifier m, int value) {
+        return Mathf.Approximately(m.Value, value);
+    }
+
+    public static bool operator !=(Modifier m, int value) {
+        return !(m == value);
+    }
+
+    public static implicit operator Vector3(Modifier m) {
         return m.VectorForm;
     }
 }

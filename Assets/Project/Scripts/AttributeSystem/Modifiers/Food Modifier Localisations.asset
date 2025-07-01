@@ -1,0 +1,105 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25f6ea59e0a846bfa220432bccb67588, type: 3}
+  m_Name: Food Modifier Localisations
+  m_EditorClassIdentifier: 
+  <Entries>k__BackingField:
+    _keys: []
+    _values: []
+    _saintsKeys:
+    - value: CharacterAttributes.Health BaseOffset
+    - value: CharacterAttributes.Health Multiplier
+    - value: CharacterAttributes.MaxHealth BaseOffset
+    - value: CharacterAttributes.MaxHealth Multiplier
+    - value: CharacterAttributes.Satiation BaseOffset
+    - value: CharacterAttributes.Satiation Multiplier
+    - value: CharacterAttributes.Damage BaseOffset
+    - value: CharacterAttributes.Damage Multiplier
+    - value: CharacterAttributes.Damage.Physical BaseOffset
+    - value: CharacterAttributes.Damage.Physical Multiplier
+    - value: CharacterAttributes.Damage.Elemental BaseOffset
+    - value: CharacterAttributes.Damage.Elemental Multiplier
+    - value: CharacterAttributes.Damage.Elemental.Fire BaseOffset
+    - value: CharacterAttributes.Damage.Elemental.Fire Multiplier
+    - value: CharacterAttributes.Damage.Elemental.Ice BaseOffset
+    - value: CharacterAttributes.Damage.Elemental.Ice Multiplier
+    - value: CharacterAttributes.Damage.Elemental.Lightning BaseOffset
+    - value: CharacterAttributes.Damage.Elemental.Lightning Multiplier
+    - value: CharacterAttributes.Damage.Elemental.Poison BaseOffset
+    - value: CharacterAttributes.Damage.Elemental.Poison Multiplier
+    - value: CharacterAttributes.Damage.Elemental.Divine BaseOffset
+    - value: CharacterAttributes.Damage.Elemental.Divine Multiplier
+    - value: CharacterAttributes.Damage.Elemental.Dark BaseOffset
+    - value: CharacterAttributes.Damage.Elemental.Dark Multiplier
+    - value: CharacterAttributes.Defence BaseOffset
+    - value: CharacterAttributes.Defence Multiplier
+    - value: CharacterAttributes.ElementalResistance BaseOffset
+    - value: CharacterAttributes.ElementalResistance Multiplier
+    - value: CharacterAttributes.ElementalResistance.Fire BaseOffset
+    - value: CharacterAttributes.ElementalResistance.Fire Multiplier
+    - value: CharacterAttributes.ElementalResistance.Ice BaseOffset
+    - value: CharacterAttributes.ElementalResistance.Ice Multiplier
+    - value: CharacterAttributes.ElementalResistance.Lightning BaseOffset
+    - value: CharacterAttributes.ElementalResistance.Lightning Multiplier
+    - value: CharacterAttributes.ElementalResistance.Poison BaseOffset
+    - value: CharacterAttributes.ElementalResistance.Poison Multiplier
+    - value: CharacterAttributes.ElementalResistance.Divine BaseOffset
+    - value: CharacterAttributes.ElementalResistance.Divine Multiplier
+    - value: CharacterAttributes.ElementalResistance.Dark BaseOffset
+    - value: CharacterAttributes.ElementalResistance.Dark Multiplier
+    - value: CharacterAttributes.Toxin BaseOffset
+    - value: CharacterAttributes.Toxin Multiplier
+    _saintsValues:
+    - value: '{value} Health from food'
+    - value: '{value} Health modifier power from food'
+    - value: '{value} Maximum Health from food'
+    - value: '{value} Maximum Health modifier power from food'
+    - value: '{value} Satiation from food'
+    - value: '{value} Satiation from modifier power food'
+    - value: '{value} Damage buff from food'
+    - value: '{value} Damage buff modifier power from food'
+    - value: '{value} Physical Damage buff from food'
+    - value: '{value} Physical Damage buff modifier power from food'
+    - value: '{value} Elemental Damage buff from food'
+    - value: '{value} Elemental Damage buff modifier power from food'
+    - value: '{value} Fire Damage buff from food'
+    - value: '{value} Fire Damage buff modifier power from food'
+    - value: '{value} Ice Damage buff from food'
+    - value: '{value} Ice Damage buff modifier power from food'
+    - value: '{value} Lightning Damage buff from food'
+    - value: '{value} Lightning Damage buff modifier power from food'
+    - value: '{value} Poison Damage buff from food'
+    - value: '{value} Poison Damage buff modifier power from food'
+    - value: '{value} Divine Damage buff from food'
+    - value: '{value} Divine Damage buff modifier power from food'
+    - value: '{value} Dark Damage buff from food'
+    - value: '{value} Dark Damage buff modifier power from food'
+    - value: '{value} Defence buff from food'
+    - value: '{value} Defence buff modifier power from food'
+    - value: '{value} Elemental Resistance buff from food'
+    - value: '{value} Elemental Resistance buff modifier power from food'
+    - value: '{value} Fire Resistance buff from food'
+    - value: '{value} Fire Resistance buff modifier power from food'
+    - value: '{value} Ice Resistance buff from food'
+    - value: '{value} Ice Resistance buff modifier power from food'
+    - value: '{value} Lightning Resistance buff from food'
+    - value: '{value} Lightning Resistance buff modifier power from food'
+    - value: '{value} Poison Resistance buff from food'
+    - value: '{value} Poison Resistance buff modifier power from food'
+    - value: '{value} Divine Resistance buff from food'
+    - value: '{value} Divine Resistance buff modifier power from food'
+    - value: '{value} Dark Resistance buff from food'
+    - value: '{value} Dark Resistance buff modifier power from food'
+    - value: '{value} Toxin from food'
+    - value: '{value} Toxin modifier power from food'
+  <Source>k__BackingField: {fileID: 11400000, guid: 6501741a3b1ca164a8ba394ce86c2a9e, type: 2}
+  <IncludedModifierTypes>k__BackingField: 0000000001000000

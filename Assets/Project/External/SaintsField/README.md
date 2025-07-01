@@ -101,10 +101,10 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.16.4**
+**4.19.0**
 
-1.  `ListDrawerSetting`, `Table`, `SaintsDictionary` search now support `SerializeReference` field search, and is case-insensitive.
-2.  UI Toolkit: `SaintsDictionary` now support debounce search
+1.  You can now use `$:ClassName.CallbackName` or `$:ClassName.FieldName` to call a static/const value/method in most place like `ShowIf/HideIf`, `EnableIf/DisableIf`, `RequiredIf`, `BelowImage/AboveImage` etc.
+2.  When a callback returns a `null` result, `AboveImage`, `BelowImage` now shows nothing, instead of giving an error notice.
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -2703,13 +2703,15 @@ Arguments:
 
 For callback (functions, fields, properties):
 
-*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
+*   (Optional) `EMode editorMode`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default, (omitting this parameter) it does not check the mode at all.
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
 
 *   `object by...`
 
-    callbacks or attributes for the condition.
+    callbacks or attributes for the condition. For more information, see `Callback` section
 
 *   AllowMultiple: Yes
 
@@ -2735,6 +2737,14 @@ using SaintsField;
 private bool ShouldBeDisabled  // change the logic here
 {
     return true;
+}
+
+// This also works on static/const callbacks using `$:`
+[DisableIf("$:" + nameof(Util) + "." + nameof(_shouldDisable))] public int disableThis;
+// you can put this under another file like `Util.cs`
+public static class Util
+{
+    [ShowInIspector] private static bool _shouldDisable;
 }
 ```
 
@@ -2831,7 +2841,7 @@ public bool boolVal;
 [EnableIf(EMode.Edit), EnableIf(nameof(boolVal))] public string enEditAndBool;
 ```
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
 #### `PlayaEnableIf`/`PlayaDisableIf` ####
 
@@ -2870,7 +2880,7 @@ using SaintsField.Playa;
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/b57f3a65-fad3-4de6-975f-14b945c85a30)
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
 #### `ShowIf` / `HideIf` ####
 
@@ -2878,13 +2888,15 @@ Show or hide the field based on a condition. . Supports callbacks (function/fiel
 
 Arguments:
 
-*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
+*   (Optional) `EMode editorMode`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default, (omitting this parameter) it does not check the mode at all.
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
 
 *   `object by...`
 
-    callbacks or attributes for the condition.
+    callbacks or attributes for the condition. For more information, see `Callback` section.
 
 *   AllowMultiple: Yes
 
@@ -2915,6 +2927,14 @@ public int showMe;
 public bool ShouldShow()  // change the logic here
 {
     return true;
+}
+
+// This also works on static/const callbacks using `$:`
+[HideIf("$:" + nameof(Util) + "." + nameof(_shouldHide))] public int hideMe;
+// you can put this under another file like `Util.cs`
+public static class Util
+{
+    [ShowInIspector] private static bool _shouldHide;
 }
 ```
 
@@ -3024,7 +3044,7 @@ public bool boolValue;
 [HideIf(EMode.Edit), HideIf(nameof(boolValue))] public string hideEditAndBool;
 ```
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
 
 #### `PlayaShowIf`/`PlayaHideIf` ####
@@ -3079,7 +3099,7 @@ public bool boolValue;
 
 ![image](https://github.com/TylerTemp/SaintsField/assets/6391063/eb07de01-3210-4f4b-be58-b5fadd899f1a)
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
 #### `Required` ####
 
@@ -3092,6 +3112,8 @@ This will check if the field value is a `truly` value, which means:
 3.  You may not want to use it on `int`, `float` (because only `0` is not `truly`) or `bool`, but it's still allowed if you insist
 
 If you have addressable installed, using `Required` on addressable's `AssetReference` will check if the target asset is valid
+
+If you have `RequiredIf`, `Required` will work as a config privider instead. See `RequiredIf` section for more information.
 
 Parameters:
 
@@ -3126,6 +3148,78 @@ public GameObject empty2;
 ```
 
 ![Image](https://github.com/user-attachments/assets/7c099777-11f8-4d4c-8adf-8f03ce217f00)
+
+### `RequiredIf` ###
+
+Like `Required`, but only required if the condition is a `truly` result.
+
+Parameters:
+
+Arguments:
+
+*   (Optional) `EMode editorMode`
+
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
+
+*   `object by...`
+
+    callbacks or attributes for the condition.
+
+*   Allow Multiple: Yes
+
+You can use multiple `RequiredIf`. The field will be required if **ALL** condition is true (`and` operation)
+
+For multiple `RequiredIf`: The field will be required if **ANY** condition is true (`or` operation)
+
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
+
+You can use `Required` to change the notice message & icon. See the example below
+
+```csharp
+using SaintsField;
+
+[Separator("Depende on other field or callback")]
+public GameObject go;
+[RequiredIf(nameof(go))]  // if a field is a dependence of another field
+public GameObject requiredIfGo;
+
+public int intValue;
+[RequiredIf(nameof(intValue) + ">=", 0)]
+public GameObject requiredIfPositive;  // if meet some condition; callback is also supported.
+
+[Separator("EMode condition")]
+
+[RequiredIf(EMode.InstanceInScene)]
+public GameObject sceneObj;  // if it's a prefab in a scene
+
+[Separator("Suggestion")]
+
+// use as a notice
+public Transform hand;
+[RequiredIf(nameof(hand))]
+[Required("It's suggested to set this field if 'hand' is set", EMessageType.Info)]  // this is now a config provider
+public GameObject suggestedIfHand;
+
+[Separator("And")]
+
+// You can also chain multiple conditions as "and" operation
+public GameObject andCondition;
+[RequiredIf(EMode.InstanceInScene, nameof(andCondition))]
+public GameObject instanceInSceneAndCondition;  // if it's a prefab in a scene and 'andCondition' is set
+
+[Separator("Or")]
+
+// You can also chain multiple RequiredIf as "or" operation
+public GameObject orCondition;
+public int orValue;
+[RequiredIf(nameof(orCondition))]
+[RequiredIf(nameof(orValue) + ">=", 0)]
+public GameObject requiredOr;  // if it's a prefab in a scene and 'andCondition' is set
+```
+
+[![video](https://github.com/user-attachments/assets/1dbd5e3b-1fcd-4b79-a1e5-d990628794db)](https://github.com/user-attachments/assets/9ffd8fef-60dd-482d-b644-ec97cae76451)
 
 #### `ValidateInput` ####
 
@@ -3787,9 +3881,11 @@ Disable or enable an entire layout group. These attributes will work on the firs
 
 Arguments:
 
-*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
+*   (Optional) `EMode editorMode`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default, (omitting this parameter) it does not check the mode at all.
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
 
 *   `object by...`
 
@@ -3805,7 +3901,7 @@ For `LayoutEnableIf`: The layout group will be enabled if **ANY** condition is t
 
 For multiple attributes: The layout group will be disabled if **ANY** condition is true (`or` operation)
 
-It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable-If" section.
+It also supports sub-field, and value comparison like `==`, `>`, `<=`. Read more in the "Syntax for Show/Hide/Enable/Disable/Required-If" section.
 
 ```csharp
 using SaintsField.Playa;
@@ -3845,9 +3941,11 @@ Show or hide an entire layout group. These attributes will work on the first lay
 
 Arguments:
 
-*   (Optional) `EMode editorMode=EMode.Edit | EMode.Play`
+*   (Optional) `EMode editorMode`
 
-    Condition: if it should be in edit mode or play mode for Editor. By default, (omitting this parameter) it does not check the mode at all.
+    Condition: if it should be in edit mode, play mode for Editor or in some prefab stage. By default, (omitting this parameter) it does not check the mode at all.
+
+    See `Misc` - `EMode` for more information.
 
 *   `object by...`
 
@@ -4829,6 +4927,10 @@ public class SearchableMono : SaintsMonoBehaviour
 
 `Handles` is drawn in the scene view instead of inspector.
 
+When using handles (except `SceneViewPicker` and `DrawLabel`), you can use right click to show/hide some handles.
+
+![image](https://github.com/user-attachments/assets/d86350c6-bd97-43d0-a7ef-1c959cd22364)
+
 ### `SceneViewPicker` ###
 
 Allow you to pick a target from a scene view, then sign it into your field.
@@ -4904,6 +5006,8 @@ Parameters:
 
 *   `string space="this"`:the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value. Only works for `Vector3`/`Vector2` type.
 
+You can use right click to show/hide handles.
+
 Example of using it with vector types + `DrawLabel`:
 
 ```csharp
@@ -4935,6 +5039,8 @@ private string LabelName(MeshRenderer target, int index) => $"{target.name}[{ind
 
 Draw a line between different objects. The decorated field need to be a `GameObject`/`Component` or a `Vector3`/`Vector2`, or a list/array of them.
 
+You can use right click to show/hide handles.
+
 Parameters:
 
 *   `string start = null`: where does the line start. `null` for the current field.
@@ -4943,8 +5049,10 @@ Parameters:
 *   `string end = null`: where does the line end. `null` for the current field.
 *   `int endIndex = 0`: when `end` is not `null`, and the end is a list/array, specify the index of the end.
 *   `string endSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
-*   `EColor color = EColor.White`: the color of the line.
-*   `float colorAlpha = 1f`: the alpha of the color.
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
+*   `float dotted = -1f`: when `>=0`, draw dotted line instead.
 
 And also `DrawLineFrom`, `DrawLineTo` as a shortcut to connect current field with another:
 
@@ -4952,8 +5060,10 @@ And also `DrawLineFrom`, `DrawLineTo` as a shortcut to connect current field wit
 *   `int targetIndex = 0`: if the target is a list/array, specify the index of the target.
 *   `string targetSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
 *   `string space = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
-*   `EColor color = EColor.White`: the color of the line.
-*   `float colorAlpha = 1f`: the alpha of the color.
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
+*   `float dotted = -1f`: when `>=0`, draw dotted line instead.
 
 ```csharp
 using SaintsField;
@@ -4999,8 +5109,10 @@ Parameters:
 *   `string end = null`: where does the arrow end. `null` for the current field.
 *   `int endIndex = 0`: when `end` is not `null`, and the end is a list/array, specify the index of the end.
 *   `string endSpace = "this"`: the containing space. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
-*   `EColor color = EColor.White`: the color of the arrow.
-*   `float colorAlpha = 1f`: the alpha of the color.
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
+*   `float dotted = -1f`: when `>=0`, draw dotted line instead.
 *   `float headLength = 0.5f`: the length of the arrow head.
 *   `float headAngle = 20.0f`: the angle of the arrow head.
 
@@ -5047,8 +5159,6 @@ Like `SaintsArrow` but using Unity's default `ArrowHandleCap` to draw. (No depen
 
 Draw an arrow between different objects. The decorated field need to be a `GameObject`/`Component` or a `Vector3`/`Vector2`, or a list/array of them.
 
-Note: Unity's arrow handle does not allow much controlling. You might see a giant arrow depending on your scaling.
-
 Parameters:
 
 *   `string start = null`: where does the arrow start. `null` for the current field.
@@ -5057,8 +5167,10 @@ Parameters:
 *   `string end = null`: where does the arrow end. `null` for the current field.
 *   `int endIndex = 0`: when `end` is not `null`, and the end is a list/array, specify the index of the end.
 *   `Space endSpace = Space.World`: if the end is a `Vector3`/`Vector2`, should it be in world space or local space.
-*   `EColor color = EColor.White`: the color of the arrow.
-*   `float colorAlpha = 1f`: the alpha of the color.
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
+*   `float dotted = -1f`: when `>=0`, draw dotted line instead.
 
 Specially
 1.  using on an array/list without specifying `start` and `end` will arrow-connect the element from first to last.
@@ -5098,7 +5210,7 @@ public Vector3[] worldPos;
 private string PosIndexLabel(Vector3 pos, int index) => $"[{index}]\n{pos}";
 ```
 
-![image](https://github.com/user-attachments/assets/ebb83a0b-2f1d-49c9-9897-9e900db4e471)
+![image](https://github.com/user-attachments/assets/e78c94c0-803b-436d-b8ff-ba319aefbe93)
 
 ### `DrawWireDisc` ###
 
@@ -5119,8 +5231,9 @@ Parameters:
 *   `string posOffsetCallback = null`: use a callback or a field value as the position offset. The value must be a `Vector3`
 *   `float rotX = 0f, float rotY = 0f, float rotZ = 0f`: rotation of the disc related to `space`
 *   `string rotCallback = null`: use a callback or a field value as the rotation. The value must be a `Quaternion`
-*   `EColor eColor = EColor.White`: line color of the disc
-*   `string color = null`: If it's starting with `#`, use a html color for the line. Otherwise, use a callback or a field value as the color. The value must be a `Color`
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
 
 ```csharp
 using SaintsField;
@@ -5212,8 +5325,9 @@ Draw a sphere in the scene like Unity's [`SphereHandleCap`](https://docs.unity3d
 *   `string space = "this"`: the containing space of the sphere. `"this"` means using the current target, `null` means using the world space, otherwise means using a callback or a field value
 *   `float posXOffset = 0f, float posYOffset = 0f, float posZOffset = 0f`: `Vector3` position offset for the sphere related to the `space`
 *   `string posOffsetCallback = null`: use a callback or a field value as the position offset. The value must be a `Vector3`
-*   `EColor eColor = EColor.White`: color of the sphere
-*   `string color = null`: If it's starting with `#`, use a html color for the sphere. Otherwise, use a callback or a field value as the color. The value must be a `Color`
+*   `EColor eColor = EColor.White`: color
+*   `float alpha = 1f`: the alpha of the color. Not works with `color`.
+*   `string color = null`: the color of the line. If it starts with `#`, use html hex color, otherwise use as a callback. This overrides the `eColor`.
 
 ```csharp
 [DrawLine]  // also draw the lines
@@ -6485,9 +6599,71 @@ This only works for decorator draws above or below the field. The above drawer w
 
 `""` means no group.
 
-### Syntax for Show/Hide/Enable/Disable-If ##
+### `EMode` ###
 
-This applies to `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, `PlayaShowIf`, `PlayaHideIf`, `PlayaEnableIf`, `PlayaDisableIf`.
+*   `EMode.Edit`: the Unity Editor is not playing
+*   `EMode.Play`: the Unity Editor is playing
+*   `EMode.InstanceInScene`: target is a prefab placed in a scene
+*   `EMode.InstanceInPrefab`: target is inside a prefab (but is not the top root of that prefab)
+*   `EMode.Regular`: target is at the top root of the prefab
+*   `EMode.Variant`: target is at the top root of the prefab, and is also a variant prefab
+*   `EMode.NonPrefabInstance`: target is not a prefab (but can be inside a prefab)
+*   `EMode.PrefabInstance` = `InstanceInPrefab | InstanceInScene`
+*   `EMode.PrefabAsset` = `Variant | Regular`
+
+### Callback ###
+
+For decorators that accept a callback, you can usually use `$` to indicate that you want a callback. The callback can be a method, a property, or a field.
+
+Use `\\$` if you do not want it to be a callback. This is useful for decorators like `RichLabel`, `InfoBox` that the displaying string itself starts with `$`.
+
+Using `$:` if the callback is a static/const field. We support the following style:
+
+```csharp
+namespace SaintsField.Samples.Scripts
+{
+    public class StaticCallback : SaintsMonoBehaviour
+    {
+        private static readonly string StaticString = "This is a static string";
+        private const string ConstString = "This is a constant string";
+
+        // using full type name
+        [AboveRichLabel("$:SaintsField.Samples.Scripts." + nameof(StaticCallback) + "." + nameof(StaticString))]
+        // using only type name. This is slow and might find the incorrect target.
+        // We'll first search the assembly of this object. If not found, then search all assemblies.
+        [InfoBox("$:" + nameof(StaticCallback) + "." + nameof(ConstString))]
+        public int field;
+
+#if UNITY_EDITOR
+        private static Texture2D ImageCallback(string name) =>
+            AssetDatabase.LoadAssetAtPath<Texture2D>(
+                $"Assets/SaintsField/Editor/Editor Default Resources/SaintsField/{name}.png");
+#endif
+
+#if UNITY_EDITOR
+        // use only field/method name. This will only try to search on the current target.
+        [BelowImage("$:" + nameof(ImageCallback), maxWidth: 20)]
+#endif
+        public string imgName;
+
+        [ShowInInspector] private static bool _disableMe = true;
+
+#if UNITY_EDITOR
+        [DisableIf("$:" + nameof(_disableMe))]
+        [RequiredIf("$:" + nameof(_disableMe), false)]
+#endif
+        public string disableIf;
+    }
+}
+```
+
+You can skip the `namespace` part. And if you also skip the `type` part, we'll try to find the callback from the current type first, then search all types in the current assembly, and finally search all types in all assemblies.
+
+Note: decorators like `OnEvent`, `OnButtonClick` does not support this `$:` yet. I'm still working on making all APIs consistent.
+
+### Syntax for Show/Hide/Enable/Disable/Required-If ##
+
+This applies to `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, `RequiredIf`, `PlayaShowIf`, `PlayaHideIf`, `PlayaEnableIf`, `PlayaDisableIf`.
 
 These decorators accept many objects.
 

@@ -1,18 +1,16 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using Project.Scripts.Common;
-using Project.Scripts.Items;
 using Project.Scripts.Items.Definitions;
 using Project.Scripts.UI.Control.MVP.Interfaces;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Project.Scripts.UI.Control.MVP.Components;
 
 public class InventoryItemEntry : ListEntry, ISelectable {
+    [NotNull] [field: SerializeField] private GameObject? EquipmentStatus { get; set; }
     [NotNull] [field: SerializeField] private TextMeshProUGUI? Nameplate { get; set; }
     [NotNull] [field: SerializeField] private Image? TypeTag { get; set; }
     [NotNull] [field: SerializeField] private TextMeshProUGUI? ValueTag { get; set; }
@@ -24,6 +22,7 @@ public class InventoryItemEntry : ListEntry, ISelectable {
     public string ItemName { private get; set; } = string.Empty;
     public ItemType? ItemType { private get; set; }
     public int Worth { private get; set; }
+    public bool IsEquipped { private get; set; }
 
     private void Start() {
         this.SelectButton.onClick.AddListener(this.OnSelected.Invoke);
@@ -33,10 +32,17 @@ public class InventoryItemEntry : ListEntry, ISelectable {
         this.Nameplate.text = this.ItemName;
         this.TypeTag.sprite = this.ItemType!.Icon;
         this.ValueTag.text = this.Worth.ToString();
+        this.EquipmentStatus.SetActive(this.IsEquipped);
     }
     
     public override void Clear() {
         this.Nameplate.text = string.Empty;
         this.TypeTag.sprite = null;
+    }
+
+    public override void OnRemove() {
+        this.OnSelected = delegate { };
+        this.OnDeselected = delegate { };
+        base.OnRemove();
     }
 }

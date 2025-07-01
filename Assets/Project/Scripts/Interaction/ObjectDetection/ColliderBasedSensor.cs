@@ -1,34 +1,33 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.Interaction.ObjectDetection;
 
 [RequireComponent(typeof(Collider))]
 public class ColliderBasedSensor : Sensor {
-    [NotNull]
-    [field: SerializeField]
-    private Collider? Collider { get; set; }
-
     private HashSet<Collider> RegisteredTargets { get; init; } = [];
 
     private void Start() {
-        this.Collider.isTrigger = true;
+        this.GetComponent<Collider>().isTrigger = true;
     }
 
     private void OnTriggerEnter(Collider other) {
-        this.RegisteredTargets.Add(other);
-        this.Detected(other);
+        this.Detect(other);
     }
     
     private void OnTriggerExit(Collider other) {
-        this.RegisteredTargets.Remove(other);
-        this.LoseTarget(other);
+        this.Forget(other);
     }
 
-    private void OntriggerStay(Collider other) {
-        if (this.RegisteredTargets.Add(other)) {
-            this.Detected(other);
-        }
+    protected override void Register(Collider other) {
+        base.Register(other);
+        this.RegisteredTargets.Add(other);
+    }
+    
+    protected override void Unregister(Collider other) {
+        base.Unregister(other);
+        this.RegisteredTargets.Remove(other);
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	[AddComponentMenu("DunGen/Culling/Adjacent Room Culling")]
 	public class AdjacentRoomCulling : MonoBehaviour
@@ -70,7 +69,7 @@ namespace DunGen.Project.External.DunGen.Code
 		protected Dictionary<Tile, List<ReflectionProbe>> reflectionProbes;
 		protected Dictionary<Door, List<Renderer>> doorRenderers;
 
-		protected Transform targetTransform { get { return (this.TargetOverride != null) ? this.TargetOverride : this.transform; } }
+		protected Transform targetTransform { get { return (TargetOverride != null) ? TargetOverride : transform; } }
 		private bool dirty;
 		private DungeonGenerator generator;
 		private Tile currentTile;
@@ -85,62 +84,62 @@ namespace DunGen.Project.External.DunGen.Code
 
 			if (runtimeDungeon != null)
 			{
-				this.generator = runtimeDungeon.Generator;
-				this.generator.OnGenerationStatusChanged += this.OnDungeonGenerationStatusChanged; ;
+				generator = runtimeDungeon.Generator;
+				generator.OnGenerationStatusChanged += OnDungeonGenerationStatusChanged; ;
 
-				if (this.generator.Status == GenerationStatus.Complete)
-					this.SetDungeon(this.generator.CurrentDungeon);
+				if (generator.Status == GenerationStatus.Complete)
+					SetDungeon(generator.CurrentDungeon);
 			}
 		}
 
 		protected virtual void OnDisable()
 		{
-			if (this.generator != null)
-				this.generator.OnGenerationStatusChanged -= this.OnDungeonGenerationStatusChanged;
+			if (generator != null)
+				generator.OnGenerationStatusChanged -= OnDungeonGenerationStatusChanged;
 
-			this.ClearDungeon();
+			ClearDungeon();
 		}
 
 		public virtual void SetDungeon(Dungeon newDungeon)
 		{
-			if (this.Ready)
-				this.ClearDungeon();
+			if (Ready)
+				ClearDungeon();
 
-			this.dungeon = newDungeon;
+			dungeon = newDungeon;
 
-			if (this.dungeon == null)
+			if (dungeon == null)
 				return;
 
-			this.allTiles = new List<Tile>(this.dungeon.AllTiles);
-			this.allDoors = new List<Door>(this.GetAllDoorsInDungeon(this.dungeon));
-			this.oldVisibleTiles = new List<Tile>(this.allTiles.Count);
-			this.visibleTiles = new List<Tile>(this.allTiles.Count);
-			this.tileVisibilities = new Dictionary<Tile, bool>();
-			this.tileRenderers = new Dictionary<Tile, List<Renderer>>();
-			this.lightSources = new Dictionary<Tile, List<Light>>();
-			this.reflectionProbes = new Dictionary<Tile, List<ReflectionProbe>>();
-			this.doorRenderers = new Dictionary<Door, List<Renderer>>();
+			allTiles = new List<Tile>(dungeon.AllTiles);
+			allDoors = new List<Door>(GetAllDoorsInDungeon(dungeon));
+			oldVisibleTiles = new List<Tile>(allTiles.Count);
+			visibleTiles = new List<Tile>(allTiles.Count);
+			tileVisibilities = new Dictionary<Tile, bool>();
+			tileRenderers = new Dictionary<Tile, List<Renderer>>();
+			lightSources = new Dictionary<Tile, List<Light>>();
+			reflectionProbes = new Dictionary<Tile, List<ReflectionProbe>>();
+			doorRenderers = new Dictionary<Door, List<Renderer>>();
 
-			this.UpdateRendererLists();
+			UpdateRendererLists();
 
-			foreach (var tile in this.allTiles)
-				this.SetTileVisibility(tile, false);
+			foreach (var tile in allTiles)
+				SetTileVisibility(tile, false);
 
-			foreach (var door in this.allDoors)
+			foreach (var door in allDoors)
 			{
-				door.OnDoorStateChanged += this.OnDoorStateChanged;
-				this.SetDoorVisibility(door, false);
+				door.OnDoorStateChanged += OnDoorStateChanged;
+				SetDoorVisibility(door, false);
 			}
 
-			this.Ready = true;
-			this.dirty = true;
+			Ready = true;
+			dirty = true;
 		}
 
 		public virtual bool IsTileVisible(Tile tile)
 		{
 			bool visibility;
 
-			if (this.tileVisibilities.TryGetValue(tile, out visibility))
+			if (tileVisibilities.TryGetValue(tile, out visibility))
 				return visibility;
 			else
 				return false;
@@ -162,89 +161,89 @@ namespace DunGen.Project.External.DunGen.Code
 
 		protected virtual void ClearDungeon()
 		{
-			if (!this.Ready)
+			if (!Ready)
 				return;
 
-			foreach (var door in this.allDoors)
+			foreach (var door in allDoors)
 			{
-				this.SetDoorVisibility(door, true);
-				door.OnDoorStateChanged -= this.OnDoorStateChanged;
+				SetDoorVisibility(door, true);
+				door.OnDoorStateChanged -= OnDoorStateChanged;
 			}
 
-			foreach (var tile in this.allTiles)
-				this.SetTileVisibility(tile, true);
+			foreach (var tile in allTiles)
+				SetTileVisibility(tile, true);
 
-			this.Ready = false;
+			Ready = false;
 		}
 
 		protected virtual void OnDoorStateChanged(Door door, bool isOpen)
 		{
-			this.dirty = true;
+			dirty = true;
 		}
 
 		protected virtual void OnDungeonGenerationStatusChanged(DungeonGenerator generator, GenerationStatus status)
 		{
 			if (status == GenerationStatus.Complete)
-				this.SetDungeon(generator.CurrentDungeon);
+				SetDungeon(generator.CurrentDungeon);
 			else if (status == GenerationStatus.Failed)
-				this.ClearDungeon();
+				ClearDungeon();
 		}
 
 		protected virtual void LateUpdate()
 		{
-			if (!this.Ready)
+			if (!Ready)
 				return;
 
-			var oldTile = this.currentTile;
+			var oldTile = currentTile;
 
 			// If currentTile doesn't exist, we need to first look for a dungeon,
 			// then search every tile to find one that encompasses this GameObject
-			if (this.currentTile == null)
-				this.currentTile = this.FindCurrentTile();
+			if (currentTile == null)
+				currentTile = FindCurrentTile();
 			// If currentTile does exist, but we're not in it, we can perform a
 			// breadth-first search radiating from currentTile. Assuming the player
 			// is likely to be in an adjacent room, this should be much quicker than
 			// testing every tile in the dungeon
-			else if (!this.currentTile.Bounds.Contains(this.targetTransform.position))
-				this.currentTile = this.SearchForNewCurrentTile();
+			else if (!currentTile.Bounds.Contains(targetTransform.position))
+				currentTile = SearchForNewCurrentTile();
 
-			if (this.currentTile != oldTile)
-				this.dirty = true;
+			if (currentTile != oldTile)
+				dirty = true;
 
-			if (this.dirty)
-				this.RefreshVisibility();
+			if (dirty)
+				RefreshVisibility();
 
-			this.dirty = false;
+			dirty = false;
 		}
 
 		protected virtual void RefreshVisibility()
 		{
-			var temp = this.visibleTiles;
-			this.visibleTiles = this.oldVisibleTiles;
-			this.oldVisibleTiles = temp;
+			var temp = visibleTiles;
+			visibleTiles = oldVisibleTiles;
+			oldVisibleTiles = temp;
 
-			this.UpdateVisibleTiles();
+			UpdateVisibleTiles();
 
 			// Hide any tiles that are no longer visible
-			foreach (var tile in this.oldVisibleTiles)
-				if (!this.visibleTiles.Contains(tile))
-					this.SetTileVisibility(tile, false);
+			foreach (var tile in oldVisibleTiles)
+				if (!visibleTiles.Contains(tile))
+					SetTileVisibility(tile, false);
 
 			// Show tiles that are newly visible
-			foreach (var tile in this.visibleTiles)
-				if (!this.oldVisibleTiles.Contains(tile))
-					this.SetTileVisibility(tile, true);
+			foreach (var tile in visibleTiles)
+				if (!oldVisibleTiles.Contains(tile))
+					SetTileVisibility(tile, true);
 
-			this.oldVisibleTiles.Clear();
-			this.RefreshDoorVisibilities();
+			oldVisibleTiles.Clear();
+			RefreshDoorVisibilities();
 		}
 
 		protected virtual void RefreshDoorVisibilities()
 		{
-			foreach (var door in this.allDoors)
+			foreach (var door in allDoors)
 			{
-				bool visible = this.visibleTiles.Contains(door.DoorwayA.Tile) || this.visibleTiles.Contains(door.DoorwayB.Tile);
-				this.SetDoorVisibility(door, visible);
+				bool visible = visibleTiles.Contains(door.DoorwayA.Tile) || visibleTiles.Contains(door.DoorwayB.Tile);
+				SetDoorVisibility(door, visible);
 			}
 		}
 
@@ -252,7 +251,7 @@ namespace DunGen.Project.External.DunGen.Code
 		{
 			List<Renderer> renderers;
 
-			if (this.doorRenderers.TryGetValue(door, out renderers))
+			if (doorRenderers.TryGetValue(door, out renderers))
 			{
 				for (int i = renderers.Count - 1; i >= 0; i--)
 				{
@@ -266,7 +265,7 @@ namespace DunGen.Project.External.DunGen.Code
 
 					// Check for overridden renderer visibility
 					bool visibleOverride;
-					if (this.OverrideRendererVisibilities.TryGetValue(renderer, out visibleOverride))
+					if (OverrideRendererVisibilities.TryGetValue(renderer, out visibleOverride))
 						renderer.enabled = visibleOverride;
 					else
 						renderer.enabled = visible;
@@ -276,21 +275,21 @@ namespace DunGen.Project.External.DunGen.Code
 
 		protected virtual void UpdateVisibleTiles()
 		{
-			this.visibleTiles.Clear();
+			visibleTiles.Clear();
 
-			if (this.currentTile != null)
-				this.visibleTiles.Add(this.currentTile);
+			if (currentTile != null)
+				visibleTiles.Add(currentTile);
 
 			int processTileStart = 0;
 
 			// Add neighbours down to RoomDepth (0 = just tiles containing characters, 1 = plus adjacent tiles, etc)
-			for (int i = 0; i < this.AdjacentTileDepth; i++)
+			for (int i = 0; i < AdjacentTileDepth; i++)
 			{
-				int processTileEnd = this.visibleTiles.Count;
+				int processTileEnd = visibleTiles.Count;
 
 				for (int t = processTileStart; t < processTileEnd; t++)
 				{
-					var tile = this.visibleTiles[t];
+					var tile = visibleTiles[t];
 
 					// Get all connections to adjacent tiles
 					foreach (var doorway in tile.UsedDoorways)
@@ -298,11 +297,11 @@ namespace DunGen.Project.External.DunGen.Code
 						var adjacentTile = doorway.ConnectedDoorway.Tile;
 
 						// Skip the tile if it's already visible
-						if (this.visibleTiles.Contains(adjacentTile))
+						if (visibleTiles.Contains(adjacentTile))
 							continue;
 
 						// No need to add adjacent rooms to the visible list when the door between them is closed
-						if (this.CullBehindClosedDoors)
+						if (CullBehindClosedDoors)
 						{
 							var door = doorway.DoorComponent;
 
@@ -310,7 +309,7 @@ namespace DunGen.Project.External.DunGen.Code
 								continue;
 						}
 
-						this.visibleTiles.Add(adjacentTile);
+						visibleTiles.Add(adjacentTile);
 					}
 				}
 
@@ -320,12 +319,12 @@ namespace DunGen.Project.External.DunGen.Code
 
 		protected virtual void SetTileVisibility(Tile tile, bool visible)
 		{
-			this.tileVisibilities[tile] = visible;
+			tileVisibilities[tile] = visible;
 
 			// Renderers
 			List<Renderer> renderers;
 
-			if (this.tileRenderers.TryGetValue(tile, out renderers))
+			if (tileRenderers.TryGetValue(tile, out renderers))
 			{
 				for (int i = renderers.Count - 1; i >= 0; i--)
 				{
@@ -339,7 +338,7 @@ namespace DunGen.Project.External.DunGen.Code
 
 					// Check for overridden renderer visibility
 					bool visibleOverride;
-					if (this.OverrideRendererVisibilities.TryGetValue(renderer, out visibleOverride))
+					if (OverrideRendererVisibilities.TryGetValue(renderer, out visibleOverride))
 						renderer.enabled = visibleOverride;
 					else
 						renderer.enabled = visible;
@@ -349,7 +348,7 @@ namespace DunGen.Project.External.DunGen.Code
 			// Lights
 			List<Light> lights;
 
-			if (this.lightSources.TryGetValue(tile, out lights))
+			if (lightSources.TryGetValue(tile, out lights))
 			{
 				for (int i = lights.Count - 1; i >= 0; i--)
 				{
@@ -363,7 +362,7 @@ namespace DunGen.Project.External.DunGen.Code
 
 					// Check for overridden renderer visibility
 					bool visibleOverride;
-					if (this.OverrideLightVisibilities.TryGetValue(light, out visibleOverride))
+					if (OverrideLightVisibilities.TryGetValue(light, out visibleOverride))
 						light.enabled = visibleOverride;
 					else
 						light.enabled = visible;
@@ -374,7 +373,7 @@ namespace DunGen.Project.External.DunGen.Code
 			// Reflection Probes
 			List<ReflectionProbe> probes;
 
-			if (this.reflectionProbes.TryGetValue(tile, out probes))
+			if (reflectionProbes.TryGetValue(tile, out probes))
 			{
 				for (int i = probes.Count - 1; i >= 0; i--)
 				{
@@ -390,64 +389,64 @@ namespace DunGen.Project.External.DunGen.Code
 				}
 			}
 
-			if (this.TileVisibilityChanged != null)
-				this.TileVisibilityChanged(tile, visible);
+			if (TileVisibilityChanged != null)
+				TileVisibilityChanged(tile, visible);
 		}
 
 		public virtual void UpdateRendererLists()
 		{
-			foreach (var tile in this.allTiles)
+			foreach (var tile in allTiles)
 			{
 				// Renderers
 				List<Renderer> renderers;
 
-				if (!this.tileRenderers.TryGetValue(tile, out renderers))
-					this.tileRenderers[tile] = renderers = new List<Renderer>();
+				if (!tileRenderers.TryGetValue(tile, out renderers))
+					tileRenderers[tile] = renderers = new List<Renderer>();
 
 				foreach (var renderer in tile.GetComponentsInChildren<Renderer>())
-					if (this.IncludeDisabledComponents || (renderer.enabled && renderer.gameObject.activeInHierarchy))
+					if (IncludeDisabledComponents || (renderer.enabled && renderer.gameObject.activeInHierarchy))
 						renderers.Add(renderer);
 
 				// Lights
 				List<Light> lights;
 
-				if (!this.lightSources.TryGetValue(tile, out lights))
-					this.lightSources[tile] = lights = new List<Light>();
+				if (!lightSources.TryGetValue(tile, out lights))
+					lightSources[tile] = lights = new List<Light>();
 
 				foreach (var light in tile.GetComponentsInChildren<Light>())
-					if (this.IncludeDisabledComponents || (light.enabled && light.gameObject.activeInHierarchy))
+					if (IncludeDisabledComponents || (light.enabled && light.gameObject.activeInHierarchy))
 						lights.Add(light);
 
 				// Reflection Probes
 				List<ReflectionProbe> probes;
 
-				if (!this.reflectionProbes.TryGetValue(tile, out probes))
-					this.reflectionProbes[tile] = probes = new List<ReflectionProbe>();
+				if (!reflectionProbes.TryGetValue(tile, out probes))
+					reflectionProbes[tile] = probes = new List<ReflectionProbe>();
 
 				foreach (var probe in tile.GetComponentsInChildren<ReflectionProbe>())
-					if (this.IncludeDisabledComponents || (probe.enabled && probe.gameObject.activeInHierarchy))
+					if (IncludeDisabledComponents || (probe.enabled && probe.gameObject.activeInHierarchy))
 						probes.Add(probe);
 			}
 
-			foreach (var door in this.allDoors)
+			foreach (var door in allDoors)
 			{
 				List<Renderer> renderers = new List<Renderer>();
-				this.doorRenderers[door] = renderers;
+				doorRenderers[door] = renderers;
 
 				foreach (var r in door.GetComponentsInChildren<Renderer>(true))
-					if (this.IncludeDisabledComponents || (r.enabled && r.gameObject.activeInHierarchy))
+					if (IncludeDisabledComponents || (r.enabled && r.gameObject.activeInHierarchy))
 						renderers.Add(r);
 			}
 		}
 
 		protected Tile FindCurrentTile()
 		{
-			if (this.dungeon == null)
+			if (dungeon == null)
 				return null;
 
-			foreach (var tile in this.dungeon.AllTiles)
+			foreach (var tile in dungeon.AllTiles)
 			{
-				if (tile.Bounds.Contains(this.targetTransform.position))
+				if (tile.Bounds.Contains(targetTransform.position))
 					return tile;
 			}
 
@@ -456,47 +455,47 @@ namespace DunGen.Project.External.DunGen.Code
 
 		protected Tile SearchForNewCurrentTile()
 		{
-			if (this.tilesToSearch == null)
-				this.tilesToSearch = new Queue<Tile>();
-			if (this.searchedTiles == null)
-				this.searchedTiles = new List<Tile>();
+			if (tilesToSearch == null)
+				tilesToSearch = new Queue<Tile>();
+			if (searchedTiles == null)
+				searchedTiles = new List<Tile>();
 
 			// Add all tiles adjacent to currentTile to the search queue
-			foreach (var door in this.currentTile.UsedDoorways)
+			foreach (var door in currentTile.UsedDoorways)
 			{
 				var adjacentTile = door.ConnectedDoorway.Tile;
 
-				if (!this.tilesToSearch.Contains(adjacentTile))
-					this.tilesToSearch.Enqueue(adjacentTile);
+				if (!tilesToSearch.Contains(adjacentTile))
+					tilesToSearch.Enqueue(adjacentTile);
 			}
 
 			// Breadth-first search to find the tile which contains the player
-			while (this.tilesToSearch.Count > 0)
+			while (tilesToSearch.Count > 0)
 			{
-				var tile = this.tilesToSearch.Dequeue();
+				var tile = tilesToSearch.Dequeue();
 
-				if (tile.Bounds.Contains(this.targetTransform.position))
+				if (tile.Bounds.Contains(targetTransform.position))
 				{
-					this.tilesToSearch.Clear();
-					this.searchedTiles.Clear();
+					tilesToSearch.Clear();
+					searchedTiles.Clear();
 					return tile;
 				}
 				else
 				{
-					this.searchedTiles.Add(tile);
+					searchedTiles.Add(tile);
 
 					foreach (var door in tile.UsedDoorways)
 					{
 						var adjacentTile = door.ConnectedDoorway.Tile;
 
-						if (!this.tilesToSearch.Contains(adjacentTile) &&
-							!this.searchedTiles.Contains(adjacentTile))
-							this.tilesToSearch.Enqueue(adjacentTile);
+						if (!tilesToSearch.Contains(adjacentTile) &&
+							!searchedTiles.Contains(adjacentTile))
+							tilesToSearch.Enqueue(adjacentTile);
 					}
 				}
 			}
 
-			this.searchedTiles.Clear();
+			searchedTiles.Clear();
 			return null;
 		}
 	}

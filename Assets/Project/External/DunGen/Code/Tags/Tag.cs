@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code.Tags
+namespace DunGen.Tags
 {
 	[Serializable]
 	public sealed class Tag : IEqualityComparer<Tag>
 	{
 		public int ID
 		{
-			get { return this.id; }
+			get { return id; }
 			set
 			{
-				this.id = value;
+				id = value;
 			}
 		}
 		public string Name
 		{
-			get { return DunGenSettings.Instance.TagManager.TryGetNameFromID(this.id); }
-			set { DunGenSettings.Instance.TagManager.TryRenameTag(this.id, value); }
+			get { return DunGenSettings.Instance.TagManager.TryGetNameFromID(id); }
+			set { DunGenSettings.Instance.TagManager.TryRenameTag(id, value); }
 		}
 
 
@@ -34,7 +34,7 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 
 		public Tag(string name)
 		{
-			DunGenSettings.Instance.TagManager.TagExists(name, out this.id);
+			DunGenSettings.Instance.TagManager.TagExists(name, out id);
 		}
 
 		public override bool Equals(object obj)
@@ -47,24 +47,24 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 			if (other == null)
 				return false;
 			else
-				return this.Equals(this, other);
+				return Equals(this, other);
 		}
 
 		public override int GetHashCode()
 		{
-			return this.id;
+			return id;
 		}
 
 		public override string ToString()
 		{
-			return string.Format("[{0}] {1}", this.id, DunGenSettings.Instance.TagManager.TryGetNameFromID(this.id));
+			return string.Format("[{0}] {1}", id, DunGenSettings.Instance.TagManager.TryGetNameFromID(id));
 		}
 
 		#region IEqualityComparer<Tag>
 
 		public int GetHashCode(Tag tag)
 		{
-			return this.id;
+			return id;
 		}
 
 		public bool Equals(Tag x, Tag y)
@@ -83,9 +83,9 @@ namespace DunGen.Project.External.DunGen.Code.Tags
 
 		public static bool operator ==(Tag a, Tag b)
 		{
-			if (object.ReferenceEquals(a, null) && object.ReferenceEquals(b, null))
+			if (ReferenceEquals(a, null) && ReferenceEquals(b, null))
 				return true;
-			else if (object.ReferenceEquals(a, null) || object.ReferenceEquals(b, null))
+			else if (ReferenceEquals(a, null) || ReferenceEquals(b, null))
 				return false;
 
 			return a.id == b.id;

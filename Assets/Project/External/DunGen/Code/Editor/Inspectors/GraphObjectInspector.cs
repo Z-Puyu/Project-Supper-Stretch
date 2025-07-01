@@ -1,41 +1,39 @@
-﻿using System.Collections.Generic;
-using DunGen.Editor.Project.External.DunGen.Code.Editor.Utility;
-using DunGen.Project.External.DunGen.Code;
-using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
+﻿using DunGen.Graph;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
+namespace DunGen.Editor.Inspectors
 {
 	[CustomEditor(typeof(GraphObjectObserver))]
 	public sealed class GraphObjectInspector : UnityEditor.Editor
 	{
 		public override void OnInspectorGUI()
 		{
-			var data = this.target as GraphObjectObserver;
+			var data = target as GraphObjectObserver;
 
 			if (data == null)
 				return;
 
-			this.serializedObject.Update();
+			serializedObject.Update();
 
 			if (data.Node != null && data.Node.TileSets != null)
-				this.DrawNodeGUI(data.Node);
+				DrawNodeGUI(data.Node);
 			else if (data.Line != null)
-				this.DrawLineGUI(data.Line);
+				DrawLineGUI(data.Line);
 
 			if (GUI.changed)
 				EditorUtility.SetDirty(data.Flow);
 
-			this.serializedObject.ApplyModifiedProperties();
+			serializedObject.ApplyModifiedProperties();
 		}
 
 		private void DrawNodeGUI(GraphNode node)
 		{
-			var data = this.target as GraphObjectObserver;
+			var data = target as GraphObjectObserver;
 			node.Graph = data.Flow;
 
-			var nodeProp = this.serializedObject.FindProperty("node");
+			var nodeProp = serializedObject.FindProperty("node");
 
 			if (string.IsNullOrEmpty(node.Label))
 				EditorGUILayout.LabelField("Node", EditorStyles.boldLabel);
@@ -45,7 +43,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 			if (node.NodeType == NodeType.Normal)
 				node.Label = EditorGUILayout.TextField("Label", node.Label);
 
-			EditorUtil.DrawObjectList<TileSet>("Tile Sets", node.TileSets, GameObjectSelectionTypes.Prefab, this.target);
+			EditorUtil.DrawObjectList<TileSet>("Tile Sets", node.TileSets, GameObjectSelectionTypes.Prefab, target);
 
 			EditorGUILayout.Space();
 
@@ -63,21 +61,21 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 				return;
 
 			EditorGUILayout.Space();
-			this.DrawKeys(node.Graph.KeyManager, node.Keys, node.Locks, true);
+			DrawKeys(node.Graph.KeyManager, node.Keys, node.Locks, true);
 
 			node.LockPlacement = (NodeLockPlacement)EditorGUILayout.EnumFlagsField("Lock Placement", node.LockPlacement);
 		}
 
 		private void DrawLineGUI(GraphLine line)
 		{
-			var data = this.target as GraphObjectObserver;
+			var data = target as GraphObjectObserver;
 			line.Graph = data.Flow;
 
 			EditorGUILayout.LabelField("Line Segment", EditorStyles.boldLabel);
-			EditorUtil.DrawObjectList<DungeonArchetype>("Dungeon Archetypes", line.DungeonArchetypes, GameObjectSelectionTypes.Prefab, this.target);
+			EditorUtil.DrawObjectList<DungeonArchetype>("Dungeon Archetypes", line.DungeonArchetypes, GameObjectSelectionTypes.Prefab, target);
 
 			EditorGUILayout.Space();
-			this.DrawKeys(line.Graph.KeyManager, line.Keys, line.Locks, false);
+			DrawKeys(line.Graph.KeyManager, line.Keys, line.Locks, false);
 		}
 
 		private void DrawKeys(KeyManager manager, List<KeyLockPlacement> keyIDs, List<KeyLockPlacement> lockIDs, bool isNode)

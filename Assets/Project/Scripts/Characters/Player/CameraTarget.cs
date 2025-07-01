@@ -1,4 +1,4 @@
-using System;
+using Project.Scripts.Common;
 using SaintsField;
 using UnityEngine;
 
@@ -12,14 +12,21 @@ public class CameraTarget : MonoBehaviour {
     
     private float Pitch { get; set; }
     private float Yaw { get; set; }
+    private bool IsFrozen { get; set; }
 
     private void Start() {
+        GameEvents.OnPause += () => this.IsFrozen = true;
+        GameEvents.OnPlay += () => this.IsFrozen = false;
         Quaternion rotation = this.transform.rotation;
         this.Pitch = rotation.eulerAngles.x;
         this.Yaw = rotation.eulerAngles.y;   
     }
 
     private void LateUpdate() {
+        if (this.IsFrozen) {
+            return;
+        }
+        
         float x = Input.GetAxis("Mouse X") * this.AngularSpeed * Time.deltaTime;
         float y = -Input.GetAxis("Mouse Y") * this.AngularSpeed * Time.deltaTime;
         this.Pitch = Mathf.Clamp(this.Pitch + y, this.VerticalRange.x, this.VerticalRange.y);

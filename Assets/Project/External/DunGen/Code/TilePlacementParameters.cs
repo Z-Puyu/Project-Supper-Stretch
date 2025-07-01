@@ -1,34 +1,34 @@
+using DunGen.Graph;
 using System;
-using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	[Serializable]
 	public class TilePlacementParameters
 	{
 		public DungeonArchetype Archetype
 		{
-			get => this.archetype;
+			get => archetype;
 			internal set
 			{
-				this.archetype = value;
+				archetype = value;
 			}
 		}
 		public GraphNode Node
 		{
-			get => this.node;
+			get => node;
 			internal set
 			{
-				this.node = value;
+				node = value;
 			}
 		}
 		public GraphLine Line
 		{
-			get => this.line;
+			get => line;
 			internal set
 			{
-				this.line = value;
+				line = value;
 			}
 		}
 

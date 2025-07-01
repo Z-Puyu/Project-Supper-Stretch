@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
+namespace DunGen.Graph
 {
 	/// <summary>
 	/// A line segment on the dungeon flow graph, representing a series of tiles forming a path through the dungeon
@@ -36,15 +36,15 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 
 		public GraphLine(DungeonFlow graph)
 		{
-			this.Graph = graph;
+			Graph = graph;
 		}
 
 		public DungeonArchetype GetRandomArchetype(RandomStream randomStream, IEnumerable<DungeonArchetype> usedArchetypes)
 		{
-			var validArchetypes = this.DungeonArchetypes.Where(a => !a.Unique || !usedArchetypes.Contains(a));
+			var validArchetypes = DungeonArchetypes.Where(a => !a.Unique || !usedArchetypes.Contains(a));
 
 			if (!validArchetypes.Any())
-				validArchetypes = this.DungeonArchetypes;
+				validArchetypes = DungeonArchetypes;
 
 			int index = randomStream.Next(0, validArchetypes.Count());
 			return validArchetypes.ElementAt(index);

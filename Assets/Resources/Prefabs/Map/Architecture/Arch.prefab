@@ -10,12 +10,12 @@ GameObject:
   m_Component:
   - component: {fileID: 215700876241428224}
   - component: {fileID: 3329167159142487341}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Collider1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 16
   m_IsActive: 1
 --- !u!4 &215700876241428224
 Transform:
@@ -63,12 +63,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1905563250560801136}
   - component: {fileID: 8471009294220885794}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Collider2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 16
   m_IsActive: 1
 --- !u!4 &1905563250560801136
 Transform:
@@ -116,12 +116,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1061347262487750276}
   - component: {fileID: 3904302749598441612}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Collider5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 16
   m_IsActive: 1
 --- !u!4 &1061347262487750276
 Transform:
@@ -169,12 +169,12 @@ GameObject:
   m_Component:
   - component: {fileID: 4952895553252124476}
   - component: {fileID: 4736506563010763850}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Collider3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 16
   m_IsActive: 1
 --- !u!4 &4952895553252124476
 Transform:
@@ -222,12 +222,12 @@ GameObject:
   m_Component:
   - component: {fileID: 2349511873034932415}
   - component: {fileID: 1678794765487644087}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Collider4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 16
   m_IsActive: 1
 --- !u!4 &2349511873034932415
 Transform:
@@ -324,6 +324,14 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 21ff30ad50ed2d74e8874afc2551998b, type: 3}
       propertyPath: m_Name
       value: Arch
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 21ff30ad50ed2d74e8874afc2551998b, type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 21ff30ad50ed2d74e8874afc2551998b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 16
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

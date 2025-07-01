@@ -1,13 +1,14 @@
 ﻿using System;
-using DunGen.Project.External.DunGen.Code.Utility;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	[Serializable]
 	public sealed class TileInjectionRule
 	{
 		public TileSet TileSet;
+		[FloatRangeLimit(0.0f, 1.0f)]
 		public FloatRange NormalizedPathDepth = new FloatRange(0, 1);
+		[FloatRangeLimit(0.0f, 1.0f)]
 		public FloatRange NormalizedBranchDepth = new FloatRange(0, 1);
 		public bool CanAppearOnMainPath = true;
 		public bool CanAppearOnBranchPath = false;

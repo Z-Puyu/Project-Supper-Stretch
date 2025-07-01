@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1233149941 &-3921180622990481833
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Sword (11)_{-3921180622990481833}
+  m_AudioClip: {fileID: 8300000, guid: 872df89f9bf03794895995862fb431da, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-2802394379342863863
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Sword (1)_{-2802394379342863863}
+  m_AudioClip: {fileID: 8300000, guid: 2a3d12744f9e4e2479bbb9aab182515f, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &1793638765968443083
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Sword (13)_{1793638765968443083}
+  m_AudioClip: {fileID: 8300000, guid: dcbcf3c543f76ff428fb53068e4e6844, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &4101470400500928519
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Sword (17)_{4101470400500928519}
+  m_AudioClip: {fileID: 8300000, guid: 95cc41b1abd9c1c46bafe3d45b8f2427, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &4469901977300616146
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Sword (10)_{4469901977300616146}
+  m_AudioClip: {fileID: 8300000, guid: 4d8d0dd5dde877248944258610f695ba, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1307931743 &6418180475301049370
+AudioRandomContainer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: EquipSword
+  m_Volume: 0
+  m_Pitch: 0
+  m_AutomaticTriggerTime: 0
+  m_LoopCount: 1
+  m_VolumeRandomizationRange: {x: 0, y: 0}
+  m_PitchRandomizationRange: {x: 0, y: 0}
+  m_AutomaticTriggerTimeRandomizationRange: {x: 0, y: 0}
+  m_LoopCountRandomizationRange: {x: 0, y: 0}
+  m_Elements:
+  - {fileID: -2802394379342863863}
+  - {fileID: 6773126732148433466}
+  - {fileID: 4469901977300616146}
+  - {fileID: -3921180622990481833}
+  - {fileID: 7750559765383894172}
+  - {fileID: 1793638765968443083}
+  - {fileID: 4101470400500928519}
+  m_AvoidRepeatingLast: 0
+  m_PlaybackMode: 2
+  m_TriggerMode: 0
+  m_AutomaticTriggerMode: 1
+  m_LoopMode: 2
+  m_VolumeRandomizationEnabled: 0
+  m_PitchRandomizationEnabled: 0
+  m_AutomaticTriggerTimeRandomizationEnabled: 0
+  m_LoopCountRandomizationEnabled: 0
+--- !u!1233149941 &6773126732148433466
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Sword (9)_{6773126732148433466}
+  m_AudioClip: {fileID: 8300000, guid: 2275f91b006f0d54194804c6a2dc0f40, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &7750559765383894172
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Sword (12)_{7750559765383894172}
+  m_AudioClip: {fileID: 8300000, guid: b676d544d3d2b0b40a4f11807ac8cf80, type: 3}
+  m_Volume: 0
+  m_Enabled: 1

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
+namespace DunGen.Graph
 {
 	/// <summary>
 	/// Possible types of node. Currently used to prevent start & goal nodes from being moved/deleted
@@ -57,7 +57,7 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 
 		public GraphNode(DungeonFlow graph)
 		{
-			this.Graph = graph;
+			Graph = graph;
 		}
 	}
 }

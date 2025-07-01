@@ -1,10 +1,10 @@
-﻿using System;
+﻿using DunGen.Graph;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	/// <summary>
 	/// Used to determine how the number of branches are calculated
@@ -32,15 +32,15 @@ namespace DunGen.Project.External.DunGen.Code
 			switch (dungeonFlow.BranchMode)
 			{
 				case BranchMode.Local:
-					BranchCountHelper.ComputeBranchCountsLocal(randomStream, proxyDungeon, ref mainPathBranches);
+					ComputeBranchCountsLocal(randomStream, proxyDungeon, ref mainPathBranches);
 					break;
 
 				case BranchMode.Global:
-					BranchCountHelper.ComputeBranchCountsGlobal(dungeonFlow, randomStream, proxyDungeon, ref mainPathBranches);
+					ComputeBranchCountsGlobal(dungeonFlow, randomStream, proxyDungeon, ref mainPathBranches);
 					break;
 
 				case BranchMode.Section:
-					BranchCountHelper.ComputeBranchCountsPerSection(randomStream, proxyDungeon, ref mainPathBranches);
+					ComputeBranchCountsPerSection(randomStream, proxyDungeon, ref mainPathBranches);
 					break;
 
 				default:
@@ -116,7 +116,7 @@ namespace DunGen.Project.External.DunGen.Code
 
 				// Distribute the branches for this section across all tiles within the section,
 				// weighted by the number of available doorways each tile has
-				int[] assignedDoorwayCounts = BranchCountHelper.DistributeByWeights(sectionBranchCount, tileWeights);
+				int[] assignedDoorwayCounts = DistributeByWeights(sectionBranchCount, tileWeights);
 
 				for (int i = 0; i < assignedDoorwayCounts.Length; i++)
 				{

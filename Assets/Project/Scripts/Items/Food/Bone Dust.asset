@@ -12,28 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ed4bfbad18b40e7b42737dbd1a6f467, type: 3}
   m_Name: Bone Dust
   m_EditorClassIdentifier: 
-  <Type>k__BackingField:
-    <Namespace>k__BackingField: Items
-    <Path>k__BackingField: Spice
-    <Tag>k__BackingField: Spice
-    <Priority>k__BackingField: 3
-    <Flags>k__BackingField: 4
-    <Icon>k__BackingField: {fileID: -897676795, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
-    <Subtypes>k__BackingField: []
+  <Type>k__BackingField: Items.Spice
   <Name>k__BackingField: Bone Dust
-  <Model>k__BackingField: {fileID: 0}
   <Worth>k__BackingField: 1
-  <Properties>k__BackingField:
-  - <Key>k__BackingField:
-      <TargetAttribute>k__BackingField: CharacterAttribute.ElementalResistance.Poison
-      <Type>k__BackingField: 0
-    <Target>k__BackingField:
-      <FullName>k__BackingField: CharacterAttribute.ElementalResistance.Poison
-      <Name>k__BackingField: Poison
-    <Method>k__BackingField: 0
-    <Value>k__BackingField: 10
-  <CraftTime>k__BackingField: 0.2
-  <Slot>k__BackingField: 0
+  <ItemProperties>k__BackingField:
+  - rid: 1548064581621383269
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 1548064581621383269
+      type: {class: CraftingMaterialPropertyData, ns: Project.Scripts.Items.Definitions, asm: Project.Scripts.Items}
+      data:
+        <Modifiers>k__BackingField:
+        - <Target>k__BackingField: CharacterAttributes.ElementalResistance.Poison
+          <Method>k__BackingField: 0
+          <Value>k__BackingField: 10
+          <Duration>k__BackingField: 600
+        <Cost>k__BackingField: 0.2

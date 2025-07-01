@@ -1,19 +1,18 @@
-﻿using System;
+﻿using DunGen.Collision;
+using DunGen.Generation;
+using DunGen.Graph;
+using DunGen.LockAndKey;
+using DunGen.Pooling;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using DunGen.Project.External.DunGen.Code.Collision;
-using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
-using DunGen.Project.External.DunGen.Code.Generation;
-using DunGen.Project.External.DunGen.Code.LockAndKey;
-using DunGen.Project.External.DunGen.Code.Pooling;
-using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Debug = UnityEngine.Debug;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	public delegate void TileInjectionDelegate(RandomStream randomStream, ref List<InjectedTile> tilesToInject);
 	public delegate void GenerationFailureReportProduced(DungeonGenerator generator, GenerationFailureReport report);
@@ -33,10 +32,20 @@ namespace DunGen.Project.External.DunGen.Code
 		NegZ,
 	}
 
+	public enum TriggerPlacementMode
+	{
+		[InspectorName("None")]
+		None,
+		[InspectorName("3D")]
+		ThreeDimensional,
+		[InspectorName("2D")]
+		TwoDimensional,
+	}
+
 	[Serializable]
 	public class DungeonGenerator : ISerializationCallbackReceiver
 	{
-		public const int CurrentFileVersion = 2;
+		public const int CurrentFileVersion = 3;
 
 		#region Legacy Properties
 
@@ -65,6 +74,9 @@ namespace DunGen.Project.External.DunGen.Code
 		[Obsolete("Use the 'CollisionSettings' property instead")]
 		public AdditionalCollisionsPredicate AdditionalCollisionsPredicate { get; set; }
 
+		[Obsolete("Use the 'TriggerPlacement' enum property instead")]
+		public bool PlaceTileTriggers = true;
+
 		#endregion
 
 		#region Helper Struct
@@ -92,7 +104,7 @@ namespace DunGen.Project.External.DunGen.Code
 		public bool AllowTileRotation = false;
 		public bool DebugRender = false;
 		public float LengthMultiplier = 1.0f;
-		public bool PlaceTileTriggers = true;
+		public TriggerPlacementMode TriggerPlacement = TriggerPlacementMode.ThreeDimensional;
 		public int TileTriggerLayer = 2;
 		public bool GenerateAsynchronously = false;
 		public float MaxAsyncFrameMilliseconds = 10;
@@ -105,7 +117,7 @@ namespace DunGen.Project.External.DunGen.Code
 		{
 			get
 			{
-				return this.UpDirection switch
+				return UpDirection switch
 				{
 					AxisDirection.PosX => new Vector3(+1, 0, 0),
 					AxisDirection.NegX => new Vector3(-1, 0, 0),
@@ -113,7 +125,7 @@ namespace DunGen.Project.External.DunGen.Code
 					AxisDirection.NegY => new Vector3(0, -1, 0),
 					AxisDirection.PosZ => new Vector3(0, 0, +1),
 					AxisDirection.NegZ => new Vector3(0, 0, -1),
-					_ => throw new NotImplementedException("AxisDirection '" + this.UpDirection + "' not implemented"),
+					_ => throw new NotImplementedException("AxisDirection '" + UpDirection + "' not implemented"),
 				};
 			}
 		}
@@ -167,11 +179,11 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public DungeonGenerator()
 		{
-			this.AllowTilePooling = true;
-			this.GenerationStats = new GenerationStats();
-			this.CollisionManager = new DungeonCollisionManager();
+			AllowTilePooling = true;
+			GenerationStats = new GenerationStats();
+			CollisionManager = new DungeonCollisionManager();
 
-			this.tileProxyPool = new BucketedObjectPool<TileProxy, TileProxy>(
+			tileProxyPool = new BucketedObjectPool<TileProxy, TileProxy>(
 				objectFactory: template => new TileProxy(template),
 				takeAction: x =>
 				{
@@ -179,64 +191,64 @@ namespace DunGen.Project.External.DunGen.Code
 				}
 				);
 
-			this.tileInstanceSource = new TileInstanceSource();
-			this.tileInstanceSource.TileInstanceSpawned += (tilePrefab, tileInstance, fromPool) =>
+			tileInstanceSource = new TileInstanceSource();
+			tileInstanceSource.TileInstanceSpawned += (tilePrefab, tileInstance, fromPool) =>
 			{
-				this.GenerationStats.TileAdded(tilePrefab, fromPool);
+				GenerationStats.TileAdded(tilePrefab, fromPool);
 			};
 		}
 
 		public DungeonGenerator(GameObject root)
 			: this()
 		{
-			this.Root = root;
+			Root = root;
 		}
 
 		public void Generate()
 		{
-			if (this.IsGenerating)
+			if (IsGenerating)
 				return;
 
-			this.OnGenerationStarted?.Invoke(this);
-			DungeonGenerator.OnAnyDungeonGenerationStarted?.Invoke(this);
+			OnGenerationStarted?.Invoke(this);
+			OnAnyDungeonGenerationStarted?.Invoke(this);
 
 			// Detach the previous dungeon if we're generating the new one as an attachment
 			// We need to do this to avoid overwriting the previous dungeon
-			if (this.AttachmentSettings != null && this.CurrentDungeon != null)
-				this.DetachDungeon();
+			if (AttachmentSettings != null && CurrentDungeon != null)
+				DetachDungeon();
 
-			if(this.CollisionSettings == null)
-				this.CollisionSettings = new DungeonCollisionSettings();
+			if(CollisionSettings == null)
+				CollisionSettings = new DungeonCollisionSettings();
 
-			if(this.CollisionManager == null)
-				this.CollisionManager = new DungeonCollisionManager();
+			if(CollisionManager == null)
+				CollisionManager = new DungeonCollisionManager();
 
-			this.CollisionManager.Settings = this.CollisionSettings;
+			CollisionManager.Settings = CollisionSettings;
 			DoorwayPairFinder.SortCustomConnectionRules();
 
-			this.IsAnalysis = false;
-			this.IsGenerating = true;
-			this.Wait(this.OuterGenerate());
+			IsAnalysis = false;
+			IsGenerating = true;
+			Wait(OuterGenerate());
 		}
 
 		public void Cancel()
 		{
-			if (!this.IsGenerating)
+			if (!IsGenerating)
 				return;
 
-			this.Clear(true);
-			this.IsGenerating = false;
+			Clear(true);
+			IsGenerating = false;
 		}
 
 		public Dungeon DetachDungeon()
 		{
-			if (this.CurrentDungeon == null)
+			if (CurrentDungeon == null)
 				return null;
 
-			Dungeon dungeon = this.CurrentDungeon;
-			this.CurrentDungeon = null;
-			this.Root = null;
-			this.Clear(true);
+			Dungeon dungeon = CurrentDungeon;
+			CurrentDungeon = null;
+			Root = null;
+			Clear(true);
 
 			// If the dungeon is empty, we should just destroy it
 			if (dungeon.transform.childCount == 0)
@@ -247,41 +259,41 @@ namespace DunGen.Project.External.DunGen.Code
 
 		protected virtual IEnumerator OuterGenerate()
 		{
-			this.Clear(false);
+			Clear(false);
 
-			this.yieldTimer.Restart();
+			yieldTimer.Restart();
 
-			this.Status = GenerationStatus.NotStarted;
+			Status = GenerationStatus.NotStarted;
 
 #if UNITY_EDITOR
 			// Validate the dungeon archetype if we're running in the editor
-			DungeonArchetypeValidator validator = new DungeonArchetypeValidator(this.DungeonFlow);
+			DungeonArchetypeValidator validator = new DungeonArchetypeValidator(DungeonFlow);
 
 			if (!validator.IsValid())
 			{
-				this.ChangeStatus(GenerationStatus.Failed);
-				this.IsGenerating = false;
+				ChangeStatus(GenerationStatus.Failed);
+				IsGenerating = false;
 				yield break;
 			}
 #endif
 
-			this.ChosenSeed = (this.ShouldRandomizeSeed) ? new RandomStream().Next() : this.Seed;
-			this.RandomStream = new RandomStream(this.ChosenSeed);
+			ChosenSeed = (ShouldRandomizeSeed) ? new RandomStream().Next() : Seed;
+			RandomStream = new RandomStream(ChosenSeed);
 
-			if (this.Root == null)
-				this.Root = new GameObject(Constants.DefaultDungeonRootName);
+			if (Root == null)
+				Root = new GameObject(Constants.DefaultDungeonRootName);
 
-			bool enableTilePooling = this.AllowTilePooling && DunGenSettings.Instance.EnableTilePooling;
-			this.tileInstanceSource.Initialise(enableTilePooling, this.Root);
+			bool enableTilePooling = AllowTilePooling && DunGenSettings.Instance.EnableTilePooling;
+			tileInstanceSource.Initialise(enableTilePooling, Root);
 
-			yield return this.Wait(this.InnerGenerate(false));
+			yield return Wait(InnerGenerate(false));
 
-			this.IsGenerating = false;
+			IsGenerating = false;
 		}
 
 		private Coroutine Wait(IEnumerator routine)
 		{
-			if (this.GenerateAsynchronously)
+			if (GenerateAsynchronously)
 				return CoroutineHelper.Start(routine);
 			else
 			{
@@ -292,123 +304,123 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public void RandomizeSeed()
 		{
-			this.Seed = new RandomStream().Next();
+			Seed = new RandomStream().Next();
 		}
 
 		protected virtual IEnumerator InnerGenerate(bool isRetry)
 		{
 			if (isRetry)
 			{
-				this.ChosenSeed = this.RandomStream.Next();
-				this.RandomStream = new RandomStream(this.ChosenSeed);
+				ChosenSeed = RandomStream.Next();
+				RandomStream = new RandomStream(ChosenSeed);
 
 
-				if (this.retryCount >= this.MaxAttemptCount && Application.isEditor)
+				if (retryCount >= MaxAttemptCount && Application.isEditor)
 				{
-					Debug.LogError(TilePlacementResult.ProduceReport(this.tilePlacementResults, this.MaxAttemptCount));
-					DungeonGenerator.OnGenerationFailureReportProduced?.Invoke(this, new GenerationFailureReport(this.MaxAttemptCount, this.tilePlacementResults));
+					Debug.LogError(TilePlacementResult.ProduceReport(tilePlacementResults, MaxAttemptCount));
+					OnGenerationFailureReportProduced?.Invoke(this, new GenerationFailureReport(MaxAttemptCount, tilePlacementResults));
 
-					this.ChangeStatus(GenerationStatus.Failed);
+					ChangeStatus(GenerationStatus.Failed);
 					yield break;
 				}
 
-				this.retryCount++;
-				this.GenerationStats.IncrementRetryCount();
+				retryCount++;
+				GenerationStats.IncrementRetryCount();
 
-				this.Retrying?.Invoke();
+				Retrying?.Invoke();
 			}
 			else
 			{
-				this.retryCount = 0;
-				this.GenerationStats.Clear();
+				retryCount = 0;
+				GenerationStats.Clear();
 			}
 
-			this.CurrentDungeon = this.Root.GetComponent<Dungeon>();
-			if (this.CurrentDungeon == null)
-				this.CurrentDungeon = this.Root.AddComponent<Dungeon>();
+			CurrentDungeon = Root.GetComponent<Dungeon>();
+			if (CurrentDungeon == null)
+				CurrentDungeon = Root.AddComponent<Dungeon>();
 
-			this.CollisionManager.Initialize(this);
+			CollisionManager.Initialize(this);
 
-			this.CurrentDungeon.DebugRender = this.DebugRender;
-			this.CurrentDungeon.PreGenerateDungeon(this);
+			CurrentDungeon.DebugRender = DebugRender;
+			CurrentDungeon.PreGenerateDungeon(this);
 
-			this.Clear(false);
-			this.targetLength = Mathf.RoundToInt(this.DungeonFlow.Length.GetRandom(this.RandomStream) * this.LengthMultiplier);
-			this.targetLength = Mathf.Max(this.targetLength, 2);
+			Clear(false);
+			targetLength = Mathf.RoundToInt(DungeonFlow.Length.GetRandom(RandomStream) * LengthMultiplier);
+			targetLength = Mathf.Max(targetLength, 2);
 
 // PauseBetweenRooms is for debug purposes only, so we should disable it in regular builds to improve performance
 #if !UNITY_EDITOR
 			PauseBetweenRooms = 0.0f;
 #endif
 
-			Transform debugVisualsRoot = (this.PauseBetweenRooms > 0f) ? this.Root.transform : null;
-			this.proxyDungeon = new DungeonProxy(debugVisualsRoot);
+			Transform debugVisualsRoot = (PauseBetweenRooms > 0f) ? Root.transform : null;
+			proxyDungeon = new DungeonProxy(debugVisualsRoot);
 
 			// Tile Injection
-			this.GenerationStats.BeginTime(GenerationStatus.TileInjection);
-			this.ChangeStatus(GenerationStatus.TileInjection);
+			GenerationStats.BeginTime(GenerationStatus.TileInjection);
+			ChangeStatus(GenerationStatus.TileInjection);
 
-			if (this.tilesPendingInjection == null)
-				this.tilesPendingInjection = new List<InjectedTile>();
+			if (tilesPendingInjection == null)
+				tilesPendingInjection = new List<InjectedTile>();
 			else
-				this.tilesPendingInjection.Clear();
+				tilesPendingInjection.Clear();
 
-			this.injectedTiles.Clear();
-			this.GatherTilesToInject();
+			injectedTiles.Clear();
+			GatherTilesToInject();
 
 			// Pre-Processing
-			this.GenerationStats.BeginTime(GenerationStatus.PreProcessing);
-			this.PreProcess();
+			GenerationStats.BeginTime(GenerationStatus.PreProcessing);
+			PreProcess();
 
 			// Main Path Generation
-			this.GenerationStats.BeginTime(GenerationStatus.MainPath);
-			yield return this.Wait(this.GenerateMainPath());
+			GenerationStats.BeginTime(GenerationStatus.MainPath);
+			yield return Wait(GenerateMainPath());
 
 			// We may have had to retry when generating the main path, if so, the status will be either Complete or Failed and we should exit here
-			if (this.Status == GenerationStatus.Complete || this.Status == GenerationStatus.Failed)
+			if (Status == GenerationStatus.Complete || Status == GenerationStatus.Failed)
 				yield break;
 
 			// Branch Paths Generation
-			this.GenerationStats.BeginTime(GenerationStatus.Branching);
-			yield return this.Wait(this.GenerateBranchPaths());
+			GenerationStats.BeginTime(GenerationStatus.Branching);
+			yield return Wait(GenerateBranchPaths());
 
 			// If there are any required tiles missing from the tile injection stage, the generation process should fail
-			foreach (var tileInjection in this.tilesPendingInjection)
+			foreach (var tileInjection in tilesPendingInjection)
 				if (tileInjection.IsRequired)
 				{
-					yield return this.Wait(this.InnerGenerate(true));
+					yield return Wait(InnerGenerate(true));
 					yield break;
 				}
 
 			// We may have missed some required injected tiles and have had to retry, if so, the status will be either Complete or Failed and we should exit here
-			if (this.Status == GenerationStatus.Complete || this.Status == GenerationStatus.Failed)
+			if (Status == GenerationStatus.Complete || Status == GenerationStatus.Failed)
 				yield break;
 
-			this.GenerationStats.BeginTime(GenerationStatus.BranchPruning);
-			this.ChangeStatus(GenerationStatus.BranchPruning);
+			GenerationStats.BeginTime(GenerationStatus.BranchPruning);
+			ChangeStatus(GenerationStatus.BranchPruning);
 
 			// Prune branches if we have any tags set up
-			if (this.DungeonFlow.BranchPruneTags.Count > 0)
-				this.PruneBranches();
+			if (DungeonFlow.BranchPruneTags.Count > 0)
+				PruneBranches();
 
 			// Instantiate Tiles
-			this.GenerationStats.BeginTime(GenerationStatus.InstantiatingTiles);
-			this.ChangeStatus(GenerationStatus.InstantiatingTiles);
+			GenerationStats.BeginTime(GenerationStatus.InstantiatingTiles);
+			ChangeStatus(GenerationStatus.InstantiatingTiles);
 
-			this.proxyDungeon.ConnectOverlappingDoorways(this.DungeonFlow.DoorwayConnectionChance, this.DungeonFlow, this.RandomStream);
-			yield return this.Wait(this.CurrentDungeon.FromProxy(this.proxyDungeon, this, this.tileInstanceSource, () => this.ShouldSkipFrame(false)));
+			proxyDungeon.ConnectOverlappingDoorways(DungeonFlow.DoorwayConnectionChance, DungeonFlow, RandomStream);
+			yield return Wait(CurrentDungeon.FromProxy(proxyDungeon, this, tileInstanceSource, () => ShouldSkipFrame(false)));
 
 			// Post-Processing
-			yield return this.Wait(this.PostProcess());
+			yield return Wait(PostProcess());
 
 			// Waiting one frame so objects are in their expected state
 			yield return null;
 
 			// Inform objects in the dungeon that generation is complete
-			foreach (var callbackReceiver in this.CurrentDungeon.gameObject.GetComponentsInChildren<IDungeonCompleteReceiver>(false))
-				callbackReceiver.OnDungeonComplete(this.CurrentDungeon);
+			foreach (var callbackReceiver in CurrentDungeon.gameObject.GetComponentsInChildren<IDungeonCompleteReceiver>(false))
+				callbackReceiver.OnDungeonComplete(CurrentDungeon);
 
-			this.ChangeStatus(GenerationStatus.Complete);
+			ChangeStatus(GenerationStatus.Complete);
 
 			bool charactersShouldRecheckTile = true;
 
@@ -428,7 +440,7 @@ namespace DunGen.Project.External.DunGen.Code
 		{
 			var branchTips = new Stack<TileProxy>();
 
-			foreach (var tile in this.proxyDungeon.BranchPathTiles)
+			foreach (var tile in proxyDungeon.BranchPathTiles)
 			{
 				var connectedTiles = tile.UsedDoorways.Select(d => d.ConnectedDoorway.TileProxy);
 
@@ -442,7 +454,7 @@ namespace DunGen.Project.External.DunGen.Code
 				var tile = branchTips.Pop();
 
 				bool isRequiredTile = tile.Placement.InjectionData != null && tile.Placement.InjectionData.IsRequired;
-				bool shouldPruneTile = !isRequiredTile && this.DungeonFlow.ShouldPruneTileWithTags(tile.PrefabTile.Tags);
+				bool shouldPruneTile = !isRequiredTile && DungeonFlow.ShouldPruneTileWithTags(tile.PrefabTile.Tags);
 
 				if (shouldPruneTile)
 				{
@@ -454,10 +466,10 @@ namespace DunGen.Project.External.DunGen.Code
 						.First();
 
 					// Remove tile and connection
-					this.proxyDungeon.RemoveTile(tile);
-					this.CollisionManager.RemoveTile(tile);
-					this.proxyDungeon.RemoveConnection(precedingTileConnection);
-					this.GenerationStats.PrunedBranchTileCount++;
+					proxyDungeon.RemoveTile(tile);
+					CollisionManager.RemoveTile(tile);
+					proxyDungeon.RemoveConnection(precedingTileConnection);
+					GenerationStats.PrunedBranchTileCount++;
 
 					var precedingTile = precedingTileConnection.A.TileProxy;
 
@@ -473,62 +485,62 @@ namespace DunGen.Project.External.DunGen.Code
 			if (stopCoroutines)
 				CoroutineHelper.StopAll();
 
-			if (this.proxyDungeon != null)
-				this.proxyDungeon.ClearDebugVisuals();
+			if (proxyDungeon != null)
+				proxyDungeon.ClearDebugVisuals();
 
-			this.proxyDungeon = null;
+			proxyDungeon = null;
 
-			if (this.CurrentDungeon != null)
-				this.CurrentDungeon.Clear(this.tileInstanceSource.DespawnTile);
+			if (CurrentDungeon != null)
+				CurrentDungeon.Clear(tileInstanceSource.DespawnTile);
 
-			this.useableTiles.Clear();
-			this.preProcessData.Clear();
+			useableTiles.Clear();
+			preProcessData.Clear();
 
-			this.previousLineSegment = null;
-			this.tilePlacementResults.Clear();
+			previousLineSegment = null;
+			tilePlacementResults.Clear();
 
-			this.Cleared?.Invoke();
+			Cleared?.Invoke();
 		}
 
 		private void ChangeStatus(GenerationStatus status)
 		{
-			var previousStatus = this.Status;
-			this.Status = status;
+			var previousStatus = Status;
+			Status = status;
 
 			if (status == GenerationStatus.Complete || status == GenerationStatus.Failed)
-				this.IsGenerating = false;
+				IsGenerating = false;
 
 			if (status == GenerationStatus.Failed)
-				this.Clear(true);
+				Clear(true);
 
 			if (previousStatus != status)
 			{
-				this.OnGenerationStatusChanged?.Invoke(this, status);
-				DungeonGenerator.OnAnyDungeonGenerationStatusChanged?.Invoke(this, status);
+				OnGenerationStatusChanged?.Invoke(this, status);
+				OnAnyDungeonGenerationStatusChanged?.Invoke(this, status);
 
 				if (status == GenerationStatus.Complete)
 				{
-					this.OnGenerationComplete?.Invoke(this);
-					DungeonGenerator.OnAnyDungeonGenerationComplete?.Invoke(this);
+					OnGenerationComplete?.Invoke(this);
+					OnAnyDungeonGenerationComplete?.Invoke(this);
 				}
 			}
 		}
 
 		protected virtual void PreProcess()
 		{
-			if (this.preProcessData.Count > 0)
+			if (preProcessData.Count > 0)
 				return;
 
-			this.ChangeStatus(GenerationStatus.PreProcessing);
+			ChangeStatus(GenerationStatus.PreProcessing);
 
-			var usedTileSets = this.DungeonFlow.GetUsedTileSets().Concat(this.tilesPendingInjection.Select(x => x.TileSet)).Distinct();
+			var usedTileSets = DungeonFlow.GetUsedTileSets().Concat(tilesPendingInjection.Select(x => x.TileSet)).Distinct();
 
 			foreach (var tileSet in usedTileSets)
 				foreach (var tile in tileSet.TileWeights.Weights)
 				{
 					if (tile.Value != null)
 					{
-						this.useableTiles.Add(tile.Value);
+						useableTiles.Add(tile.Value);
 						tile.TileSet = tileSet;
 					}
 				}
@@ -536,10 +548,10 @@ namespace DunGen.Project.External.DunGen.Code
 
 		protected virtual void GatherTilesToInject()
 		{
-			var injectionRandomStream = new RandomStream(this.ChosenSeed);
+			var injectionRandomStream = new RandomStream(ChosenSeed);
 
 			// Gather from DungeonFlow
-			foreach (var rule in this.DungeonFlow.TileInjectionRules)
+			foreach (var rule in DungeonFlow.TileInjectionRules)
 			{
 				// Ignore invalid rules
 				if (rule.TileSet == null || (!rule.CanAppearOnMainPath && !rule.CanAppearOnBranchPath))
@@ -548,48 +560,48 @@ namespace DunGen.Project.External.DunGen.Code
 				bool isOnMainPath = (!rule.CanAppearOnBranchPath) ? true : (!rule.CanAppearOnMainPath) ? false : injectionRandomStream.NextDouble() > 0.5;
 				var injectedTile = new InjectedTile(rule, isOnMainPath, injectionRandomStream);
 
-				this.tilesPendingInjection.Add(injectedTile);
+				tilesPendingInjection.Add(injectedTile);
 			}
 
 			// Gather from external delegates
-			this.TileInjectionMethods?.Invoke(injectionRandomStream, ref this.tilesPendingInjection);
+			TileInjectionMethods?.Invoke(injectionRandomStream, ref tilesPendingInjection);
 		}
 
 		protected virtual IEnumerator GenerateMainPath()
 		{
-			this.ChangeStatus(GenerationStatus.MainPath);
-			this.nextNodeIndex = 0;
-			var handledNodes = new List<GraphNode>(this.DungeonFlow.Nodes.Count);
+			ChangeStatus(GenerationStatus.MainPath);
+			nextNodeIndex = 0;
+			var handledNodes = new List<GraphNode>(DungeonFlow.Nodes.Count);
 			bool isDone = false;
 			int i = 0;
 
 			// Keep track of these now, we'll need them later when we know the actual length of the dungeon
-			var placementSlots = new List<TilePlacementParameters>(this.targetLength);
+			var placementSlots = new List<TilePlacementParameters>(targetLength);
 			var slotTileSets = new List<List<TileSet>>();
 
 			// We can't rigidly stick to the target length since we need at least one room for each node and that might be more than targetLength
 			while (!isDone)
 			{
-				float depth = Mathf.Clamp(i / (float)(this.targetLength - 1), 0, 1);
-				GraphLine lineSegment = this.DungeonFlow.GetLineAtDepth(depth);
+				float depth = Mathf.Clamp(i / (float)(targetLength - 1), 0, 1);
+				GraphLine lineSegment = DungeonFlow.GetLineAtDepth(depth);
 
 				// This should never happen
 				if (lineSegment == null)
 				{
-					yield return this.Wait(this.InnerGenerate(true));
+					yield return Wait(InnerGenerate(true));
 					yield break;
 				}
 
 				// We're on a new line segment, change the current archetype
-				if (lineSegment != this.previousLineSegment)
+				if (lineSegment != previousLineSegment)
 				{
-					this.currentArchetype = lineSegment.GetRandomArchetype(this.RandomStream, placementSlots.Select(x => x.Archetype));
-					this.previousLineSegment = lineSegment;
+					currentArchetype = lineSegment.GetRandomArchetype(RandomStream, placementSlots.Select(x => x.Archetype));
+					previousLineSegment = lineSegment;
 				}
 
 				List<TileSet> useableTileSets = null;
 				GraphNode nextNode = null;
-				var orderedNodes = this.DungeonFlow.Nodes.OrderBy(x => x.Position).ToArray();
+				var orderedNodes = DungeonFlow.Nodes.OrderBy(x => x.Position).ToArray();
 
 				// Determine which node comes next
 				foreach (var node in orderedNodes)
@@ -609,7 +621,7 @@ namespace DunGen.Project.External.DunGen.Code
 				if (nextNode != null)
 				{
 					useableTileSets = nextNode.TileSets;
-					this.nextNodeIndex = (this.nextNodeIndex >= orderedNodes.Length - 1) ? -1 : this.nextNodeIndex + 1;
+					nextNodeIndex = (nextNodeIndex >= orderedNodes.Length - 1) ? -1 : nextNodeIndex + 1;
 					placementParams.Node = nextNode;
 
 					if (nextNode == orderedNodes[orderedNodes.Length - 1])
@@ -617,8 +629,8 @@ namespace DunGen.Project.External.DunGen.Code
 				}
 				else
 				{
-					useableTileSets = this.currentArchetype.TileSets;
-					placementParams.Archetype = this.currentArchetype;
+					useableTileSets = currentArchetype.TileSets;
+					placementParams.Archetype = currentArchetype;
 					placementParams.Line = lineSegment;
 				}
 
@@ -631,26 +643,26 @@ namespace DunGen.Project.External.DunGen.Code
 
 			for (int j = 0; j < placementSlots.Count; j++)
 			{
-				var attachTo = (j == 0) ? null : this.proxyDungeon.MainPathTiles[this.proxyDungeon.MainPathTiles.Count - 1];
-				var tile = this.AddTile(attachTo, slotTileSets[j], j / (float)(placementSlots.Count - 1), placementSlots[j]);
+				var attachTo = (j == 0) ? null : proxyDungeon.MainPathTiles[proxyDungeon.MainPathTiles.Count - 1];
+				var tile = AddTile(attachTo, slotTileSets[j], j / (float)(placementSlots.Count - 1), placementSlots[j]);
 
 				// if no tile could be generated delete last successful tile and retry from previous index
 				// else return false
 				if (j > 5 && tile == null && tileRetryCount < 5 && totalForLoopRetryCount < 20)
 				{
-					TileProxy previousTile = this.proxyDungeon.MainPathTiles[j - 1];
+					TileProxy previousTile = proxyDungeon.MainPathTiles[j - 1];
 
 					// If the tile we're removing was placed by tile injection, be sure to place the injected tile back on the pending list
 					InjectedTile previousInjectedTile;
-					if (this.injectedTiles.TryGetValue(previousTile, out previousInjectedTile))
+					if (injectedTiles.TryGetValue(previousTile, out previousInjectedTile))
 					{
-						this.tilesPendingInjection.Add(previousInjectedTile);
-						this.injectedTiles.Remove(previousTile);
+						tilesPendingInjection.Add(previousInjectedTile);
+						injectedTiles.Remove(previousTile);
 					}
 
-					this.proxyDungeon.RemoveLastConnection();
-					this.proxyDungeon.RemoveTile(previousTile);
-					this.CollisionManager.RemoveTile(previousTile);
+					proxyDungeon.RemoveLastConnection();
+					proxyDungeon.RemoveTile(previousTile);
+					CollisionManager.RemoveTile(previousTile);
 
 					j -= 2; // -2 because loop adds 1
 					tileRetryCount++;
@@ -658,7 +670,7 @@ namespace DunGen.Project.External.DunGen.Code
 				}
 				else if (tile == null)
 				{
-					yield return this.Wait(this.InnerGenerate(true));
+					yield return Wait(InnerGenerate(true));
 					yield break;
 				}
 				else
@@ -668,8 +680,8 @@ namespace DunGen.Project.External.DunGen.Code
 
 
 					// Wait for a frame to allow for animated loading screens, etc
-					if (this.ShouldSkipFrame(true))
-						yield return this.GetRoomPause();
+					if (ShouldSkipFrame(true))
+						yield return GetRoomPause();
 				}
 			}
 
@@ -678,19 +690,19 @@ namespace DunGen.Project.External.DunGen.Code
 
 		private bool ShouldSkipFrame(bool isRoomPlacement)
 		{
-			if (!this.GenerateAsynchronously)
+			if (!GenerateAsynchronously)
 				return false;
 
-			if (isRoomPlacement && this.PauseBetweenRooms > 0)
+			if (isRoomPlacement && PauseBetweenRooms > 0)
 				return true;
 			else
 			{
-				bool frameWasTooLong =	this.MaxAsyncFrameMilliseconds <= 0 ||
-										this.yieldTimer.Elapsed.TotalMilliseconds >= this.MaxAsyncFrameMilliseconds;
+				bool frameWasTooLong =	MaxAsyncFrameMilliseconds <= 0 ||
+										yieldTimer.Elapsed.TotalMilliseconds >= MaxAsyncFrameMilliseconds;
 
 				if (frameWasTooLong)
 				{
-					this.yieldTimer.Restart();
+					yieldTimer.Restart();
 					return true;
 				}
 				else
@@ -700,24 +712,24 @@ namespace DunGen.Project.External.DunGen.Code
 
 		private YieldInstruction GetRoomPause()
 		{
-			if (this.PauseBetweenRooms > 0)
-				return new WaitForSeconds(this.PauseBetweenRooms);
+			if (PauseBetweenRooms > 0)
+				return new WaitForSeconds(PauseBetweenRooms);
 			else
 				return null;
 		}
 
 		protected virtual IEnumerator GenerateBranchPaths()
 		{
-			this.ChangeStatus(GenerationStatus.Branching);
+			ChangeStatus(GenerationStatus.Branching);
 
-			int[] mainPathBranches = new int[this.proxyDungeon.MainPathTiles.Count];
-			BranchCountHelper.ComputeBranchCounts(this.DungeonFlow, this.RandomStream, this.proxyDungeon, ref mainPathBranches);
+			int[] mainPathBranches = new int[proxyDungeon.MainPathTiles.Count];
+			BranchCountHelper.ComputeBranchCounts(DungeonFlow, RandomStream, proxyDungeon, ref mainPathBranches);
 
 			int branchId = 0;
 
 			for (int b = 0; b < mainPathBranches.Length; b++)
 			{
-				var tile = this.proxyDungeon.MainPathTiles[b];
+				var tile = proxyDungeon.MainPathTiles[b];
 				int branchCount = mainPathBranches[b];
 
 				// This tile was created from a graph node, there should be no branching
@@ -730,7 +742,7 @@ namespace DunGen.Project.External.DunGen.Code
 				for (int i = 0; i < branchCount; i++)
 				{
 					TileProxy previousTile = tile;
-					int branchDepth = tile.Placement.Archetype.BranchingDepth.GetRandom(this.RandomStream);
+					int branchDepth = tile.Placement.Archetype.BranchingDepth.GetRandom(RandomStream);
 
 					for (int j = 0; j < branchDepth; j++)
 					{
@@ -757,7 +769,7 @@ namespace DunGen.Project.External.DunGen.Code
 							useableTileSets = tile.Placement.Archetype.TileSets;
 
 						float normalizedDepth = (branchDepth <= 1) ? 1 : j / (float)(branchDepth - 1);
-						var newTile = this.AddTile(previousTile, useableTileSets, normalizedDepth, tile.Placement.PlacementParameters);
+						var newTile = AddTile(previousTile, useableTileSets, normalizedDepth, tile.Placement.PlacementParameters);
 
 						if (newTile == null)
 							break;
@@ -769,8 +781,8 @@ namespace DunGen.Project.External.DunGen.Code
 						previousTile = newTile;
 
 						// Wait for a frame to allow for animated loading screens, etc
-						if (this.ShouldSkipFrame(true))
-							yield return this.GetRoomPause();
+						if (ShouldSkipFrame(true))
+							yield return GetRoomPause();
 					}
 
 					branchId++;
@@ -782,13 +794,13 @@ namespace DunGen.Project.External.DunGen.Code
 
 		protected virtual TileProxy AddTile(TileProxy attachTo, IEnumerable<TileSet> useableTileSets, float normalizedDepth, TilePlacementParameters placementParams)
 		{
-			bool isOnMainPath = (this.Status == GenerationStatus.MainPath);
+			bool isOnMainPath = (Status == GenerationStatus.MainPath);
 			bool isFirstTile = attachTo == null;
 
 			// If we're attaching to an existing dungeon, generate a dummy attachment point
-			if(isFirstTile && this.AttachmentSettings != null)
+			if(isFirstTile && AttachmentSettings != null)
 			{
-				var attachmentProxy = this.AttachmentSettings.GenerateAttachmentProxy(this.UpVector, this.RandomStream);
+				var attachmentProxy = AttachmentSettings.GenerateAttachmentProxy(UpVector, RandomStream);
 				attachTo = attachmentProxy;
 			}
 
@@ -798,14 +810,14 @@ namespace DunGen.Project.External.DunGen.Code
 
 			bool isPlacingSpecificRoom = isOnMainPath && (placementParams.Archetype == null);
 
-			if (this.tilesPendingInjection != null && !isPlacingSpecificRoom)
+			if (tilesPendingInjection != null && !isPlacingSpecificRoom)
 			{
-				float pathDepth = (isOnMainPath) ? normalizedDepth : attachTo.Placement.PathDepth / (this.targetLength - 1f);
+				float pathDepth = (isOnMainPath) ? normalizedDepth : attachTo.Placement.PathDepth / (targetLength - 1f);
 				float branchDepth = (isOnMainPath) ? 0 : normalizedDepth;
 
-				for (int i = 0; i < this.tilesPendingInjection.Count; i++)
+				for (int i = 0; i < tilesPendingInjection.Count; i++)
 				{
-					var injectedTile = this.tilesPendingInjection[i];
+					var injectedTile = tilesPendingInjection[i];
 
 					if (injectedTile.ShouldInjectTileAtPoint(isOnMainPath, pathDepth, branchDepth))
 					{
@@ -831,31 +843,31 @@ namespace DunGen.Project.External.DunGen.Code
 			bool? allowRotation = null;
 			
 			// Apply constraint overrides
-			if (this.OverrideAllowTileRotation)
-				allowRotation = this.AllowTileRotation;
+			if (OverrideAllowTileRotation)
+				allowRotation = AllowTileRotation;
 
 
 			DoorwayPairFinder doorwayPairFinder = new DoorwayPairFinder()
 			{
-				DungeonFlow = this.DungeonFlow,
-				RandomStream = this.RandomStream,
+				DungeonFlow = DungeonFlow,
+				RandomStream = RandomStream,
 				PlacementParameters = placementParams,
-				GetTileTemplateDelegate = this.GetTileTemplate,
+				GetTileTemplateDelegate = GetTileTemplate,
 				IsOnMainPath = isOnMainPath,
 				NormalizedDepth = normalizedDepth,
 				PreviousTile = attachTo,
-				UpVector = this.UpVector,
+				UpVector = UpVector,
 				AllowRotation = allowRotation,
 				TileWeights = new List<GameObjectChance>(chanceEntries),
-				DungeonProxy = this.proxyDungeon,
+				DungeonProxy = proxyDungeon,
 
 				IsTileAllowedPredicate = (TileProxy previousTile, TileProxy potentialNextTile, ref float weight) =>
 				{
 					bool isImmediateRepeat = previousTile != null && (potentialNextTile.Prefab == previousTile.Prefab);
 					var repeatMode = TileRepeatMode.Allow;
 
-					if (this.OverrideRepeatMode)
-						repeatMode = this.RepeatMode;
+					if (OverrideRepeatMode)
+						repeatMode = RepeatMode;
 					else if (potentialNextTile != null)
 						repeatMode = potentialNextTile.PrefabTile.RepeatMode;
 
@@ -872,7 +884,7 @@ namespace DunGen.Project.External.DunGen.Code
 							break;
 
 						case TileRepeatMode.Disallow:
-							allowTile = !this.proxyDungeon.AllTiles.Where(t => t.Prefab == potentialNextTile.Prefab).Any();
+							allowTile = !proxyDungeon.AllTiles.Where(t => t.Prefab == potentialNextTile.Prefab).Any();
 							break;
 
 						default:
@@ -883,24 +895,24 @@ namespace DunGen.Project.External.DunGen.Code
 				},
 			};
 
-			int? maxPairingAttempts = (this.UseMaximumPairingAttempts) ? (int?)this.MaxPairingAttempts : null;
+			int? maxPairingAttempts = (UseMaximumPairingAttempts) ? (int?)MaxPairingAttempts : null;
 			Queue<DoorwayPair> pairsToTest = doorwayPairFinder.GetDoorwayPairs(maxPairingAttempts);
 			TilePlacementResult lastTileResult = null;
 			TileProxy createdTile = null;
 
 			if (pairsToTest.Count == 0)
-				this.tilePlacementResults.Add(new NoMatchingDoorwayPlacementResult(attachTo));
+				tilePlacementResults.Add(new NoMatchingDoorwayPlacementResult(attachTo));
 
 			while (pairsToTest.Count > 0)
 			{
 				var pair = pairsToTest.Dequeue();
 
-				lastTileResult = this.TryPlaceTile(pair, placementParams, out createdTile);
+				lastTileResult = TryPlaceTile(pair, placementParams, out createdTile);
 
 				if (lastTileResult is SuccessPlacementResult)
 					break;
 				else
-					this.tilePlacementResults.Add(lastTileResult);
+					tilePlacementResults.Add(lastTileResult);
 			}
 
 			// Successfully placed the tile
@@ -911,11 +923,11 @@ namespace DunGen.Project.External.DunGen.Code
 				{
 					createdTile.Placement.InjectionData = chosenInjectedTile;
 
-					this.injectedTiles[createdTile] = chosenInjectedTile;
-					this.tilesPendingInjection.RemoveAt(injectedTileIndexToRemove);
+					injectedTiles[createdTile] = chosenInjectedTile;
+					tilesPendingInjection.RemoveAt(injectedTileIndexToRemove);
 
 					if (isOnMainPath)
-						this.targetLength++;
+						targetLength++;
 				}
 
 				return createdTile;
@@ -935,8 +947,8 @@ namespace DunGen.Project.External.DunGen.Code
 				return new NullTemplatePlacementResult();
 
 			int toDoorwayIndex = pair.NextTemplate.Doorways.IndexOf(pair.NextDoorway);
-			tile = this.tileProxyPool.TakeObject(toTemplate);
-			tile.Placement.IsOnMainPath = this.Status == GenerationStatus.MainPath;
+			tile = tileProxyPool.TakeObject(toTemplate);
+			tile.Placement.IsOnMainPath = Status == GenerationStatus.MainPath;
 			tile.Placement.PlacementParameters = placementParameters;
 			tile.Placement.TileSet = pair.NextTileSet;
 
@@ -949,18 +961,18 @@ namespace DunGen.Project.External.DunGen.Code
 				Bounds proxyBounds = tile.Placement.Bounds;
 
 				// Check if the new tile is outside of the valid bounds
-				if (this.RestrictDungeonToBounds && !this.TilePlacementBounds.Contains(proxyBounds))
+				if (RestrictDungeonToBounds && !TilePlacementBounds.Contains(proxyBounds))
 				{
-					this.tileProxyPool.ReturnObject(tile);
+					tileProxyPool.ReturnObject(tile);
 					return new OutOfBoundsPlacementResult(toTemplate);
 				}
 
 				// Check if the new tile is colliding with any other
-				bool isColliding = this.CollisionManager.IsCollidingWithAnyTile(this.UpDirection, tile, fromDoorway.TileProxy);
+				bool isColliding = CollisionManager.IsCollidingWithAnyTile(UpDirection, tile, fromDoorway.TileProxy);
 
 				if (isColliding)
 				{
-					this.tileProxyPool.ReturnObject(tile);
+					tileProxyPool.ReturnObject(tile);
 					return new TileIsCollidingPlacementResult(toTemplate);
 				}
 			}
@@ -979,10 +991,10 @@ namespace DunGen.Project.External.DunGen.Code
 			var toDoorway = tile.Doorways[toDoorwayIndex];
 
 			if (fromDoorway != null)
-				this.proxyDungeon.MakeConnection(fromDoorway, toDoorway);
+				proxyDungeon.MakeConnection(fromDoorway, toDoorway);
 
-			this.proxyDungeon.AddTile(tile);
-			this.CollisionManager.AddTile(tile);
+			proxyDungeon.AddTile(tile);
+			CollisionManager.AddTile(tile);
 
 			return new SuccessPlacementResult();
 		}
@@ -990,10 +1002,10 @@ namespace DunGen.Project.External.DunGen.Code
 		protected TileProxy GetTileTemplate(GameObject prefab)
 		{
 			// No proxy has been loaded yet, we should create one
-			if (!this.preProcessData.TryGetValue(prefab, out var template))
+			if (!preProcessData.TryGetValue(prefab, out var template))
 			{
 				template = new TileProxy(prefab);
-				this.preProcessData.Add(prefab, template);
+				preProcessData.Add(prefab, template);
 			}
 
 			return template;
@@ -1002,24 +1014,24 @@ namespace DunGen.Project.External.DunGen.Code
 		protected TileProxy PickRandomTemplate(DoorwaySocket socketGroupFilter)
 		{
 			// Pick a random tile
-			var tile = this.useableTiles[this.RandomStream.Next(0, this.useableTiles.Count)];
-			var template = this.GetTileTemplate(tile);
+			var tile = useableTiles[RandomStream.Next(0, useableTiles.Count)];
+			var template = GetTileTemplate(tile);
 
 			// If there's a socket group filter and the chosen Tile doesn't have a socket of this type, try again
 			if (socketGroupFilter != null && !template.UnusedDoorways.Where(d => d.Socket == socketGroupFilter).Any())
-				return this.PickRandomTemplate(socketGroupFilter);
+				return PickRandomTemplate(socketGroupFilter);
 
 			return template;
 		}
 
 		protected int NormalizedDepthToIndex(float normalizedDepth)
 		{
-			return Mathf.RoundToInt(normalizedDepth * (this.targetLength - 1));
+			return Mathf.RoundToInt(normalizedDepth * (targetLength - 1));
 		}
 
 		protected float IndexToNormalizedDepth(int index)
 		{
-			return index / (float)this.targetLength;
+			return index / (float)targetLength;
 		}
 
 		/// <summary>
@@ -1030,7 +1042,7 @@ namespace DunGen.Project.External.DunGen.Code
 		/// <param name="phase">Which phase to run the post-process step. Used to determine whether the step should run before or after DunGen's built-in post-processing</param>
 		public void RegisterPostProcessStep(Action<DungeonGenerator> postProcessCallback, int priority = 0, PostProcessPhase phase = PostProcessPhase.AfterBuiltIn)
 		{
-			this.postProcessSteps.Add(new DungeonGeneratorPostProcessStep(postProcessCallback, priority, phase));
+			postProcessSteps.Add(new DungeonGeneratorPostProcessStep(postProcessCallback, priority, phase));
 		}
 
 		/// <summary>
@@ -1039,23 +1051,23 @@ namespace DunGen.Project.External.DunGen.Code
 		/// <param name="postProcessCallback">The callback to remove</param>
 		public void UnregisterPostProcessStep(Action<DungeonGenerator> postProcessCallback)
 		{
-			for (int i = 0; i < this.postProcessSteps.Count; i++)
-				if (this.postProcessSteps[i].PostProcessCallback == postProcessCallback)
-					this.postProcessSteps.RemoveAt(i);
+			for (int i = 0; i < postProcessSteps.Count; i++)
+				if (postProcessSteps[i].PostProcessCallback == postProcessCallback)
+					postProcessSteps.RemoveAt(i);
 		}
 
 		protected virtual IEnumerator PostProcess()
 		{
-			this.GenerationStats.BeginTime(GenerationStatus.PostProcessing);
-			this.ChangeStatus(GenerationStatus.PostProcessing);
-			int length = this.proxyDungeon.MainPathTiles.Count;
+			GenerationStats.BeginTime(GenerationStatus.PostProcessing);
+			ChangeStatus(GenerationStatus.PostProcessing);
+			int length = proxyDungeon.MainPathTiles.Count;
 
 			// Calculate maximum branch depth
 			int maxBranchDepth = 0;
 
-			if (this.proxyDungeon.BranchPathTiles.Count > 0)
+			if (proxyDungeon.BranchPathTiles.Count > 0)
 			{
-				foreach(var branchTile in this.proxyDungeon.BranchPathTiles)
+				foreach(var branchTile in proxyDungeon.BranchPathTiles)
 				{
 					int branchDepth = branchTile.Placement.BranchDepth;
 
@@ -1069,15 +1081,15 @@ namespace DunGen.Project.External.DunGen.Code
 
 
 			// Order post-process steps by priority
-			this.postProcessSteps.Sort((a, b) =>
+			postProcessSteps.Sort((a, b) =>
 			{
 				return b.Priority.CompareTo(a.Priority);
 			});
 
 			// Apply any post-process to be run BEFORE built-in post-processing is run
-			foreach (var step in this.postProcessSteps)
+			foreach (var step in postProcessSteps)
 			{
-				if (this.ShouldSkipFrame(false))
+				if (ShouldSkipFrame(false))
 					yield return null;
 
 				if (step.Phase == PostProcessPhase.BeforeBuiltIn)
@@ -1088,26 +1100,26 @@ namespace DunGen.Project.External.DunGen.Code
 			// Waiting one frame so objects are in their expected state
 			yield return null;
 
-			foreach (var tile in this.CurrentDungeon.AllTiles)
+			foreach (var tile in CurrentDungeon.AllTiles)
 			{
-				if (this.ShouldSkipFrame(false))
+				if (ShouldSkipFrame(false))
 					yield return null;
 
 				tile.Placement.NormalizedPathDepth = tile.Placement.PathDepth / (float)(length - 1);
 			}
 
-			this.CurrentDungeon.PostGenerateDungeon(this);
+			CurrentDungeon.PostGenerateDungeon(this);
 
 
 			// Process random props
-			this.ProcessLocalProps();
-			this.ProcessGlobalProps();
+			ProcessLocalProps();
+			ProcessGlobalProps();
 
-			if (this.DungeonFlow.KeyManager != null)
-				this.PlaceLocksAndKeys();
+			if (DungeonFlow.KeyManager != null)
+				PlaceLocksAndKeys();
 
-			this.GenerationStats.SetRoomStatistics(this.CurrentDungeon.MainPathTiles.Count, this.CurrentDungeon.BranchPathTiles.Count, maxBranchDepth);
-			this.preProcessData.Clear();
+			GenerationStats.SetRoomStatistics(CurrentDungeon.MainPathTiles.Count, CurrentDungeon.BranchPathTiles.Count, maxBranchDepth);
+			preProcessData.Clear();
 
 
 			// Waiting one frame so objects are in their expected state
@@ -1115,9 +1127,9 @@ namespace DunGen.Project.External.DunGen.Code
 
 
 			// Apply any post-process to be run AFTER built-in post-processing is run
-			foreach (var step in this.postProcessSteps)
+			foreach (var step in postProcessSteps)
 			{
-				if (this.ShouldSkipFrame(false))
+				if (ShouldSkipFrame(false))
 					yield return null;
 
 				if (step.Phase == PostProcessPhase.AfterBuiltIn)
@@ -1126,10 +1138,10 @@ namespace DunGen.Project.External.DunGen.Code
 
 
 			// Finalise
-			this.GenerationStats.EndTime();
+			GenerationStats.EndTime();
 
 			// Activate all door gameobjects that were added to doorways
-			foreach (var door in this.CurrentDungeon.Doors)
+			foreach (var door in CurrentDungeon.Doors)
 				if (door != null)
 					door.SetActive(true);
 		}
@@ -1145,7 +1157,7 @@ namespace DunGen.Project.External.DunGen.Code
 				}
 			}
 
-			var props = this.Root.GetComponentsInChildren<RandomProp>();
+			var props = Root.GetComponentsInChildren<RandomProp>();
 			var propData = new List<PropProcessingData>();
 
 			foreach (var prop in props)
@@ -1174,7 +1186,7 @@ namespace DunGen.Project.External.DunGen.Code
 					continue;
 
 				spawnedObjects.Clear();
-				data.PropComponent.Process(this.RandomStream, data.OwningTile, ref spawnedObjects);
+				data.PropComponent.Process(RandomStream, data.OwningTile, ref spawnedObjects);
 
 				// Gather any spawned sub-props and insert them into the list to be processed too
 				var spawnedSubProps = spawnedObjects.SelectMany(x => x.GetComponentsInChildren<RandomProp>()).Distinct();
@@ -1195,7 +1207,7 @@ namespace DunGen.Project.External.DunGen.Code
 		{
 			Dictionary<int, GameObjectChanceTable> globalPropWeights = new Dictionary<int, GameObjectChanceTable>();
 
-			foreach (var tile in this.CurrentDungeon.AllTiles)
+			foreach (var tile in CurrentDungeon.AllTiles)
 			{
 				foreach (var prop in tile.GetComponentsInChildren<GlobalProp>(true))
 				{
@@ -1228,18 +1240,18 @@ namespace DunGen.Project.External.DunGen.Code
 					continue;
 				}
 
-				var prop = this.DungeonFlow.GlobalProps.Where(x => x.ID == pair.Key).FirstOrDefault();
+				var prop = DungeonFlow.GlobalProps.Where(x => x.ID == pair.Key).FirstOrDefault();
 
 				if (prop == null)
 					continue;
 
 				var weights = pair.Value.Clone();
-				int propCount = prop.Count.GetRandom(this.RandomStream);
+				int propCount = prop.Count.GetRandom(RandomStream);
 				propCount = Mathf.Clamp(propCount, 0, weights.Weights.Count);
 
 				for (int i = 0; i < propCount; i++)
 				{
-					var chosenEntry = weights.GetRandom(this.RandomStream,
+					var chosenEntry = weights.GetRandom(RandomStream,
 						isOnMainPath: true,
 						normalizedDepth: 0,
 						previouslyChosen: null,
@@ -1256,8 +1268,8 @@ namespace DunGen.Project.External.DunGen.Code
 
 		protected virtual void PlaceLocksAndKeys()
 		{
-			var nodes = this.CurrentDungeon.ConnectionGraph.Nodes.Select(x => x.Tile.Placement.GraphNode).Where(x => { return x != null; }).Distinct().ToArray();
-			var lines = this.CurrentDungeon.ConnectionGraph.Nodes.Select(x => x.Tile.Placement.GraphLine).Where(x => { return x != null; }).Distinct().ToArray();
+			var nodes = CurrentDungeon.ConnectionGraph.Nodes.Select(x => x.Tile.Placement.GraphNode).Where(x => { return x != null; }).Distinct().ToArray();
+			var lines = CurrentDungeon.ConnectionGraph.Nodes.Select(x => x.Tile.Placement.GraphLine).Where(x => { return x != null; }).Distinct().ToArray();
 
 			Dictionary<Doorway, Key> lockedDoorways = new Dictionary<Doorway, Key>();
 
@@ -1266,8 +1278,8 @@ namespace DunGen.Project.External.DunGen.Code
 			{
 				foreach (var l in node.Locks)
 				{
-					var tile = this.CurrentDungeon.AllTiles.Where(x => { return x.Placement.GraphNode == node; }).FirstOrDefault();
-					var connections = this.CurrentDungeon.ConnectionGraph.Nodes.Where(x => { return x.Tile == tile; }).FirstOrDefault().Connections;
+					var tile = CurrentDungeon.AllTiles.Where(x => { return x.Placement.GraphNode == node; }).FirstOrDefault();
+					var connections = CurrentDungeon.ConnectionGraph.Nodes.Where(x => { return x.Tile == tile; }).FirstOrDefault().Connections;
 					Doorway entrance = null;
 					Doorway exit = null;
 
@@ -1292,7 +1304,7 @@ namespace DunGen.Project.External.DunGen.Code
 			// Lock doorways on lines
 			foreach (var line in lines)
 			{
-				var doorways = this.CurrentDungeon.ConnectionGraph.Connections.Where(x =>
+				var doorways = CurrentDungeon.ConnectionGraph.Connections.Where(x =>
 				{
 					var tileSet = x.DoorwayA.Tile.Placement.TileSet;
 
@@ -1314,7 +1326,7 @@ namespace DunGen.Project.External.DunGen.Code
 
 				foreach (var l in line.Locks)
 				{
-					int lockCount = l.Range.GetRandom(this.RandomStream);
+					int lockCount = l.Range.GetRandom(RandomStream);
 					lockCount = Mathf.Clamp(lockCount, 0, doorways.Count);
 
 					for (int i = 0; i < lockCount; i++)
@@ -1322,7 +1334,7 @@ namespace DunGen.Project.External.DunGen.Code
 						if (doorways.Count == 0)
 							break;
 
-						var doorway = doorways[this.RandomStream.Next(0, doorways.Count)];
+						var doorway = doorways[RandomStream.Next(0, doorways.Count)];
 						doorways.Remove(doorway);
 
 						if (lockedDoorways.ContainsKey(doorway))
@@ -1336,7 +1348,7 @@ namespace DunGen.Project.External.DunGen.Code
 
 
 			// Lock doorways on injected tiles
-			foreach (var tile in this.CurrentDungeon.AllTiles)
+			foreach (var tile in CurrentDungeon.AllTiles)
 			{
 				if (tile.Placement.InjectionData != null && tile.Placement.InjectionData.IsLocked)
 				{
@@ -1359,7 +1371,7 @@ namespace DunGen.Project.External.DunGen.Code
 					if (validLockedDoorways.Any())
 					{
 						var doorway = validLockedDoorways.First();
-						var key = this.DungeonFlow.KeyManager.GetKeyByID(tile.Placement.InjectionData.LockID);
+						var key = DungeonFlow.KeyManager.GetKeyByID(tile.Placement.InjectionData.LockID);
 
 						lockedDoorways.Add(doorway, key);
 					}
@@ -1375,7 +1387,7 @@ namespace DunGen.Project.External.DunGen.Code
 				var key = pair.Value;
 				var possibleSpawnTiles = new List<Tile>();
 
-				foreach (var t in this.CurrentDungeon.AllTiles)
+				foreach (var t in CurrentDungeon.AllTiles)
 				{
 					if (t.Placement.NormalizedPathDepth >= doorway.Tile.Placement.NormalizedPathDepth)
 						continue;
@@ -1397,13 +1409,13 @@ namespace DunGen.Project.External.DunGen.Code
 					.SelectMany(x => x.GetComponentsInChildren<Component>()
 					.OfType<IKeySpawner>())
 					.Except(usedSpawnComponents)
-					.Where(x => x.CanSpawnKey(this.DungeonFlow.KeyManager, key))
+					.Where(x => x.CanSpawnKey(DungeonFlow.KeyManager, key))
 					.ToArray();
 
 				GameObject lockedDoorPrefab = null;
 				
 				if(possibleSpawnComponents.Any())
-					lockedDoorPrefab = this.TryGetRandomLockedDoorPrefab(doorway, key, this.DungeonFlow.KeyManager);
+					lockedDoorPrefab = TryGetRandomLockedDoorPrefab(doorway, key, DungeonFlow.KeyManager);
 
 				if (!possibleSpawnComponents.Any() || lockedDoorPrefab == null)
 					locksToRemove.Add(doorway);
@@ -1411,26 +1423,26 @@ namespace DunGen.Project.External.DunGen.Code
 				{
 					doorway.LockID = key.ID;
 
-					var keySpawnParameters = new KeySpawnParameters(key, this.DungeonFlow.KeyManager, this);
+					var keySpawnParameters = new KeySpawnParameters(key, DungeonFlow.KeyManager, this);
 
-					int keysToSpawn = key.KeysPerLock.GetRandom(this.RandomStream);
+					int keysToSpawn = key.KeysPerLock.GetRandom(RandomStream);
 					keysToSpawn = Math.Min(keysToSpawn, possibleSpawnComponents.Length);
 
 					for (int i = 0; i < keysToSpawn; i++)
 					{
-						int chosenSpawnerIndex = this.RandomStream.Next(0, possibleSpawnComponents.Length);
+						int chosenSpawnerIndex = RandomStream.Next(0, possibleSpawnComponents.Length);
 						var keySpawner = possibleSpawnComponents[chosenSpawnerIndex];
 
 						keySpawnParameters.OutputSpawnedKeys.Clear();
 						keySpawner.SpawnKey(keySpawnParameters);
 
 						foreach(var receiver in keySpawnParameters.OutputSpawnedKeys)
-							receiver.OnKeyAssigned(key, this.DungeonFlow.KeyManager);
+							receiver.OnKeyAssigned(key, DungeonFlow.KeyManager);
 
 						usedSpawnComponents.Add(keySpawner);
 					}
 
-					this.LockDoorway(doorway, lockedDoorPrefab, key, this.DungeonFlow.KeyManager);
+					LockDoorway(doorway, lockedDoorPrefab, key, DungeonFlow.KeyManager);
 				}
 			}
 
@@ -1464,7 +1476,7 @@ namespace DunGen.Project.External.DunGen.Code
 			if (prefabs.Length == 0)
 				return null;
 
-			var chosenEntry = prefabs[this.RandomStream.Next(0, prefabs.Length)].GetRandom(this.RandomStream, placement.IsOnMainPath, placement.NormalizedDepth, null, true);
+			var chosenEntry = prefabs[RandomStream.Next(0, prefabs.Length)].GetRandom(RandomStream, placement.IsOnMainPath, placement.NormalizedDepth, null, true);
 			return chosenEntry.Value;
 		}
 
@@ -1472,7 +1484,7 @@ namespace DunGen.Project.External.DunGen.Code
 		{
 			GameObject doorObj = GameObject.Instantiate(doorPrefab, doorway.transform);
 
-			DungeonUtil.AddAndSetupDoorComponent(this.CurrentDungeon, doorObj, doorway);
+			DungeonUtil.AddAndSetupDoorComponent(CurrentDungeon, doorObj, doorway);
 
 			// Remove any existing door prefab that may have been placed as we'll be replacing it with a locked door
 			doorway.RemoveUsedPrefab();
@@ -1489,7 +1501,7 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public void OnBeforeSerialize()
 		{
-			this.fileVersion = DungeonGenerator.CurrentFileVersion;
+			fileVersion = CurrentFileVersion;
 		}
 
 		public void OnAfterDeserialize()
@@ -1497,20 +1509,23 @@ namespace DunGen.Project.External.DunGen.Code
 #pragma warning disable CS0618 // Type or member is obsolete
 
 			// Upgrade to new repeat mode
-			if (this.fileVersion < 1)
-				this.RepeatMode = (this.allowImmediateRepeats) ? TileRepeatMode.Allow : TileRepeatMode.DisallowImmediate;
+			if (fileVersion < 1)
+				RepeatMode = (allowImmediateRepeats) ? TileRepeatMode.Allow : TileRepeatMode.DisallowImmediate;
 
 			// Moved collision properties to their own settings class
-			if (this.fileVersion < 2)
+			if (fileVersion < 2)
 			{
-				if(this.CollisionSettings == null)
-					this.CollisionSettings = new DungeonCollisionSettings();
+				if(CollisionSettings == null)
+					CollisionSettings = new DungeonCollisionSettings();
 
-				this.CollisionSettings.DisallowOverhangs = this.DisallowOverhangs;
-				this.CollisionSettings.OverlapThreshold = this.OverlapThreshold;
-				this.CollisionSettings.Padding = this.Padding;
-				this.CollisionSettings.AvoidCollisionsWithOtherDungeons = this.AvoidCollisionsWithOtherDungeons;
+				CollisionSettings.DisallowOverhangs = DisallowOverhangs;
+				CollisionSettings.OverlapThreshold = OverlapThreshold;
+				CollisionSettings.Padding = Padding;
+				CollisionSettings.AvoidCollisionsWithOtherDungeons = AvoidCollisionsWithOtherDungeons;
 			}
+
+			if (fileVersion < 3)
+				TriggerPlacement = PlaceTileTriggers ? TriggerPlacementMode.ThreeDimensional : TriggerPlacementMode.None;
 
 #pragma warning restore CS0618 // Type or member is obsolete
 		}

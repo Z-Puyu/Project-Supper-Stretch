@@ -11,8 +11,6 @@ GameObject:
   - component: {fileID: 2116577648490278070}
   - component: {fileID: 3201449053189669078}
   - component: {fileID: 5485054057428465779}
-  - component: {fileID: 7520496352226763131}
-  - component: {fileID: 8331775590108123878}
   - component: {fileID: 8480777821997556362}
   m_Layer: 5
   m_Name: Border
@@ -34,6 +32,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3837814558936458165}
+  - {fileID: 4045634617756016180}
   m_Father: {fileID: 2533431087323288691}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -79,99 +78,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &7520496352226763131
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1508891644700327156}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 994c66b6148109b489689ed705d244cd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Parent: {fileID: 2533431087323288691}
-  SiblingIndex: 0
-  LayoutPosition: {x: 0, y: 0, z: 0}
-  LayoutRotation: {x: 0, y: 0, z: 0, w: 1}
-  AdapterBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 230.1125, y: 50, z: 0}
-  LayoutBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 230.1125, y: 50, z: 0}
-  RotatedAndScaledBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 230.1125, y: 50, z: 0}
-  ComponentScale: {x: 1, y: 1, z: 1}
-  FillSize: {x: 460.225, y: 100, z: 0}
-  ShrinkSize: {x: 999999, y: 999999, z: 999999}
-  TargetPosition: {x: 0, y: 0, z: 0}
-  TargetRotation: {x: 0, y: 0, z: 0, w: 1}
-  TargetScale: {x: 1, y: 1, z: 1}
-  TargetRectSize: {x: 460.225, y: 100, z: 0}
-  TransformPosition: {x: 0, y: 0, z: 0}
-  TransformRotation: {x: 0, y: 0, z: 0, w: 1}
-  TransformScale: {x: 1, y: 1, z: 1}
-  TransformRectSize: {x: 460.225, y: 100}
---- !u!114 &8331775590108123878
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1508891644700327156}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00b0da67f6b3c9a4e84ed47af9da4884, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _version: 4
-  _widthType: 1
-  _width: 100
-  _widthOfParent: 1
-  _heightType: 1
-  _height: 100
-  _heightOfParent: 1
-  _depthType: 2
-  _depth: 1
-  _depthOfParent: 1
-  _minWidthType: 0
-  _minWidth: 0
-  _minWidthOfParent: 0
-  _minHeightType: 0
-  _minHeight: 0
-  _minHeightOfParent: 0
-  _minDepthType: 0
-  _minDepth: 0
-  _minDepthOfParent: 0
-  _maxWidthType: 0
-  _maxWidth: 100
-  _maxWidthOfParent: 1
-  _maxHeightType: 0
-  _maxHeight: 100
-  _maxHeightOfParent: 1
-  _maxDepthType: 0
-  _maxDepth: 1
-  _maxDepthOfParent: 1
-  _offset: {x: 0, y: 0, z: 0}
-  _scale: {x: 1, y: 1, z: 1}
-  _rotation: {x: 0, y: 0, z: 0, w: 1}
-  _marginLeft: 0
-  _marginRight: 0
-  _marginTop: 0
-  _marginBottom: 0
-  _marginFront: 0
-  _marginBack: 0
-  _paddingLeft: 0
-  _paddingRight: 0
-  _paddingTop: 0
-  _paddingBottom: 0
-  _paddingFront: 0
-  _paddingBack: 0
-  _skipLayout: 0
-  _useDefaultAdapter: 1
 --- !u!114 &8480777821997556362
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -199,6 +105,7 @@ GameObject:
   - component: {fileID: 2565351137016866123}
   - component: {fileID: 5632395834170617616}
   - component: {fileID: 8627851536078264435}
+  - component: {fileID: 7468365602947520871}
   m_Layer: 5
   m_Name: UnityButton
   m_TagString: Untagged
@@ -306,7 +213,48 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5632395834170617616}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2487602207331416158}
+        m_TargetAssemblyTypeName: UnityEngine.AudioSource, UnityEngine
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &7468365602947520871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2191232546302162980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 0
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1905979711580572270}
+          m_TargetAssemblyTypeName: UnityEngine.AudioSource, UnityEngine
+          m_MethodName: Play
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &6984984082369710648
 GameObject:
   m_ObjectHideFlags: 0
@@ -316,8 +264,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2533431087323288691}
-  - component: {fileID: 4148358396109664247}
-  - component: {fileID: 1849796371922610922}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -345,52 +291,115 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 460.225, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &4148358396109664247
-MonoBehaviour:
+--- !u!1001 &5940846977035319068
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2116577648490278070}
+    m_Modifications:
+    - target: {fileID: 5760854255808714090, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_Name
+      value: ButtonAudio
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+--- !u!82 &1905979711580572270 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 5188505943997431154, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+  m_PrefabInstance: {fileID: 5940846977035319068}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6984984082369710648}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8c3cd677ba641f4974c5d23a0b9bb36, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <ButtonElement>k__BackingField: {fileID: 8627851536078264435}
---- !u!114 &1849796371922610922
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+--- !u!82 &2487602207331416158 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 8140148430809059138, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+  m_PrefabInstance: {fileID: 5940846977035319068}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6984984082369710648}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 994c66b6148109b489689ed705d244cd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Parent: {fileID: 0}
-  SiblingIndex: 0
-  LayoutPosition: {x: 0, y: 0, z: 0}
-  LayoutRotation: {x: 0, y: 0, z: 0, w: 1}
-  AdapterBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 230.1125, y: 50, z: 0}
-  LayoutBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 230.1125, y: 50, z: 0}
-  RotatedAndScaledBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 230.1125, y: 50, z: 0}
-  ComponentScale: {x: 1, y: 1, z: 1}
-  FillSize: {x: 768, y: 108.39463, z: 0}
-  ShrinkSize: {x: 999999, y: 999999, z: 999999}
-  TargetPosition: {x: 0, y: 0, z: 0}
-  TargetRotation: {x: 0, y: 0, z: 0, w: 1}
-  TargetScale: {x: 1, y: 1, z: 1}
-  TargetRectSize: {x: 460.225, y: 100, z: 0}
-  TransformPosition: {x: 0, y: 0, z: 0}
-  TransformRotation: {x: 0, y: 0, z: 0, w: 1}
-  TransformScale: {x: 1, y: 1, z: 1}
-  TransformRectSize: {x: 460.225, y: 100}
+--- !u!224 &4045634617756016180 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7662553268500457768, guid: 3579737c32207354bafdfdd6b7283d5b, type: 3}
+  m_PrefabInstance: {fileID: 5940846977035319068}
+  m_PrefabAsset: {fileID: 0}

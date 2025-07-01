@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	public sealed class GenerationStats
 	{
@@ -26,7 +26,7 @@ namespace DunGen.Project.External.DunGen.Code
 		public int PrunedBranchTileCount { get; internal set; }
 
 		public Dictionary<GenerationStatus, float> GenerationStepTimes { get; private set; }
-		public float TotalTime => this.GenerationStepTimes.Values.Sum();
+		public float TotalTime => GenerationStepTimes.Values.Sum();
 
 		private Stopwatch stopwatch = new Stopwatch();
 		private GenerationStatus generationStatus;
@@ -35,28 +35,28 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public GenerationStats()
 		{
-			this.GenerationStepTimes = new Dictionary<GenerationStatus, float>();
+			GenerationStepTimes = new Dictionary<GenerationStatus, float>();
 		}
 
 		public float GetGenerationStepTime(GenerationStatus step)
 		{
-			if (this.GenerationStepTimes.TryGetValue(step, out float time))
+			if (GenerationStepTimes.TryGetValue(step, out float time))
 				return time;
 			else
 				return 0f;
 		}
 
-		public IEnumerable<TileStatistics> GetTileStatistics() => this.tileStatistics.Values;
+		public IEnumerable<TileStatistics> GetTileStatistics() => tileStatistics.Values;
 
 		public void TileAdded(Tile tilePrefab, bool fromPool)
 		{
-			if (!this.tileStatistics.TryGetValue(tilePrefab, out TileStatistics stats))
+			if (!tileStatistics.TryGetValue(tilePrefab, out TileStatistics stats))
 			{
 				stats = new TileStatistics
 				{
 					TilePrefab = tilePrefab
 				};
-				this.tileStatistics.Add(tilePrefab, stats);
+				tileStatistics.Add(tilePrefab, stats);
 			}
 
 			stats.TotalCount++;
@@ -67,61 +67,61 @@ namespace DunGen.Project.External.DunGen.Code
 
 		internal void Clear()
 		{
-			this.MainPathRoomCount = 0;
-			this.BranchPathRoomCount = 0;
-			this.TotalRoomCount = 0;
-			this.MaxBranchDepth = 0;
-			this.TotalRetries = 0;
-			this.PrunedBranchTileCount = 0;
-			this.GenerationStepTimes.Clear();
-			this.tileStatistics.Clear();
+			MainPathRoomCount = 0;
+			BranchPathRoomCount = 0;
+			TotalRoomCount = 0;
+			MaxBranchDepth = 0;
+			TotalRetries = 0;
+			PrunedBranchTileCount = 0;
+			GenerationStepTimes.Clear();
+			tileStatistics.Clear();
 		}
 
 		internal void IncrementRetryCount()
 		{
-			this.TotalRetries++;
+			TotalRetries++;
 		}
 
 		internal void SetRoomStatistics(int mainPathRoomCount, int branchPathRoomCount, int maxBranchDepth)
 		{
-			this.MainPathRoomCount = mainPathRoomCount;
-			this.BranchPathRoomCount = branchPathRoomCount;
-			this.MaxBranchDepth = maxBranchDepth;
-			this.TotalRoomCount = this.MainPathRoomCount + this.BranchPathRoomCount;
+			MainPathRoomCount = mainPathRoomCount;
+			BranchPathRoomCount = branchPathRoomCount;
+			MaxBranchDepth = maxBranchDepth;
+			TotalRoomCount = MainPathRoomCount + BranchPathRoomCount;
 		}
 
 		internal void BeginTime(GenerationStatus status)
 		{
-			if (this.stopwatch.IsRunning)
-				this.EndTime();
+			if (stopwatch.IsRunning)
+				EndTime();
 
-			this.generationStatus = status;
-			this.stopwatch.Reset();
-			this.stopwatch.Start();
+			generationStatus = status;
+			stopwatch.Reset();
+			stopwatch.Start();
 		}
 
 		internal void EndTime()
 		{
-			this.stopwatch.Stop();
-			float elapsedTime = (float)this.stopwatch.Elapsed.TotalMilliseconds;
+			stopwatch.Stop();
+			float elapsedTime = (float)stopwatch.Elapsed.TotalMilliseconds;
 
-			this.GenerationStepTimes.TryGetValue(this.generationStatus, out float currentTime);
+			GenerationStepTimes.TryGetValue(generationStatus, out float currentTime);
 			currentTime += elapsedTime;
 
-			this.GenerationStepTimes[this.generationStatus] = currentTime;
+			GenerationStepTimes[generationStatus] = currentTime;
 		}
 
 		public GenerationStats Clone()
 		{
 			GenerationStats newStats = new GenerationStats();
 
-			newStats.MainPathRoomCount = this.MainPathRoomCount;
-			newStats.BranchPathRoomCount = this.BranchPathRoomCount;
-			newStats.TotalRoomCount = this.TotalRoomCount;
-			newStats.MaxBranchDepth = this.MaxBranchDepth;
-			newStats.TotalRetries = this.TotalRetries;
-			newStats.PrunedBranchTileCount = this.PrunedBranchTileCount;
-			newStats.GenerationStepTimes = new Dictionary<GenerationStatus, float>(this.GenerationStepTimes);
+			newStats.MainPathRoomCount = MainPathRoomCount;
+			newStats.BranchPathRoomCount = BranchPathRoomCount;
+			newStats.TotalRoomCount = TotalRoomCount;
+			newStats.MaxBranchDepth = MaxBranchDepth;
+			newStats.TotalRetries = TotalRetries;
+			newStats.PrunedBranchTileCount = PrunedBranchTileCount;
+			newStats.GenerationStepTimes = new Dictionary<GenerationStatus, float>(GenerationStepTimes);
 
 			return newStats;
 		}

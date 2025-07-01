@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DunGen.Project.External.DunGen.Code;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers
+namespace DunGen.Editor.Drawers
 {
 	[CustomPropertyDrawer(typeof(GameObjectChanceTable))]
 	sealed class GameObjectChanceTableDrawer : PropertyDrawer
@@ -17,13 +16,13 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers
 		{
 			ReorderableList list = null;
 
-			if (this.lists.TryGetValue(property.propertyPath, out list))
+			if (lists.TryGetValue(property.propertyPath, out list))
 				return list;
 			else
 			{
 				var weightsProperty = property.FindPropertyRelative("Weights");
 				var targetObject = property.serializedObject.targetObject;
-				var chanceTable = (GameObjectChanceTable)this.fieldInfo.GetValue(targetObject);
+				var chanceTable = (GameObjectChanceTable)fieldInfo.GetValue(targetObject);
 
 				list = new ReorderableList(property.serializedObject, weightsProperty, true, true, true, true)
 				{
@@ -38,23 +37,23 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers
 					},
 				};
 
-				this.lists[property.propertyPath] = list;
+				lists[property.propertyPath] = list;
 				return list;
 			}
 		}
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
-			var list = this.GetOrCreateList(property, label);
+			var list = GetOrCreateList(property, label);
 			return list.GetHeight();
 		}
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			var list = this.GetOrCreateList(property, label);
-			var attribute = this.fieldInfo.GetCustomAttributes(typeof(AcceptGameObjectTypesAttribute), true)
-			                    .Cast<AcceptGameObjectTypesAttribute>()
-			                    .FirstOrDefault();
+			var list = GetOrCreateList(property, label);
+			var attribute = fieldInfo.GetCustomAttributes(typeof(AcceptGameObjectTypesAttribute), true)
+									 .Cast<AcceptGameObjectTypesAttribute>()
+									 .FirstOrDefault();
 
 			if (attribute != null)
 				GameObjectChanceDrawer.FilterOverride = attribute.Filter;

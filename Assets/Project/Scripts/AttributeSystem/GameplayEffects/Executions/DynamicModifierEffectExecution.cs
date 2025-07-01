@@ -13,12 +13,12 @@ namespace Project.Scripts.AttributeSystem.GameplayEffects.Executions;
 /// </summary>
 [Serializable]
 public sealed class DynamicModifierEffectExecution : EffectExecution {
-    [field: SerializeField] private List<Modifier> DefaultModifiers { get; set; } = [];
+    [field: SerializeField] private List<ModifierData> DefaultModifiers { get; set; } = [];
     private Dictionary<ModifierKey, Modifier> ModifierDictionary { get; init; } = [];
 
     protected override IEnumerable<Modifier> Run(AttributeSet target, GameplayEffectExecutionArgs args) {
         this.ModifierDictionary.Clear();
-        this.DefaultModifiers.ForEach(modifier => this.ModifierDictionary.Add(modifier.Key, modifier));
+        this.DefaultModifiers.ForEach(modifier => this.ModifierDictionary.Add(modifier.Key, Modifier.From(modifier)));
         if (!args.ModifierOverrides.Any() && !this.ModifierDictionary.Any()) {
             throw new ArgumentException($"{this.GetType().Name} requires modifier values from caller or default values");    
         }

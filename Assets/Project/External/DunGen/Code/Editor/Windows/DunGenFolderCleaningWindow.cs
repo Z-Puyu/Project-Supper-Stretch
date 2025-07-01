@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using DunGen.Project.External.DunGen.Code;
 using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
+namespace DunGen.Editor.Windows
 {
 	public class DunGenFolderCleaningWindow : EditorWindow
 	{
@@ -18,24 +17,24 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 
 			EditorApplication.delayCall += () =>
 			{
-				DunGenFolderCleaningWindow.CleanDunGenDirectory();
+				CleanDunGenDirectory();
 			};
 		}
 
 		public static void CleanDunGenDirectory()
 		{
-			string relativeDunGenRootDirectory = DunGenFolderCleaningWindow.GetRelativeDunGenRootDirectory();
-			string absoluteDunGenRootDirectory = DunGenFolderCleaningWindow.RelativeToAbsolutePath(relativeDunGenRootDirectory);
+			string relativeDunGenRootDirectory = GetRelativeDunGenRootDirectory();
+			string absoluteDunGenRootDirectory = RelativeToAbsolutePath(relativeDunGenRootDirectory);
 
 			if (relativeDunGenRootDirectory == null || !Directory.Exists(absoluteDunGenRootDirectory))
 				return;
 
-			var filesToRemove = DunGenFolderCleaningWindow.GetFilesToRemove(relativeDunGenRootDirectory);
+			var filesToRemove = GetFilesToRemove(relativeDunGenRootDirectory);
 
 			if(filesToRemove == null || filesToRemove.Count == 0)
 				return;
 
-			var window = EditorWindow.GetWindow<DunGenFolderCleaningWindow>("DunGen Cleaner");
+			var window = GetWindow<DunGenFolderCleaningWindow>("DunGen Cleaner");
 			window.minSize = new Vector2(500, 280);
 
 			window.relativeDunGenRootDirectory = relativeDunGenRootDirectory;
@@ -136,11 +135,11 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 
 			EditorGUILayout.LabelField("Files to Remove:", EditorStyles.boldLabel);
 
-			this.scrollPosition = EditorGUILayout.BeginScrollView(this.scrollPosition);
+			scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
 			EditorGUILayout.BeginVertical(GUI.skin.box);
-			foreach (var file in this.filesToRemove)
+			foreach (var file in filesToRemove)
 			{
-				string displayPath = Path.Combine(this.relativeDunGenRootDirectory, file).Replace('\\', '/');
+				string displayPath = Path.Combine(relativeDunGenRootDirectory, file).Replace('\\', '/');
 				EditorGUILayout.LabelField(displayPath);
 			}
 			EditorGUILayout.EndVertical();
@@ -163,30 +162,30 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 			{
 				if (EditorUtility.DisplayDialog("Confirm Deletion", "Are you sure you want to delete the selected files? This action cannot be undone.", "Yes", "No"))
 				{
-					if (this.DeleteFiles())
+					if (DeleteFiles())
 						EditorUtility.DisplayDialog("DunGen Folder Cleaned", "The unused files have been deleted.", "OK");
 					else
 						EditorUtility.DisplayDialog("Error", "An error occurred while trying to delete the files. Some or all of the files were not deleted. Please check the console for more details.", "OK");
 
 					AssetDatabase.Refresh();
-					this.Close();
+					Close();
 				}
 			}
 
 			if (GUILayout.Button("Cancel"))
-				this.Close();
+				Close();
 		}
 
 		private bool DeleteFiles()
 		{
 			bool success = true;
 
-			foreach (var file in this.filesToRemove)
+			foreach (var file in filesToRemove)
 			{
-				var filePath = Path.GetFullPath(Path.Combine(this.absoluteDunGenRootDirectory, file));
+				var filePath = Path.GetFullPath(Path.Combine(absoluteDunGenRootDirectory, file));
 
 				// Never delete files outside of the DunGen root directory
-				if (!filePath.StartsWith(this.absoluteDunGenRootDirectory))
+				if (!filePath.StartsWith(absoluteDunGenRootDirectory))
 					continue;
 
 				try

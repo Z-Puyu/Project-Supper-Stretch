@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	/// <summary>
 	/// LEGACY - This used to determine which doorways could connect
@@ -22,7 +22,7 @@ namespace DunGen.Project.External.DunGen.Code
 	[CreateAssetMenu(fileName = "New Doorway Socket", menuName = "DunGen/Doorway Socket", order = 700)]
 	public class DoorwaySocket : ScriptableObject
 	{
-		public Vector2 Size { get { return this.size; } }
+		public Vector2 Size { get { return size; } }
 
 		[SerializeField]
 		private Vector2 size = new Vector2(1, 2);
@@ -39,8 +39,8 @@ namespace DunGen.Project.External.DunGen.Code
 		public static bool CanSocketsConnect(DoorwaySocket a, DoorwaySocket b)
 		{
 #pragma warning disable 0618
-			if (DoorwaySocket.CustomSocketConnectionDelegate != null)
-				return DoorwaySocket.CustomSocketConnectionDelegate(a, b);
+			if (CustomSocketConnectionDelegate != null)
+				return CustomSocketConnectionDelegate(a, b);
 			else
 				return a == b; // By default, sockets can only connect if they match
 #pragma warning restore 0618

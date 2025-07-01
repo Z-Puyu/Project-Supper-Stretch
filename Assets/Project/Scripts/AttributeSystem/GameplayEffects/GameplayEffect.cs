@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Project.Scripts.AttributeSystem.Attributes;
-using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.AttributeSystem.GameplayEffects.Executions;
 using Project.Scripts.AttributeSystem.Modifiers;
 using SaintsField;

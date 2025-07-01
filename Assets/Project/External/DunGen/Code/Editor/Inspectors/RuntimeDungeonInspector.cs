@@ -1,10 +1,8 @@
-﻿using DunGen.Editor.Project.External.DunGen.Code.Editor.Utility;
-using DunGen.Project.External.DunGen.Code;
+﻿using UnityEngine;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
-using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
+namespace DunGen.Editor
 {
 	[CustomEditor(typeof(RuntimeDungeon))]
 	public sealed class RuntimeDungeonInspector : UnityEditor.Editor
@@ -17,48 +15,48 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 
 		private void OnEnable()
 		{
-			this.generateOnStartProp = this.serializedObject.FindProperty(nameof(RuntimeDungeon.GenerateOnStart));
-			this.rootProp = this.serializedObject.FindProperty(nameof(RuntimeDungeon.Root));
+			generateOnStartProp = serializedObject.FindProperty(nameof(RuntimeDungeon.GenerateOnStart));
+			rootProp = serializedObject.FindProperty(nameof(RuntimeDungeon.Root));
 
-			this.placementBoundsHandle = new BoxBoundsHandle();
-			this.placementBoundsHandle.SetColor(Color.magenta);
+			placementBoundsHandle = new BoxBoundsHandle();
+			placementBoundsHandle.SetColor(Color.magenta);
 		}
 
 		public override void OnInspectorGUI()
 		{
-			this.serializedObject.Update();
+			serializedObject.Update();
 
-			EditorGUILayout.PropertyField(this.generateOnStartProp);
-			EditorGUILayout.PropertyField(this.rootProp, new GUIContent("Root", "An optional root object for the dungeon to be parented to. If blank, a new root GameObject will be created named \"" + Constants.DefaultDungeonRootName + "\""), true);
+			EditorGUILayout.PropertyField(generateOnStartProp);
+			EditorGUILayout.PropertyField(rootProp, new GUIContent("Root", "An optional root object for the dungeon to be parented to. If blank, a new root GameObject will be created named \"" + Constants.DefaultDungeonRootName + "\""), true);
 
 			EditorGUILayout.BeginVertical("box");
-			DungeonGeneratorDrawUtil.DrawDungeonGenerator(this.serializedObject.FindProperty(nameof(RuntimeDungeon.Generator)), true);
+			DungeonGeneratorDrawUtil.DrawDungeonGenerator(serializedObject.FindProperty(nameof(RuntimeDungeon.Generator)), true);
 			EditorGUILayout.EndVertical();
 
-			this.serializedObject.ApplyModifiedProperties();
+			serializedObject.ApplyModifiedProperties();
 		}
 
 		private void OnSceneGUI()
 		{
-			var dungeon = (RuntimeDungeon)this.target;
+			var dungeon = (RuntimeDungeon)target;
 
 			if (!dungeon.Generator.RestrictDungeonToBounds)
 				return;
 
-			this.placementBoundsHandle.center = dungeon.Generator.TilePlacementBounds.center;
-			this.placementBoundsHandle.size = dungeon.Generator.TilePlacementBounds.size;
+			placementBoundsHandle.center = dungeon.Generator.TilePlacementBounds.center;
+			placementBoundsHandle.size = dungeon.Generator.TilePlacementBounds.size;
 
 			EditorGUI.BeginChangeCheck();
 
 			using (new Handles.DrawingScope(dungeon.transform.localToWorldMatrix))
 			{
-				this.placementBoundsHandle.DrawHandle();
+				placementBoundsHandle.DrawHandle();
 			}
 
 			if (EditorGUI.EndChangeCheck())
 			{
 				Undo.RecordObject(dungeon, "Inspector");
-				dungeon.Generator.TilePlacementBounds = new Bounds(this.placementBoundsHandle.center, this.placementBoundsHandle.size);
+				dungeon.Generator.TilePlacementBounds = new Bounds(placementBoundsHandle.center, placementBoundsHandle.size);
 				Undo.FlushUndoRecordObjects();
 			}
 		}

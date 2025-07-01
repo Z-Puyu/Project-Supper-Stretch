@@ -1,8 +1,8 @@
+using DunGen.Graph;
 using System;
-using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	/// <summary>
 	/// A container for all of the information about a tile's posoitioning in the generated dungeon
@@ -15,32 +15,32 @@ namespace DunGen.Project.External.DunGen.Code
 		/// </summary>
 		public int PathDepth
 		{
-			get { return this.pathDepth; }
-			internal set { this.pathDepth = value; }
+			get { return pathDepth; }
+			internal set { pathDepth = value; }
 		}
 		/// <summary>
 		/// Gets the normalized depth (0.0-1.0) of this tile in the dungeon along the main path
 		/// </summary>
 		public float NormalizedPathDepth
 		{
-			get { return this.normalizedPathDepth; }
-			internal set { this.normalizedPathDepth = value; }
+			get { return normalizedPathDepth; }
+			internal set { normalizedPathDepth = value; }
 		}
 		/// <summary>
 		/// Gets the depth of this tile in the dungeon along the branch it's on
 		/// </summary>
 		public int BranchDepth
 		{
-			get { return this.branchDepth; }
-			internal set { this.branchDepth = value; }
+			get { return branchDepth; }
+			internal set { branchDepth = value; }
 		}
 		/// <summary>
 		/// Gets the normalized depth (0.0-1.0) of this tile in the dungeon along the branch it's on
 		/// </summary>
 		public float NormalizedBranchDepth
 		{
-			get { return this.normalizedBranchDepth; }
-			internal set { this.normalizedBranchDepth = value; }
+			get { return normalizedBranchDepth; }
+			internal set { normalizedBranchDepth = value; }
 		}
 		/// <summary>
 		/// An ID representing which branch the tile belongs to. All tiles on the same branch will share an ID.
@@ -48,16 +48,16 @@ namespace DunGen.Project.External.DunGen.Code
 		/// </summary>
 		public int BranchId
 		{
-			get { return this.branchId;  }
-			internal set { this.branchId = value; }
+			get { return branchId;  }
+			internal set { branchId = value; }
 		}
 		/// <summary>
 		/// Whether or not this tile lies on the dungeon's main path
 		/// </summary>
 		public bool IsOnMainPath
 		{
-			get { return this.isOnMainPath; }
-			internal set { this.isOnMainPath = value; }
+			get { return isOnMainPath; }
+			internal set { isOnMainPath = value; }
 		}
 
 		/// <summary>
@@ -65,8 +65,8 @@ namespace DunGen.Project.External.DunGen.Code
 		/// </summary>
 		public Bounds Bounds
 		{
-			get => this.worldBounds;
-			private set => this.worldBounds = value;
+			get => worldBounds;
+			private set => worldBounds = value;
 		}
 
 		/// <summary>
@@ -74,48 +74,48 @@ namespace DunGen.Project.External.DunGen.Code
 		/// </summary>
 		public Bounds LocalBounds
 		{
-			get { return this.localBounds; }
+			get { return localBounds; }
 			internal set
 			{
-				this.localBounds = value;
-				this.RecalculateTransform();
+				localBounds = value;
+				RecalculateTransform();
 			}
 		}
 
 		public TilePlacementParameters PlacementParameters
 		{
-			get { return this.placementParameters; }
-			internal set { this.placementParameters = value; }
+			get { return placementParameters; }
+			internal set { placementParameters = value; }
 		}
 
-		public GraphNode GraphNode => this.placementParameters.Node;
+		public GraphNode GraphNode => placementParameters.Node;
 
-		public GraphLine GraphLine =>  this.placementParameters.Line;
+		public GraphLine GraphLine =>  placementParameters.Line;
 
-		public DungeonArchetype Archetype => this.placementParameters.Archetype;
+		public DungeonArchetype Archetype => placementParameters.Archetype;
 
 		public TileSet TileSet
 		{
-			get { return this.tileSet; }
-			internal set { this.tileSet = value; }
+			get { return tileSet; }
+			internal set { tileSet = value; }
 		}
 
 		public Vector3 Position
 		{
-			get { return this.position; }
+			get { return position; }
 			set
 			{
-				this.position = value;
-				this.RecalculateTransform();
+				position = value;
+				RecalculateTransform();
 			}
 		}
 		public Quaternion Rotation
 		{
-			get { return this.rotation; }
+			get { return rotation; }
 			set
 			{
-				this.rotation = value;
-				this.RecalculateTransform();
+				rotation = value;
+				RecalculateTransform();
 			}
 		}
 		public Matrix4x4 Transform { get; private set; }
@@ -123,12 +123,12 @@ namespace DunGen.Project.External.DunGen.Code
 		/// <summary>
 		/// Gets the depth of this tile. Returns the branch depth if on a branch path, otherwise, returns the main path depth
 		/// </summary>
-		public int Depth { get { return (this.isOnMainPath) ? this.pathDepth : this.branchDepth; } }
+		public int Depth { get { return (isOnMainPath) ? pathDepth : branchDepth; } }
 
 		/// <summary>
 		/// Gets the normalized depth (0-1) of this tile. Returns the branch depth if on a branch path, otherwise, returns the main path depth
 		/// </summary>
-		public float NormalizedDepth { get { return (this.isOnMainPath) ? this.normalizedPathDepth : this.normalizedBranchDepth; } }
+		public float NormalizedDepth { get { return (isOnMainPath) ? normalizedPathDepth : normalizedBranchDepth; } }
 
 		/// <summary>
 		/// Data about how this tile was injected, or null if it was not placed using tile injection
@@ -164,27 +164,27 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public TilePlacementData()
 		{
-			this.RecalculateTransform();
+			RecalculateTransform();
 		}
 
 		public TilePlacementData(TilePlacementData copy)
 		{
-			this.PathDepth = copy.PathDepth;
-			this.NormalizedPathDepth = copy.NormalizedPathDepth;
-			this.BranchDepth = copy.BranchDepth;
-			this.NormalizedBranchDepth = copy.NormalizedDepth;
-			this.BranchId = copy.BranchId;
-			this.IsOnMainPath = copy.IsOnMainPath;
-			this.LocalBounds = copy.LocalBounds;
-			this.Transform = copy.Transform;
-			this.PlacementParameters = copy.PlacementParameters;
-			this.TileSet = copy.TileSet;
-			this.InjectionData = copy.InjectionData;
+			PathDepth = copy.PathDepth;
+			NormalizedPathDepth = copy.NormalizedPathDepth;
+			BranchDepth = copy.BranchDepth;
+			NormalizedBranchDepth = copy.NormalizedDepth;
+			BranchId = copy.BranchId;
+			IsOnMainPath = copy.IsOnMainPath;
+			LocalBounds = copy.LocalBounds;
+			Transform = copy.Transform;
+			PlacementParameters = copy.PlacementParameters;
+			TileSet = copy.TileSet;
+			InjectionData = copy.InjectionData;
 
-			this.position = copy.position;
-			this.rotation = copy.rotation;
+			position = copy.position;
+			rotation = copy.rotation;
 
-			this.RecalculateTransform();
+			RecalculateTransform();
 		}
 
 		public void SetPositionAndRotation(Vector3 position, Quaternion rotation)
@@ -192,15 +192,15 @@ namespace DunGen.Project.External.DunGen.Code
 			this.position = position;
 			this.rotation = rotation;
 
-			this.RecalculateTransform();
+			RecalculateTransform();
 		}
 
 		private void RecalculateTransform()
 		{
-			this.Transform = Matrix4x4.TRS(this.position, this.rotation, Vector3.one);
+			Transform = Matrix4x4.TRS(position, rotation, Vector3.one);
 
-			Vector3 min = this.Transform.MultiplyPoint(this.localBounds.min);
-			Vector3 max = this.Transform.MultiplyPoint(this.localBounds.max);
+			Vector3 min = Transform.MultiplyPoint(localBounds.min);
+			Vector3 max = Transform.MultiplyPoint(localBounds.max);
 
 			Vector3 size = max - min;
 			Vector3 center = min + size / 2f;
@@ -209,7 +209,7 @@ namespace DunGen.Project.External.DunGen.Code
 			size.y = Mathf.Abs(size.y);
 			size.z = Mathf.Abs(size.z);
 
-			this.Bounds = new Bounds(center, size);
+			Bounds = new Bounds(center, size);
 		}
 	}
 }

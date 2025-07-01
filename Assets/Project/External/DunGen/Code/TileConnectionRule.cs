@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	public sealed class TileConnectionRule
 	{
@@ -51,14 +51,14 @@ namespace DunGen.Project.External.DunGen.Code
 		[Obsolete("Use the constructor that takes a delegate of type 'TileConnectionDelegate' instead")]
 		public TileConnectionRule(CanTilesConnectDelegate connectionDelegate, int priority = 0)
 		{
-			this.Delegate = connectionDelegate;
-			this.Priority = priority;
+			Delegate = connectionDelegate;
+			Priority = priority;
 		}
 
 		public TileConnectionRule(TileConnectionDelegate connectionDelegate, int priority = 0)
 		{
-			this.ConnectionDelegate = connectionDelegate;
-			this.Priority = priority;
+			ConnectionDelegate = connectionDelegate;
+			Priority = priority;
 		}
 	}
 }

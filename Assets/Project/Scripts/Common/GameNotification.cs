@@ -2,6 +2,7 @@
 
 public enum GameNotification {
     ComboHasEnded,
-    AttackPerformed,
-    Dead
+    AttackJustStarted,
+    Dead,
+    BlockingStarted
 }

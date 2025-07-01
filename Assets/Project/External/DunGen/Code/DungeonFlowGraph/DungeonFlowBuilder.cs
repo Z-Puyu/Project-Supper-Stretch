@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
+namespace DunGen.Graph
 {
 	/// <summary>
 	/// A helper class for building a dungeon flow with a fluent interface, removing a lot of manual work
@@ -21,7 +21,7 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 
 		public DungeonFlowBuilder(DungeonFlow flow)
 		{
-			this.Flow = flow;
+			Flow = flow;
 		}
 
 		/// <summary>
@@ -34,7 +34,7 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 		/// <returns></returns>
 		public DungeonFlowBuilder AddLine(DungeonArchetype archetype, float length = 1f, IEnumerable<KeyLockPlacement> locks = null, IEnumerable<KeyLockPlacement> keys = null)
 		{
-			return this.AddLine(new DungeonArchetype[] { archetype }, length, locks, keys);
+			return AddLine(new DungeonArchetype[] { archetype }, length, locks, keys);
 		}
 
 		/// <summary>
@@ -50,8 +50,8 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 			if (length <= 0f)
 				throw new ArgumentOutOfRangeException("Length must be grater than zero");
 
-			var line = new GraphLine(this.Flow);
-			line.Position = this.currentPosition;
+			var line = new GraphLine(Flow);
+			line.Position = currentPosition;
 			line.Length = length;
 
 			if (archetypes != null && archetypes.Any())
@@ -62,8 +62,8 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 			if (keys != null && keys.Any())
 				line.Keys.AddRange(keys);
 
-			this.lines.Add(line);
-			this.currentPosition += length;
+			lines.Add(line);
+			currentPosition += length;
 
 			return this;
 		}
@@ -75,11 +75,11 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 		/// <returns></returns>
 		public DungeonFlowBuilder ContinueLine(float length = 1f)
 		{
-			if (this.lines.Count == 0)
+			if (lines.Count == 0)
 				throw new Exception("Cannot call ContinueLine(..) before AddLine(..)");
 
-			this.lines.Last().Length += length;
-			this.currentPosition += length;
+			lines.Last().Length += length;
+			currentPosition += length;
 
 			return this;
 		}
@@ -96,7 +96,7 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 		/// <returns></returns>
 		public DungeonFlowBuilder AddNode(TileSet tileSet, string label = null, bool allowLocksOnEntrance = false, bool allowLocksOnExit = false, IEnumerable<KeyLockPlacement> locks = null, IEnumerable<KeyLockPlacement> keys = null)
 		{
-			return this.AddNode(new TileSet[] { tileSet }, label, allowLocksOnEntrance, allowLocksOnExit, locks, keys);
+			return AddNode(new TileSet[] { tileSet }, label, allowLocksOnEntrance, allowLocksOnExit, locks, keys);
 		}
 
 		/// <summary>
@@ -111,10 +111,10 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 		/// <returns></returns>
 		public DungeonFlowBuilder AddNode(IEnumerable<TileSet> tileSets, string label = null, bool allowLocksOnEntrance = false, bool allowLocksOnExit = false, IEnumerable<KeyLockPlacement> locks = null, IEnumerable<KeyLockPlacement> keys = null)
 		{
-			var node = new GraphNode(this.Flow);
+			var node = new GraphNode(Flow);
 
 			node.Label = (label == null) ? "Node" : label;
-			node.Position = this.currentPosition;
+			node.Position = currentPosition;
 			node.NodeType = NodeType.Normal;
 
 			if (allowLocksOnEntrance)
@@ -130,7 +130,7 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 			if (keys != null && keys.Any())
 				node.Keys.AddRange(keys);
 
-			this.nodes.Add(node);
+			nodes.Add(node);
 			return this;
 		}
 
@@ -140,36 +140,36 @@ namespace DunGen.Project.External.DunGen.Code.DungeonFlowGraph
 		/// <returns></returns>
 		public DungeonFlowBuilder Complete()
 		{
-			if (this.lines.Count == 0)
+			if (lines.Count == 0)
 				throw new Exception("DungeonFlowBuilder must have at least one line added before finalizing");
-			if (this.nodes.Count < 2)
+			if (nodes.Count < 2)
 				throw new Exception("DungeonFlowBuilder must have at least two nodes added before finalizing");
 
 
 			// Normalize flow length
-			float length = this.currentPosition;
-			this.currentPosition = 1.0f;
+			float length = currentPosition;
+			currentPosition = 1.0f;
 
-			foreach (var line in this.lines)
+			foreach (var line in lines)
 			{
 				line.Position /= length;
 				line.Length /= length;
 			}
 
-			foreach(var node in this.nodes)
+			foreach(var node in nodes)
 				node.Position /= length;
 
 
 			// Set node types
-			this.nodes.First().NodeType = NodeType.Start;
-			this.nodes.Last().NodeType = NodeType.Goal;
+			nodes.First().NodeType = NodeType.Start;
+			nodes.Last().NodeType = NodeType.Goal;
 
 
 			// Assign lines and nodes to the dungeon flow
-			this.Flow.Lines.Clear();
-			this.Flow.Nodes.Clear();
-			this.Flow.Lines.AddRange(this.lines);
-			this.Flow.Nodes.AddRange(this.nodes);
+			Flow.Lines.Clear();
+			Flow.Nodes.Clear();
+			Flow.Lines.AddRange(lines);
+			Flow.Nodes.AddRange(nodes);
 
 			return this;
 		}

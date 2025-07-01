@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1233149941 &-5481845772288984642
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 06. Battle Roar_{-5481845772288984642}
+  m_AudioClip: {fileID: 8300000, guid: 8a42266be58db4c518b5d4e47cc0f780, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-4909757535358978899
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 02. Ferocious Roar_{-4909757535358978899}
+  m_AudioClip: {fileID: 8300000, guid: ec834e3a0a9a041e58e015c0bf39ed52, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-592413905824654128
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 10. Attack Roar_{-592413905824654128}
+  m_AudioClip: {fileID: 8300000, guid: 9a2d033f7760b4ef09400945a538ccd9, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &2241255095345355078
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 12. Ambush Growl_{2241255095345355078}
+  m_AudioClip: {fileID: 8300000, guid: 33d8eaf76b94f4ee399dc3026881ad78, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &2633586968653415866
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 01. Primal Roar_{2633586968653415866}
+  m_AudioClip: {fileID: 8300000, guid: c55fb47f6865f480c989e8407de1d19c, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &5037650998286829811
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 16. Feral Growl_{5037650998286829811}
+  m_AudioClip: {fileID: 8300000, guid: 014b715f8aa9c4fad845b6356f430853, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1307931743 &6418180475301049370
+AudioRandomContainer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MonsterAttackRoar
+  m_Volume: 0
+  m_Pitch: 0
+  m_AutomaticTriggerTime: 0
+  m_LoopCount: 1
+  m_VolumeRandomizationRange: {x: 0, y: 0}
+  m_PitchRandomizationRange: {x: 0, y: 0}
+  m_AutomaticTriggerTimeRandomizationRange: {x: 0, y: 0}
+  m_LoopCountRandomizationRange: {x: 0, y: 0}
+  m_Elements:
+  - {fileID: 2633586968653415866}
+  - {fileID: -4909757535358978899}
+  - {fileID: -5481845772288984642}
+  - {fileID: -592413905824654128}
+  - {fileID: 2241255095345355078}
+  - {fileID: 5037650998286829811}
+  - {fileID: 7115798116614969223}
+  m_AvoidRepeatingLast: 0
+  m_PlaybackMode: 2
+  m_TriggerMode: 0
+  m_AutomaticTriggerMode: 1
+  m_LoopMode: 2
+  m_VolumeRandomizationEnabled: 0
+  m_PitchRandomizationEnabled: 0
+  m_AutomaticTriggerTimeRandomizationEnabled: 0
+  m_LoopCountRandomizationEnabled: 0
+--- !u!1233149941 &7115798116614969223
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 14. Guttural Growl_{7115798116614969223}
+  m_AudioClip: {fileID: 8300000, guid: bbd6f387f9dab4575982b233ba2dad90, type: 3}
+  m_Volume: 0
+  m_Enabled: 1

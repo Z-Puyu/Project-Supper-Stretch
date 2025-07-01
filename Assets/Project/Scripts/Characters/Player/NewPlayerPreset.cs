@@ -1,4 +1,4 @@
-﻿using Project.Scripts.Characters.CharacterControl;
+﻿using Project.Scripts.AttributeSystem.GameplayEffects;
 using SaintsField;
 using Project.Scripts.Items;
 using UnityEngine;

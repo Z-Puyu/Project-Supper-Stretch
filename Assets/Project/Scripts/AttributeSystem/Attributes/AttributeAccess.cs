@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using SaintsField;
 using UnityEngine;
 
@@ -9,11 +8,11 @@ namespace Project.Scripts.AttributeSystem.Attributes;
 public class AttributeAccess : MonoBehaviour, IAttributeReader {
     [NotNull]
     [field: SerializeField]
-    [field: InfoBox("If unassigned, the component will fetch the closest one in its parents.")]
+    [field: InfoBox("If unassigned, the component will fetch the closest one in the hierarchy of root object.")]
     private AttributeSet? Source { get; set; }
     
     public AdvancedDropdownList<string> AllAccessibleAttributes => !this.Source 
-            ? this.GetComponentInParent<AttributeSet>().AllAccessibleAttributes
+            ? this.transform.root.GetComponentInChildren<AttributeSet>().AllAccessibleAttributes
             : this.Source.AllAccessibleAttributes;
 
     private void Awake() {
@@ -21,9 +20,9 @@ public class AttributeAccess : MonoBehaviour, IAttributeReader {
             return;
         }
 
-        this.Source = this.GetComponentInParent<AttributeSet>();
+        this.Source = this.transform.root.GetComponentInChildren<AttributeSet>();
         if (!this.Source) {
-            throw new InvalidOperationException("No attribute set found in parents.");
+            throw new InvalidOperationException("No attribute set found.");
         }
     }
 
@@ -40,11 +39,6 @@ public class AttributeAccess : MonoBehaviour, IAttributeReader {
     }
     
     public int ReadMax(string attribute) {
-        Attribute value = this.Read(attribute);
-        if (value.Cap == string.Empty) {
-            return value.HardLimit >= 0 ? value.HardLimit : int.MaxValue;
-        }
-        
-        return this.ReadCurrent(value.Cap);
+        return this.Source.ReadMax(attribute);
     }
 }

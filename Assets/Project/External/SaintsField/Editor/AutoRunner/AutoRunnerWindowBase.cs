@@ -6,8 +6,10 @@ using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorStateDrawer;
 using SaintsField.Editor.Linq;
+using SaintsField.Editor.Playa.Renderer.MethodBindFakeRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
+using SaintsField.Playa;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
@@ -68,12 +70,34 @@ namespace SaintsField.Editor.AutoRunner
                 }
 
                 // ReSharper disable once MergeIntoLogicalPattern
-                if(obj is GameObject || obj is ScriptableObject)
+                if(obj is GameObject go)
+                {
+                    foreach (Component comp in go.transform.GetComponentsInChildren<Component>(true))
+                    {
+                        SerializedObject so;
+                        try
+                        {
+                            so = new SerializedObject(comp);
+                        }
+#pragma warning disable CS0168
+                        catch (Exception e)
+#pragma warning restore CS0168
+                        {
+#if SAINTSFIELD_DEBUG
+                            Debug.Log($"#AutoRunner# Skip {obj} as it's not a valid object: {e}");
+#endif
+                            continue;
+                        }
+
+                        yield return so;
+                    }
+                }
+                else if (obj is ScriptableObject scriptableObject)
                 {
                     SerializedObject so;
                     try
                     {
-                        so = new SerializedObject(obj);
+                        so = new SerializedObject(scriptableObject);
                     }
 #pragma warning disable CS0168
                     catch (Exception e)
@@ -273,7 +297,7 @@ namespace SaintsField.Editor.AutoRunner
                 switch (extraResource)
                 {
                     case GameObject go:
-                        serializeObjects = go.GetComponents<Component>().Cast<Object>().ToArray();
+                        serializeObjects = go.transform.GetComponentsInChildren<Component>(true).Cast<Object>().ToArray();
                         break;
                     case ScriptableObject scriptableObject:
                         serializeObjects = new Object[] { scriptableObject };
@@ -371,9 +395,34 @@ namespace SaintsField.Editor.AutoRunner
                         }
                     }
 
-
                     // Debug.Log($"#AutoRunner# Processing {so.targetObject}");
                     bool hasFixer = false;
+
+                    // method
+                    Object serializedTarget = so.targetObject;
+                    // we only care about public method
+                    foreach (MethodInfo methodInfo in serializedTarget
+                                 .GetType()
+                                 .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.FlattenHierarchy))
+                    {
+                        IPlayaAutoRunnerFix[] playaFixAttributes = ReflectCache.GetCustomAttributes<IPlayaAutoRunnerFix>(methodInfo);
+                        foreach (IPlayaAutoRunnerFix playaAutoRunnerFix in playaFixAttributes)
+                        {
+                            AutoRunnerFixerResult autoRunnerResult = CheckPlayaAutoRunnerAttribute(playaAutoRunnerFix, methodInfo, serializedTarget, serializedTarget);
+                            // ReSharper disable once InvertIf
+                            if (autoRunnerResult != null)
+                            {
+                                Results.Add(new AutoRunnerResult
+                                {
+                                    FixerResult = autoRunnerResult,
+                                    mainTarget = ConvertMainTarget(target),
+                                    subTarget = so.targetObject,
+                                    propertyPath = $"{methodInfo.Name}({string.Join(", ", methodInfo.GetParameters().Select(each => each.Name))}) => {methodInfo.ReturnType}",
+                                    SerializedObject = so,
+                                });
+                            }
+                        }
+                    }
 
                     SerializedProperty property = so.GetIterator();
                     while (property.NextVisible(true))
@@ -608,6 +657,9 @@ namespace SaintsField.Editor.AutoRunner
             // EditorUtility.SetDirty(EditorInspectingTarget == null? this: EditorInspectingTarget);
 
             string msg = $"All done, {Results.Count} found";
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_AUTO_RUNNER
+            Debug.Log($"#AutoRunner# finished with message: {msg}");
+#endif
             yield return new ProcessInfo
             {
                 GroupTotal = totalCount,
@@ -615,10 +667,22 @@ namespace SaintsField.Editor.AutoRunner
                 ProcessCount = processedItemCount,
                 ProcessMessage = msg,
             };
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_AUTO_RUNNER
-            Debug.Log($"#AutoRunner# {msg}");
-#endif
             // EditorRefreshTarget();
+        }
+
+        private static AutoRunnerFixerResult CheckPlayaAutoRunnerAttribute(IPlayaAutoRunnerFix playaAutoRunnerAttribute, MemberInfo memberInfo, Object serializedTarget, object target)
+        {
+            if (playaAutoRunnerAttribute is IPlayaMethodBindAttribute onButtonClickAttribute)
+            {
+                return CheckPlayaOnButtonClickAttribute(onButtonClickAttribute, (MethodInfo)memberInfo, serializedTarget, target);
+            }
+
+            return null;
+        }
+
+        private static AutoRunnerFixerResult CheckPlayaOnButtonClickAttribute(IPlayaMethodBindAttribute onButtonClick, MethodInfo methodInfo, Object serializedTarget, object target)
+        {
+            return MethodBindRenderer.AutoRunFix(onButtonClick, methodInfo, serializedTarget, target);
         }
 
         protected bool AllowToRestoreScene()

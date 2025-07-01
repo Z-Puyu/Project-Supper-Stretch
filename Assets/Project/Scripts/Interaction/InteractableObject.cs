@@ -50,8 +50,8 @@ public class InteractableObject : MonoBehaviour {
     public event UnityAction<Interactor> OnInteraction = delegate { };
 
     private void Start() {
-        this.Detector.OnDetection += this.OnInteractorDetected;
-        this.Detector.OnLostSight += this.OnInteractorOutOfRange;
+        this.Detector.OnDetected += this.OnInteractorDetected;
+        this.Detector.OnTargetLost += this.OnInteractorOutOfRange;
     }
     
     private void OnEnable() {
@@ -67,24 +67,14 @@ public class InteractableObject : MonoBehaviour {
     }
 
     private void OnInteractorDetected(Collider actor) {
-        if (!actor.TryGetComponent(out Interactor interactor)) {
-            return;
-        }
-        
         this.HasInteractorInRange = true;
         this.OnApproached.Invoke();
-        interactor.Add(this);
     }
 
     private void OnInteractorOutOfRange(Collider actor) {
-        if (!actor.TryGetComponent(out Interactor interactor)) {
-            return;
-        }
-        
         this.Deactivate();
         this.HasInteractorInRange = false;
         this.OnLeft.Invoke();
-        interactor.Remove(this);
     }
     
     public void Interact(Interactor interactor) {

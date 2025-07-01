@@ -11,7 +11,7 @@ public class AttributeBarPresenter : ProgressBarPresenter<AttributeSet> {
     private AdvancedDropdownList<string> Attributes => ObjectCache<AttributeDefinition>.Instance.Objects.LeafTags();
     
     [field: SerializeField, AdvancedDropdown(nameof(this.Attributes))] 
-    protected string Attribute { get; private set; }
+    protected string Attribute { get; private set; } = string.Empty;
     
     [field: SerializeField] private AttributeSet? Source { get; set; }
 
@@ -20,8 +20,7 @@ public class AttributeBarPresenter : ProgressBarPresenter<AttributeSet> {
             return;
         }
 
-        this.Source.OnAttributeChanged += this.Parse;
-        this.Refresh();
+        this.UpdateView(this.Source);
     }
 
     private void Parse(AttributeChange data) {
@@ -34,6 +33,7 @@ public class AttributeBarPresenter : ProgressBarPresenter<AttributeSet> {
         }
 
         this.View.CurrentValue = data.NewCurrentValue;
+        this.View.Refresh();
     }
 
     protected override void UpdateView(AttributeSet model) {
@@ -45,5 +45,6 @@ public class AttributeBarPresenter : ProgressBarPresenter<AttributeSet> {
         this.Source.OnAttributeChanged += this.Parse;
         this.View.CurrentValue = this.Source.ReadCurrent(this.Attribute);
         this.View.MaxValue = this.Source.ReadMax(this.Attribute);
+        this.View.Refresh();
     }
 }

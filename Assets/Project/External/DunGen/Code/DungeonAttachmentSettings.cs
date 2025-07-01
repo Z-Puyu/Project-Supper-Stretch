@@ -1,8 +1,7 @@
-using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	public class DungeonAttachmentSettings
 	{
@@ -23,37 +22,37 @@ namespace DunGen.Project.External.DunGen.Code
 		public DungeonAttachmentSettings(Doorway attachmentDoorway)
 		{
 			Assert.IsNotNull(attachmentDoorway, "attachmentDoorway cannot be null");
-			this.AttachmentDoorway = attachmentDoorway;
+			AttachmentDoorway = attachmentDoorway;
 		}
 
 		public DungeonAttachmentSettings(Tile attachmentTile)
 		{
 			Assert.IsNotNull(attachmentTile, "attachmentTile cannot be null");
-			this.AttachmentTile = attachmentTile;
+			AttachmentTile = attachmentTile;
 		}
 
 		public TileProxy GenerateAttachmentProxy(Vector3 upVector, RandomStream randomStream)
 		{
-			if (this.AttachmentTile != null)
+			if (AttachmentTile != null)
 			{
 				// This tile wasn't placed by DunGen so we'll need to do
 				// some extra setup to ensure we have all the data we'll need later
-				if (this.AttachmentTile.Prefab == null)
-					this.PrepareManuallyPlacedTile(this.AttachmentTile, upVector, randomStream);
+				if (AttachmentTile.Prefab == null)
+					PrepareManuallyPlacedTile(AttachmentTile, upVector, randomStream);
 
-				this.TileProxy = new TileProxy(this.AttachmentTile.Prefab,
-					(doorway, index) => this.AttachmentTile.UnusedDoorways.Contains(this.AttachmentTile.AllDoorways[index])); // Ensure chosen doorway is unused
+				TileProxy = new TileProxy(AttachmentTile.Prefab,
+					(doorway, index) => AttachmentTile.UnusedDoorways.Contains(AttachmentTile.AllDoorways[index])); // Ensure chosen doorway is unused
 
-				this.TileProxy.Placement.Position = this.AttachmentTile.transform.localPosition;
-				this.TileProxy.Placement.Rotation = this.AttachmentTile.transform.localRotation;
+				TileProxy.Placement.Position = AttachmentTile.transform.localPosition;
+				TileProxy.Placement.Rotation = AttachmentTile.transform.localRotation;
 			}
-			else if (this.AttachmentDoorway != null)
+			else if (AttachmentDoorway != null)
 			{
-				var attachmentTile = this.AttachmentDoorway.Tile;
+				var attachmentTile = AttachmentDoorway.Tile;
 
 				if(attachmentTile == null)
 				{
-					attachmentTile = this.AttachmentDoorway.GetComponentInParent<Tile>();
+					attachmentTile = AttachmentDoorway.GetComponentInParent<Tile>();
 
 					if(attachmentTile == null)
 					{
@@ -63,19 +62,19 @@ namespace DunGen.Project.External.DunGen.Code
 				}
 
 				if(attachmentTile.Prefab == null)
-					this.PrepareManuallyPlacedTile(attachmentTile, upVector, randomStream);
+					PrepareManuallyPlacedTile(attachmentTile, upVector, randomStream);
 
-				if (this.AttachmentDoorway.Tile.UsedDoorways.Contains(this.AttachmentDoorway))
-					Debug.LogError($"Cannot attach dungeon to doorway '{this.AttachmentDoorway.name}' as it is already in use");
+				if (AttachmentDoorway.Tile.UsedDoorways.Contains(AttachmentDoorway))
+					Debug.LogError($"Cannot attach dungeon to doorway '{AttachmentDoorway.name}' as it is already in use");
 
-				this.TileProxy = new TileProxy(this.AttachmentDoorway.Tile.Prefab,
-					(doorway, index) => index == attachmentTile.AllDoorways.IndexOf(this.AttachmentDoorway));
+				TileProxy = new TileProxy(AttachmentDoorway.Tile.Prefab,
+					(doorway, index) => index == attachmentTile.AllDoorways.IndexOf(AttachmentDoorway));
 
-				this.TileProxy.Placement.Position = this.AttachmentDoorway.Tile.transform.localPosition;
-				this.TileProxy.Placement.Rotation = this.AttachmentDoorway.Tile.transform.localRotation;
+				TileProxy.Placement.Position = AttachmentDoorway.Tile.transform.localPosition;
+				TileProxy.Placement.Rotation = AttachmentDoorway.Tile.transform.localRotation;
 			}
 
-			return this.TileProxy;
+			return TileProxy;
 		}
 
 		private void PrepareManuallyPlacedTile(Tile tileToPrepare, Vector3 upVector, RandomStream randomStream)
@@ -106,10 +105,10 @@ namespace DunGen.Project.External.DunGen.Code
 		{
 			Tile attachmentTile = null;
 
-			if (this.AttachmentTile != null)
-				attachmentTile = this.AttachmentTile;
-			else if (this.AttachmentDoorway != null)
-				attachmentTile = this.AttachmentDoorway.Tile;
+			if (AttachmentTile != null)
+				attachmentTile = AttachmentTile;
+			else if (AttachmentDoorway != null)
+				attachmentTile = AttachmentDoorway.Tile;
 
 			return attachmentTile;
 		}

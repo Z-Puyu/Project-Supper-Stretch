@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace DunGen.Project.External.DunGen.Code.Graph
+namespace DunGen
 {
 	public class DungeonGraph
 	{
@@ -19,13 +19,13 @@ namespace DunGen.Project.External.DunGen.Code.Graph
 			{
 				var node = new DungeonGraphNode(tile);
 				nodeMap[tile] = node;
-				this.Nodes.Add(node);
+				Nodes.Add(node);
 			}
 
 			foreach (var conn in dungeon.Connections)
 			{
 				var nodeConn = new DungeonGraphConnection(nodeMap[conn.A.Tile], nodeMap[conn.B.Tile], conn.A, conn.B);
-				this.Connections.Add(nodeConn);
+				Connections.Add(nodeConn);
 			}
 		}
 	}

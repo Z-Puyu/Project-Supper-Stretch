@@ -1,8 +1,7 @@
-﻿using DunGen.Project.External.DunGen.Code;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
+namespace DunGen.Editor
 {
 	[CustomEditor(typeof(DoorwaySocket))]
 	public sealed class DoorwaySocketInspector : UnityEditor.Editor
@@ -20,7 +19,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 
 			public Properties(SerializedObject obj)
 			{
-				this.Size = obj.FindProperty("size");
+				Size = obj.FindProperty("size");
 			}
 		}
 
@@ -31,16 +30,16 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 
 		private void OnEnable()
 		{
-			this.properties = new Properties(this.serializedObject);
+			properties = new Properties(serializedObject);
 		}
 
 		public override void OnInspectorGUI()
 		{
-			this.serializedObject.Update();
+			serializedObject.Update();
 
-			EditorGUILayout.PropertyField(this.properties.Size, Labels.Size);
+			EditorGUILayout.PropertyField(properties.Size, Labels.Size);
 
-			this.serializedObject.ApplyModifiedProperties();
+			serializedObject.ApplyModifiedProperties();
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿namespace DunGen.Project.External.DunGen.Code
+﻿namespace DunGen
 {
 	/// <summary>
 	/// Contains details about where a tile should be injected into the dungeon layout
@@ -37,35 +37,35 @@
 
 		public InjectedTile(TileSet tileSet, bool isOnMainPath, float normalizedPathDepth, float normalizedBranchDepth, bool isRequired = false)
 		{
-			this.TileSet = tileSet;
-			this.IsOnMainPath = isOnMainPath;
-			this.NormalizedPathDepth = normalizedPathDepth;
-			this.NormalizedBranchDepth = normalizedBranchDepth;
-			this.IsRequired = isRequired;
+			TileSet = tileSet;
+			IsOnMainPath = isOnMainPath;
+			NormalizedPathDepth = normalizedPathDepth;
+			NormalizedBranchDepth = normalizedBranchDepth;
+			IsRequired = isRequired;
 		}
 
 		public InjectedTile(TileInjectionRule rule, bool isOnMainPath, RandomStream randomStream)
 		{
-			this.TileSet = rule.TileSet;
-			this.NormalizedPathDepth = rule.NormalizedPathDepth.GetRandom(randomStream);
-			this.NormalizedBranchDepth = rule.NormalizedBranchDepth.GetRandom(randomStream);
-			this.IsOnMainPath = isOnMainPath;
-			this.IsRequired = rule.IsRequired;
-			this.IsLocked = rule.IsLocked;
-			this.LockID = rule.LockID;
+			TileSet = rule.TileSet;
+			NormalizedPathDepth = rule.NormalizedPathDepth.GetRandom(randomStream);
+			NormalizedBranchDepth = rule.NormalizedBranchDepth.GetRandom(randomStream);
+			IsOnMainPath = isOnMainPath;
+			IsRequired = rule.IsRequired;
+			IsLocked = rule.IsLocked;
+			LockID = rule.LockID;
 		}
 
 		public bool ShouldInjectTileAtPoint(bool isOnMainPath, float pathDepth, float branchDepth)
 		{
-			if (this.IsOnMainPath != isOnMainPath)
+			if (IsOnMainPath != isOnMainPath)
 				return false;
 
-			if (this.NormalizedPathDepth > pathDepth)
+			if (NormalizedPathDepth > pathDepth)
 				return false;
 			else if (isOnMainPath)
 				return true;
 
-			return this.NormalizedBranchDepth <= branchDepth;
+			return NormalizedBranchDepth <= branchDepth;
 		}
 	}
 }

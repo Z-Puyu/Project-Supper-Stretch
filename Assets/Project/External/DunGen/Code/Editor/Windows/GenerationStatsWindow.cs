@@ -1,10 +1,9 @@
 ﻿using System.Linq;
-using DunGen.Project.External.DunGen.Code;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
+namespace DunGen.Editor
 {
 	public class DungeonStatsDisplayWindow : EditorWindow
 	{
@@ -13,7 +12,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 		[MenuItem("Window/DunGen/Generation Stats")]
 		public static void ShowWindow()
 		{
-			var window = EditorWindow.GetWindow<DungeonStatsDisplayWindow>("Generation Stats");
+			var window = GetWindow<DungeonStatsDisplayWindow>("Generation Stats");
 			window.minSize = new Vector2(380, 590);
 			window.Show();
 		}
@@ -33,21 +32,21 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 
 		private void OnEnable()
 		{
-			DungeonGenerator.OnAnyDungeonGenerationStarted += this.OnGenerationStarted;
-			this.CreateUI();
+			DungeonGenerator.OnAnyDungeonGenerationStarted += OnGenerationStarted;
+			CreateUI();
 		}
 
 		private void OnDisable()
 		{
-			DungeonGenerator.OnAnyDungeonGenerationStarted -= this.OnGenerationStarted;
+			DungeonGenerator.OnAnyDungeonGenerationStarted -= OnGenerationStarted;
 		}
 
 		private void CreateUI()
 		{
-			var root = this.rootVisualElement;
+			var root = rootVisualElement;
 
 			// Load stylesheet
-			var styleSheet = this.FindStyleSheet();
+			var styleSheet = FindStyleSheet();
 			if (styleSheet != null)
 				root.styleSheets.Add(styleSheet);
 
@@ -55,10 +54,10 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 			var statusContainer = new VisualElement() { name = "StatusContainer" };
 			root.Add(statusContainer);
 
-			this.generatingLabel = new Label("Generation in progress. Please wait...") { name = "StatusLabel" };
-			this.noStatsLabel = new Label("No generation stats available. Generate a dungeon to see statistics.") { name = "StatusLabel" };
-			statusContainer.Add(this.generatingLabel);
-			statusContainer.Add(this.noStatsLabel);
+			generatingLabel = new Label("Generation in progress. Please wait...") { name = "StatusLabel" };
+			noStatsLabel = new Label("No generation stats available. Generate a dungeon to see statistics.") { name = "StatusLabel" };
+			statusContainer.Add(generatingLabel);
+			statusContainer.Add(noStatsLabel);
 
 			// Create main container with column flex
 			var mainContainer = new VisualElement() { name = "MainContainer" };
@@ -72,54 +71,54 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 			mainContainer.Add(contentContainer);
 
 			// Panels
-			this.leftPanel = new VisualElement() { name = "LeftPanel" };
-			this.rightPanel = new VisualElement() { name = "RightPanel" };
-			contentContainer.Add(this.leftPanel);
-			contentContainer.Add(this.rightPanel);
+			leftPanel = new VisualElement() { name = "LeftPanel" };
+			rightPanel = new VisualElement() { name = "RightPanel" };
+			contentContainer.Add(leftPanel);
+			contentContainer.Add(rightPanel);
 
-			this.CreateLeftPanel();
-			this.CreateRightPanel();
+			CreateLeftPanel();
+			CreateRightPanel();
 
 			// Register callback for window resize
-			root.RegisterCallback<GeometryChangedEvent>(this.OnGeometryChanged);
+			root.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
 
-			this.UpdateUI();
+			UpdateUI();
 		}
 
 		private void OnGeometryChanged(GeometryChangedEvent evt)
 		{
-			var contentContainer = this.rootVisualElement.Q("ContentContainer");
+			var contentContainer = rootVisualElement.Q("ContentContainer");
 
 			// Switch between row and column layout based on width
 			if (contentContainer != null)
 			{
-				bool isWide = evt.newRect.width >= DungeonStatsDisplayWindow.WideModeThreshold;
+				bool isWide = evt.newRect.width >= WideModeThreshold;
 
 				contentContainer.style.flexDirection = isWide ? FlexDirection.Row : FlexDirection.Column;
 
 				if (isWide)
 				{
-					this.leftPanel.style.width = new Length(40, LengthUnit.Percent);
-					this.rightPanel.style.width = new Length(60, LengthUnit.Percent);
-					this.leftPanel.style.marginRight = 10;
-					this.rightPanel.style.marginLeft = 10;
-					this.rightPanel.style.marginTop = 0;
+					leftPanel.style.width = new Length(40, LengthUnit.Percent);
+					rightPanel.style.width = new Length(60, LengthUnit.Percent);
+					leftPanel.style.marginRight = 10;
+					rightPanel.style.marginLeft = 10;
+					rightPanel.style.marginTop = 0;
 
 					// Reset height styles
-					this.leftPanel.style.height = StyleKeyword.Auto;
-					this.rightPanel.style.height = StyleKeyword.Auto;
+					leftPanel.style.height = StyleKeyword.Auto;
+					rightPanel.style.height = StyleKeyword.Auto;
 				}
 				else
 				{
 					// In column mode, use full width
-					this.leftPanel.style.width = new Length(100, LengthUnit.Percent);
-					this.rightPanel.style.width = new Length(100, LengthUnit.Percent);
-					this.leftPanel.style.marginRight = 0;
-					this.rightPanel.style.marginLeft = 0;
-					this.rightPanel.style.marginTop = 10;
+					leftPanel.style.width = new Length(100, LengthUnit.Percent);
+					rightPanel.style.width = new Length(100, LengthUnit.Percent);
+					leftPanel.style.marginRight = 0;
+					rightPanel.style.marginLeft = 0;
+					rightPanel.style.marginTop = 10;
 
-					this.leftPanel.style.height = StyleKeyword.Auto;
-					this.rightPanel.style.flexGrow = 1;
+					leftPanel.style.height = StyleKeyword.Auto;
+					rightPanel.style.flexGrow = 1;
 				}
 			}
 		}
@@ -143,14 +142,14 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 		private void CreateLeftPanel()
 		{
 			// Overview section
-			this.leftPanel.Add(new Label("Generation Overview") { name = "SectionHeader" });
-			this.statsContainer = new VisualElement() { name = "StatsContainer" };
-			this.leftPanel.Add(this.statsContainer);
+			leftPanel.Add(new Label("Generation Overview") { name = "SectionHeader" });
+			statsContainer = new VisualElement() { name = "StatsContainer" };
+			leftPanel.Add(statsContainer);
 
 			// Generation Steps section
-			this.leftPanel.Add(new Label("Generation Step Times") { name = "SectionHeader" });
+			leftPanel.Add(new Label("Generation Step Times") { name = "SectionHeader" });
 			var stepsContainer = new VisualElement() { name = "StepsContainer" };
-			this.leftPanel.Add(stepsContainer);
+			leftPanel.Add(stepsContainer);
 		}
 
 		private void CreateRightPanel()
@@ -158,7 +157,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 			var rightContainer = new VisualElement() { name = "RightContainer" };
 			rightContainer.style.flexGrow = 1;
 			rightContainer.style.flexDirection = FlexDirection.Column; // Ensure vertical layout
-			this.rightPanel.Add(rightContainer);
+			rightPanel.Add(rightContainer);
 
 			rightContainer.Add(new Label("Tile Statistics") { name = "SectionHeader" });
 
@@ -169,51 +168,51 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 			rightContainer.Add(scrollContainer);
 
 			// Create scroll view for tile stats
-			this.tileStatsScrollView = new ScrollView(ScrollViewMode.Vertical) { name = "TileStatsScrollView" };
-			this.tileStatsScrollView.style.flexGrow = 1;
-			this.tileStatsScrollView.style.minHeight = 0;
-			scrollContainer.Add(this.tileStatsScrollView);
+			tileStatsScrollView = new ScrollView(ScrollViewMode.Vertical) { name = "TileStatsScrollView" };
+			tileStatsScrollView.style.flexGrow = 1;
+			tileStatsScrollView.style.minHeight = 0;
+			scrollContainer.Add(tileStatsScrollView);
 		}
 
 		private void UpdateUI()
 		{
-			if (this.rootVisualElement == null)
+			if (rootVisualElement == null)
 				return;
 
-			this.generatingLabel.style.display = this.isGenerating ? DisplayStyle.Flex : DisplayStyle.None;
-			this.noStatsLabel.style.display = (!this.isGenerating && this.currentStats == null) ? DisplayStyle.Flex : DisplayStyle.None;
+			generatingLabel.style.display = isGenerating ? DisplayStyle.Flex : DisplayStyle.None;
+			noStatsLabel.style.display = (!isGenerating && currentStats == null) ? DisplayStyle.Flex : DisplayStyle.None;
 
-			var mainContainer = this.rootVisualElement.Q("MainContainer");
-			mainContainer.style.display = (!this.isGenerating && this.currentStats != null) ? DisplayStyle.Flex : DisplayStyle.None;
+			var mainContainer = rootVisualElement.Q("MainContainer");
+			mainContainer.style.display = (!isGenerating && currentStats != null) ? DisplayStyle.Flex : DisplayStyle.None;
 
-			if (this.currentStats != null && !this.isGenerating)
+			if (currentStats != null && !isGenerating)
 			{
-				this.UpdateStats();
-				this.UpdateTileStats();
+				UpdateStats();
+				UpdateTileStats();
 			}
 		}
 
 		private void UpdateStats()
 		{
-			this.statsContainer.Clear();
+			statsContainer.Clear();
 
-			this.AddStatRow("Total Time", $"{this.currentStats.TotalTime:F2} ms");
-			this.AddStatRow("Total Room Count", this.currentStats.TotalRoomCount.ToString());
-			this.AddStatRow("Main Path Rooms", this.currentStats.MainPathRoomCount.ToString());
-			this.AddStatRow("Branch Path Rooms", this.currentStats.BranchPathRoomCount.ToString());
-			this.AddStatRow("Max Branch Depth", this.currentStats.MaxBranchDepth.ToString());
-			this.AddStatRow("Total Retries", this.currentStats.TotalRetries.ToString());
+			AddStatRow("Total Time", $"{currentStats.TotalTime:F2} ms");
+			AddStatRow("Total Room Count", currentStats.TotalRoomCount.ToString());
+			AddStatRow("Main Path Rooms", currentStats.MainPathRoomCount.ToString());
+			AddStatRow("Branch Path Rooms", currentStats.BranchPathRoomCount.ToString());
+			AddStatRow("Max Branch Depth", currentStats.MaxBranchDepth.ToString());
+			AddStatRow("Total Retries", currentStats.TotalRetries.ToString());
 
-			var stepsContainer = this.rootVisualElement.Q("StepsContainer");
+			var stepsContainer = rootVisualElement.Q("StepsContainer");
 			stepsContainer.Clear();
 
-			foreach (var step in this.currentStats.GenerationStepTimes)
-				this.AddStatRow(step.Key.ToString(), $"{step.Value:F2} ms", stepsContainer);
+			foreach (var step in currentStats.GenerationStepTimes)
+				AddStatRow(step.Key.ToString(), $"{step.Value:F2} ms", stepsContainer);
 		}
 
 		private void AddStatRow(string label, string value, VisualElement container = null)
 		{
-			container ??= this.statsContainer;
+			container ??= statsContainer;
 
 			var row = new VisualElement() { name = "StatRow" };
 			row.style.flexDirection = FlexDirection.Row;
@@ -232,9 +231,9 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 
 		private void UpdateTileStats()
 		{
-			this.tileStatsScrollView.Clear();
+			tileStatsScrollView.Clear();
 
-			foreach (var stat in this.currentStats.GetTileStatistics())
+			foreach (var stat in currentStats.GetTileStatistics())
 			{
 				var tileContainer = new VisualElement() { name = "TileStatContainer" };
 
@@ -259,28 +258,28 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Windows
 					tileContainer.Add(new Label($"• From Pool: {stat.FromPoolCount}"));
 				}
 
-				this.tileStatsScrollView.Add(tileContainer);
+				tileStatsScrollView.Add(tileContainer);
 			}
 		}
 
 		private void OnGenerationStarted(DungeonGenerator generator)
 		{
-			generator.OnGenerationComplete += this.OnGenerationComplete;
-			this.isGenerating = true;
-			this.SetStats(null);
+			generator.OnGenerationComplete += OnGenerationComplete;
+			isGenerating = true;
+			SetStats(null);
 		}
 
 		private void OnGenerationComplete(DungeonGenerator generator)
 		{
-			generator.OnGenerationComplete -= this.OnGenerationComplete;
-			this.isGenerating = false;
-			this.SetStats(generator.GenerationStats);
+			generator.OnGenerationComplete -= OnGenerationComplete;
+			isGenerating = false;
+			SetStats(generator.GenerationStats);
 		}
 
 		public void SetStats(GenerationStats stats)
 		{
-			this.currentStats = stats;
-			this.UpdateUI();
+			currentStats = stats;
+			UpdateUI();
 		}
 	}
 }

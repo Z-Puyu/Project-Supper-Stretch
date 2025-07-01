@@ -1,8 +1,7 @@
-﻿using DunGen.Project.External.DunGen.Code;
-using DunGen.Project.External.DunGen.Code.LockAndKey;
+﻿using DunGen.LockAndKey;
 using UnityEngine;
 
-namespace Project.External.DunGen.Samples.Basic.Scripts
+namespace DunGen.Demo
 {
 	public class KeySpawnPoint : MonoBehaviour, IKeySpawner
 	{
@@ -17,7 +16,7 @@ namespace Project.External.DunGen.Samples.Basic.Scripts
 		public bool CanSpawnKey(KeyManager keyManaager, Key key)
 		{
 			// Has already spawned a key (this check shouldn't be necessary)
-			if (this.spawnedKey != null)
+			if (spawnedKey != null)
 				return false;
 
 			// Cannot spawn a key that doesn't have a prefab
@@ -27,23 +26,23 @@ namespace Project.External.DunGen.Samples.Basic.Scripts
 		public void SpawnKey(KeySpawnParameters keySpawnParameters)
 		{
 			// Spawn the key attached to the dungeon root
-			this.spawnedKey = GameObject.Instantiate(keySpawnParameters.Key.Prefab);
-			this.spawnedKey.transform.parent = keySpawnParameters.DungeonGenerator.Root.transform;
-			this.spawnedKey.transform.SetPositionAndRotation(this.transform.position, this.transform.rotation);
+			spawnedKey = GameObject.Instantiate(keySpawnParameters.Key.Prefab);
+			spawnedKey.transform.parent = keySpawnParameters.DungeonGenerator.Root.transform;
+			spawnedKey.transform.SetPositionAndRotation(transform.position, transform.rotation);
 
-			if (this.SetColourOnSpawn && Application.isPlaying)
+			if (SetColourOnSpawn && Application.isPlaying)
 			{
-				if (this.propertyBlock == null)
-					this.propertyBlock = new MaterialPropertyBlock();
+				if (propertyBlock == null)
+					propertyBlock = new MaterialPropertyBlock();
 
-				this.propertyBlock.SetColor("_Color", keySpawnParameters.Key.Colour);
+				propertyBlock.SetColor("_Color", keySpawnParameters.Key.Colour);
 
-				foreach (var r in this.spawnedKey.GetComponentsInChildren<Renderer>())
-					r.SetPropertyBlock(this.propertyBlock);
+				foreach (var r in spawnedKey.GetComponentsInChildren<Renderer>())
+					r.SetPropertyBlock(propertyBlock);
 			}
 
 			// Pass any components that implement IKeyLock back to the dungeon generator
-			keySpawnParameters.OutputSpawnedKeys.AddRange(this.spawnedKey.GetComponents<IKeyLock>());
+			keySpawnParameters.OutputSpawnedKeys.AddRange(spawnedKey.GetComponents<IKeyLock>());
 		}
 
 		#endregion

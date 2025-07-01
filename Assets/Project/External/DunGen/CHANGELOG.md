@@ -1,3 +1,12 @@
+## 2.18.1 - [2025/06/17]
+
+### Added
+- Added support for 2D tile trigger placement
+
+### Changed
+- Tile injection rules can now be re-ordered and collapsed in the inspector. This has no effect on the generation process and is purely visual
+
+
 ## 2.18 - [2025/06/10]
 
 ### Added
@@ -57,6 +66,13 @@
 ### Removed
 - Removed support for versions of A\* Pathfinding Project Pro before 5.0
 - Removed RAIN AI integration
+
+
+## 2.17.5 - [2025/05/03]
+
+### Fixed
+- Path straightening should now work as intended
+
 
 ## 2.17.4 - [2024/10/15]
 

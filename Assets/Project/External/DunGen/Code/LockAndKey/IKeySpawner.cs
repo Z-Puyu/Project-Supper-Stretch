@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DunGen.Project.External.DunGen.Code.LockAndKey
+namespace DunGen.LockAndKey
 {
 	/// <summary>
 	/// Parameters for spawning keys
@@ -27,9 +27,9 @@ namespace DunGen.Project.External.DunGen.Code.LockAndKey
 
 		public KeySpawnParameters(Key key, KeyManager keyManager, DungeonGenerator dungeonGenerator)
 		{
-			this.Key = key;
-			this.KeyManager = keyManager;
-			this.DungeonGenerator = dungeonGenerator;
+			Key = key;
+			KeyManager = keyManager;
+			DungeonGenerator = dungeonGenerator;
 		}
 	}
 

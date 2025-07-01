@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1233149941 &-3665334266278816196
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Hurt_Undead_08_{-3665334266278816196}
+  m_AudioClip: {fileID: 8300000, guid: e6bfec43c31d709419a04343e7da9a78, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-1400711987870024149
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Hurt_Undead_03_{-1400711987870024149}
+  m_AudioClip: {fileID: 8300000, guid: e6248f937ce04b142b4d2260be27879a, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &1569590096969039059
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Hurt_Undead_07_{1569590096969039059}
+  m_AudioClip: {fileID: 8300000, guid: c898da0250e5b494bbbdc9aeaea2fe49, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &1726610052046082190
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Hurt_Undead_01_{1726610052046082190}
+  m_AudioClip: {fileID: 8300000, guid: b2b59643e29f99f438e9b402aa2fe558, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &2450101508269192074
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Hurt_Undead_02_{2450101508269192074}
+  m_AudioClip: {fileID: 8300000, guid: f8f393c9c4819d746abaa41b1f8f88a3, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &3560435677749862951
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Hurt_Undead_06_{3560435677749862951}
+  m_AudioClip: {fileID: 8300000, guid: 20ee832ac106a854c9cef34835e24a65, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &4257993732142660437
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Hurt_Undead_05_{4257993732142660437}
+  m_AudioClip: {fileID: 8300000, guid: 76fe1b13e9b64504ea337039fbd5ae17, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1307931743 &6418180475301049370
+AudioRandomContainer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UndeadHurt
+  m_Volume: 0
+  m_Pitch: 0
+  m_AutomaticTriggerTime: 0
+  m_LoopCount: 1
+  m_VolumeRandomizationRange: {x: 0, y: 0}
+  m_PitchRandomizationRange: {x: 0, y: 0}
+  m_AutomaticTriggerTimeRandomizationRange: {x: -6.3813186, y: 18.054478}
+  m_LoopCountRandomizationRange: {x: 0, y: 0}
+  m_Elements:
+  - {fileID: 1726610052046082190}
+  - {fileID: 2450101508269192074}
+  - {fileID: -1400711987870024149}
+  - {fileID: 6949425402025047231}
+  - {fileID: 4257993732142660437}
+  - {fileID: 3560435677749862951}
+  - {fileID: 1569590096969039059}
+  - {fileID: -3665334266278816196}
+  m_AvoidRepeatingLast: 0
+  m_PlaybackMode: 2
+  m_TriggerMode: 0
+  m_AutomaticTriggerMode: 1
+  m_LoopMode: 1
+  m_VolumeRandomizationEnabled: 0
+  m_PitchRandomizationEnabled: 0
+  m_AutomaticTriggerTimeRandomizationEnabled: 0
+  m_LoopCountRandomizationEnabled: 0
+--- !u!1233149941 &6949425402025047231
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Hurt_Undead_04_{6949425402025047231}
+  m_AudioClip: {fileID: 8300000, guid: 3c01be3bbcacb264d83c2f157f344e45, type: 3}
+  m_Volume: 0
+  m_Enabled: 1

@@ -1,13 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Editor;
-using Project.Scripts.Common;
 using Project.Scripts.Items;
-using Project.Scripts.Items.Definitions;
 using Project.Scripts.Items.InventorySystem;
 using Project.Scripts.UI.Control.MVP.Components;
-using SaintsField;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -25,6 +20,7 @@ public class InventoryListPresenter : ListPresenter<Inventory, KeyValuePair<Item
         entry.ItemName = data.Value > 1 ? $"{data.Key.Name} ({data.Value})" : data.Key.Name;
         entry.ItemType = data.Key.Type;
         entry.Worth = data.Value;
+        entry.IsEquipped = data.Key.IsEquipped;
     }
 
     protected override void UpdateView(Inventory model) {
@@ -32,14 +28,20 @@ public class InventoryListPresenter : ListPresenter<Inventory, KeyValuePair<Item
         if (this.InventoryModel != model) {
             if (this.InventoryModel) {
                 this.InventoryModel.OnInventoryChanged -= this.HandleInventoryChange;
+                this.InventoryModel.OnItemApplied -= this.HandleItemUsage;
             }
             
             this.InventoryModel = model;
             this.InventoryModel.OnInventoryChanged += this.HandleInventoryChange;
+            this.InventoryModel.OnItemApplied += this.HandleItemUsage;
         }
 
         this.View.DataSource = model[this.IsValidItem].OrderBy(pair => pair.Key);
         this.View.Refresh();
+    }
+
+    private void HandleItemUsage(Item _) {
+        this.Refresh();
     }
 
     private bool IsValidItem(Item item) {
@@ -51,6 +53,7 @@ public class InventoryListPresenter : ListPresenter<Inventory, KeyValuePair<Item
     }
 
     protected override void Select(KeyValuePair<Item, int> entry) {
+        base.Select(entry);
         if (this.InventoryModel) {
             this.InventoryModel.Apply(entry.Key);
         }
@@ -73,7 +76,7 @@ public class InventoryListPresenter : ListPresenter<Inventory, KeyValuePair<Item
         
         DragPreview preview = dropped.DragPreview!;
         if (preview.Payload is Item item) {
-            if (this.IsValidItem(item) || !this.InventoryModel) {
+            if (!this.IsValidItem(item) || !this.InventoryModel) {
                 preview.Source.Drop(isSuccessful: false);
             } else {
                 this.InventoryModel.Add(item);

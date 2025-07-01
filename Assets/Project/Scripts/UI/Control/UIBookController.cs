@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.Common;
 using Project.Scripts.Items.CraftingSystem;
 using Project.Scripts.Items.InventorySystem;
 using Project.Scripts.Items.InventorySystem.LootContainers;
+using Project.Scripts.UI.Control.MVP.Components;
 using Project.Scripts.UI.Control.MVP.Presenters;
 using UnityEngine;
 
@@ -19,6 +21,8 @@ public class UIBookController : MonoBehaviour {
 
     private void Start() {
         GameEvents.UI.OnGoBack += this.Book.PreviousPage;
+        GameEvents.UI.OnOpenPauseMenu += () => this.Book.Open<PauseMenu>();
+        AttributeSet.OnOpen += this.Book.Open<PlayerStatsPresenter>;
         Inventory.OnOpen += this.Book.Open<InventoryCoordinator>;
         LootContainer.OnOpen += this.Book.Open<LootContainerCoordinator>;
         CampFire.OnOpen += this.Book.Open<CampMenuCoordinator>;

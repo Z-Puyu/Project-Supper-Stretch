@@ -1,21 +1,20 @@
 using System;
-using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	[Serializable]
 	public sealed class Key
 	{
 		public int ID
 		{
-			get { return this.id; }
-			set { this.id = value; }
+			get { return id; }
+			set { id = value; }
 		}
 		public string Name
 		{
-			get { return this.name; }
-			internal set { this.name = value; }
+			get { return name; }
+			internal set { name = value; }
 		}
 		public GameObject Prefab;
 		public Color Colour;

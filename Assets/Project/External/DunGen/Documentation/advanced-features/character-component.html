@@ -1672,14 +1672,14 @@
 <li>It monitors the Tile that the GameObject it's attached to currently occupies.</li>
 <li>When the GameObject enters a <em>different</em> Tile's bounds, it fires an event.</li>
 <li>This requires the GameObject to have a <strong>Collider</strong> component attached.</li>
-<li>It relies on the <strong>"Place Tile Triggers"</strong> option being <strong>enabled</strong> on the <a href="../core-concepts/dungeon-generator.html">Runtime Dungeon Generator</a>, as it uses these trigger volumes to detect transitions.</li>
+<li>It relies on the <strong>"Trigger Placement"</strong> option being <strong>enabled</strong> on the <a href="../core-concepts/dungeon-generator.html">Runtime Dungeon Generator</a>, as it uses these trigger volumes to detect transitions.</li>
 </ul>
 <p>It has <strong>no configurable settings</strong> in the Inspector – its sole purpose is to provide this transition event via code.</p>
 <hr />
 <h2 id="how-to-use-it">How to Use It</h2>
 <ol>
 <li><strong>Add the Component:</strong> Attach the <code>DunGen Character</code> component to the GameObject you want to track (e.g., your player character). You can add it via the menu: <code>Add Component &gt; DunGen &gt; Character</code>. Ensure this GameObject also has a <code>Collider</code> component.</li>
-<li><strong>Enable Tile Triggers:</strong> Make sure the <code>Place Tile Triggers</code> checkbox is enabled on your <code>Runtime Dungeon</code> component in the scene. Set the <code>Trigger Layer</code> appropriately if needed.</li>
+<li><strong>Enable Tile Triggers:</strong> Make sure the <code>Trigger Placement</code> mode is set to either <strong>3D</strong> or <strong>2D</strong> (depending on your dungeon's perspective) on your <code>Runtime Dungeon</code> component in the scene. Set the <code>Trigger Layer</code> appropriately if needed.</li>
 <li><strong>Subscribe to the Event:</strong> In another script (e.g., your player controller or a UI manager), get a reference to the <code>DunGenCharacter</code> component and subscribe to its <code>OnTileChanged</code> event.</li>
 </ol>
 <p><strong>Example Script:</strong></p>
@@ -1760,7 +1760,7 @@
 <li><strong>AI Behavior:</strong> Notify AI agents about the player's current tile location.</li>
 <li><strong>Debugging:</strong> Log tile transitions to help diagnose generation or gameplay issues.</li>
 </ul>
-<p>The <code>DunGen Character</code> component provides a convenient, event-driven way to react to character movement within your generated dungeons without needing to manually manage trigger collisions yourself. Remember the prerequisites: a Collider on the tracked object and "Place Tile Triggers" enabled on the generator.</p>
+<p>The <code>DunGen Character</code> component provides a convenient, event-driven way to react to character movement within your generated dungeons without needing to manually manage trigger collisions yourself. Remember the prerequisites: a Collider on the tracked object and "Trigger Placement" enabled on the generator.</p>
 
 
 

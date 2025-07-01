@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code.Collision
+namespace DunGen.Collision
 {
 	[Serializable]
 	public abstract class BroadphaseSettings

@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 8988895908218871494}
   - component: {fileID: 3913587270739074466}
   - component: {fileID: 3898063885423551320}
-  - component: {fileID: 4225351954109559884}
   - component: {fileID: 842647174864436293}
   m_Layer: 5
   m_Name: Border
@@ -78,42 +77,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &4225351954109559884
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 911646078920272233}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 994c66b6148109b489689ed705d244cd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Parent: {fileID: 4671950940653984538}
-  SiblingIndex: 0
-  LayoutPosition: {x: 0, y: 0, z: 0}
-  LayoutRotation: {x: 0, y: 0, z: 0, w: 1}
-  AdapterBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 127.98654, y: 99.17845, z: 0}
-  LayoutBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 127.98654, y: 99.17845, z: 0}
-  RotatedAndScaledBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 127.98654, y: 99.17845, z: 0}
-  ComponentScale: {x: 1, y: 1, z: 1}
-  FillSize: {x: 255.97308, y: 198.3569, z: 0}
-  ShrinkSize: {x: 999999, y: 999999, z: 999999}
-  TargetPosition: {x: 0, y: 0, z: 0}
-  TargetRotation: {x: 0, y: 0, z: 0, w: 1}
-  TargetScale: {x: 1, y: 1, z: 1}
-  TargetRectSize: {x: 255.97308, y: 198.3569, z: 0}
-  TransformPosition: {x: 0, y: 0, z: 0}
-  TransformRotation: {x: 0, y: 0, z: 0, w: 1}
-  TransformScale: {x: 1, y: 1, z: 1}
-  TransformRectSize: {x: 255.97308, y: 198.3569}
 --- !u!114 &842647174864436293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -138,7 +101,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4671950940653984538}
-  - component: {fileID: 6802504131683071977}
   m_Layer: 5
   m_Name: FreeSizePanel
   m_TagString: Untagged
@@ -166,42 +128,6 @@ RectTransform:
   m_AnchoredPosition: {x: 41.533386, y: 13.751892}
   m_SizeDelta: {x: -729.227, y: -357.8431}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &6802504131683071977
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4143780642513970147}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 994c66b6148109b489689ed705d244cd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Parent: {fileID: 0}
-  SiblingIndex: 0
-  LayoutPosition: {x: 0, y: 0, z: 0}
-  LayoutRotation: {x: 0, y: 0, z: 0, w: 1}
-  AdapterBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 127.98654, y: 99.17845, z: 0}
-  LayoutBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 127.98654, y: 99.17845, z: 0}
-  RotatedAndScaledBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 127.98654, y: 99.17845, z: 0}
-  ComponentScale: {x: 1, y: 1, z: 1}
-  FillSize: {x: 985.2001, y: 556.2, z: 0}
-  ShrinkSize: {x: 999999, y: 999999, z: 999999}
-  TargetPosition: {x: 41.533386, y: 13.751892, z: 0}
-  TargetRotation: {x: 0, y: 0, z: 0, w: 1}
-  TargetScale: {x: 1, y: 1, z: 1}
-  TargetRectSize: {x: 255.97308, y: 198.3569, z: 0}
-  TransformPosition: {x: 41.533386, y: 13.751892, z: 0}
-  TransformRotation: {x: 0, y: 0, z: 0, w: 1}
-  TransformScale: {x: 1, y: 1, z: 1}
-  TransformRectSize: {x: 255.97308, y: 198.3569}
 --- !u!1 &4742857205038108154
 GameObject:
   m_ObjectHideFlags: 0
@@ -213,7 +139,6 @@ GameObject:
   - component: {fileID: 7869712303738744352}
   - component: {fileID: 6810551563347765774}
   - component: {fileID: 5626021428223167370}
-  - component: {fileID: 2002459898346630007}
   m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
@@ -278,39 +203,3 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2002459898346630007
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4742857205038108154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 994c66b6148109b489689ed705d244cd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Parent: {fileID: 0}
-  SiblingIndex: 0
-  LayoutPosition: {x: 0, y: 0, z: 0}
-  LayoutRotation: {x: 0, y: 0, z: 0, w: 1}
-  AdapterBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 127.98654, y: 99.17845, z: 0}
-  LayoutBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 127.98654, y: 99.17845, z: 0}
-  RotatedAndScaledBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 127.98654, y: 99.17845, z: 0}
-  ComponentScale: {x: 1, y: 1, z: 1}
-  FillSize: {x: 255.97308, y: 198.3569, z: 0}
-  ShrinkSize: {x: 999999, y: 999999, z: 999999}
-  TargetPosition: {x: 0, y: 0, z: 0}
-  TargetRotation: {x: -0, y: -0, z: -0, w: 1}
-  TargetScale: {x: 1, y: 1, z: 1}
-  TargetRectSize: {x: 255.97308, y: 198.3569, z: 0}
-  TransformPosition: {x: 0, y: 0, z: 0}
-  TransformRotation: {x: -0, y: -0, z: -0, w: 1}
-  TransformScale: {x: 1, y: 1, z: 1}
-  TransformRectSize: {x: 255.97308, y: 198.3569}

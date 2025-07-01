@@ -13,13 +13,13 @@ namespace Project.Scripts.AttributeSystem.GameplayEffects.Executions;
 /// </summary>
 [Serializable]
 public sealed class ModifierEffectExecution : EffectExecution {
-    [field: SerializeField] private List<Modifier> Modifiers { get; set; } = [];
+    [field: SerializeField] private List<ModifierData> Modifiers { get; set; } = [];
 
     protected override IEnumerable<Modifier> Run(AttributeSet target, GameplayEffectExecutionArgs args) {
         if (args.ModifierOverrides.Any()) {
             throw new ArgumentException($"{this.GetType().Name} does not support modifier values set by caller");
         }
         
-        return this.Modifiers;
+        return this.Modifiers.GetModifiers();
     }
 }

@@ -1,8 +1,7 @@
-﻿using DunGen.Project.External.DunGen.Code.Utility;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Drawers
+namespace DunGen.Editor.Drawers
 {
 	[CustomPropertyDrawer(typeof(IntRange))]
 	sealed class IntRangeDrawer : PropertyDrawer

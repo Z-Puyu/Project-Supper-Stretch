@@ -1,8 +1,7 @@
-﻿using DunGen.Project.External.DunGen.Code;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
+namespace DunGen.Editor
 {
 	public static class DungeonGeneratorDrawUtil
 	{
@@ -13,7 +12,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
 			public static readonly GUIContent MaxFailedAttempts = new GUIContent("Max Failed Attempts", "The maximum number of times DunGen is allowed to fail at generating a dungeon layout before giving up. This only applies in-editor; in a packaged build, DunGen will keep trying indefinitely");
 			public static readonly GUIContent LengthMultiplier = new GUIContent("Length Multiplier", "Used to alter the length of the dungeon without modifying the Dungeon Flow asset. 1 = normal-length, 2 = double-length, 0.5 = half-length, etc.");
 			public static readonly GUIContent UpDirection = new GUIContent("Up Direction", "The up direction of the dungeon. This won't actually rotate your dungeon, but it must match the expected up-vector for your dungeon layout - usually +Y for 3D and side-on 2D, -Z for top-down 2D");
-			public static readonly GUIContent PlaceTileTriggers = new GUIContent("Place Tile Triggers", "Places trigger colliders around Tiles which can be used in conjunction with the DungenCharacter component to receive events when changing rooms");
+			public static readonly GUIContent TriggerPlacement = new GUIContent("Trigger Placement", "Places trigger colliders around Tiles which can be used in conjunction with the DungenCharacter component to receive events when changing rooms");
 			public static readonly GUIContent TriggerLayer = new GUIContent("Trigger Layer", "The layer to place the tile root objects on if \"Place Tile Triggers\" is checked");
 			public static readonly GUIContent GenerateAsynchronously = new GUIContent("Generate Asynchronously", "If checked, DunGen will generate the layout without blocking Unity's main thread, allowing for things like animated loading screens to be shown");
 			public static readonly GUIContent MaxFrameTime = new GUIContent("Max Frame Time", "How many milliseconds the dungeon generation is allowed to take per-frame");
@@ -46,7 +45,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
 			var lengthMultiplierProp = dungeonGeneratorProp.FindPropertyRelative(nameof(DungeonGenerator.LengthMultiplier));
 			var upDirectionProp = dungeonGeneratorProp.FindPropertyRelative(nameof(DungeonGenerator.UpDirection));
 			var debugRenderProp = dungeonGeneratorProp.FindPropertyRelative(nameof(DungeonGenerator.DebugRender));
-			var placeTileTriggersProp = dungeonGeneratorProp.FindPropertyRelative(nameof(DungeonGenerator.PlaceTileTriggers));
+			var triggerPlacementProp = dungeonGeneratorProp.FindPropertyRelative(nameof(DungeonGenerator.TriggerPlacement));
 			var tileTriggerLayerProp = dungeonGeneratorProp.FindPropertyRelative(nameof(DungeonGenerator.TileTriggerLayer));
 			var generateAsyncProp = dungeonGeneratorProp.FindPropertyRelative(nameof(DungeonGenerator.GenerateAsynchronously));
 			var maxAsyncFrameMsProp = dungeonGeneratorProp.FindPropertyRelative(nameof(DungeonGenerator.MaxAsyncFrameMilliseconds));
@@ -114,8 +113,9 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
 
 					if (collisionSettingsProp.isExpanded)
 					{
-						EditorGUILayout.PropertyField(placeTileTriggersProp, Labels.PlaceTileTriggers);
-						EditorGUI.BeginDisabledGroup(!placeTileTriggersProp.boolValue);
+						EditorGUILayout.PropertyField(triggerPlacementProp, Labels.TriggerPlacement);
+
+						EditorGUI.BeginDisabledGroup(triggerPlacementProp.enumValueIndex == 0);
 						{
 							tileTriggerLayerProp.intValue = EditorGUILayout.LayerField(Labels.TriggerLayer, tileTriggerLayerProp.intValue);
 						}
@@ -179,7 +179,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Utility
 					}
 					EditorGUILayout.EndHorizontal();
 
-					DungeonGeneratorDrawUtil.DrawOverride("Allow Tile Rotation", overrideAllowTileRotationProp, allowTileRotationProp);
+					DrawOverride("Allow Tile Rotation", overrideAllowTileRotationProp, allowTileRotationProp);
 				}
 
 				EditorGUI.indentLevel--;

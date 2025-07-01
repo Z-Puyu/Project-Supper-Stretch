@@ -2,13 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DunGen.Project.External.DunGen.Code;
-using DunGen.Project.External.DunGen.Code.Adapters;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Project.External.DunGen.Integration.Unity_NavMesh
+namespace DunGen.Adapters
 {
 	[AddComponentMenu("DunGen/NavMesh/Unity NavMesh Adapter")]
 	public class UnityNavMeshAdapter : NavMeshAdapter
@@ -61,14 +59,14 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 
 		public override void Generate(Dungeon dungeon)
 		{
-			if (this.BakeMode == RuntimeNavMeshBakeMode.FullDungeonBake)
+			if (BakeMode == RuntimeNavMeshBakeMode.FullDungeonBake)
 			{
-				this.BakeFullDungeon(dungeon);
+				BakeFullDungeon(dungeon);
 				return;
 			}
 
 			// Bake Surfaces
-			if (this.BakeMode != RuntimeNavMeshBakeMode.PreBakedOnly)
+			if (BakeMode != RuntimeNavMeshBakeMode.PreBakedOnly)
 			{
 				foreach (var tile in dungeon.AllTiles)
 				{
@@ -76,16 +74,16 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 					var existingSurfaces = tile.gameObject.GetComponentsInChildren<NavMeshSurface>();
 
 					// Add surfaces for any agent type that is missing one
-					var addedSurfaces = this.AddMissingSurfaces(tile, existingSurfaces);
+					var addedSurfaces = AddMissingSurfaces(tile, existingSurfaces);
 
 					// Gather surfaces to bake
 					IEnumerable<NavMeshSurface> surfacesToBake = addedSurfaces;
 
 					// Append all existing surfaces if mode is set to "Always Rebake"
-					if (this.BakeMode == RuntimeNavMeshBakeMode.AlwaysRebake)
+					if (BakeMode == RuntimeNavMeshBakeMode.AlwaysRebake)
 						surfacesToBake = surfacesToBake.Concat(existingSurfaces);
 					// Append only unbaked surfaces if mode is set to "Add if no Surface Exists"
-					else if (this.BakeMode == RuntimeNavMeshBakeMode.AddIfNoSurfaceExists)
+					else if (BakeMode == RuntimeNavMeshBakeMode.AddIfNoSurfaceExists)
 					{
 						var existingUnbakedSurfaces = existingSurfaces.Where(x => x.navMeshData == null);
 						surfacesToBake = surfacesToBake.Concat(existingUnbakedSurfaces);
@@ -99,26 +97,26 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 			}
 
 			// Add links between rooms
-			if (this.AddNavMeshLinksBetweenRooms)
+			if (AddNavMeshLinksBetweenRooms)
 			{
 				foreach (var connection in dungeon.Connections)
-					foreach (var linkInfo in this.NavMeshAgentTypes)
-						this.AddNavMeshLink(connection, linkInfo);
+					foreach (var linkInfo in NavMeshAgentTypes)
+						AddNavMeshLink(connection, linkInfo);
 			}
 
-			if (this.OnProgress != null)
-				this.OnProgress(new NavMeshGenerationProgress() { Description = "Done", Percentage = 1.0f });
+			if (OnProgress != null)
+				OnProgress(new NavMeshGenerationProgress() { Description = "Done", Percentage = 1.0f });
 		}
 
 		private void BakeFullDungeon(Dungeon dungeon)
 		{
-			if (this.AutoGenerateFullRebakeSurfaces)
+			if (AutoGenerateFullRebakeSurfaces)
 			{
-				foreach (var surface in this.fullBakeSurfaces)
+				foreach (var surface in fullBakeSurfaces)
 					if (surface != null)
 						surface.RemoveData();
 
-				this.fullBakeSurfaces.Clear();
+				fullBakeSurfaces.Clear();
 
 				int settingsCount = NavMesh.GetSettingsCount();
 
@@ -137,32 +135,32 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 
 						surface.agentTypeID = settings.agentTypeID;
 						surface.collectObjects = CollectObjects.Children;
-						surface.layerMask = this.LayerMask;
+						surface.layerMask = LayerMask;
 					}
 
-					this.fullBakeSurfaces.Add(surface);
+					fullBakeSurfaces.Add(surface);
 
 					surface.BuildNavMesh();
 				}
 
 				// Disable all other surfaces to avoid overlapping navmeshes
 				foreach (var surface in dungeon.gameObject.GetComponentsInChildren<NavMeshSurface>())
-					if (!this.fullBakeSurfaces.Contains(surface))
+					if (!fullBakeSurfaces.Contains(surface))
 						surface.enabled = false;
 			}
 			else
 			{
-				foreach (var surface in this.FullRebakeTargets)
+				foreach (var surface in FullRebakeTargets)
 					surface.BuildNavMesh();
 			}
 
-			if (this.OnProgress != null)
-				this.OnProgress(new NavMeshGenerationProgress() { Description = "Done", Percentage = 1.0f });
+			if (OnProgress != null)
+				OnProgress(new NavMeshGenerationProgress() { Description = "Done", Percentage = 1.0f });
 		}
 
 		private NavMeshSurface[] AddMissingSurfaces(Tile tile, NavMeshSurface[] existingSurfaces)
 		{
-			this.addedSurfaces.Clear();
+			addedSurfaces.Clear();
 			int settingsCount = NavMesh.GetSettingsCount();
 
 			for (int i = 0; i < settingsCount; i++)
@@ -176,12 +174,12 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 				var surface = tile.gameObject.AddComponent<NavMeshSurface>();
 				surface.agentTypeID = settings.agentTypeID;
 				surface.collectObjects = CollectObjects.Children;
-				surface.layerMask = this.LayerMask;
+				surface.layerMask = LayerMask;
 
-				this.addedSurfaces.Add(surface);
+				addedSurfaces.Add(surface);
 			}
 
-			return this.addedSurfaces.ToArray();
+			return addedSurfaces.ToArray();
 		}
 
 		private void AddNavMeshLink(DoorwayConnection connection, NavMeshAgentLinkInfo agentLinkInfo)
@@ -199,15 +197,15 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 			link.area = agentLinkInfo.AreaTypeID;
 			link.width = linkWidth;
 
-			if (this.UseAutomaticLinkDistance)
+			if (UseAutomaticLinkDistance)
 			{
-				link.startPoint = doorway.transform.InverseTransformPoint(this.GetClosestPointOnNavMesh(doorway.transform.position, doorway.transform.forward)) + new Vector3(0f, 0f, this.AutomaticLinkDistanceOffset);
-				link.endPoint = doorway.transform.InverseTransformPoint(this.GetClosestPointOnNavMesh(doorway.transform.position, -doorway.transform.forward)) - new Vector3(0f, 0f, this.AutomaticLinkDistanceOffset);
+				link.startPoint = doorway.transform.InverseTransformPoint(GetClosestPointOnNavMesh(doorway.transform.position, doorway.transform.forward)) + new Vector3(0f, 0f, AutomaticLinkDistanceOffset);
+				link.endPoint = doorway.transform.InverseTransformPoint(GetClosestPointOnNavMesh(doorway.transform.position, -doorway.transform.forward)) - new Vector3(0f, 0f, AutomaticLinkDistanceOffset);
 			}
 			else
 			{
-				link.startPoint = new Vector3(0, 0, -this.NavMeshLinkDistanceFromDoorway);
-				link.endPoint = new Vector3(0, 0, this.NavMeshLinkDistanceFromDoorway);
+				link.startPoint = new Vector3(0, 0, -NavMeshLinkDistanceFromDoorway);
+				link.endPoint = new Vector3(0, 0, NavMeshLinkDistanceFromDoorway);
 			}
 
 
@@ -262,9 +260,9 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh
 				Vector3 v1 = triangulation.vertices[triangulation.indices[i - 1]];
 				Vector3 v2 = triangulation.vertices[triangulation.indices[i]];
 
-				Vector3 p0 = this.GetClosestPointOnEdge(point, v0, v1);
-				Vector3 p1 = this.GetClosestPointOnEdge(point, v1, v2);
-				Vector3 p2 = this.GetClosestPointOnEdge(point, v2, v0);
+				Vector3 p0 = GetClosestPointOnEdge(point, v0, v1);
+				Vector3 p1 = GetClosestPointOnEdge(point, v1, v2);
+				Vector3 p2 = GetClosestPointOnEdge(point, v2, v0);
 
 				float p0Dist = CalculateDistance(point, p0);
 				float p1Dist = CalculateDistance(point, p1);

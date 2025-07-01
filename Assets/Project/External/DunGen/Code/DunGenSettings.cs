@@ -1,13 +1,13 @@
-﻿
+﻿#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using System.IO;
 using System.Linq;
-using DunGen.Project.External.DunGen.Code.Collision;
-using DunGen.Project.External.DunGen.Code.Tags;
-using DunGen.Project.External.DunGen.Code.Utility;
-using UnityEditor;
 using UnityEngine;
+using DunGen.Tags;
+using DunGen.Collision;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	public sealed class DunGenSettings : ScriptableObject
 	{
@@ -18,12 +18,12 @@ namespace DunGen.Project.External.DunGen.Code
 		{
 			get
 			{
-				if (DunGenSettings.instance != null)
-					return DunGenSettings.instance;
+				if (instance != null)
+					return instance;
 				else
 				{
-					DunGenSettings.instance = DunGenSettings.FindOrCreateInstanceAsset();
-					return DunGenSettings.instance;
+					instance = FindOrCreateInstanceAsset();
+					return instance;
 				}
 			}
 		}
@@ -32,31 +32,31 @@ namespace DunGen.Project.External.DunGen.Code
 		public static DunGenSettings FindOrCreateInstanceAsset()
 		{
 			// Try to find an existing instance in a resource folder
-			DunGenSettings.instance = Resources.Load<DunGenSettings>("DunGen Settings");
+			instance = Resources.Load<DunGenSettings>("DunGen Settings");
 
 			// Create a new instance if one is not found
-			if (DunGenSettings.instance == null)
+			if (instance == null)
 			{
 #if UNITY_EDITOR
-				DunGenSettings.instance = ScriptableObject.CreateInstance<DunGenSettings>();
+				instance = CreateInstance<DunGenSettings>();
 
 				if (!Directory.Exists(Application.dataPath + "/Resources"))
 					AssetDatabase.CreateFolder("Assets", "Resources");
 
-				AssetDatabase.CreateAsset(DunGenSettings.instance, "Assets/Resources/DunGen Settings.asset");
-				DunGenSettings.instance.defaultSocket = DunGenSettings.instance.GetOrAddSocketByName("Default");
+				AssetDatabase.CreateAsset(instance, "Assets/Resources/DunGen Settings.asset");
+				instance.defaultSocket = instance.GetOrAddSocketByName("Default");
 #else
 				throw new System.Exception("No instance of DunGen settings was found.");
 #endif
 			}
 
-			return DunGenSettings.instance;
+			return instance;
 		}
 
 		#endregion
 
-		public DoorwaySocket DefaultSocket { get { return this.defaultSocket; } }
-		public TagManager TagManager { get { return this.tagManager; } }
+		public DoorwaySocket DefaultSocket { get { return defaultSocket; } }
+		public TagManager TagManager { get { return tagManager; } }
 
 		/// <summary>
 		/// Optional broadphase settings for speeding up collision tests
@@ -95,8 +95,8 @@ namespace DunGen.Project.External.DunGen.Code
 
 		private void OnValidate()
 		{
-			if(this.defaultSocket == null)
-				this.defaultSocket = this.GetOrAddSocketByName("Default");
+			if(defaultSocket == null)
+				defaultSocket = GetOrAddSocketByName("Default");
 		}
 
 #if UNITY_EDITOR
@@ -111,7 +111,7 @@ namespace DunGen.Project.External.DunGen.Code
 			if (socket != null)
 				return socket;
 
-			socket = ScriptableObject.CreateInstance<DoorwaySocket>();
+			socket = CreateInstance<DoorwaySocket>();
 			socket.name = name;
 
 			AssetDatabase.AddObjectToAsset(socket, this);

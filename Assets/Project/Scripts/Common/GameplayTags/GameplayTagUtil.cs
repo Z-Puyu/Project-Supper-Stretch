@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Codice.CM.Common;
 using Editor;
 using SaintsField;
 
@@ -137,5 +136,15 @@ public static class GameplayTagUtil {
         }
 
         return list;
+    }
+
+    public static T? Definition<S, T>(this string name) where T : GameplayTagNode where S : GameplayTagTree<T> {
+        foreach (S tree in ObjectCache<S>.Instance.Objects) {
+            if (tree.TryFind(name, out T? node)) {
+                return node;
+            }
+        }
+
+        return null;
     }
 }

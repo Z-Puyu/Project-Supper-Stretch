@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	public sealed class CoroutineHelper : MonoBehaviour
 	{
@@ -10,27 +10,27 @@ namespace DunGen.Project.External.DunGen.Code
 		{
 			get
 			{
-				if (CoroutineHelper.instance == null)
+				if (instance == null)
 				{
 					var obj = new GameObject("DunGen Coroutine Helper");
 					obj.hideFlags = HideFlags.HideInHierarchy;
 
-					CoroutineHelper.instance = obj.AddComponent<CoroutineHelper>();
+					instance = obj.AddComponent<CoroutineHelper>();
 				}
 
-				return CoroutineHelper.instance;
+				return instance;
 			}
 		}
 
 
 		public static Coroutine Start(IEnumerator routine)
 		{
-			return CoroutineHelper.Instance.StartCoroutine(routine);
+			return Instance.StartCoroutine(routine);
 		}
 
 		public static void StopAll()
 		{
-			CoroutineHelper.Instance.StopAllCoroutines();
+			Instance.StopAllCoroutines();
 		}
 	}
 }

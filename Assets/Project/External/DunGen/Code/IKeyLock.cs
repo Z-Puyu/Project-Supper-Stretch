@@ -1,4 +1,4 @@
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	public interface IKeyLock
 	{

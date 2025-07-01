@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using DunGen.Graph;
+using System.Collections.Generic;
 using System.Linq;
-using DunGen.Project.External.DunGen.Code;
-using DunGen.Project.External.DunGen.Code.DungeonFlowGraph;
-using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Validation.Rules
+namespace DunGen.Editor.Validation.Rules
 {
 	sealed class DoorwayRule : IValidationRule
 	{
@@ -19,8 +17,8 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Validation.Rules
 
 			public DoorwayInfo(Doorway doorway, GameObject tilePrefab)
 			{
-				this.Doorway = doorway;
-				this.TilePrefab = tilePrefab;
+				Doorway = doorway;
+				TilePrefab = tilePrefab;
 			}
 		}
 
@@ -40,10 +38,10 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Validation.Rules
 			foreach (var tile in tiles)
 				tileDoorways[tile] = tile.GetComponentsInChildren<Doorway>(true);
 
-			this.CheckDoorwayCount(flow, validator);
-			this.CheckDoorwayUpVectors(flow, validator, tileDoorways);
-			this.CheckDoorwayForwardVectorsAndPositionAlongBounds(flow, validator, tileDoorways);
-			this.CheckDoorwaySockets(flow, validator, tileDoorways);
+			CheckDoorwayCount(flow, validator);
+			CheckDoorwayUpVectors(flow, validator, tileDoorways);
+			CheckDoorwayForwardVectorsAndPositionAlongBounds(flow, validator, tileDoorways);
+			CheckDoorwaySockets(flow, validator, tileDoorways);
 		}
 
 		private void CheckDoorwayCount(DungeonFlow flow, DungeonValidator validator)
@@ -83,7 +81,7 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Validation.Rules
 					List<DoorwayInfo> doorwaySet = null;
 
 					foreach(var existingPair in doorwaysByUpVector)
-						if(Vector3.Angle(upVector, existingPair.Key) <= DoorwayRule.AngleThreshold)
+						if(Vector3.Angle(upVector, existingPair.Key) <= AngleThreshold)
 							doorwaySet = existingPair.Value;
 
 					if(doorwaySet == null)

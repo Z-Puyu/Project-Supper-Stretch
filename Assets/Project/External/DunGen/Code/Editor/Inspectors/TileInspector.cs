@@ -1,10 +1,8 @@
-﻿using DunGen.Project.External.DunGen.Code;
-using DunGen.Project.External.DunGen.Code.Utility;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
-namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
+namespace DunGen.Editor
 {
 	[CustomEditor(typeof(Tile))]
 	public class TileInspector : UnityEditor.Editor
@@ -41,44 +39,44 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 
 		private void OnEnable()
 		{
-			this.allowRotation = this.serializedObject.FindProperty("AllowRotation");
-			this.repeatMode = this.serializedObject.FindProperty("RepeatMode");
-			this.overrideAutomaticTileBounds = this.serializedObject.FindProperty("OverrideAutomaticTileBounds");
-			this.tileBoundsOverride = this.serializedObject.FindProperty("TileBoundsOverride");
-			this.entrances = this.serializedObject.FindProperty("Entrances");
-			this.exits = this.serializedObject.FindProperty("Exits");
-			this.overrideConnectionChance = this.serializedObject.FindProperty("OverrideConnectionChance");
-			this.connectionChance = this.serializedObject.FindProperty("ConnectionChance");
-			this.tags = this.serializedObject.FindProperty("Tags");
+			allowRotation = serializedObject.FindProperty("AllowRotation");
+			repeatMode = serializedObject.FindProperty("RepeatMode");
+			overrideAutomaticTileBounds = serializedObject.FindProperty("OverrideAutomaticTileBounds");
+			tileBoundsOverride = serializedObject.FindProperty("TileBoundsOverride");
+			entrances = serializedObject.FindProperty("Entrances");
+			exits = serializedObject.FindProperty("Exits");
+			overrideConnectionChance = serializedObject.FindProperty("OverrideConnectionChance");
+			connectionChance = serializedObject.FindProperty("ConnectionChance");
+			tags = serializedObject.FindProperty("Tags");
 
 
-			this.overrideBoundsHandle = new BoxBoundsHandle();
-			this.overrideBoundsHandle.SetColor(Color.red);
+			overrideBoundsHandle = new BoxBoundsHandle();
+			overrideBoundsHandle.SetColor(Color.red);
 		}
 
 		public override void OnInspectorGUI()
 		{
-			var tile = (Tile)this.target;
+			var tile = (Tile)target;
 
-			this.serializedObject.Update();
+			serializedObject.Update();
 
-			EditorGUILayout.PropertyField(this.allowRotation, Label.AllowRotation);
-			EditorGUILayout.PropertyField(this.repeatMode, Label.RepeatMode);
+			EditorGUILayout.PropertyField(allowRotation, Label.AllowRotation);
+			EditorGUILayout.PropertyField(repeatMode, Label.RepeatMode);
 
 			EditorGUILayout.Space();
 
 			// Tile Bounds Override
 			EditorGUILayout.BeginVertical("box");
 
-			EditorGUILayout.PropertyField(this.overrideAutomaticTileBounds, Label.OverrideAutomaticTileBounds);
+			EditorGUILayout.PropertyField(overrideAutomaticTileBounds, Label.OverrideAutomaticTileBounds);
 
-			EditorGUI.BeginDisabledGroup(!this.overrideAutomaticTileBounds.boolValue);
+			EditorGUI.BeginDisabledGroup(!overrideAutomaticTileBounds.boolValue);
 
 			EditorGUILayout.Space();
-			EditorGUILayout.PropertyField(this.tileBoundsOverride, GUIContent.none);
+			EditorGUILayout.PropertyField(tileBoundsOverride, GUIContent.none);
 
 			if (GUILayout.Button(Label.FitToTile))
-				this.tileBoundsOverride.boundsValue = tile.transform.InverseTransformBounds(UnityUtil.CalculateObjectBounds(tile.gameObject, false, false));
+				tileBoundsOverride.boundsValue = tile.transform.InverseTransformBounds(UnityUtil.CalculateObjectBounds(tile.gameObject, false, false));
 
 			EditorGUI.EndDisabledGroup();
 			EditorGUILayout.Space();
@@ -88,11 +86,11 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 			// Connection Chance Override
 			EditorGUILayout.BeginVertical("box");
 
-			EditorGUILayout.PropertyField(this.overrideConnectionChance, Label.OverrideConnectionChance);
+			EditorGUILayout.PropertyField(overrideConnectionChance, Label.OverrideConnectionChance);
 
-			EditorGUI.BeginDisabledGroup(!this.overrideConnectionChance.boolValue);
+			EditorGUI.BeginDisabledGroup(!overrideConnectionChance.boolValue);
 
-			EditorGUILayout.Slider(this.connectionChance, 0f, 1f, Label.ConnectionChance);
+			EditorGUILayout.Slider(connectionChance, 0f, 1f, Label.ConnectionChance);
 
 			EditorGUI.EndDisabledGroup();
 			EditorGUILayout.Space();
@@ -104,8 +102,8 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 			EditorGUILayout.HelpBox("You can optionally designate doorways as entrances or exits for this tile", MessageType.Info);
 
 			EditorGUI.indentLevel++;
-			EditorGUILayout.PropertyField(this.entrances, Label.Entrances);
-			EditorGUILayout.PropertyField(this.exits, Label.Exits);
+			EditorGUILayout.PropertyField(entrances, Label.Entrances);
+			EditorGUILayout.PropertyField(exits, Label.Exits);
 			EditorGUI.indentLevel--;
 
 			EditorGUILayout.Space();
@@ -114,39 +112,39 @@ namespace DunGen.Editor.Project.External.DunGen.Code.Editor.Inspectors
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();
 
-			EditorGUILayout.PropertyField(this.tags, Label.Tags);
+			EditorGUILayout.PropertyField(tags, Label.Tags);
 
 			EditorGUILayout.Space();
 
 			if (GUILayout.Button("Recalculate Bounds"))
 			{
 				tile.RecalculateBounds();
-				EditorUtility.SetDirty(this.target);
+				EditorUtility.SetDirty(target);
 			}
 
-			this.serializedObject.ApplyModifiedProperties();
+			serializedObject.ApplyModifiedProperties();
 		}
 
 		private void OnSceneGUI()
 		{
-			if (!this.overrideAutomaticTileBounds.boolValue)
+			if (!overrideAutomaticTileBounds.boolValue)
 				return;
 
-			var tile = (Tile)this.target;
-			this.overrideBoundsHandle.center = this.tileBoundsOverride.boundsValue.center;
-			this.overrideBoundsHandle.size = this.tileBoundsOverride.boundsValue.size;
+			var tile = (Tile)target;
+			overrideBoundsHandle.center = tileBoundsOverride.boundsValue.center;
+			overrideBoundsHandle.size = tileBoundsOverride.boundsValue.size;
 
 			EditorGUI.BeginChangeCheck();
 
 			using (new Handles.DrawingScope(tile.transform.localToWorldMatrix))
 			{
-				this.overrideBoundsHandle.DrawHandle();
+				overrideBoundsHandle.DrawHandle();
 			}
 
 			if (EditorGUI.EndChangeCheck())
 			{
-				this.tileBoundsOverride.boundsValue = new Bounds(this.overrideBoundsHandle.center, this.overrideBoundsHandle.size);
-				this.serializedObject.ApplyModifiedProperties();
+				tileBoundsOverride.boundsValue = new Bounds(overrideBoundsHandle.center, overrideBoundsHandle.size);
+				serializedObject.ApplyModifiedProperties();
 			}
 		}
 	}

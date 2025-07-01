@@ -1,5 +1,43 @@
 # Changelog
 
+## 4.19.0 ##
+
+1.  You can now use `$:ClassName.CallbackName` or `$:ClassName.FieldName` to call a static/const value/method in most place like `ShowIf/HideIf`, `EnableIf/DisableIf`, `RequiredIf`, `BelowImage/AboveImage` etc.
+2.  When a callback returns a `null` result, `AboveImage`, `BelowImage` now shows nothing, instead of giving an error notice.
+
+## 4.18.1 ##
+
+1.  `Handles` displays now can be toggled using right click context menu [#217](https://github.com/TylerTemp/SaintsField/issues/217)
+2.  Fix some handles not displayed on list
+3.  Add `dotted` for line, arrow type of handles
+4.  Add `alpha` for handles' `eColor` color control
+5.  Improved `ArrowHandleCap` with better scaling
+
+## 4.18.0 ##
+
+1.  Add `RequiredIf` for conditional required field; `EMode` supported
+2.  Add Auto Validator for `OnEvent` & `OnButtonClick`
+3.  Fix `Button` of `IEnumerator` won't hide the loading icon even the coroutine is done
+4.  Fix Auto Validator won't check sub object of a prefab
+
+## 4.17.0 ##
+
+1.  Add `EMode.InstanceInScene`, `EMode.InstanceInPrefab`, `EMode.Regular`, `EMode.Variant`, `EMode.NonPrefabInstance` which can be used for `ShowIf`, `HideIf`, `EnableIf`, `DisableIf`, and `Playa*` version of them.
+
+    *   `EMode.InstanceInScene`: target is a prefab placed in a scene
+    *   `EMode.InstanceInPrefab`: target is inside a prefab (but is not the top root of that prefab)
+    *   `EMode.Regular`: target is at the top root of the prefab
+    *   `EMode.Variant`: target is at the top root of the prefab, and is also a variant prefab
+    *   `EMode.NonPrefabInstance`: target is not a prefab (but can be inside a prefab)
+    *   `EMode.PrefabInstance` = `InstanceInPrefab | InstanceInScene`
+    *   `EMode.PrefabAsset` = `Variant | Regular`
+
+2.  Provide a workaround solution for [#240](https://github.com/TylerTemp/SaintsField/issues/240), for editing a field inside a serializable struct.
+
+## 4.16.5 ##
+
+If you have multiple targets selected, `AboveButton`, `BelowButton`, `PostFieldButton` can be triggered on all selected targets.
+
 ## 4.16.4 ##
 
 1.  `ListDrawerSetting`, `Table`, `SaintsDictionary` search now support `SerializeReference` field search, and is case-insensitive.

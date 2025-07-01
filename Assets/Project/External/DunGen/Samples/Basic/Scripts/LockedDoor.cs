@@ -1,11 +1,10 @@
-﻿using DunGen.Project.External.DunGen.Code;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Project.External.DunGen.Samples.Basic.Scripts
+namespace DunGen.Demo
 {
 	public class LockedDoor : MonoBehaviour, IKeyLock
 	{
-		public Key Key { get { return this.keyManager.GetKeyByID(this.keyID); } }
+		public Key Key { get { return keyManager.GetKeyByID(keyID); } }
 		public float OpenDuration = 1.0f;
 		public Vector3 OpenPositionOffset = new Vector3(0, -3, 0);
 
@@ -25,18 +24,18 @@ namespace Project.External.DunGen.Samples.Basic.Scripts
 
 		private void Start()
 		{
-			this.door = this.GetComponent<Door>();
+			door = GetComponent<Door>();
 		}
 
 		public void OnKeyAssigned(Key key, KeyManager keyManager)
 		{
-			this.keyID = key.ID;
+			keyID = key.ID;
 			this.keyManager = keyManager;
 		}
 
 		private void OnTriggerEnter(Collider c)
 		{
-			if (this.isOpening)
+			if (isOpening)
 				return;
 
 			var inventory = c.GetComponent<PlayerInventory>();
@@ -44,42 +43,42 @@ namespace Project.External.DunGen.Samples.Basic.Scripts
 			if (inventory == null)
 				return;
 
-			if (inventory.HasKey(this.keyID))
+			if (inventory.HasKey(keyID))
 			{
-				ScreenText.Log("Opened {0} door", this.Key.Name);
+				ScreenText.Log("Opened {0} door", Key.Name);
 
-				inventory.RemoveKey(this.keyID);
-				this.Open();
+				inventory.RemoveKey(keyID);
+				Open();
 			}
 			else
-				ScreenText.Log("{0} key required", this.Key.Name);
+				ScreenText.Log("{0} key required", Key.Name);
 		}
 
 		private void Update()
 		{
-			if (this.isOpening)
+			if (isOpening)
 			{
-				this.openTime += Time.deltaTime;
+				openTime += Time.deltaTime;
 
-				if (this.openTime >= this.OpenDuration)
+				if (openTime >= OpenDuration)
 				{
-					this.openTime = this.OpenDuration;
-					this.isOpening = false;
+					openTime = OpenDuration;
+					isOpening = false;
 				}
 
-				this.transform.position = Vector3.Lerp(this.initialPosition, this.initialPosition + this.OpenPositionOffset, this.openTime / this.OpenDuration);
+				transform.position = Vector3.Lerp(initialPosition, initialPosition + OpenPositionOffset, openTime / OpenDuration);
 			}
 		}
 
 		private void Open()
 		{
-			if (this.isOpening)
+			if (isOpening)
 				return;
 
-			this.isOpening = true;
-			this.initialPosition = this.transform.position;
-			this.openTime = 0;
-			this.door.IsOpen = true;
+			isOpening = true;
+			initialPosition = transform.position;
+			openTime = 0;
+			door.IsOpen = true;
 		}
 	}
 }

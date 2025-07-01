@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using DunGen.Project.External.DunGen.Code.Pooling;
+﻿using DunGen.Pooling;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	[AddComponentMenu("DunGen/Random Props/Random Prefab")]
 	public class RandomPrefab : RandomProp, ITileSpawnEventReceiver
@@ -17,21 +17,21 @@ namespace DunGen.Project.External.DunGen.Code
 
 		private void ClearExistingInstances()
 		{
-			if (this.propInstance == null)
+			if (propInstance == null)
 				return;
 
-			Object.DestroyImmediate(this.propInstance);
-			this.propInstance = null;
+			DestroyImmediate(propInstance);
+			propInstance = null;
 		}
 
 		public override void Process(RandomStream randomStream, Tile tile, ref List<GameObject> spawnedObjects)
 		{
-			this.ClearExistingInstances();
+			ClearExistingInstances();
 
-			if (this.Props.Weights.Count <= 0)
+			if (Props.Weights.Count <= 0)
 				return;
 
-			var chosenEntry = this.Props.GetRandom(randomStream,
+			var chosenEntry = Props.GetRandom(randomStream,
 				tile.Placement.IsOnMainPath,
 				tile.Placement.NormalizedDepth,
 				previouslyChosen: null,
@@ -44,20 +44,20 @@ namespace DunGen.Project.External.DunGen.Code
 
 			var prefab = chosenEntry.Value;
 
-			this.propInstance = Object.Instantiate(prefab);
-			this.propInstance.transform.parent = this.transform;
+			propInstance = Instantiate(prefab);
+			propInstance.transform.parent = transform;
 
-			spawnedObjects.Add(this.propInstance);
+			spawnedObjects.Add(propInstance);
 
-			if (this.ZeroPosition)
-				this.propInstance.transform.localPosition = Vector3.zero;
+			if (ZeroPosition)
+				propInstance.transform.localPosition = Vector3.zero;
 			else
-				this.propInstance.transform.localPosition = prefab.transform.localPosition;
+				propInstance.transform.localPosition = prefab.transform.localPosition;
 
-			if (this.ZeroRotation)
-				this.propInstance.transform.localRotation = Quaternion.identity;
+			if (ZeroRotation)
+				propInstance.transform.localRotation = Quaternion.identity;
 			else
-				this.propInstance.transform.localRotation = prefab.transform.localRotation;
+				propInstance.transform.localRotation = prefab.transform.localRotation;
 		}
 
 		//
@@ -65,7 +65,7 @@ namespace DunGen.Project.External.DunGen.Code
 
 		public void OnTileSpawned(Tile tile) { }
 
-		public void OnTileDespawned(Tile tile) => this.ClearExistingInstances();
+		public void OnTileDespawned(Tile tile) => ClearExistingInstances();
 
 		// End ITileSpawnEventReceiver implementation
 		//

@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using DunGen.Project.External.DunGen.Code.Utility;
 using UnityEngine;
 
-namespace DunGen.Project.External.DunGen.Code
+namespace DunGen
 {
 	public delegate void DungenCharacterDelegate(DungenCharacter character);
 	public delegate void CharacterTileChangedEvent(DungenCharacter character, Tile previousTile, Tile newTile);
@@ -24,7 +23,7 @@ namespace DunGen.Project.External.DunGen.Code
 
 		static DungenCharacter()
 		{
-			DungenCharacter.AllCharacters = new ReadOnlyCollection<DungenCharacter>(DungenCharacter.allCharacters);
+			AllCharacters = new ReadOnlyCollection<DungenCharacter>(allCharacters);
 		}
 
 		#endregion
@@ -33,10 +32,10 @@ namespace DunGen.Project.External.DunGen.Code
 		{
 			get
 			{
-				if (this.overlappingTiles == null || this.overlappingTiles.Count == 0)
+				if (overlappingTiles == null || overlappingTiles.Count == 0)
 					return null;
 				else
-					return this.overlappingTiles[this.overlappingTiles.Count - 1];
+					return overlappingTiles[overlappingTiles.Count - 1];
 			}
 		}
 		public event CharacterTileChangedEvent OnTileChanged;
@@ -46,31 +45,31 @@ namespace DunGen.Project.External.DunGen.Code
 
 		protected virtual void OnEnable()
 		{
-			if (this.overlappingTiles == null)
-				this.overlappingTiles = new List<Tile>();
+			if (overlappingTiles == null)
+				overlappingTiles = new List<Tile>();
 
-			DungenCharacter.allCharacters.Add(this);
+			allCharacters.Add(this);
 
-			if (DungenCharacter.CharacterAdded != null)
-				DungenCharacter.CharacterAdded(this);
+			if (CharacterAdded != null)
+				CharacterAdded(this);
 		}
 
 		protected virtual void OnDisable()
 		{
-			DungenCharacter.allCharacters.Remove(this);
+			allCharacters.Remove(this);
 
-			if (DungenCharacter.CharacterRemoved != null)
-				DungenCharacter.CharacterRemoved(this);
+			if (CharacterRemoved != null)
+				CharacterRemoved(this);
 		}
 
 		internal void ForceRecheckTile()
 		{
-			this.overlappingTiles.Clear();
+			overlappingTiles.Clear();
 
 			foreach (var tile in UnityUtil.FindObjectsByType<Tile>())
-				if (tile.Placement.Bounds.Contains(this.transform.position))
+				if (tile.Placement.Bounds.Contains(transform.position))
 				{
-					this.OnTileEntered(tile);
+					OnTileEntered(tile);
 					break;
 				}
 		}
@@ -79,31 +78,31 @@ namespace DunGen.Project.External.DunGen.Code
 
 		internal void OnTileEntered(Tile tile)
 		{
-			if (this.overlappingTiles.Contains(tile))
+			if (overlappingTiles.Contains(tile))
 				return;
 
-			var previousTile = this.CurrentTile;
-			this.overlappingTiles.Add(tile);
+			var previousTile = CurrentTile;
+			overlappingTiles.Add(tile);
 
-			if (this.CurrentTile != previousTile)
+			if (CurrentTile != previousTile)
 			{
-				this.OnTileChanged?.Invoke(this, previousTile, this.CurrentTile);
-				this.OnTileChangedEvent(previousTile, this.CurrentTile);
+				OnTileChanged?.Invoke(this, previousTile, CurrentTile);
+				OnTileChangedEvent(previousTile, CurrentTile);
 			}
 		}
 
 		internal void OnTileExited(Tile tile)
 		{
-			if (!this.overlappingTiles.Contains(tile))
+			if (!overlappingTiles.Contains(tile))
 				return;
 
-			var previousTile = this.CurrentTile;
-			this.overlappingTiles.Remove(tile);
+			var previousTile = CurrentTile;
+			overlappingTiles.Remove(tile);
 
-			if (this.CurrentTile != previousTile)
+			if (CurrentTile != previousTile)
 			{
-				this.OnTileChanged?.Invoke(this, previousTile, this.CurrentTile);
-				this.OnTileChangedEvent(previousTile, this.CurrentTile);
+				OnTileChanged?.Invoke(this, previousTile, CurrentTile);
+				OnTileChangedEvent(previousTile, CurrentTile);
 			}
 		}
 	}

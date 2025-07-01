@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +17,7 @@ public class InteractionPromptView : UIView {
 
     public override void Refresh() {
         this.Text.Content = this.Prompt;
+        this.Text.Refresh();
     }
 
     public override void Clear() {

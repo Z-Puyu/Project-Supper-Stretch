@@ -1,17 +1,18 @@
 ﻿#if UNITY_NAVIGATION_COMPONENTS
 
 //#define NAVMESHCOMPONENTS_SHOW_NAVMESHDATA_REF
+using DunGen.Adapters;
 using Unity.AI.Navigation.Editor;
 using UnityEditor;
 using UnityEditor.AI;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Project.External.DunGen.Integration.Unity_NavMesh.Editor
+namespace Dungen.Adapters
 {
 	[CanEditMultipleObjects]
 	[CustomEditor(typeof(UnityNavMesh2DAdapter))]
-	public sealed class UnityNavMesh2DAdapterInspector : UnityEditor.Editor
+	public sealed class UnityNavMesh2DAdapterInspector : Editor
 	{
 		private SerializedProperty agentTypeID;
 		private SerializedProperty defaultArea;
@@ -36,14 +37,14 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh.Editor
 
 		private void OnEnable()
 		{
-			this.agentTypeID = this.serializedObject.FindProperty("agentTypeID");
-			this.defaultArea = this.serializedObject.FindProperty("defaultArea");
-			this.layerMask = this.serializedObject.FindProperty("layerMask");
-			this.overrideTileSize = this.serializedObject.FindProperty("overrideTileSize");
-			this.overrideVoxelSize = this.serializedObject.FindProperty("overrideVoxelSize");
-			this.tileSize = this.serializedObject.FindProperty("tileSize");
-			this.voxelSize = this.serializedObject.FindProperty("voxelSize");
-			this.unwalkableArea = this.serializedObject.FindProperty("unwalkableArea");
+			agentTypeID = serializedObject.FindProperty("agentTypeID");
+			defaultArea = serializedObject.FindProperty("defaultArea");
+			layerMask = serializedObject.FindProperty("layerMask");
+			overrideTileSize = serializedObject.FindProperty("overrideTileSize");
+			overrideVoxelSize = serializedObject.FindProperty("overrideVoxelSize");
+			tileSize = serializedObject.FindProperty("tileSize");
+			voxelSize = serializedObject.FindProperty("voxelSize");
+			unwalkableArea = serializedObject.FindProperty("unwalkableArea");
 
 #if NAVMESHCOMPONENTS_SHOW_NAVMESHDATA_REF
 			m_NavMeshData = serializedObject.FindProperty("navMeshData");
@@ -52,12 +53,12 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh.Editor
 
 		public override void OnInspectorGUI()
 		{
-			if (UnityNavMesh2DAdapterInspector.styles == null)
-				UnityNavMesh2DAdapterInspector.styles = new Styles();
+			if (styles == null)
+				styles = new Styles();
 
-			this.serializedObject.Update();
+			serializedObject.Update();
 
-			var buildSettings = NavMesh.GetSettingsByID(this.agentTypeID.intValue);
+			var buildSettings = NavMesh.GetSettingsByID(agentTypeID.intValue);
 
 			if (buildSettings.agentTypeID != -1)
 			{
@@ -66,62 +67,62 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh.Editor
 				Rect agentDiagramRect = EditorGUILayout.GetControlRect(false, diagramHeight);
 				NavMeshEditorHelpers.DrawAgentDiagram(agentDiagramRect, buildSettings.agentRadius, buildSettings.agentHeight, buildSettings.agentClimb, buildSettings.agentSlope);
 			}
-			NavMeshComponentsGUIUtility.AgentTypePopup("Agent Type", this.agentTypeID);
+			NavMeshComponentsGUIUtility.AgentTypePopup("Agent Type", agentTypeID);
 
 			EditorGUILayout.Space();
 
-			EditorGUILayout.PropertyField(this.layerMask, UnityNavMesh2DAdapterInspector.styles.LayerMask);
+			EditorGUILayout.PropertyField(layerMask, styles.LayerMask);
 
 			EditorGUILayout.Space();
 
-			this.overrideVoxelSize.isExpanded = EditorGUILayout.Foldout(this.overrideVoxelSize.isExpanded, "Advanced");
-			if (this.overrideVoxelSize.isExpanded)
+			overrideVoxelSize.isExpanded = EditorGUILayout.Foldout(overrideVoxelSize.isExpanded, "Advanced");
+			if (overrideVoxelSize.isExpanded)
 			{
 				EditorGUI.indentLevel++;
 
-				NavMeshComponentsGUIUtility.AreaPopup("Default Area", this.defaultArea);
-				NavMeshComponentsGUIUtility.AreaPopup("Unwalkable Area", this.unwalkableArea);
+				NavMeshComponentsGUIUtility.AreaPopup("Default Area", defaultArea);
+				NavMeshComponentsGUIUtility.AreaPopup("Unwalkable Area", unwalkableArea);
 
 				// Override voxel size.
-				EditorGUILayout.PropertyField(this.overrideVoxelSize);
+				EditorGUILayout.PropertyField(overrideVoxelSize);
 
-				using (new EditorGUI.DisabledScope(!this.overrideVoxelSize.boolValue || this.overrideVoxelSize.hasMultipleDifferentValues))
+				using (new EditorGUI.DisabledScope(!overrideVoxelSize.boolValue || overrideVoxelSize.hasMultipleDifferentValues))
 				{
 					EditorGUI.indentLevel++;
 
-					EditorGUILayout.PropertyField(this.voxelSize);
+					EditorGUILayout.PropertyField(voxelSize);
 
-					if (!this.overrideVoxelSize.hasMultipleDifferentValues)
+					if (!overrideVoxelSize.hasMultipleDifferentValues)
 					{
-						if (!this.agentTypeID.hasMultipleDifferentValues)
+						if (!agentTypeID.hasMultipleDifferentValues)
 						{
-							float voxelsPerRadius = this.voxelSize.floatValue > 0.0f ? (buildSettings.agentRadius / this.voxelSize.floatValue) : 0.0f;
+							float voxelsPerRadius = voxelSize.floatValue > 0.0f ? (buildSettings.agentRadius / voxelSize.floatValue) : 0.0f;
 							EditorGUILayout.LabelField(" ", voxelsPerRadius.ToString("0.00") + " voxels per agent radius", EditorStyles.miniLabel);
 						}
-						if (this.overrideVoxelSize.boolValue)
+						if (overrideVoxelSize.boolValue)
 							EditorGUILayout.HelpBox("Voxel size controls how accurately the navigation mesh is generated from the level geometry. A good voxel size is 2-4 voxels per agent radius. Making voxel size smaller will increase build time.", MessageType.None);
 					}
 					EditorGUI.indentLevel--;
 				}
 
 				// Override tile size
-				EditorGUILayout.PropertyField(this.overrideTileSize);
+				EditorGUILayout.PropertyField(overrideTileSize);
 
-				using (new EditorGUI.DisabledScope(!this.overrideTileSize.boolValue || this.overrideTileSize.hasMultipleDifferentValues))
+				using (new EditorGUI.DisabledScope(!overrideTileSize.boolValue || overrideTileSize.hasMultipleDifferentValues))
 				{
 					EditorGUI.indentLevel++;
 
-					EditorGUILayout.PropertyField(this.tileSize);
+					EditorGUILayout.PropertyField(tileSize);
 
-					if (!this.tileSize.hasMultipleDifferentValues && !this.voxelSize.hasMultipleDifferentValues)
+					if (!tileSize.hasMultipleDifferentValues && !voxelSize.hasMultipleDifferentValues)
 					{
-						float tileWorldSize = this.tileSize.intValue * this.voxelSize.floatValue;
+						float tileWorldSize = tileSize.intValue * voxelSize.floatValue;
 						EditorGUILayout.LabelField(" ", tileWorldSize.ToString("0.00") + " world units", EditorStyles.miniLabel);
 					}
 
-					if (!this.overrideTileSize.hasMultipleDifferentValues)
+					if (!overrideTileSize.hasMultipleDifferentValues)
 					{
-						if (this.overrideTileSize.boolValue)
+						if (overrideTileSize.boolValue)
 							EditorGUILayout.HelpBox("Tile size controls the how local the changes to the world are (rebuild or carve). Small tile size allows more local changes, while potentially generating more data overall.", MessageType.None);
 					}
 					EditorGUI.indentLevel--;
@@ -133,11 +134,11 @@ namespace Project.External.DunGen.Integration.Unity_NavMesh.Editor
 
 			EditorGUILayout.Space();
 
-			this.serializedObject.ApplyModifiedProperties();
+			serializedObject.ApplyModifiedProperties();
 
 			var hadError = false;
-			var multipleTargets = this.targets.Length > 1;
-			foreach (UnityNavMesh2DAdapter adapter in this.targets)
+			var multipleTargets = targets.Length > 1;
+			foreach (UnityNavMesh2DAdapter adapter in targets)
 			{
 				var settings = adapter.GetBuildSettings();
 				var bounds = new Bounds(Vector3.zero, Vector3.zero);
