@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Editor;
 using Project.Scripts.AttributeSystem.Modifiers;
 using Project.Scripts.Common;
 using Project.Scripts.Common.GameplayTags;
@@ -24,7 +23,9 @@ public class Workbench : MonoBehaviour {
 
     public Dictionary<Modifier, int> Modifiers { get; init; } = [];
     
-    private AdvancedDropdownList<string> AllSchemes => ObjectCache<SchemeDefinition>.Instance.Objects.LeafTags();
+    private AdvancedDropdownList<string> AllSchemes => GameplayTagTree<Scheme>.Instances
+                                                                              .OfType<SchemeDefinition>()
+                                                                              .LeafTags();
     
     public event Action<int, Item> OnCraft = delegate { };
     public event Action<int, Recipe> OnRecipeChanged = delegate { };

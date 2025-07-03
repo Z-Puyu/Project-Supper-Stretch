@@ -1,4 +1,4 @@
-﻿using Editor;
+﻿using System.Linq;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.Common.GameplayTags;
@@ -8,7 +8,9 @@ using UnityEngine;
 namespace Project.Scripts.UI.Control.MVP.Presenters;
 
 public class AttributeBarPresenter : ProgressBarPresenter<AttributeSet> {
-    private AdvancedDropdownList<string> Attributes => ObjectCache<AttributeDefinition>.Instance.Objects.LeafTags();
+    private AdvancedDropdownList<string> Attributes => GameplayTagTree<AttributeType>.Instances
+                                                                                     .OfType<AttributeDefinition>()
+                                                                                     .LeafTags();
     
     [field: SerializeField, AdvancedDropdown(nameof(this.Attributes))] 
     protected string Attribute { get; private set; } = string.Empty;

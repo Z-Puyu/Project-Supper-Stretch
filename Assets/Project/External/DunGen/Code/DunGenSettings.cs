@@ -95,8 +95,10 @@ namespace DunGen
 
 		private void OnValidate()
 		{
+#if UNITY_EDITOR
 			if(defaultSocket == null)
 				defaultSocket = GetOrAddSocketByName("Default");
+#endif
 		}
 
 #if UNITY_EDITOR

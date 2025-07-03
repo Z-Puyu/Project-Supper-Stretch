@@ -2,13 +2,8 @@
 //
 
 #if UNITY_EDITOR
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Koenigz.PerfectCulling;
 using UnityEditor;
 using UnityEngine;
-using Object = System.Object;
 
 namespace Koenigz.PerfectCulling
 {

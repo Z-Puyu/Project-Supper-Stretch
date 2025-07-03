@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Editor;
+using System.Linq;
 using Project.Scripts.Common.GameplayTags;
 using SaintsField;
 using UnityEngine;
@@ -28,7 +28,9 @@ public class AttributeType : GameplayTagNode {
     [field: SerializeField] public bool AllowNegative { get; set; }
     [field: SerializeField] public bool BehaveLikeHealth { get; set; }
 
-    private AdvancedDropdownList<string> AllAttributes => ObjectCache<AttributeDefinition>.Instance.Objects.AllTags();
+    private AdvancedDropdownList<string> AllAttributes => GameplayTagTree<AttributeType>.Instances
+                                                                                        .OfType<AttributeDefinition>()
+                                                                                        .AllTags();
 
     protected override void OnRename() {
         this.TracePath<AttributeDefinition, AttributeType>();

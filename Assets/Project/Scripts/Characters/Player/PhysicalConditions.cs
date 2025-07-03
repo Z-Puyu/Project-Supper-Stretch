@@ -55,13 +55,13 @@ public class PhysicalConditions : MonoBehaviour {
     private AdvancedDropdownList<string> AllAttributes =>
             this.AttributeSetComponent ? this.AttributeSetComponent.AllAccessibleAttributes : [];
 
-    private void Start() {
-        this.AttributeSetComponent.OnAttributeChanged += this.UpdateAttributes;
+    public void Initialise() {
         if (this.DigestionEffect) {
             this.AttributeSetComponent.AddEffect(this.DigestionEffect, this.AttributeSetComponent);
         }
         
         this.NextPoisonUpdate = Time.time + this.PoisonUpdateInterval;
+        this.AttributeSetComponent.OnAttributeChanged += this.UpdateAttributes;
     }
 
     public void CheckInitialConditions() {

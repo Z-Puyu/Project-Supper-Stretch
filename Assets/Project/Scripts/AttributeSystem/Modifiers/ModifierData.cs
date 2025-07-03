@@ -1,5 +1,5 @@
 ﻿using System;
-using Editor;
+using System.Linq;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.Common.GameplayTags;
 using SaintsField;
@@ -27,5 +27,7 @@ public class ModifierData {
     
     public ModifierKey Key => new ModifierKey(this.Target, this.Method);
     
-    private AdvancedDropdownList<string> AllTargets => ObjectCache<AttributeDefinition>.Instance.Objects.AllTags();
+    private AdvancedDropdownList<string> AllTargets => GameplayTagTree<AttributeType>.Instances
+                                                                                     .OfType<AttributeDefinition>()
+                                                                                     .AllTags();
 }

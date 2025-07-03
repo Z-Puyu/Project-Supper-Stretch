@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class AnkleGrabberExample : MonoBehaviour {
 	private Animator anim;

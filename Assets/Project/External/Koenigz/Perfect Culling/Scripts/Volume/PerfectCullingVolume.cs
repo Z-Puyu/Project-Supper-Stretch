@@ -1,8 +1,6 @@
 ﻿// Perfect Culling (C) 2021 Patrick König
 //
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
 
 #if UNITY_EDITOR

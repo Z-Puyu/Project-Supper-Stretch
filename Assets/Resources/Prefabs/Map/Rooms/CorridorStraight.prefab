@@ -221,6 +221,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7562140364544465585}
   - component: {fileID: -7320999845245987488}
+  - component: {fileID: 2976946053732017389}
+  - component: {fileID: 3932060387253740322}
   m_Layer: 0
   m_Name: CorridorStraight
   m_TagString: Untagged
@@ -243,7 +245,6 @@ Transform:
   m_Children:
   - {fileID: 2128606387909136489}
   - {fileID: 531808802954001998}
-  - {fileID: 7874232247009650107}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &-7320999845245987488
@@ -319,46 +320,13 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 1}
   fileVersion: 3
---- !u!1 &6327060123403175394
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7874232247009650107}
-  - component: {fileID: 9176865263031443209}
-  - component: {fileID: 3469130898774060526}
-  m_Layer: 0
-  m_Name: PerfectCulling Baking Volume
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7874232247009650107
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6327060123403175394}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -43.875732, y: -29.7, z: 304.6781}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 7562140364544465585}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9176865263031443209
+--- !u!114 &2976946053732017389
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6327060123403175394}
+  m_GameObject: {fileID: 5894143431047852854}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 264be463914cfe447ad639dd78d12d5f, type: 3}
@@ -2849,13 +2817,13 @@ MonoBehaviour:
   bakeCellSize: {x: 2, y: 2, z: 2}
   mergeDownsampleIterations: 1
   visibilityLayer: -1
---- !u!114 &3469130898774060526
+--- !u!114 &3932060387253740322
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6327060123403175394}
+  m_GameObject: {fileID: 5894143431047852854}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f048476427cba5045936400518e92609, type: 3}

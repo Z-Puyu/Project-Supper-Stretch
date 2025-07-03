@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Editor;
 using SaintsField;
 
 namespace Project.Scripts.Common.GameplayTags;
@@ -9,7 +8,7 @@ namespace Project.Scripts.Common.GameplayTags;
 public static class GameplayTagUtil {
     public static void TracePath<S, T>(this T origin) where T : GameplayTagNode where S : GameplayTagTree<T> {
         string path = string.Empty;
-        foreach (S tree in ObjectCache<S>.Instance.Objects) {
+        foreach (S tree in GameplayTagTree<T>.Instances.OfType<S>()) {
             Dictionary<GameplayTagNode, GameplayTagNode> predecessors = [];
             Stack<string> address = [];
             PreorderIterator<T> iterator = new PreorderIterator<T>(tree.Nodes);
@@ -139,7 +138,7 @@ public static class GameplayTagUtil {
     }
 
     public static T? Definition<S, T>(this string name) where T : GameplayTagNode where S : GameplayTagTree<T> {
-        foreach (S tree in ObjectCache<S>.Instance.Objects) {
+        foreach (S tree in GameplayTagTree<T>.Instances.OfType<S>()) {
             if (tree.TryFind(name, out T? node)) {
                 return node;
             }

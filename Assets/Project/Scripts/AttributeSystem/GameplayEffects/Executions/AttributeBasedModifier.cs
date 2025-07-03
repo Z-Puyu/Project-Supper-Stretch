@@ -1,5 +1,5 @@
 using System;
-using Editor;
+using System.Linq;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.AttributeSystem.Modifiers;
@@ -26,9 +26,13 @@ public record class AttributeBasedModifier {
     [field: SerializeField] private float Coefficient { get; set; } = 1;
     [field: SerializeField] private int Duration { get; set; }
     
-    private AdvancedDropdownList<string> AllTargets => ObjectCache<AttributeDefinition>.Instance.Objects.AllTags();
+    private AdvancedDropdownList<string> AllTargets => GameplayTagTree<AttributeType>.Instances
+                                                                                     .OfType<AttributeDefinition>()
+                                                                                     .AllTags();
 
-    private AdvancedDropdownList<string> AllSources => ObjectCache<AttributeDefinition>.Instance.Objects.LeafTags();
+    private AdvancedDropdownList<string> AllSources => GameplayTagTree<AttributeType>.Instances
+                                                                                     .OfType<AttributeDefinition>()
+                                                                                     .LeafTags();
 
     public Modifier GenerateFrom(IAttributeReader target, IAttributeReader instigator) {
         float value = this.Coefficient * this.SourceAttributes switch {

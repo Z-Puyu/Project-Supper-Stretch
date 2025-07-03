@@ -1,5 +1,5 @@
 using System;
-using Editor;
+using System.Linq;
 using Project.Scripts.Common.GameplayTags;
 using SaintsField;
 using UnityEngine;
@@ -8,7 +8,9 @@ namespace Project.Scripts.AttributeSystem.Attributes.Definitions;
 
 [Serializable]
 public record class AttributeConversionRule {
-    private AdvancedDropdownList<string> AllDefinitions => ObjectCache<AttributeDefinition>.Instance.Objects.AllTags();
+    private AdvancedDropdownList<string> AllDefinitions => GameplayTagTree<AttributeType>.Instances
+                                                                                         .OfType<AttributeDefinition>()
+                                                                                         .AllTags();
     
     [field: SerializeField, AdvancedDropdown(nameof(this.AllDefinitions))]
     public string From { get; private set; } = string.Empty;

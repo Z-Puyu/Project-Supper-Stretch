@@ -1,5 +1,5 @@
 using System;
-using Editor;
+using System.Linq;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.AttributeSystem.Modifiers;
 using Project.Scripts.Common.GameplayTags;
@@ -10,7 +10,9 @@ namespace Project.Scripts.AttributeSystem.Attributes.AttributeTypes;
 
 [Serializable]
 public record class AttributeInitialisationData {
-    private AdvancedDropdownList<string> AllDefinitions => ObjectCache<AttributeDefinition>.Instance.Objects.AllTags();
+    private AdvancedDropdownList<string> AllDefinitions => GameplayTagTree<AttributeType>.Instances
+                                                                                         .OfType<AttributeDefinition>()
+                                                                                         .AllTags();
     
     [field: SerializeField, AdvancedDropdown(nameof(this.AllDefinitions), EUnique.Remove)] 
     public string Key { get; private set; } = string.Empty;

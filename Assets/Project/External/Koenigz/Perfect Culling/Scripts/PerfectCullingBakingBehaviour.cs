@@ -1,14 +1,11 @@
 ﻿// Perfect Culling (C) 2021 Patrick König
 //
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 namespace Koenigz.PerfectCulling
 {

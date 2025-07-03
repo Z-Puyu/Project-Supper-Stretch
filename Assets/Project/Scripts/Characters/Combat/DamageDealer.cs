@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Editor;
+using System.Linq;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.AttributeSystem.GameplayEffects;
@@ -15,7 +15,9 @@ namespace Project.Scripts.Characters.Combat;
 
 [DisallowMultipleComponent]
 public class DamageDealer : MonoBehaviour {
-    private AdvancedDropdownList<string> AllAttributes => ObjectCache<AttributeDefinition>.Instance.Objects.LeafTags();
+    private AdvancedDropdownList<string> AllAttributes => GameplayTagTree<AttributeType>.Instances
+                                                                                        .OfType<AttributeDefinition>()
+                                                                                        .LeafTags();
     
     [NotNull] [field: SerializeField] private GameObject? Owner { get; set; }
     private HitBox? CurrentTarget { get; set; }
