@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.Common;
 using Project.Scripts.Items;
 using Project.Scripts.Items.CraftingSystem;
 using Project.Scripts.Items.InventorySystem;
@@ -21,9 +22,8 @@ public class CampMenuCoordinator : MonoBehaviour, IPresenter {
     [NotNull] [field: SerializeField] private RecipePresenter? RecipeDescription { get; set; }
     [NotNull] [field: SerializeField] private TextView? TimeRemaining { get; set; }
 
-    private Dictionary<int, Item> IndexedIngredients { get; set; } = [];
-
     private void Start() {
+        GameEvents.UI.OnGoBack += this.ReturnAllIngredients;
         foreach (ItemSlotPresenter slot in this.IngredientSlots) {
             slot.OnItemReturned += handleRemoveItem;
             slot.OnItemAdded += handleAddedItem;
@@ -40,6 +40,10 @@ public class CampMenuCoordinator : MonoBehaviour, IPresenter {
         this.CookButton.interactable = false;
         return;
         void handleSwitchCookingMethod(int idx) => this.Model.workbench.ChangeScheme(idx);
+    }
+
+    private void ReturnAllIngredients() {
+        this.Model.workbench.Recipe?.Clear(this.Model.inventory);
     }
 
     private void OnCraftComplete() {

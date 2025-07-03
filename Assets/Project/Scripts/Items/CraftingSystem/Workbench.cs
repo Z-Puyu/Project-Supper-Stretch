@@ -12,7 +12,6 @@ namespace Project.Scripts.Items.CraftingSystem;
 
 [DisallowMultipleComponent]
 public class Workbench : MonoBehaviour {
-    private List<string> Moves { get; init; } = [];
     public (Item? ingredient, bool isRemoved) LastOperation { get; private set; } = (null, false);
     public Recipe? Recipe { get; private set; }
     public float Cost { get; set; }
@@ -47,7 +46,6 @@ public class Workbench : MonoBehaviour {
         this.Recipe?.AddIngredient(ingredient);
         this.LastOperation = (ingredient, false);
         ingredient.Process(this);
-        this.Moves.Add($"Add {ingredient.Name}");
         this.NotifyRecipeChange();
     }
 
@@ -60,7 +58,6 @@ public class Workbench : MonoBehaviour {
         this.Recipe?.RemoveIngredient(ingredient);
         this.LastOperation = (ingredient, true);
         ingredient.Process(this);
-        this.Moves.Add($"Remove {ingredient.Name}");
         this.NotifyRecipeChange();
     }
 

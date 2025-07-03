@@ -10,7 +10,6 @@ using Project.Scripts.Common;
 using SaintsField;
 using SaintsField.Playa;
 using UnityEngine;
-using UnityEngine.Audio;
 using UnityEngine.Events;
 
 namespace Project.Scripts.Items.Equipments;

@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Project.Scripts.Common;
@@ -38,6 +37,10 @@ public class CharacterComponent : MonoBehaviour {
             case LifeCycle.DestroyOnDeath:
                 this.Owner.OnKilled += () => Object.Destroy(this.gameObject);
                 this.gameObject.SetActive(true);
+                break;
+            case LifeCycle.AlwaysAlive:
+                this.Owner.OnKilled += () => this.GetComponentsInChildren<Behaviour>()
+                                                 .ForEach(behaviour => behaviour.enabled = false);
                 break;
         }
     }

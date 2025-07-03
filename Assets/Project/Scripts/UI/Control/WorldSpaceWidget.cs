@@ -1,8 +1,6 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.GameManagement;
 using Project.Scripts.Util.Singleton;
-using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.UI.Control;

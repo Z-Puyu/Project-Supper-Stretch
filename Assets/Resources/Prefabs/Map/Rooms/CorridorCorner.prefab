@@ -163,6 +163,7 @@ Transform:
   m_Children:
   - {fileID: 2128606387909136489}
   - {fileID: 531808802954001998}
+  - {fileID: 4565614630274407122}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &-7320999845245987488
@@ -242,6 +243,87 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 1}
   fileVersion: 3
+--- !u!1 &8362514972829299082
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4565614630274407122}
+  - component: {fileID: 1348838396921222876}
+  - component: {fileID: 9112618418977571005}
+  m_Layer: 0
+  m_Name: PerfectCulling Baking Volume
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4565614630274407122
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8362514972829299082}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7562140364544465585}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1348838396921222876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8362514972829299082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 264be463914cfe447ad639dd78d12d5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  searchForNonEmptyCells: 0
+  emptyCellCullBehaviour: 1
+  outOfBoundsBehaviour: 0
+  bakeGroups:
+  - groupType: 0
+    renderers:
+    - {fileID: 7326151959561329259}
+    unityBehaviours: []
+    vertexCount: 24
+  - groupType: 0
+    renderers:
+    - {fileID: 4655578964059155129}
+    unityBehaviours: []
+    vertexCount: 24
+  additionalOccluders: []
+  volumeSize: {x: 6, y: 6, z: 6}
+  volumeBakeData: {fileID: 11400000, guid: 78bd8b2ade3dbbf4cafa6fd77b43073e, type: 2}
+  bakeCellSize: {x: 2, y: 2, z: 2}
+  mergeDownsampleIterations: 1
+  visibilityLayer: -1
+--- !u!114 &9112618418977571005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8362514972829299082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f048476427cba5045936400518e92609, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 35074
+  distance: 5
 --- !u!1 &8747294985669183907
 GameObject:
   m_ObjectHideFlags: 0
@@ -399,6 +481,11 @@ PrefabInstance:
 --- !u!4 &3061365789014571965 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2643393599352495174, guid: cbee6c2058331ef4aacecd2ea778f957, type: 3}
+  m_PrefabInstance: {fileID: 1068232232290576379}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &4655578964059155129 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 5641022317284527426, guid: cbee6c2058331ef4aacecd2ea778f957, type: 3}
   m_PrefabInstance: {fileID: 1068232232290576379}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1175903721690446700
@@ -728,6 +815,11 @@ PrefabInstance:
 --- !u!4 &6587047306575066124 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4103433261194162192, guid: 0977827c4af4fa144ad442bf2fa9cd06, type: 3}
+  m_PrefabInstance: {fileID: 7177531020312937500}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &7326151959561329259 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 445871803755585143, guid: 0977827c4af4fa144ad442bf2fa9cd06, type: 3}
   m_PrefabInstance: {fileID: 7177531020312937500}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7273356143995337155

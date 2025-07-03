@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Audio;
@@ -6,7 +5,6 @@ using Project.Scripts.Characters.Combat;
 using Project.Scripts.Util.Components;
 using SaintsField;
 using UnityEngine;
-using UnityEngine.Audio;
 
 namespace Project.Scripts.Characters.Footsteps;
 

@@ -41,6 +41,7 @@ public class GameMap : MonoBehaviour {
         return;
 
         void onComplete(DungeonGenerator generator) {
+            generator.CurrentDungeon.GetComponentsInChildren<EnemySpawnPoint>().ForEach(point => point.Spawn());
             onReady?.Invoke(generator);
         } 
     }

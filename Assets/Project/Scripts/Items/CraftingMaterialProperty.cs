@@ -46,16 +46,16 @@ public sealed record class CraftingMaterialProperty(Modifier[] Modifiers, float 
     }
 
     public override string FormatAsText(ModifierLocalisationMapping mapping) {
-        return new StringBuilder()
-               .AppendLine($"Cooking time: {this.Cost:+#;-#;+#}")
-               .AppendJoin('\n', $"{this.Modifiers.Select(modifier => modifier.FormatAsText(mapping))}")
+        return new StringBuilder("As ingredient:\n")
+               .AppendLine($"Cooking time: {this.Cost}")
+               .AppendJoin('\n', this.Modifiers.Select(modifier => modifier.FormatAsText(mapping)))
                .ToString();
     }
 
     public override string FormatAsText() {
-        return new StringBuilder()
-               .AppendLine($"Cooking time: {this.Cost:+#;-#;+#}")
-               .AppendJoin('\n', $"{this.Modifiers.Select(modifier => modifier.FormatAsText())}")
+        return new StringBuilder("As ingredient:\n")
+               .AppendLine($"Cooking time: {this.Cost}")
+               .AppendJoin('\n', this.Modifiers.Select(modifier => modifier.FormatAsText()))
                .ToString();
     }
     

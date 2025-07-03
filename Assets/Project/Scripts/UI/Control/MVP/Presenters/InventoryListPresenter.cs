@@ -21,6 +21,8 @@ public class InventoryListPresenter : ListPresenter<Inventory, KeyValuePair<Item
         entry.ItemType = data.Key.Type;
         entry.Worth = data.Value;
         entry.IsEquipped = data.Key.IsEquipped;
+        string desc = data.Key.FormatAsText();
+        entry.Description = desc;
     }
 
     protected override void UpdateView(Inventory model) {

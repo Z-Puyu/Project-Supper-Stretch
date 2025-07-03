@@ -1,9 +1,6 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
-using Project.Scripts.Common;
 using Project.Scripts.GameManagement;
 using Project.Scripts.UI.Control.Minimap;
-using Project.Scripts.Util.Linq;
 using Project.Scripts.Util.Singleton;
 using SaintsField;
 using UnityEngine;
@@ -38,12 +35,6 @@ public class MapMarker : MonoBehaviour {
     private void Awake() {
         MapMarker.CameraTransform = Singleton<MinimapCamera>.Instance.transform;
         this.CanvasScale = this.IconTransform.GetComponentInParent<Canvas>().transform.localScale;
-    }
-
-    private void OnEnable() {
-        this.VerticalDistanceToPlayer =
-                Mathf.Abs(this.Anchor.position.y - Singleton<GameInstance>.Instance.PlayerTransform.position.y);
-        this.UpdatePosition();
     }
 
     private void OnDisable() {

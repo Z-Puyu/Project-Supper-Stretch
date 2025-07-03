@@ -1,13 +1,10 @@
 using System;
 using System.Linq;
-using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.GameplayEffects;
-using Project.Scripts.AttributeSystem.GameplayEffects.Executions;
 using Project.Scripts.AttributeSystem.Modifiers;
 using Project.Scripts.Items.Equipments;
 using Project.Scripts.Util.Linq;
 using UnityEngine;
-using UnityEngine.Audio;
 
 namespace Project.Scripts.Items;
 

@@ -2,13 +2,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DunGen;
-using Project.Scripts.AttributeSystem.Attributes;
-using Project.Scripts.Characters.Enemies;
 using Project.Scripts.Common;
 using Project.Scripts.Common.Input;
-using Project.Scripts.Interaction;
 using Project.Scripts.Items;
-using Project.Scripts.Items.Equipments;
 using Project.Scripts.Items.InventorySystem;
 using Project.Scripts.Util.Components;
 using Project.Scripts.Util.Linq;
@@ -53,6 +49,10 @@ public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
         
         this.InputActions.Player.Enable();
         this.GetComponent<DungenCharacter>().OnTileChanged += PlayerCharacter.OnEnterDungeonRoom;
+    }
+
+    public void InitialiseComponents() {
+        this.GetComponentInChildren<PhysicalConditions>().CheckInitialConditions();
     }
     
     protected override void OnPause() {

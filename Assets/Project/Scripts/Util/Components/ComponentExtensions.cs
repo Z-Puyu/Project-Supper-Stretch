@@ -94,6 +94,6 @@ public static class ComponentExtensions {
     }
     
     public static bool HasChildComponent<T>(this Component root, out T component) where T : Component {
-        return component = root.GetComponentInChildren<T>();
+        return component = root.GetComponentInChildren<T>(includeInactive: true);
     }
 }

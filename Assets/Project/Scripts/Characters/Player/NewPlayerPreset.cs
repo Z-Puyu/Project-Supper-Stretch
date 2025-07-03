@@ -1,5 +1,4 @@
-﻿using Project.Scripts.AttributeSystem.GameplayEffects;
-using SaintsField;
+﻿using SaintsField;
 using Project.Scripts.Items;
 using UnityEngine;
 

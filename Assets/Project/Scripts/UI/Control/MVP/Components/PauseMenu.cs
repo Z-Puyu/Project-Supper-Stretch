@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.GameManagement;

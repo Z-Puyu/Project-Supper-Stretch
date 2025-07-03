@@ -1,6 +1,5 @@
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.UI.Control.MVP.Components;
-using UnityEngine;
 
 namespace Project.Scripts.UI.Control.MVP.Presenters;
 

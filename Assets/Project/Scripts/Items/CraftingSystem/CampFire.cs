@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.AttributeSystem.Attributes;
+using Project.Scripts.AttributeSystem.GameplayEffects;
 using Project.Scripts.Common;
 using Project.Scripts.Interaction;
 using Project.Scripts.Items.InventorySystem;
@@ -22,6 +23,7 @@ public class CampFire : MonoBehaviour {
     
     public static event UnityAction<UIData> OnOpen = delegate { };
     
+    [field: SerializeField] private GameplayEffect? FirstUseEffect { get; set; }
     [NotNull] private AttributeSet? PlayerAttributes { get; set; }
     [NotNull] private Inventory? PlayerInventory { get; set; }
     [NotNull] private InteractableObject? Interactable { get; set; }
@@ -71,6 +73,9 @@ public class CampFire : MonoBehaviour {
             this.PlayerAttributes = interactor.GetSiblingComponent<AttributeSet>();
             this.PlayerInventory = interactor.GetSiblingComponent<Inventory>();
             this.HasBeenUsedBefore = true;
+            if (this.FirstUseEffect) {
+                this.PlayerAttributes.AddEffect(this.FirstUseEffect);
+            }
         }
         
         CampFire.OnOpen.Invoke(new UIData(this.Workbench, this.PlayerInventory, this.RemainingTime, 0));

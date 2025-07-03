@@ -229,11 +229,11 @@ AudioRandomContainer:
   m_Name: BackgroundMusic
   m_Volume: 0
   m_Pitch: 32
-  m_AutomaticTriggerTime: 0
+  m_AutomaticTriggerTime: 3
   m_LoopCount: 1
   m_VolumeRandomizationRange: {x: 0, y: 0}
   m_PitchRandomizationRange: {x: -1200, y: 1200}
-  m_AutomaticTriggerTimeRandomizationRange: {x: 0, y: 0}
+  m_AutomaticTriggerTimeRandomizationRange: {x: -15, y: 20}
   m_LoopCountRandomizationRange: {x: 0, y: 0}
   m_Elements:
   - {fileID: -7403762892621461963}
@@ -260,14 +260,14 @@ AudioRandomContainer:
   - {fileID: -4687325702495304400}
   - {fileID: -3180132607513207647}
   - {fileID: 2593874449414820987}
-  m_AvoidRepeatingLast: 3
-  m_PlaybackMode: 2
+  m_AvoidRepeatingLast: 0
+  m_PlaybackMode: 1
   m_TriggerMode: 1
   m_AutomaticTriggerMode: 1
   m_LoopMode: 0
   m_VolumeRandomizationEnabled: 0
   m_PitchRandomizationEnabled: 0
-  m_AutomaticTriggerTimeRandomizationEnabled: 1
+  m_AutomaticTriggerTimeRandomizationEnabled: 0
   m_LoopCountRandomizationEnabled: 0
 --- !u!1233149941 &6463751591717739096
 AudioContainerElement:

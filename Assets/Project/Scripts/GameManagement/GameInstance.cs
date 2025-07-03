@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 using Project.Scripts.Characters;
 using Project.Scripts.Characters.Player;
-using Project.Scripts.Common;
 using Project.Scripts.Map;
 using Project.Scripts.Util.Linq;
 using SaintsField.Playa;
@@ -38,6 +36,7 @@ public class GameInstance : Singleton<GameInstance> {
     [field: SerializeField, LayoutEnd, Header("UI")]
     private GameObject? UI { get; set; }
     
+    [field: SerializeField] private GameOver? GameOverScreen { get; set; }
     [field: SerializeField] private GameObject? PlayerHUD { get; set; }
     [field: SerializeField] private LoadingScreen? LoadingScreen { get; set; }
     
@@ -47,6 +46,7 @@ public class GameInstance : Singleton<GameInstance> {
     [NotNull] public PlayerCharacter? PlayerInstance { get; private set; }
     [NotNull] public Transform? PlayerTransform { get; private set; }
     [NotNull] private LoadingScreen? LoadingScreenInstance { get; set; }
+    [NotNull] private GameOver? GameOverScreenInstance { get; set; }
     
     private void Start() {
         this.LoadGame();
@@ -69,6 +69,8 @@ public class GameInstance : Singleton<GameInstance> {
     private void InitialiseUI() {
         Object.Instantiate(this.UI);
         Object.Instantiate(this.PlayerHUD);
+        this.GameOverScreenInstance = Object.Instantiate(this.GameOverScreen);
+        this.PlayerInstance.OnKilled += () => this.GameOverScreenInstance.gameObject.SetActive(true);
     }
 
     private void InstantiateObjects() {
@@ -95,8 +97,6 @@ public class GameInstance : Singleton<GameInstance> {
         this.LoadingScreenInstance.FlashHintText("Enabling Scripts...");
         this.StartingMap.GetComponentsInChildren<GoalPoint>(includeInactive: true)
             .ForEach(point => point.gameObject.SetActive(true));
-        Object.FindObjectsByType<GameCharacter>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
-              .ForEach(character => character.transform.SetParent(null));
         Object.FindObjectsByType<NavMeshAgent>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
               .ForEach(agent => agent.enabled = true);
         Object.FindObjectsByType<BehaviorGraphAgent>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
@@ -104,6 +104,7 @@ public class GameInstance : Singleton<GameInstance> {
         PlayerCharacter.OnDungeonLevelCleared += this.StartingMap.Generate;
         this.VirtualCamera!.Target.TrackingTarget =
                 this.PlayerInstance.GetComponentInChildren<CameraTarget>().transform;
+        this.PlayerInstance.InitialiseComponents();
         LeanTween.alphaCanvas(this.LoadingScreenInstance.GetComponent<CanvasGroup>(), 0, 2f)
                  .setOnComplete(() => {
                      this.LoadingScreenInstance.gameObject.SetActive(false);

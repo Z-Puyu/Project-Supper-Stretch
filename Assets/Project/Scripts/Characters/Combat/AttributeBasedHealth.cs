@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
-using Project.Scripts.AttributeSystem.GameplayEffects;
 using Project.Scripts.AttributeSystem.GameplayEffects.Executions;
 using Project.Scripts.Common;
 using SaintsField;

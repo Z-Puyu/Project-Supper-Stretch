@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common.Input;
 using UnityEngine;
-using UnityEngine.VFX;
 
 namespace Project.Scripts.Interaction;
 

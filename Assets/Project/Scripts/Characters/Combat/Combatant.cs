@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common;
 using Project.Scripts.Common.Input;
-using Project.Scripts.Items;
 using Project.Scripts.Items.Equipments;
-using Project.Scripts.Util.Linq;
 using SaintsField;
 using UnityEngine;
 using UnityEngine.Events;

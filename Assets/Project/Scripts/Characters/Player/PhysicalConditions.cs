@@ -1,10 +1,7 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.GameplayEffects;
 using Project.Scripts.AttributeSystem.GameplayEffects.Executions;
-using Project.Scripts.AttributeSystem.Modifiers;
-using Project.Scripts.Characters.Combat;
 using SaintsField;
 using SaintsField.Playa;
 using UnityEngine;
@@ -67,6 +64,27 @@ public class PhysicalConditions : MonoBehaviour {
         this.NextPoisonUpdate = Time.time + this.PoisonUpdateInterval;
     }
 
+    public void CheckInitialConditions() {
+        int satiation = this.AttributeSetComponent.ReadCurrent(this.HungerAttribute);
+        if (satiation <= this.StarvedThreshold) {
+            this.IsStarving = true;
+            this.OnStarved.Invoke();
+        } else if (satiation <= this.HungryThreshold) {
+            this.IsStarving = false;
+            this.OnHungry.Invoke();
+        } else {
+            this.IsStarving = false;
+            this.OnSatiated.Invoke();
+        }
+        
+        int toxin = this.AttributeSetComponent.ReadCurrent(this.ToxinAttribute);
+        if (toxin < this.SeriouslyPoisonedThreshold) {
+            this.OnPoisonCured.Invoke();
+        } else {
+            this.OnFoodPoisoned.Invoke();
+        }
+    }
+
     private void UpdateAttributes(AttributeChange change) {
         if (change.Type == this.HungerAttribute && this.HungryEffect && this.StarvedEffect) {
             this.UpdateHunger(change.OldCurrentValue, change.NewCurrentValue);
@@ -106,7 +124,7 @@ public class PhysicalConditions : MonoBehaviour {
         if (current <= this.HungryThreshold && old > this.HungryThreshold && this.HungryEffect) {
             this.OnHungry.Invoke();
             if (this.Audio) {
-                this.Audio.Pause(CharacterAudio.Sound.Starving);
+                this.Audio.Play(CharacterAudio.Sound.Starving);
             }
             
             GameplayEffectExecutionArgs args = GameplayEffectExecutionArgs.Builder
@@ -120,7 +138,7 @@ public class PhysicalConditions : MonoBehaviour {
         if (current <= this.StarvedThreshold && old > this.StarvedThreshold) {
             this.OnStarved.Invoke();
             if (this.Audio) {
-                this.Audio.Pause(CharacterAudio.Sound.Starving);
+                this.Audio.Play(CharacterAudio.Sound.Starving);
             }
             
             this.IsStarving = true;
@@ -135,7 +153,7 @@ public class PhysicalConditions : MonoBehaviour {
         int toxin = this.AttributeSetComponent.ReadCurrent(this.ToxinAttribute);
         int maxToxin = this.AttributeSetComponent.ReadMax(this.ToxinAttribute);
         int chance = (int)this.ChanceOfPoisoning.Evaluate(toxin / (float)maxToxin);
-        if (chance > Random.Range(0, 100)) {
+        if (Random.Range(0, 100) >= chance) {
             return;
         }
         

@@ -1,7 +1,5 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Audio;
-using UnityEngine;
 
 namespace Project.Scripts.Characters.Combat;
 

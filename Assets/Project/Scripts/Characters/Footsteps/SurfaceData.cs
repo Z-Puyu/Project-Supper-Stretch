@@ -1,5 +1,3 @@
-using System;
-using Project.Scripts.Audio;
 using UnityEngine;
 using UnityEngine.Audio;
 

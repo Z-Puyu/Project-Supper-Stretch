@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Project.Scripts.AttributeSystem.Attributes;
-using Project.Scripts.AttributeSystem.GameplayEffects.Executions;
-using Project.Scripts.Audio;
 using Project.Scripts.Characters.Combat;
 using Project.Scripts.Common;
-using Project.Scripts.Items;
-using Project.Scripts.Items.Equipments;
-using Project.Scripts.Items.InventorySystem;
 using Project.Scripts.Util.Linq;
 using SaintsField;
+using SaintsField.Playa;
 using UnityEngine;
 using UnityEngine.Events; 
 using Object = UnityEngine.Object;
-using Random = UnityEngine.Random;
 
 namespace Project.Scripts.Characters;
 
@@ -69,9 +62,13 @@ public abstract class GameCharacter : MonoBehaviour {
         this.Animator.SetBool(this.DeathAnimationParameter, true);
     }
 
+    [Button("Debug: Kill")]
     public void Kill() {
         this.GetComponents<Component>().Where(c => c.GetType() != typeof(Transform)).ForEach(Object.Destroy);
-        this.Animator.GetComponents<Component>().Where(c => c.GetType() != typeof(Transform)).ForEach(Object.Destroy);
+        this.Animator.GetComponents<Component>()
+            .Where(c => c.GetType() != typeof(Transform) && c.GetType() != typeof(Animator))
+            .ForEach(Object.Destroy);
+        this.Animator.enabled = false;
         this.OnKilled.Invoke();
     }
 
