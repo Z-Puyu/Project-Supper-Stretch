@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Editor;
 using Project.Scripts.AttributeSystem.Attributes;
@@ -8,7 +7,6 @@ using Project.Scripts.AttributeSystem.GameplayEffects;
 using Project.Scripts.Characters.Player;
 using Project.Scripts.Common;
 using Project.Scripts.Common.GameplayTags;
-using Project.Scripts.Util.Components;
 using SaintsField;
 using UnityEngine;
 using UnityEngine.Events;
@@ -65,20 +63,15 @@ public class DamageDealer : MonoBehaviour {
 
     private void Start() {
         this.TargetDetector.enabled = false;
-        this.enabled = false;
     }
 
-    private void OnEnable() {
+    public void Enable() {
         this.OnAttack.Invoke();
         this.TargetDetector.enabled = true;
     }
 
-    private void OnDisable() {
-        this.TargetDetector.enabled = false;
-    }
-
     public void TryPerformHit() {
-        this.enabled = false;
+        this.TargetDetector.enabled = false;
         if (!this.HasTarget) { 
             return;
         }
@@ -100,11 +93,6 @@ public class DamageDealer : MonoBehaviour {
     }
 
     private bool IsValidHit(GameObject target, Collider at, out HitBox? hitPoint) {
-        bool test1 = target == this.Owner;
-        bool test2 = target.CompareTag(this.Owner.tag);
-        bool test3 = this.FriendlyTags.Contains(target.tag);
-        bool test4 = target.transform.IsChildOf(this.Owner.transform);
-        bool test5 = this.Owner.transform.IsChildOf(target.transform);
         bool isFriendlyTarget = target == this.Owner || target.CompareTag(this.Owner.tag) ||
                                 this.FriendlyTags.Contains(target.tag) ||
                                 target.transform.IsChildOf(this.Owner.transform) ||

@@ -1,8 +1,6 @@
-using Project.Scripts.Common;
 using Project.Scripts.UI.Control.Minimap;
 using Project.Scripts.Util.Singleton;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Project.Scripts.UI.Control;
 

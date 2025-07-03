@@ -1,36 +1,33 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.Util.Singleton;
 using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.Audio;
 
-public class AmbientTrack : MonoBehaviour {
-    [NotNull] 
+[DisallowMultipleComponent]
+public class AmbientTrack : Singleton<AmbientTrack> {
+    [NotNull]
     [field: SerializeField, Required] 
-    private AudioSource? BackgroundMusic { get; set; }
+    private PlayList? BackgroundMusic { get; set; }
     
-    [NotNull] 
+    [NotNull]
     [field: SerializeField, Required] 
-    private AudioSource? CombatMusic { get; set; }
-
+    private PlayList? CombatMusic { get; set; }
+    
     private void Start() {
-        this.CombatMusic.volume = 0;
-        this.BackgroundMusic.volume = 0;
-        this.CombatMusic.Play();
-        this.BackgroundMusic.Play();
-        LeanTween.value(this.BackgroundMusic.gameObject, value => this.BackgroundMusic.volume = value, 0, 1, 2f);
+        this.BackgroundMusic.Stop();
+        this.CombatMusic.Stop();
+        this.BackgroundMusic.FadeInNext();
     }
 
     public void TransitionToCombat() {
-        LeanTween.value(this.BackgroundMusic.gameObject, value => this.BackgroundMusic.volume = value,
-            this.BackgroundMusic.volume, 0, 2f);
-        LeanTween.value(this.BackgroundMusic.gameObject, value => this.CombatMusic.volume = value, 0, 1, 2f);
+        this.BackgroundMusic.FadeOut();
+        this.CombatMusic.FadeInNext();
     }
     
     public void TransitionToBackground() {
-        LeanTween.value(this.BackgroundMusic.gameObject, value => this.BackgroundMusic.volume = value, 0, 1, 2f);
-        LeanTween.value(this.BackgroundMusic.gameObject, value => this.CombatMusic.volume = value,
-            this.CombatMusic.volume, 0, 2f);
+        this.CombatMusic.FadeOut();
+        this.BackgroundMusic.FadeInNext();   
     }
 }

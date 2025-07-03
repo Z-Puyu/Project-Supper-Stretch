@@ -82,6 +82,15 @@ public class AttributeSet : MonoBehaviour, IAttributeReader, IPresentable, IPlay
         }
     }
 
+    public void ChangeHardLimit(string attribute, int by) {
+        if (!this.HardLimits.TryGetValue(attribute, out int limit)) {
+            Logging.Error($"{attribute} does not have a hard limit.", this);
+            return;
+        }
+        
+        this.HardLimits[attribute] = limit + by;
+    }
+
     private void UpdateAttribute(Modifier modifier, float potential) {
         string key = modifier.Target;
         this.PreAttributeUpdate(key);
@@ -306,14 +315,20 @@ public class AttributeSet : MonoBehaviour, IAttributeReader, IPresentable, IPlay
         StringBuilder sb = new StringBuilder();
         foreach (KeyValuePair<string, AttributeType> entry in this.Defined) {
             if (!entry.Value.IsLeaf) {
-                sb.AppendLine();
                 continue;
             }
-            
-            int current = this.ReadCurrent(entry.Key);
-            sb.AppendLine(entry.Value.HowToClamp == AttributeType.ClampPolicy.None
-                    ? $"{entry.Value}: {this.ReadCurrent(entry.Key)}"
-                    : $"{entry.Value}: {this.ReadCurrent(entry.Key)} / {this.ReadMax(entry.Key)}");
+
+            int multiplier = this.Mediator[entry.Key, ModifierType.Multiplier];
+            if (multiplier == 0) {
+                sb.AppendLine(entry.Value.HowToClamp == AttributeType.ClampPolicy.None
+                        ? $"{entry.Value}: {this.ReadCurrent(entry.Key)}"
+                        : $"{entry.Value}: {this.ReadCurrent(entry.Key)} / {this.ReadMax(entry.Key)}");
+            } else {
+                string value = $"{this.ReadCurrent(entry.Key)} ({multiplier:+#;-#;0}%)";
+                sb.AppendLine(entry.Value.HowToClamp == AttributeType.ClampPolicy.None
+                        ? $"{entry.Value}: {value}"
+                        : $"{entry.Value}: {value} / {this.ReadMax(entry.Key)}");
+            }
         }
         
         return sb.ToString();

@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ed4bfbad18b40e7b42737dbd1a6f467, type: 3}
+  m_Name: SuspiciousMeat
+  m_EditorClassIdentifier: 
+  <Type>k__BackingField: Items.FoodIngredient
+  <Name>k__BackingField: Suspicious Meat
+  <Worth>k__BackingField: 5
+  <ItemProperties>k__BackingField:
+  - rid: 1548064581621383275
+  - rid: 1548064581621383276
+  references:
+    version: 2
+    RefIds:
+    - rid: 1548064581621383275
+      type: {class: ConsumablePropertyData, ns: Project.Scripts.Items.Definitions, asm: Project.Scripts.Items}
+      data:
+        <Effects>k__BackingField:
+        - <Target>k__BackingField: CharacterAttributes.Health
+          <Method>k__BackingField: 2
+          <Value>k__BackingField: -10
+          <Duration>k__BackingField: 30
+        - <Target>k__BackingField: CharacterAttributes.Satiation
+          <Method>k__BackingField: 2
+          <Value>k__BackingField: 5
+          <Duration>k__BackingField: 0
+        - <Target>k__BackingField: CharacterAttributes.Toxin
+          <Method>k__BackingField: 2
+          <Value>k__BackingField: 12
+          <Duration>k__BackingField: 0
+        <GameplayEffectOnUse>k__BackingField: {fileID: 11400000, guid: ce5296e21acb56d44a5f82cfc7b53003, type: 2}
+    - rid: 1548064581621383276
+      type: {class: CraftingMaterialPropertyData, ns: Project.Scripts.Items.Definitions, asm: Project.Scripts.Items}
+      data:
+        <Modifiers>k__BackingField:
+        - <Target>k__BackingField: CharacterAttributes.Health
+          <Method>k__BackingField: 0
+          <Value>k__BackingField: 5
+          <Duration>k__BackingField: 0
+        - <Target>k__BackingField: CharacterAttributes.Satiation
+          <Method>k__BackingField: 0
+          <Value>k__BackingField: 5
+          <Duration>k__BackingField: 0
+        - <Target>k__BackingField: CharacterAttributes.Toxin
+          <Method>k__BackingField: 0
+          <Value>k__BackingField: 10
+          <Duration>k__BackingField: 0
+        <Cost>k__BackingField: 0.2

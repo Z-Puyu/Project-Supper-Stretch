@@ -1,4 +1,3 @@
-using System;
 using UnityEngine.Events;
 
 namespace Project.Scripts.UI.Control.MVP.Interfaces;

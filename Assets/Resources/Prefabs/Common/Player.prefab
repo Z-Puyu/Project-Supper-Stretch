@@ -225,7 +225,7 @@ MonoBehaviour:
   <CharacterData>k__BackingField: {fileID: 11400000, guid: 932aecd0fa476384f9fb2272c7baf933, type: 2}
   <AttributeSet>k__BackingField: {fileID: 2237949048826024690}
   <Movement>k__BackingField: {fileID: 8658536185692222552}
-  <IsInvincible>k__BackingField: 1
+  <IsInvincible>k__BackingField: 0
 --- !u!54 &414616920984253660
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2132,6 +2132,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1435015714907449600}
     m_Modifications:
+    - target: {fileID: 2844509695992151975, guid: c53f1b4c7e0c45d4b95b7d556563d182, type: 3}
+      propertyPath: <Policy>k__BackingField
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3440864872215862125, guid: c53f1b4c7e0c45d4b95b7d556563d182, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2500,7 +2504,7 @@ PrefabInstance:
       objectReference: {fileID: 1435015714907449600}
     - target: {fileID: 4613843516510825725, guid: 0bc06685a3944774e8f4f53bdb4275f8, type: 3}
       propertyPath: <DistanceBelowCamera>k__BackingField
-      value: 0.02
+      value: 0.07
       objectReference: {fileID: 0}
     - target: {fileID: 5531453285834009812, guid: 0bc06685a3944774e8f4f53bdb4275f8, type: 3}
       propertyPath: m_Name
@@ -2669,6 +2673,10 @@ PrefabInstance:
     - target: {fileID: 440354129113870287, guid: cf7e95c344afea2419267099531ca37a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3639485424705387702, guid: cf7e95c344afea2419267099531ca37a, type: 3}
+      propertyPath: <Policy>k__BackingField
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8899955074444241125, guid: cf7e95c344afea2419267099531ca37a, type: 3}
       propertyPath: <Root>k__BackingField

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common;
 using Project.Scripts.UI.Control.MVP;
 using UnityEngine;
@@ -16,6 +15,7 @@ public class UIPage : MonoBehaviour {
     [NotNull] public Canvas? Canvas { get; private set; }
     [NotNull] public CanvasGroup? CanvasGroup { get; private set; }
     [NotNull] public IPresenter? MainPresenter { get; private set; }
+    [field: SerializeField] public bool CanBeClosed { get; private set; } = true;
     public bool IsOpen { get; private set; }
     public bool IsClosed => !this.IsOpen;
 

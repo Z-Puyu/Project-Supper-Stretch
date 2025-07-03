@@ -11,6 +11,10 @@ public class AnimatorNotificationProxy : MonoBehaviour {
     
     public void OnAnimatorStateNotification(GameNotification message) {
         if (this.GameNotificationHandlers.TryGetValue(message, out UnityEvent handler)) {
+            if (message == GameNotification.Dead) {
+                int a = 0;
+            }
+            
             handler.Invoke();       
         }
     }

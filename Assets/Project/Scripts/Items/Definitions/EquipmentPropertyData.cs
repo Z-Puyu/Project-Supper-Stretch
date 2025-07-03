@@ -7,7 +7,6 @@ using Project.Scripts.AttributeSystem.Modifiers;
 using Project.Scripts.Items.Equipments;
 using SaintsField;
 using UnityEngine;
-using UnityEngine.Audio;
 
 namespace Project.Scripts.Items.Definitions;
 

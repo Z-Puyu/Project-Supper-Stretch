@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using Project.Scripts.Common;
 using Project.Scripts.Common.Input;
+using Project.Scripts.GameManagement;
 using Project.Scripts.UI.Control.MVP;
-using Project.Scripts.UI.Control.MVP.Components;
+using Project.Scripts.Util.Singleton;
 using UnityEngine;
 
 namespace Project.Scripts.UI.Control;
@@ -15,6 +16,7 @@ public class UIBook : MonoBehaviour, IUserInterface {
     [field: SerializeField] private UserInterfaceAudio? Audio { get; set; }
 
     private void Start() {
+        Singleton<GameInstance>.Instance.PlayerInstance.OnKilled += this.CloseAll;
         foreach (UIPage page in this.GetComponentsInChildren<UIPage>(includeInactive: true)) {
             this.AddNewPage(page);
         }
@@ -89,6 +91,10 @@ public class UIBook : MonoBehaviour, IUserInterface {
             return;
         }
 
+        if (!top.CanBeClosed) {
+            return;
+        }
+        
         top.Close();
         while (this.History.TryPeek(out UIPage prev) && prev.IsClosed) {
             this.History.Pop();

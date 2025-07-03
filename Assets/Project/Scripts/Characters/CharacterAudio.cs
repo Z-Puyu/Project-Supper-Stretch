@@ -1,15 +1,13 @@
-using System;
+using System.Linq;
 using Project.Scripts.Audio;
 using Project.Scripts.Characters.Combat;
 using Project.Scripts.Common;
-using Project.Scripts.Interaction.ObjectDetection;
 using Project.Scripts.Items.Equipments;
 using Project.Scripts.Items.InventorySystem;
 using Project.Scripts.Util.Components;
 using Project.Scripts.Util.Linq;
 using SaintsField;
 using UnityEngine;
-using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace Project.Scripts.Characters;
@@ -44,7 +42,7 @@ public class CharacterAudio : AudioPlayer<CharacterAudio.Sound> {
             }
         };
         this.Character.HealthComponent.OnDeath += _ => {
-            this.AudioSources.ForEach(source => source.Stop());
+            this.AudioSources.Where(source => source).ForEach(source => source.Stop());
             this.Play(Sound.Death);
         };
 

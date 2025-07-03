@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8550111938174931213}
   - component: {fileID: 2032971831703176932}
   - component: {fileID: 8392851929511812219}
+  - component: {fileID: 7065290451676002104}
   m_Layer: 16
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -29,8 +30,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4891713736168078090}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.25340134, y: -0.0000000046925495, z: 0.0000000012292185, w: 0.9673613}
-  m_LocalPosition: {x: 0, y: 2.25, z: -4}
+  m_LocalRotation: {x: -0.06523645, y: 0.39654648, z: 0.028264273, w: 0.9152575}
+  m_LocalPosition: {x: -1.1053737, y: -1.496113, z: 6.257926}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -45,8 +46,8 @@ Camera:
   m_GameObject: {fileID: 4891713736168078090}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -67,15 +68,15 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 1
-  far clip plane: 849.7
+  near clip plane: 0.1
+  far clip plane: 500
   field of view: 60.000004
   orthographic: 0
-  orthographic size: 5
+  orthographic size: 10
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 559615
+    m_Bits: 2093055
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -187,3 +188,17 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 32
   m_MaxRayIntersections: 1
+--- !u!114 &7065290451676002104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4891713736168078090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27a8b1fdce814504ba2c2525e18bfe3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NeighborCellIncludeRadius: 0
+  visibilityLayer: -1

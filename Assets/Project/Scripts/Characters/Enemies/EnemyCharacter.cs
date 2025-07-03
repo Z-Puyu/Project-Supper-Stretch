@@ -1,9 +1,9 @@
-﻿using Project.Scripts.Interaction.ObjectDetection;
-using SaintsField;
-using Project.Scripts.Items;
-using Project.Scripts.Items.InventorySystem;
+﻿using System.Collections.Generic;
+using Project.Scripts.Audio;
+using Project.Scripts.Characters.Enemies.AI;
 using Project.Scripts.Items.InventorySystem.LootContainers;
 using Project.Scripts.Util.Components;
+using Project.Scripts.Util.Singleton;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
@@ -11,10 +11,9 @@ using UnityEngine.AI;
 namespace Project.Scripts.Characters.Enemies;
 
 public class EnemyCharacter : GameCharacter<Enemy> {
-    protected override void Awake() {
-        base.Awake();
-        this.Animator.runtimeAnimatorController = this.CharacterData.Animations;
-    }
+    private static HashSet<EnemyCharacter> AggressiveEnemies { get; } = [];
+
+    [field: SerializeField] private EngagedInCombat? OnCombatStatusChanged { get; set; }
     
     protected override void Start() {
         base.Start();
@@ -22,7 +21,35 @@ public class EnemyCharacter : GameCharacter<Enemy> {
             return;
         }
 
+        if (this.OnCombatStatusChanged) {
+            this.OnCombatStatusChanged.Event += this.RegisterEnemy;
+        }
+
         loot.Inject(this.CharacterData.LootTable!);
+    }
+
+    private void OnDestroy() {
+        if (this.OnCombatStatusChanged) {
+            this.OnCombatStatusChanged.Event -= this.RegisterEnemy;
+        }
+    }
+
+    private void RegisterEnemy(GameObject agent, GameObject _, bool isEngaged) {
+        if (agent != this.gameObject) {
+            return;
+        }
+                
+        if (isEngaged) {
+            EnemyCharacter.AggressiveEnemies.Add(this);
+            if (EnemyCharacter.AggressiveEnemies.Count == 1) {
+                Singleton<AmbientTrack>.Instance.TransitionToCombat();
+            }
+        } else {
+            EnemyCharacter.AggressiveEnemies.Remove(this);
+            if (EnemyCharacter.AggressiveEnemies.Count == 0) {
+                Singleton<AmbientTrack>.Instance.TransitionToBackground();
+            }
+        }
     }
 
     protected override void OnPause() {
@@ -44,6 +71,14 @@ public class EnemyCharacter : GameCharacter<Enemy> {
         
         if (this.TryGetComponent(out BehaviorGraphAgent agent)) {
             agent.enabled = true;
+        }
+    }
+
+    protected override void DyingFrom(GameObject? source) {
+        base.DyingFrom(source);
+        EnemyCharacter.AggressiveEnemies.Remove(this);
+        if (EnemyCharacter.AggressiveEnemies.Count == 0) {
+            Singleton<AmbientTrack>.Instance.TransitionToBackground();
         }
     }
 }

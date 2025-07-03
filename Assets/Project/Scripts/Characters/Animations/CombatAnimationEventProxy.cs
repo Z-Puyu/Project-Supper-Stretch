@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Characters.Combat;
-using Project.Scripts.Characters.Player;
 using Project.Scripts.Items.Equipments;
-using Project.Scripts.Util.Components;
 using SaintsField;
 using UnityEngine;
 
@@ -23,7 +20,7 @@ public class CombatAnimationEventProxy : MonoBehaviour {
     
     [NotNull] [field: SerializeField] private Animator? Animator { get; set; }
     
-    [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Trigger)]
+    [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Int)]
     private int KnockBackTrigger { get; set; }
 
     public void OnBlock(EquipmentSlot where) {
@@ -35,7 +32,7 @@ public class CombatAnimationEventProxy : MonoBehaviour {
     public void OnAttackStart(EquipmentSlot where) {
         if (this.PredefinedWeapons.TryGetValue(where, out DamageDealer? weapon)) {
             this.CurrentWeapon = weapon;
-            weapon.enabled = true;
+            weapon.Enable();
             weapon.OnKnockedBack += this.OnKnockBack;
             return;
         }
@@ -45,11 +42,11 @@ public class CombatAnimationEventProxy : MonoBehaviour {
         }
         
         this.CurrentWeapon = weapon;
-        weapon!.enabled = true;
+        weapon!.Enable();
     }
 
     private void OnKnockBack() {
-        this.Animator.SetTrigger(this.KnockBackTrigger);
+        this.Animator.SetInteger(this.KnockBackTrigger, 1);
         this.CombatComponent.ConcludeStage();
     }
 

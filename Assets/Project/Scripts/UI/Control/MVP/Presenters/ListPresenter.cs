@@ -2,7 +2,6 @@ using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.UI.Control.MVP.Components;
 using Project.Scripts.UI.Control.MVP.Interfaces;
 using UnityEngine;
-using UnityEngine.Pool;
 using Object = UnityEngine.Object;
 
 namespace Project.Scripts.UI.Control.MVP.Presenters;

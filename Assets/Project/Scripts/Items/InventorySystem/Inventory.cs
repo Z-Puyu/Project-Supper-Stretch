@@ -6,7 +6,6 @@ using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.Common;
 using Project.Scripts.Common.Input;
 using Project.Scripts.Items.Equipments;
-using Project.Scripts.Util.Components;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;

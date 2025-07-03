@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Project.Scripts.Items.InventorySystem;
 
 namespace Project.Scripts.Items.CraftingSystem;
 
@@ -13,6 +14,11 @@ public class Recipe {
             : this.Scheme.FormatName(this.Ingredients);
     
     public bool IsEmpty => !this.Ingredients.Any() || this.Scheme is null;
+
+    public void Clear(Inventory inventory) {
+        this.Ingredients.ForEach(ingredient => inventory.Add(ingredient));
+        this.Ingredients.Clear();
+    }
 
     public void AddIngredient(Item item) {
         this.Ingredients.Add(item);

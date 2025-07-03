@@ -1,5 +1,4 @@
-﻿using System;
-using Project.Scripts.Interaction;
+﻿using Project.Scripts.Interaction;
 using Project.Scripts.UI.Control.MVP.Components;
 
 namespace Project.Scripts.UI.Control.MVP.Presenters;

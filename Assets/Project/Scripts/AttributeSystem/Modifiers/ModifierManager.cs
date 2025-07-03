@@ -15,8 +15,7 @@ public class ModifierManager {
     }
 
     private Dictionary<string, Vector3> Modifiers { get; init; } = [];
-    
-    public IEnumerable<string> AffectedAttributes => this.Modifiers.Keys;
+    public int this[string key, ModifierType type] => (int)this.ModifierMagnitude(type, key);
 
     public float ModifierMagnitude(ModifierType type, string key) {
         return type switch {

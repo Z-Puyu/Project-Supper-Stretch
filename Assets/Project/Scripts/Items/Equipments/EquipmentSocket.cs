@@ -1,7 +1,6 @@
 ﻿using System;
 using Project.Scripts.Common;
 using UnityEngine;
-using UnityEngine.Events;
 using Object = UnityEngine.Object;
 
 namespace Project.Scripts.Items.Equipments;

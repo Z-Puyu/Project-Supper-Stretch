@@ -42,4 +42,6 @@ public partial class SearchForHostileTargetAction : Action {
     protected override Status OnUpdate() {
         return this.Target.Value ? Status.Success : Status.Running;
     }
+    
+    
 }

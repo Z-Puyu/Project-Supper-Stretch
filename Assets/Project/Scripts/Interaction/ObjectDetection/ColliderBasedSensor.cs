@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.Interaction.ObjectDetection;

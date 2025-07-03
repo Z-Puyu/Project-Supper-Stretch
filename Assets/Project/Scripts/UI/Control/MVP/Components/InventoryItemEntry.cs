@@ -1,20 +1,21 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Items.Definitions;
 using Project.Scripts.UI.Control.MVP.Interfaces;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Project.Scripts.UI.Control.MVP.Components;
 
-public class InventoryItemEntry : ListEntry, ISelectable {
+public class InventoryItemEntry : ListEntry, ISelectable, IPointerEnterHandler, IPointerExitHandler {
     [NotNull] [field: SerializeField] private GameObject? EquipmentStatus { get; set; }
     [NotNull] [field: SerializeField] private TextMeshProUGUI? Nameplate { get; set; }
     [NotNull] [field: SerializeField] private Image? TypeTag { get; set; }
     [NotNull] [field: SerializeField] private TextMeshProUGUI? ValueTag { get; set; }
     [NotNull] [field: SerializeField] private Button? SelectButton { get; set; }
+    [NotNull] [field: SerializeField] private TooltipTrigger? TooltipTrigger { get; set; }
     
     public event UnityAction OnDeselected = delegate { };
     public event UnityAction OnSelected = delegate { };
@@ -23,6 +24,7 @@ public class InventoryItemEntry : ListEntry, ISelectable {
     public ItemType? ItemType { private get; set; }
     public int Worth { private get; set; }
     public bool IsEquipped { private get; set; }
+    public string Description { private get; set; } = string.Empty;
 
     private void Start() {
         this.SelectButton.onClick.AddListener(this.OnSelected.Invoke);
@@ -44,5 +46,15 @@ public class InventoryItemEntry : ListEntry, ISelectable {
         this.OnSelected = delegate { };
         this.OnDeselected = delegate { };
         base.OnRemove();
+    }
+
+    public void OnPointerEnter(PointerEventData eventData) {
+        this.TooltipTrigger.TooltipHeader = this.ItemName;
+        this.TooltipTrigger.TooltipText = this.Description;
+    }
+    
+    public void OnPointerExit(PointerEventData eventData) {
+        this.TooltipTrigger.TooltipHeader = string.Empty;
+        this.TooltipTrigger.TooltipText = string.Empty;
     }
 }
