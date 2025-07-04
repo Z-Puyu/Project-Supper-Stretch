@@ -2,14 +2,12 @@
 //
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Koenigz.PerfectCulling.IO;
 using UnityEditor;
 using UnityEngine;
-using Object = System.Object;
 
 namespace Koenigz.PerfectCulling
 {

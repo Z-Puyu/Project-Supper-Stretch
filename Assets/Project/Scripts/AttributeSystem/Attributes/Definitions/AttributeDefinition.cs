@@ -5,7 +5,8 @@ namespace Project.Scripts.AttributeSystem.Attributes.Definitions;
 
 [CreateAssetMenu(fileName = "AttributeDefinition", menuName = "Attribute System/Attribute Definition", order = 0)]
 public class AttributeDefinition : GameplayTagTree<AttributeType> {
-    private void Awake() {
+    protected override void Awake() {
+        base.Awake();
         PreorderIterator<AttributeType> iterator = new PreorderIterator<AttributeType>(this.Nodes);
         iterator.ForEach = cleanup;
         this.Traverse(iterator);

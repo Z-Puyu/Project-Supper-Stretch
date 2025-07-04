@@ -225,6 +225,7 @@ MonoBehaviour:
   <CharacterData>k__BackingField: {fileID: 11400000, guid: 932aecd0fa476384f9fb2272c7baf933, type: 2}
   <AttributeSet>k__BackingField: {fileID: 2237949048826024690}
   <Movement>k__BackingField: {fileID: 8658536185692222552}
+  <ExperienceSystem>k__BackingField: {fileID: 7094885825523419196}
   <IsInvincible>k__BackingField: 0
 --- !u!54 &414616920984253660
 Rigidbody:
@@ -1419,7 +1420,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb309507e4194e6ba2d3dc373d09f94d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <AngularSpeed>k__BackingField: 100
+  <AngularSpeed>k__BackingField: 500
   <VerticalRange>k__BackingField: {x: -40, y: 70}
 --- !u!1 &5714443740499907794
 GameObject:
@@ -3000,6 +3001,58 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1435015714907449600}
     m_Modifications:
+    - target: {fileID: 4229700210119313883, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
+      propertyPath: <Owner>k__BackingField
+      value: 
+      objectReference: {fileID: 2112626442620293118}
+    - target: {fileID: 4229700210119313883, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
+      propertyPath: <LevellingCurve>k__BackingField.m_Curve.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4229700210119313883, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
+      propertyPath: <LevellingCurve>k__BackingField.m_Curve.Array.data[1].time
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 4229700210119313883, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
+      propertyPath: <LevellingCurve>k__BackingField.m_Curve.Array.data[2].time
+      value: 99
+      objectReference: {fileID: 0}
+    - target: {fileID: 4229700210119313883, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
+      propertyPath: <LevellingCurve>k__BackingField.m_Curve.Array.data[1].value
+      value: 250
+      objectReference: {fileID: 0}
+    - target: {fileID: 4229700210119313883, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
+      propertyPath: <LevellingCurve>k__BackingField.m_Curve.Array.data[2].value
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 4229700210119313883, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
+      propertyPath: <LevellingCurve>k__BackingField.m_Curve.Array.data[1].inSlope
+      value: 5.3797145
+      objectReference: {fileID: 0}
+    - target: {fileID: 4229700210119313883, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
+      propertyPath: <LevellingCurve>k__BackingField.m_Curve.Array.data[2].inSlope
+      value: 24.540306
+      objectReference: {fileID: 0}
+    - target: {fileID: 4229700210119313883, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
+      propertyPath: <LevellingCurve>k__BackingField.m_Curve.Array.data[1].inWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 4229700210119313883, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
+      propertyPath: <LevellingCurve>k__BackingField.m_Curve.Array.data[1].outSlope
+      value: 5.3797145
+      objectReference: {fileID: 0}
+    - target: {fileID: 4229700210119313883, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
+      propertyPath: <LevellingCurve>k__BackingField.m_Curve.Array.data[2].inWeight
+      value: 0.072737336
+      objectReference: {fileID: 0}
+    - target: {fileID: 4229700210119313883, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
+      propertyPath: <LevellingCurve>k__BackingField.m_Curve.Array.data[2].outSlope
+      value: 24.540306
+      objectReference: {fileID: 0}
+    - target: {fileID: 4229700210119313883, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
+      propertyPath: <LevellingCurve>k__BackingField.m_Curve.Array.data[1].outWeight
+      value: 0.10878458
+      objectReference: {fileID: 0}
     - target: {fileID: 6650552364578380150, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
       propertyPath: m_Name
       value: ExperienceComponent
@@ -3062,6 +3115,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7203918192883576756, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
   m_PrefabInstance: {fileID: 6396502348961251815}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7094885825523419196 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4229700210119313883, guid: a35a4c54e16551d41a6df7ea6701bf72, type: 3}
+  m_PrefabInstance: {fileID: 6396502348961251815}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a0be428cb04401ca8d5172d4910da9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &6528991066831406676
 PrefabInstance:
   m_ObjectHideFlags: 0

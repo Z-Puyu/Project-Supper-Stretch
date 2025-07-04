@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Editor;
+using System.Linq;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.AttributeSystem.Modifiers;
@@ -23,9 +23,13 @@ public class DamageExecution : CustomExecution {
     
     [field: SerializeField, Table] private List<ModifierReaction> ElementalEffects { get; set; } = [];
     
-    private AdvancedDropdownList<string> AllAttributes => ObjectCache<AttributeDefinition>.Instance.Objects.AllTags();
+    private AdvancedDropdownList<string> AllAttributes => GameplayTagTree<AttributeType>.Instances
+                                                                                        .OfType<AttributeDefinition>()
+                                                                                        .AllTags();
     
-    private AdvancedDropdownList<string> AllLeaves => ObjectCache<AttributeDefinition>.Instance.Objects.LeafTags();
+    private AdvancedDropdownList<string> AllLeaves => GameplayTagTree<AttributeType>.Instances
+                                                                                    .OfType<AttributeDefinition>()
+                                                                                    .LeafTags();
     
     protected override IEnumerable<Modifier> Run(AttributeSet target, GameplayEffectExecutionArgs args) {
         if (args.Instigator == null) {

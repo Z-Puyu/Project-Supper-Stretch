@@ -1,8 +1,6 @@
 ﻿// Perfect Culling (C) 2021 Patrick König
 //
 
-using System;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif

@@ -14,6 +14,7 @@ public class ProgressBar : UIView {
 
     public float CurrentValue { private get; set; }
     public float MaxValue { private get; set; }
+    public string ValueLabelText { private get; set; } = string.Empty;
     
     private List<Image> FillSections { get; init; } = [];
     private List<Slider> SliderSections { get; init; } = [];
@@ -71,7 +72,9 @@ public class ProgressBar : UIView {
         
         this.SetCurrentAndMaxValue(this.CurrentValue, this.MaxValue);
         if (this.ValueLabel) {
-            this.ValueLabel.text = $"{this.CurrentValue}/{this.MaxValue}";
+            this.ValueLabel.text = this.ValueLabelText == string.Empty
+                    ? $"{this.CurrentValue}/{this.MaxValue}"
+                    : this.ValueLabelText;
         }
     }
     

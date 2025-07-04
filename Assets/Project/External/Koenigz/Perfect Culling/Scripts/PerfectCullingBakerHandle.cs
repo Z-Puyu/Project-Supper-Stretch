@@ -1,9 +1,6 @@
 ﻿// Perfect Culling (C) 2021 Patrick König
 //
 
-using System;
-using UnityEngine;
-
 namespace Koenigz.PerfectCulling
 {
     /// <summary>

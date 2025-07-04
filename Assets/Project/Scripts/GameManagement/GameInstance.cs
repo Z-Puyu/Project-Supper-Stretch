@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Project.Scripts.Characters;
 using Project.Scripts.Characters.Player;
+using Project.Scripts.Common;
+using Project.Scripts.Items.Definitions;
 using Project.Scripts.Map;
 using Project.Scripts.Util.Linq;
 using SaintsField.Playa;
@@ -47,8 +48,9 @@ public class GameInstance : Singleton<GameInstance> {
     [NotNull] public Transform? PlayerTransform { get; private set; }
     [NotNull] private LoadingScreen? LoadingScreenInstance { get; set; }
     [NotNull] private GameOver? GameOverScreenInstance { get; set; }
-    
+
     private void Start() {
+        Resources.LoadAll<ItemDefinition>("").ForEach(asset => asset.name = asset.name);
         this.LoadGame();
     }
 
@@ -81,6 +83,7 @@ public class GameInstance : Singleton<GameInstance> {
         this.PlayerInstance = Object.Instantiate(this.Player).GetComponent<PlayerCharacter>();
         this.PlayerTransform = this.PlayerInstance.transform;
         this.StartingMap = Object.Instantiate(this.MapGenerator);
+        Logging.Info("Instantiating Objects... Done.", this);
     }
 
     private void InitialiseObjects() {
@@ -91,6 +94,7 @@ public class GameInstance : Singleton<GameInstance> {
         this.LoadingScreenInstance.FlashHintText("Generating Maps...");
         Object.FindAnyObjectByType<NavMeshSurface>().BuildNavMesh();
         this.StartingMap.Begin(_ => this.BeginGame());
+        Logging.Info("Initialising Map... Done.", this);
     }
 
     private void BeginGame() {
@@ -110,5 +114,6 @@ public class GameInstance : Singleton<GameInstance> {
                      this.LoadingScreenInstance.gameObject.SetActive(false);
                      this.PlayerInstance.EnableInput();
                  });
+        Logging.Info("Enabling Scripts... Done.", this);
     }
 }

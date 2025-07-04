@@ -1,11 +1,8 @@
 ﻿// Perfect Culling (C) 2021 Patrick König
 //
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 

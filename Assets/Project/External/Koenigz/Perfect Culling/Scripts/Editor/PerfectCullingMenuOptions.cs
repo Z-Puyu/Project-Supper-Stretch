@@ -2,14 +2,9 @@
 //
 
 #if UNITY_EDITOR
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using Koenigz.PerfectCulling;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Object = UnityEngine.Object;
 
 namespace Koenigz.PerfectCulling
 {

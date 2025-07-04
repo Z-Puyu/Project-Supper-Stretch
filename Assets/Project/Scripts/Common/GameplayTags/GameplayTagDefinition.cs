@@ -1,4 +1,4 @@
-using Editor;
+using System.Linq;
 using SaintsField;
 using UnityEngine;
 
@@ -12,7 +12,11 @@ public class GameplayTagDefinition : GameplayTagTree<GameplayTag> {
     [AdvancedDropdown(nameof(this.All))]
     public string testAll = string.Empty;
     
-    private AdvancedDropdownList<string> Leaves => ObjectCache<GameplayTagDefinition>.Instance.Objects.LeafTags();
+    private AdvancedDropdownList<string> Leaves => GameplayTagTree<GameplayTag>.Instances
+                                                                               .OfType<GameplayTagDefinition>()
+                                                                               .LeafTags();
 
-    private AdvancedDropdownList<string> All => ObjectCache<GameplayTagDefinition>.Instance.Objects.AllTags();
+    private AdvancedDropdownList<string> All => GameplayTagTree<GameplayTag>.Instances
+                                                                            .OfType<GameplayTagDefinition>()
+                                                                            .AllTags();
 }

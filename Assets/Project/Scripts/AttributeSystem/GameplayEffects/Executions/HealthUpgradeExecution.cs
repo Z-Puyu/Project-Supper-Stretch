@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Editor;
+using System.Linq;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.AttributeSystem.Modifiers;
@@ -17,7 +17,9 @@ public class HealthUpgradeExecution : CustomExecution {
 
     [field: SerializeField] private int MaxHealthUpgradeValue { get; set; } = 10;
     
-    private AdvancedDropdownList<string> AllAttributes => ObjectCache<AttributeDefinition>.Instance.Objects.AllTags();
+    private AdvancedDropdownList<string> AllAttributes => GameplayTagTree<AttributeType>.Instances
+                                                                                        .OfType<AttributeDefinition>()
+                                                                                        .AllTags();
     
     protected override IEnumerable<Modifier> Run(AttributeSet target, GameplayEffectExecutionArgs args) {
         AttributeType? type = this.HealthAttribute.Definition<AttributeDefinition, AttributeType>();

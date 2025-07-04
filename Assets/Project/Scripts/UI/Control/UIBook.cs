@@ -83,6 +83,7 @@ public class UIBook : MonoBehaviour, IUserInterface {
     }
 
     public void PreviousPage() {
+        Singleton<TooltipSystem>.Instance.Hide();
         while (this.History.TryPeek(out UIPage page) && page.IsClosed) {
             this.History.Pop();
         }

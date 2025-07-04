@@ -1,19 +1,18 @@
+using System;
+using Project.Scripts.Characters.Player;
+using Project.Scripts.Common;
+
 namespace Project.Scripts.UI.Control.MVP.Presenters;
 
-/*public class ExperienceBarPresenter : ProgressBarPresenter<ExperienceSystem, ExperienceSystem.UIData> {
-    [NotNull] [field: SerializeField] private TextView? LevelText { get; set; }
-
-    public override void Present(ExperienceSystem.UIData data) {
-        this.LevelText.Content = (data.Value.level);
-        this.View.Display((data.Value.xp, data.Value.xpToNextLevel));
+public class ExperienceBarPresenter : ProgressBarPresenter<ExperienceSystem> {
+    private void Start() {
+        ExperienceSystem.OnExperienceChanged += this.UpdateView;
     }
 
-    public override void Refresh() {
-        if (!this.Model) {
-            return;
-        }
-            
-        this.View.Display((this.Model.CurrentXp, this.Model.XpToNextLevel));
-        this.LevelText.Content = (this.Model.CurrentLevel);
+    protected override void UpdateView(ExperienceSystem model) {
+        this.View.CurrentValue = model.CurrentXp;
+        this.View.MaxValue = model.XpToNextLevel;
+        this.View.ValueLabelText = model.CurrentLevel.ToString();
+        this.View.Refresh();  
     }
-}*/
+}

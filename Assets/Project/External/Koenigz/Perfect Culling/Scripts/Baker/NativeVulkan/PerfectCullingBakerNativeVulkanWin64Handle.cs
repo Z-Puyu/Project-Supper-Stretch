@@ -1,11 +1,6 @@
 ﻿// Perfect Culling (C) 2022 Patrick König
 //
 
-using System.Collections;
-using System.Collections.Generic;
-using Koenigz.PerfectCulling;
-using UnityEngine;
-
 namespace Koenigz.PerfectCulling
 {
     public class PerfectCullingBakerNativeVulkanWin64Handle : PerfectCullingBakerHandle

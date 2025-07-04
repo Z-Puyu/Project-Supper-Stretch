@@ -1,5 +1,5 @@
 using System;
-using Editor;
+using System.Linq;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.Common.GameplayTags;
 using SaintsField;
@@ -17,7 +17,11 @@ public record struct ModifierReaction {
     [field: SerializeField, AdvancedDropdown(nameof(this.AllTargets))] 
     public string Reacting { get; private set; }
     
-    private AdvancedDropdownList<string> AllTargets => ObjectCache<AttributeDefinition>.Instance.Objects.AllTags();
+    private AdvancedDropdownList<string> AllTargets => GameplayTagTree<AttributeType>.Instances
+                                                                                     .OfType<AttributeDefinition>()
+                                                                                     .AllTags();
 
-    private AdvancedDropdownList<string> AllSources => ObjectCache<AttributeDefinition>.Instance.Objects.LeafTags();
+    private AdvancedDropdownList<string> AllSources => GameplayTagTree<AttributeType>.Instances
+                                                                                     .OfType<AttributeDefinition>()
+                                                                                     .LeafTags();
 }
