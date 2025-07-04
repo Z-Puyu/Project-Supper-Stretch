@@ -121,6 +121,78 @@ PrefabInstance:
       propertyPath: 'Exits.Array.data[3]'
       value: 
       objectReference: {fileID: 6004635921935370720}
+    - target: {fileID: -7320999845245987488, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: placement.localBounds.m_Center.x
+      value: 0.00000166893
+      objectReference: {fileID: 0}
+    - target: {fileID: -7320999845245987488, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: placement.localBounds.m_Center.y
+      value: -0.099999666
+      objectReference: {fileID: 0}
+    - target: {fileID: -7320999845245987488, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: placement.localBounds.m_Center.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7320999845245987488, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: placement.localBounds.m_Extent.x
+      value: 1.9999998
+      objectReference: {fileID: 0}
+    - target: {fileID: -7320999845245987488, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: placement.localBounds.m_Extent.y
+      value: 2.1000001
+      objectReference: {fileID: 0}
+    - target: {fileID: -7320999845245987488, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: placement.worldBounds.m_Center.x
+      value: 0.00000166893
+      objectReference: {fileID: 0}
+    - target: {fileID: -7320999845245987488, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: placement.worldBounds.m_Center.y
+      value: -0.099999666
+      objectReference: {fileID: 0}
+    - target: {fileID: -7320999845245987488, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: placement.worldBounds.m_Center.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7320999845245987488, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: placement.worldBounds.m_Extent.x
+      value: 1.9999998
+      objectReference: {fileID: 0}
+    - target: {fileID: -7320999845245987488, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: placement.worldBounds.m_Extent.y
+      value: 2.1000001
+      objectReference: {fileID: 0}
+    - target: {fileID: 2976946053732017389, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: volumeBakeData
+      value: 
+      objectReference: {fileID: 11400000, guid: 28ebbbef8c9c93346aca103dc46ee780, type: 2}
+    - target: {fileID: 2976946053732017389, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: bakeGroups.Array.size
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 2976946053732017389, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: 'bakeGroups.Array.data[10].renderers.Array.data[0]'
+      value: 
+      objectReference: {fileID: 3763533405173181605}
+    - target: {fileID: 2976946053732017389, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: 'bakeGroups.Array.data[11].renderers.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1829912285772728068}
+    - target: {fileID: 2976946053732017389, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: 'bakeGroups.Array.data[12].renderers.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2939815656339531127}
+    - target: {fileID: 2976946053732017389, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: 'bakeGroups.Array.data[13].renderers.Array.data[0]'
+      value: 
+      objectReference: {fileID: 877788651326856634}
+    - target: {fileID: 2976946053732017389, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: 'bakeGroups.Array.data[14].renderers.Array.data[0]'
+      value: 
+      objectReference: {fileID: 5986835486091772744}
+    - target: {fileID: 2976946053732017389, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+      propertyPath: 'bakeGroups.Array.data[15].renderers.Array.data[0]'
+      value: 
+      objectReference: {fileID: 5732747335907667971}
     - target: {fileID: 5894143431047852854, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
       propertyPath: m_Name
       value: CorridorWithSideRooms
@@ -186,9 +258,39 @@ PrefabInstance:
       addedObject: {fileID: 2850899665407838291}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+--- !u!23 &877788651326856634 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 4487522224114501449, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+  m_PrefabInstance: {fileID: 3632269164324903667}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &1829912285772728068 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3102221515260403191, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+  m_PrefabInstance: {fileID: 3632269164324903667}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &2939815656339531127 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1919724538922221444, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+  m_PrefabInstance: {fileID: 3632269164324903667}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &3763533405173181605 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 455611498028938838, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+  m_PrefabInstance: {fileID: 3632269164324903667}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3821643786229867709 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 531808802954001998, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+  m_PrefabInstance: {fileID: 3632269164324903667}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &5732747335907667971 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 9072121960722803440, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
+  m_PrefabInstance: {fileID: 3632269164324903667}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &5986835486091772744 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 7025029004684220859, guid: 5af7a2f59b2242e429669f68c21a12b3, type: 3}
   m_PrefabInstance: {fileID: 3632269164324903667}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8771086697790805394

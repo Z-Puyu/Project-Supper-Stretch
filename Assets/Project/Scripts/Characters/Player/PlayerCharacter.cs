@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DunGen;
@@ -34,7 +35,7 @@ public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
     }
 
     public void EnableInput() {
-        this.InputActions.Player.OpenPauseMenu.performed += _ => GameEvents.UI.OnOpenPauseMenu.Invoke();
+        this.InputActions.Player.OpenPauseMenu.performed += _ => GameEvents.UI.OnOpenPauseMenu?.Invoke();
         this.GetComponentsInChildren<IPlayerControllable>().ForEach(control => control.BindInput(this.InputActions));
         Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None)
               .OfType<IUserInterface>()
@@ -100,8 +101,26 @@ public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
             Logging.Info($"{this.gameObject.name} is invincible (DEBUG MODE)", this);
             return;
         }
-        
+
+        this.GetComponentsInChildren<IPlayerControllable>(includeInactive: true)
+            .ForEach(component => component.UnbindInput(this.InputActions));
         this.InputActions.Player.Disable();
         base.DyingFrom(source);
+    }
+
+    public override void Kill() {
+        this.InputActions.Dispose();
+        base.Kill();
+    }
+
+    private void OnDisable() {
+        this.InputActions.Disable();
+    }
+
+    protected override void OnDestroy() {
+        base.OnDestroy();
+        this.GetComponentsInChildren<IPlayerControllable>(includeInactive: true)
+            .ForEach(component => component.UnbindInput(this.InputActions));
+        GameCharacter<Enemy>.OnDeath -= this.CheckDeadEnemy;
     }
 }

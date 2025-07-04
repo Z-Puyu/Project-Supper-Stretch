@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.Characters.Player;
 using Project.Scripts.Common;
@@ -14,6 +15,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.AI;
 using CameraTarget = Project.Scripts.Characters.Player.CameraTarget;
+using Object = UnityEngine.Object;
 
 namespace Project.Scripts.GameManagement;
 
@@ -52,6 +54,9 @@ public class GameInstance : Singleton<GameInstance> {
     [NotNull] private GameOver? GameOverScreenInstance { get; set; }
 
     private void Start() {
+        GameEvents.OnPause = delegate { };
+        GameEvents.OnPlay = delegate { };
+        GameEvents.UI.OnOpenPauseMenu = delegate { };
         Resources.LoadAll<ItemDefinition>("").ForEach(asset => asset.name = asset.name);
         Resources.LoadAll<AttributeDefinition>("").ForEach(asset => asset.name = asset.name);
         Resources.LoadAll<SchemeDefinition>("").ForEach(asset => asset.name = asset.name);
@@ -87,9 +92,11 @@ public class GameInstance : Singleton<GameInstance> {
         Object.Instantiate(this.MainCamera);
         this.Eyes = Camera.main!.transform;
         this.VirtualCamera = Object.Instantiate(this.CinemachineCamera);
-        this.PlayerInstance = Object.Instantiate(this.Player).GetComponent<PlayerCharacter>();
-        this.PlayerTransform = this.PlayerInstance.transform;
         this.StartingMap = Object.Instantiate(this.MapGenerator);
+        Transform playerStart = GameObject.FindGameObjectWithTag("Player").transform;
+        this.PlayerInstance = Object.Instantiate(this.Player, playerStart.position, Quaternion.identity)
+                                    .GetComponent<PlayerCharacter>();
+        this.PlayerTransform = this.PlayerInstance.transform;
         Logging.Info("Instantiating Objects... Done.", this);
     }
 
@@ -122,5 +129,9 @@ public class GameInstance : Singleton<GameInstance> {
                      this.PlayerInstance.EnableInput();
                  });
         Logging.Info("Enabling Scripts... Done.", this);
+    }
+
+    private void OnDestroy() {
+        PlayerCharacter.OnDungeonLevelCleared -= this.StartingMap.Generate;
     }
 }

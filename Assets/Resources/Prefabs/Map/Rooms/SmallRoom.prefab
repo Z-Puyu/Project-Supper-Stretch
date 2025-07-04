@@ -196,7 +196,7 @@ Transform:
   m_GameObject: {fileID: 4363508416187921290}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.67472, y: 0, z: -10.16023}
+  m_LocalPosition: {x: 1.67472, y: -2, z: -12.16023}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -371,7 +371,7 @@ Transform:
   m_GameObject: {fileID: 5372033731331915987}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4, y: 0, z: -2}
+  m_LocalPosition: {x: -4, y: -2, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -458,11 +458,11 @@ MonoBehaviour:
     branchId: -1
     isOnMainPath: 0
     localBounds:
-      m_Center: {x: 0.0000009536743, y: 1.6451962, z: 2}
-      m_Extent: {x: 6.000001, y: 2.4853246, z: 6}
+      m_Center: {x: 0.0000009536743, y: -0.099999666, z: 0}
+      m_Extent: {x: 6.000001, y: 2.1000001, z: 6}
     worldBounds:
-      m_Center: {x: 0.0000009536743, y: 1.6451962, z: 2}
-      m_Extent: {x: 6.000001, y: 2.4853246, z: 6}
+      m_Center: {x: 0.0000009536743, y: -0.099999666, z: 0}
+      m_Extent: {x: 6.000001, y: 2.1000001, z: 6}
     placementParameters:
       archetype: {fileID: 0}
       node:
@@ -658,15 +658,10 @@ MonoBehaviour:
     - {fileID: 7433865935622491332}
     unityBehaviours: []
     vertexCount: 417
-  - groupType: 0
-    renderers:
-    - {fileID: 0}
-    unityBehaviours: []
-    vertexCount: 0
   additionalOccluders: []
-  volumeSize: {x: 14, y: 6, z: 14}
+  volumeSize: {x: 16, y: 6, z: 16}
   volumeBakeData: {fileID: 11400000, guid: b09a67e72aefecc4692492624f63a909, type: 2}
-  bakeCellSize: {x: 2, y: 2, z: 2}
+  bakeCellSize: {x: 1, y: 2, z: 1}
   mergeDownsampleIterations: 1
   visibilityLayer: -1
 --- !u!114 &463754265099769107
@@ -710,7 +705,7 @@ Transform:
   m_GameObject: {fileID: 8747294985669183907}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4, y: 0, z: -2}
+  m_LocalPosition: {x: -4, y: -2, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common;
 using Project.Scripts.Items;
@@ -69,5 +70,10 @@ public class CampMenuCoordinator : MonoBehaviour, IPresenter {
         if (data.Workbench.Recipe is not null) {
             this.RecipeDescription.Present(data);
         }
+    }
+
+    private void OnDestroy() {
+        GameEvents.UI.OnGoBack -= this.ReturnAllIngredients;
+        CampFire.OnCampingSituationUpdated -= this.Present;
     }
 }

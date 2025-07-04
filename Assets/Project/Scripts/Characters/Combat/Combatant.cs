@@ -6,6 +6,7 @@ using Project.Scripts.Items.Equipments;
 using SaintsField;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 using InputActions = Project.Scripts.Common.Input.InputActions;
 using Random = UnityEngine.Random;
 
@@ -47,8 +48,21 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     public event UnityAction OnAttackEnded = delegate { };
 
     private void Start() {
-        GameEvents.OnPause += () => this.IsFrozen = true;
-        GameEvents.OnPlay += () => this.IsFrozen = false;
+        GameEvents.OnPause += this.Freeze;
+        GameEvents.OnPlay += this.Unfreeze;
+    }
+
+    private void OnDestroy() {
+        GameEvents.OnPause -= this.Freeze;
+        GameEvents.OnPlay -= this.Unfreeze;
+    }
+
+    private void Freeze() {
+        this.IsFrozen = true;
+    }
+    
+    private void Unfreeze() {
+        this.IsFrozen = false;
     }
 
     private void CommitStage(int stage) {
@@ -133,8 +147,26 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     }
 
     public void BindInput(InputActions actions) {
-        actions.Player.RightHandAttack.performed += _ => this.CommitNextStage();
-        actions.Player.Block.performed += _ => this.ToggleBlocking(true);
-        actions.Player.Block.canceled += _ => this.ToggleBlocking(false);
+        actions.Player.RightHandAttack.performed += this.OnRightHandAttack;
+        actions.Player.Block.performed += this.OnBlock;
+        actions.Player.Block.canceled += this.OnUnblock;
+    }
+
+    private void OnRightHandAttack(InputAction.CallbackContext _) {
+        this.CommitNextStage();
+    }
+    
+    private void OnBlock(InputAction.CallbackContext _) {
+        this.ToggleBlocking(true);
+    }
+    
+    private void OnUnblock(InputAction.CallbackContext _) {
+        this.ToggleBlocking(false);
+    }
+
+    public void UnbindInput(InputActions actions) {
+        actions.Player.RightHandAttack.performed -= this.OnRightHandAttack;
+        actions.Player.Block.performed -= this.OnBlock;
+        actions.Player.Block.canceled -= this.OnUnblock;
     }
 }

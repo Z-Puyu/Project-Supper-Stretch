@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common;
 using SaintsField;
 using Project.Scripts.Common.Input;
@@ -62,7 +63,12 @@ public class PlayerMovement : MonoBehaviour, IPlayerControllable {
         GameEvents.OnPlay += this.ResumeMovement;
         this.Animator.applyRootMotion = true;
     }
-    
+
+    private void OnDestroy() {
+        GameEvents.OnPause -= this.StopImmediately;
+        GameEvents.OnPlay -= this.ResumeMovement;
+    }
+
     private void StopImmediately() {
         this.Direction = Vector3.zero; // This will stop both movement and rotation :O
         this.IsPaused = true;
@@ -135,18 +141,52 @@ public class PlayerMovement : MonoBehaviour, IPlayerControllable {
     }
 
     public void BindInput(InputActions actions) {
-        actions.Player.Move.performed += parseInput;
-        actions.Player.Move.canceled += _ => this.Direction = Vector3.zero;
-        actions.Player.Run.performed += _ => this.SwitchMode(Mode.Run);
-        actions.Player.Run.canceled += _ => this.SwitchMode(Mode.Walk);
-        actions.Player.Sprint.performed += _ => this.SwitchMode(Mode.Sprint);
-        actions.Player.Sprint.canceled += _ => this.SwitchMode(Mode.Walk);
-        actions.Player.LockWalking.performed += _ => this.Locked = !this.Locked;
-        return;
-        
-        void parseInput(InputAction.CallbackContext context) {
-            Vector2 input = context.ReadValue<Vector2>();
-            this.MoveTowards(new Vector3(input.x, 0, input.y));
-        }
+        actions.Player.Move.performed += this.ParseInput;
+        actions.Player.Move.canceled += this.OnStopMoving;
+        actions.Player.Run.performed += this.OnRun;
+        actions.Player.Run.canceled += this.OnStopRunning;
+        actions.Player.Sprint.performed += this.OnSprint;
+        actions.Player.Sprint.canceled += this.OnStopSprinting;
+        actions.Player.LockWalking.performed += this.OnLockWalking;
+    }
+
+    private void OnStopMoving(InputAction.CallbackContext _) {
+        this.Direction = Vector3.zero;
+    }
+    
+    private void OnLockWalking(InputAction.CallbackContext _) {
+        this.Locked = !this.Locked;
+    }
+    
+    private void OnSprint(InputAction.CallbackContext _) {
+        this.SwitchMode(Mode.Sprint);
+    }
+    
+    private void OnStopSprinting(InputAction.CallbackContext _) {
+        this.SwitchMode(Mode.Walk);
+    }
+    
+    private void OnRun(InputAction.CallbackContext _) {
+        this.SwitchMode(Mode.Run);
+    }
+
+    private void OnStopRunning(InputAction.CallbackContext _) {
+        this.SwitchMode(Mode.Walk);
+    }
+
+    private void ParseInput(InputAction.CallbackContext context) {
+        Vector2 input = context.ReadValue<Vector2>();
+        this.MoveTowards(new Vector3(input.x, 0, input.y));
+    }
+    
+
+    public void UnbindInput(InputActions actions) {
+        actions.Player.Move.performed -= this.ParseInput;
+        actions.Player.Move.canceled -= this.OnStopMoving;
+        actions.Player.Run.performed -= this.OnRun;
+        actions.Player.Run.canceled -= this.OnStopRunning;
+        actions.Player.Sprint.performed -= this.OnSprint;
+        actions.Player.Sprint.canceled -= this.OnStopSprinting;
+        actions.Player.LockWalking.performed -= this.OnLockWalking;
     }
 }

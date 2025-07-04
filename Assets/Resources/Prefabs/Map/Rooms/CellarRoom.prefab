@@ -155,7 +155,7 @@ Transform:
   m_GameObject: {fileID: 2432345326364109966}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -6.22299, y: 0, z: 2.16756}
+  m_LocalPosition: {x: -4.68, y: -7, z: 2.16756}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -471,7 +471,7 @@ Transform:
   m_GameObject: {fileID: 5372033731331915987}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4, y: 0, z: -2}
+  m_LocalPosition: {x: 0, y: -7, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -560,11 +560,11 @@ MonoBehaviour:
     branchId: -1
     isOnMainPath: 0
     localBounds:
-      m_Center: {x: -4.2050104, y: 5.6826267, z: 0}
-      m_Extent: {x: 10.205013, y: 6.485325, z: 8}
+      m_Center: {x: -0.4537182, y: -1.1404858, z: 0}
+      m_Extent: {x: 10.45372, y: 6.1404867, z: 8}
     worldBounds:
-      m_Center: {x: -4.2050104, y: 5.6826267, z: 0}
-      m_Extent: {x: 10.205013, y: 6.485325, z: 8}
+      m_Center: {x: -0.4537182, y: -1.1404858, z: 0}
+      m_Extent: {x: 10.45372, y: 6.1404867, z: 8}
     placementParameters:
       archetype: {fileID: 0}
       node:
@@ -1247,26 +1247,6 @@ MonoBehaviour:
     vertexCount: 362
   - groupType: 0
     renderers:
-    - {fileID: 0}
-    unityBehaviours: []
-    vertexCount: 0
-  - groupType: 0
-    renderers:
-    - {fileID: 0}
-    unityBehaviours: []
-    vertexCount: 0
-  - groupType: 0
-    renderers:
-    - {fileID: 0}
-    unityBehaviours: []
-    vertexCount: 0
-  - groupType: 0
-    renderers:
-    - {fileID: 0}
-    unityBehaviours: []
-    vertexCount: 0
-  - groupType: 0
-    renderers:
     - {fileID: 2261905490510341253}
     unityBehaviours: []
     vertexCount: 2768
@@ -1290,6 +1270,11 @@ MonoBehaviour:
     - {fileID: 4105292723491623380}
     unityBehaviours: []
     vertexCount: 4661
+  - groupType: 0
+    renderers:
+    - {fileID: 7089921465784212806}
+    unityBehaviours: []
+    vertexCount: 24
   additionalOccluders: []
   volumeSize: {x: 22, y: 14, z: 18}
   volumeBakeData: {fileID: 11400000, guid: da418f4f737057b45a8e17da81cf5232, type: 2}
@@ -1338,7 +1323,7 @@ Transform:
   m_GameObject: {fileID: 8277372507285773353}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.67472, y: 0, z: -10.16023}
+  m_LocalPosition: {x: 7.67472, y: -7, z: -10.16023}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1527,7 +1512,7 @@ Transform:
   m_GameObject: {fileID: 8747294985669183907}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4, y: 0, z: -2}
+  m_LocalPosition: {x: 0, y: -7, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5549,15 +5534,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2168374925268541900, guid: c75fc23f05b373f4e86c0b5d1830d5d5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4
+      value: 8.280001
       objectReference: {fileID: 0}
     - target: {fileID: 2168374925268541900, guid: c75fc23f05b373f4e86c0b5d1830d5d5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -7
       objectReference: {fileID: 0}
     - target: {fileID: 2168374925268541900, guid: c75fc23f05b373f4e86c0b5d1830d5d5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 6
+      value: 6.31
       objectReference: {fileID: 0}
     - target: {fileID: 2168374925268541900, guid: c75fc23f05b373f4e86c0b5d1830d5d5, type: 3}
       propertyPath: m_LocalRotation.w
@@ -6894,6 +6879,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 7237153773798679529}
   m_SourcePrefab: {fileID: 100100000, guid: f96442df40a0bf74bbd6431cf2ee05d9, type: 3}
+--- !u!23 &7089921465784212806 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2401526503693211510, guid: f96442df40a0bf74bbd6431cf2ee05d9, type: 3}
+  m_PrefabInstance: {fileID: 4843508853078084144}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8227894957942498857 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3537792449865722905, guid: f96442df40a0bf74bbd6431cf2ee05d9, type: 3}

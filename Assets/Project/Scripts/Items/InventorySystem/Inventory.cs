@@ -104,17 +104,19 @@ public class Inventory : MonoBehaviour, IPresentable, IPlayerControllable {
     }
 
     public void BindInput(InputActions actions) {
-        actions.Player.OpenInventory.performed += open;
-        return;
+        actions.Player.OpenInventory.performed += this.Open;
+    }
 
-        void open(InputAction.CallbackContext context) {
-            Inventory.OnOpen.Invoke(this);
-            actions.Player.Disable();
-            actions.UI.Enable();
-        }
+    public void UnbindInput(InputActions actions) {
+        actions.Player.OpenInventory.performed -= this.Open;
+    }
+    
+    private void Open(InputAction.CallbackContext context) {
+        Inventory.OnOpen.Invoke(this);
     }
 
     public string FormatAsText() {
         return this.ToString();
     }
+    
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common;
 using Project.Scripts.Util.Singleton;
@@ -22,5 +23,9 @@ public class TooltipSystem : Singleton<TooltipSystem> {
     
     public void Hide() {
         this.Tooltip.gameObject.SetActive(false);
+    }
+
+    private void OnDestroy() {
+        GameEvents.UI.OnGoBack -= this.Hide;
     }
 }

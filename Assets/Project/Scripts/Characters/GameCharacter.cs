@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.Characters.Combat;
@@ -65,7 +66,7 @@ public abstract class GameCharacter : MonoBehaviour {
     }
 
     [Button("Debug: Kill")]
-    public void Kill() {
+    public virtual void Kill() {
         this.GetComponents<Component>().Where(c => c.GetType() != typeof(Transform)).ForEach(Object.Destroy);
         this.Animator.GetComponents<Component>()
             .Where(c => c.GetType() != typeof(Transform) && c.GetType() != typeof(Animator))
@@ -77,6 +78,11 @@ public abstract class GameCharacter : MonoBehaviour {
     protected virtual void OnPause() { }
 
     protected virtual void OnPlay() { }
+
+    protected virtual void OnDestroy() {
+        GameEvents.OnPause -= this.OnPause;
+        GameEvents.OnPlay -= this.OnPlay;
+    }
 }
 
 public abstract class GameCharacter<C> : GameCharacter where C : CharacterData {

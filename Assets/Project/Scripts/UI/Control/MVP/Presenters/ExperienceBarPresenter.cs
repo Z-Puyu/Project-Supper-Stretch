@@ -15,4 +15,8 @@ public class ExperienceBarPresenter : ProgressBarPresenter<ExperienceSystem> {
         this.View.ValueLabelText = model.CurrentLevel.ToString();
         this.View.Refresh();  
     }
+
+    private void OnDestroy() {
+        ExperienceSystem.OnExperienceChanged -= this.UpdateView;
+    }
 }

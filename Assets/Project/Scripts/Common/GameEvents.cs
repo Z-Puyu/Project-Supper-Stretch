@@ -9,7 +9,7 @@ public static class GameEvents {
     public static Action<GameNotification, GameObject> OnNotification { get; set; } = delegate { };
 
     public static class UI {
-        public static Action OnOpenPauseMenu = delegate { };
-        public static Action OnGoBack = delegate { };
+        public static Action? OnOpenPauseMenu = delegate { };
+        public static Action? OnGoBack = delegate { };
     }
 }

@@ -28,9 +28,18 @@ public class GameMap : MonoBehaviour {
     }
 
     private void Start() {
-        GoalPoint.OnReached += () => this.RuntimeDungeon.Generator.CurrentDungeon
-                                         .GetComponentsInChildren<GoalPoint>(includeInactive: true)
-                                         .ForEach(point => point.gameObject.SetActive(true));
+        GoalPoint.OnReached += this.OnReachedGoal;
+    }
+
+    private void OnDestroy() {
+        this.RuntimeDungeon.Generator.Clear(false);
+        GoalPoint.OnReached -= this.OnReachedGoal;
+    }
+
+    private void OnReachedGoal() {
+        this.RuntimeDungeon.Generator.CurrentDungeon
+            .GetComponentsInChildren<GoalPoint>(includeInactive: true)
+            .ForEach(point => point.gameObject.SetActive(true));
     }
 
     public void Begin(Action<DungeonGenerator>? onReady = null) {
