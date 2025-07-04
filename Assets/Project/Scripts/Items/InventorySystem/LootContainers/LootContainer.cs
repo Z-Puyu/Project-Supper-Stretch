@@ -6,6 +6,7 @@ using Project.Scripts.Common;
 using SaintsField;
 using Project.Scripts.Interaction;
 using Project.Scripts.Util.Components;
+using Project.Scripts.Util.Singleton;
 using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
@@ -79,15 +80,13 @@ public class LootContainer : MonoBehaviour {
             return 0;
         }
         
-        Func<KeyValuePair<ItemData, int>, float>? weightFunction = !this.LootDropConfig 
-                ? null 
-                : loot => this.LootDropConfig.ComputeDropFactor(loot.Key, loot.Value, parameters);
-        return this.LootTable.ComputeTotalWeight(weightFunction);
+        return this.LootTable.ComputeTotalWeight(parameters);
     }
 
     private void Open(Interactor interactor) {
         if (!this.HasBeenOpenedBefore) {
-            this.DropRandom(new LootDropParameters());
+            int level = interactor.GetSiblingComponent<ExperienceSystem>().CurrentLevel;
+            this.DropRandom(new LootDropParameters(level));
         }
 
         this.CurrentInteractorInventory = interactor.GetSiblingComponent<Inventory>();

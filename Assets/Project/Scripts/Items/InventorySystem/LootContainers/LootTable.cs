@@ -16,6 +16,9 @@ public class LootTable : ScriptableObject, IEnumerable<KeyValuePair<ItemData, in
     [field: InfoBox("Entries local to this table will override entries from the parent table.")]
     private SaintsDictionary<ItemData, int> Loots { get; set; } = [];
     
+    [field: SerializeField, SaintsDictionary("Item", "Weight Curve"), CurveRange(0, 0, 99, 10)]
+    private SaintsDictionary<ItemData, AnimationCurve> WeightCurves { get; set; } = [];
+    
     [field: SerializeField]
     [field: Tooltip("Use this to set key items excluded from table inheritance and not used in weight calculations.")]
     public List<ItemData> AlwaysDrop { get; private set; } = [];
@@ -31,8 +34,18 @@ public class LootTable : ScriptableObject, IEnumerable<KeyValuePair<ItemData, in
         }
     }
 
-    public float ComputeTotalWeight(Func<KeyValuePair<ItemData, int>, float>? calculator = null) {
-        return this.Loots.Sum(entry => calculator?.Invoke(entry) ?? entry.Value);
+    public int WeightOf(ItemData item, LootDropParameters parameters) {
+        if (!this.Loots.TryGetValue(item, out int raw)) {
+            return 0;
+        }
+        
+        return this.WeightCurves.TryGetValue(item, out AnimationCurve curve)
+                ? Mathf.CeilToInt(curve.Evaluate(parameters.PlayerLevel) * raw)
+                : raw;       
+    }
+
+    public float ComputeTotalWeight(LootDropParameters parameters) {
+        return this.Loots.Keys.Sum(item => this.WeightOf(item, parameters));
     }
 
     public IEnumerator<KeyValuePair<ItemData, int>> GetEnumerator() {
@@ -45,5 +58,11 @@ public class LootTable : ScriptableObject, IEnumerable<KeyValuePair<ItemData, in
 
     IEnumerator IEnumerable.GetEnumerator() {
         return this.GetEnumerator();
+    }
+
+    private void OnValidate() {
+        foreach (KeyValuePair<ItemData, int> pair in this.Loots) {
+            this.WeightCurves.TryAdd(pair.Key, AnimationCurve.Constant(0, 99, 1));       
+        }
     }
 }

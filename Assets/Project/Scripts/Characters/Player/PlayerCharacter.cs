@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DunGen;
+using Project.Scripts.Characters.Enemies;
 using Project.Scripts.Common;
 using Project.Scripts.Common.Input;
 using Project.Scripts.Items;
@@ -19,6 +20,7 @@ public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
     
     [NotNull] public InputActions? InputActions { get; private set; }
     [NotNull] [field: SerializeField] private PlayerMovement? Movement { get; set; }
+    [NotNull] [field: SerializeField] private ExperienceSystem? ExperienceSystem { get; set; }
 
     #region Debug
 
@@ -50,7 +52,14 @@ public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
         
         this.OnPlay();
         this.GetComponent<DungenCharacter>().OnTileChanged += PlayerCharacter.OnEnterDungeonRoom;
+        GameCharacter<Enemy>.OnDeath += this.CheckDeadEnemy;
         Logging.Info("Player started", this);
+    }
+
+    private void CheckDeadEnemy(Enemy enemy, GameObject? killer) {
+        if (killer && killer.transform.IsChildOf(this.gameObject.transform)) {
+            this.ExperienceSystem.AddExperience(enemy.Experience);
+        }
     }
 
     public void InitialiseComponents() {

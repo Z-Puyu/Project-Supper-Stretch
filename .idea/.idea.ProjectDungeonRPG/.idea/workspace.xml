@@ -19,228 +19,48 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="563b67d7-83ba-4c0a-a769-7b348254f777" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Interaction/InteractionDescriptor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Interaction/InteractionDescriptor.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProjectDungeonRPG/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProjectDungeonRPG/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.plastic/plastic.changes" beforeDir="false" afterPath="$PROJECT_DIR$/.plastic/plastic.changes" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.plastic/plastic.wktree" beforeDir="false" afterPath="$PROJECT_DIR$/.plastic/plastic.wktree" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Editor.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Editor/Editor.asmdef" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Editor/Editor.asmdef.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Editor/IsExternalInit.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Editor/IsExternalInit.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Editor/ObjectCache.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Editor/ObjectCache.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Editor/UIFrameworkUtils.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Editor/UIFrameworkUtils.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Editor/csc.rsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Editor/csc.rsp.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/DunGen/Code/DunGenSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/DunGen/Code/DunGenSettings.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Ghoul/Assets/Scripts/AnkleGrabberExample.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Ghoul/Assets/Scripts/AnkleGrabberExample.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Materials/M_Ground.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Materials/M_Ground.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Materials/M_Transparent.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Materials/M_Transparent.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Materials/M_Wall_Opaque.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Materials/M_Wall_Opaque.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Scenes/Demo_Portal_Cells.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Scenes/Demo_Portal_Cells.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Scenes/Demo_Prefabs.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Scenes/Demo_Prefabs.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Scenes/Demo_Rooms.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Scenes/Demo_Rooms.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Scripts/FlyCamera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Scripts/FlyCamera.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Scripts/RedCube.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Demos/Scripts/RedCube.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/Native/PerfectCullingBakerNativeWin64.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/Native/PerfectCullingBakerNativeWin64.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/Native/PerfectCullingBakerNativeWin64Handle.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/Native/PerfectCullingBakerNativeWin64Handle.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/NativeVulkan/PerfectCullingBakerNativeVulkanWin64.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/NativeVulkan/PerfectCullingBakerNativeVulkanWin64.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/NativeVulkan/PerfectCullingBakerNativeVulkanWin64Handle.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/NativeVulkan/PerfectCullingBakerNativeVulkanWin64Handle.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/PerfectCullingBaker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/PerfectCullingBaker.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/PerfectCullingBakerFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/PerfectCullingBakerFactory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/Unity/PerfectCullingBakerUnity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/Unity/PerfectCullingBakerUnity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/Unity/PerfectCullingBakerUnityCpuHandle.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/Unity/PerfectCullingBakerUnityCpuHandle.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/Unity/PerfectCullingBakerUnityHandle.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Baker/Unity/PerfectCullingBakerUnityHandle.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Camera/PerfectCullingCamera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Camera/PerfectCullingCamera.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/CustomHandle.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/CustomHandle.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingAlwaysIncludeVolumeEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingAlwaysIncludeVolumeEditor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingCameraEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingCameraEditor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingColorTableEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingColorTableEditor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingExcludeVolumeEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingExcludeVolumeEditor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingMenuOptions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingMenuOptions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingRendererSelectionWindow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingRendererSelectionWindow.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingSceneCullingGroupEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingSceneCullingGroupEditor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingSettingsEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingSettingsEditor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingVolumeEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingVolumeEditor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingVolumeSizeWindow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Editor/PerfectCullingVolumeSizeWindow.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/IO/PerfectCullingBitStreams.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/IO/PerfectCullingBitStreams.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingBakeAbortedYieldInstruction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingBakeAbortedYieldInstruction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingBakeData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingBakeData.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingBakeGroup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingBakeGroup.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingBakeNotStartedYieldInstruction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingBakeNotStartedYieldInstruction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingBakerHandle.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingBakerHandle.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingBakingBehaviour.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingBakingBehaviour.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingBakingManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingBakingManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingColorTable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingColorTable.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingMonoGroup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingMonoGroup.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingPortalCell.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingPortalCell.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingRendererTag.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingRendererTag.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingResourcesLocator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingResourcesLocator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingSceneColor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingSceneColor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingTerrain.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/PerfectCullingTerrain.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/SamplingProviders/ExcludeInsideCollidersSamplingProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/SamplingProviders/ExcludeInsideCollidersSamplingProvider.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/TerrainToMeshUtility.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/TerrainToMeshUtility.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Util/PerfectCullingClustering.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Util/PerfectCullingClustering.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Util/PerfectCullingConstants.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Util/PerfectCullingConstants.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Util/PerfectCullingEditorUtil.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Util/PerfectCullingEditorUtil.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Util/PerfectCullingMath.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Util/PerfectCullingMath.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Util/PerfectCullingMeshSplitting.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Util/PerfectCullingMeshSplitting.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Util/PerfectCullingNullRendererDebugUtilV1.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Util/PerfectCullingNullRendererDebugUtilV1.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Util/PerfectCullingTemp.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Util/PerfectCullingTemp.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Volume/DefaultActiveSamplingProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Volume/DefaultActiveSamplingProvider.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Volume/PerfectCullingAlwaysIncludeVolume.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Volume/PerfectCullingAlwaysIncludeVolume.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Volume/PerfectCullingExcludeVolume.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Volume/PerfectCullingExcludeVolume.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Volume/PerfectCullingVolume.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Volume/PerfectCullingVolume.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Volume/PerfectCullingVolumeBakeData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/Scripts/Volume/PerfectCullingVolumeBakeData.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/bin/x64/pc_renderer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/bin/x64/pc_renderer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/bin/x64/pc_renderer_vulkan.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Koenigz/Perfect Culling/bin/x64/pc_renderer_vulkan.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Vefects/Free Fire VFX URP/Scene/Settings/UniversalRenderPipelineGlobalSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Vefects/Free Fire VFX URP/Scene/Settings/UniversalRenderPipelineGlobalSettings.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Attributes/AttributeSet.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Attributes/AttributeSet.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Attributes/AttributeTypes/AttributeInitialisationData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Attributes/AttributeTypes/AttributeInitialisationData.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Attributes/Definitions/AttributeConversionRule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Attributes/Definitions/AttributeConversionRule.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Attributes/Definitions/AttributeDefinition.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Attributes/Definitions/AttributeDefinition.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Attributes/Definitions/AttributeType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Attributes/Definitions/AttributeType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Attributes/Definitions/CharacterAttributes.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Attributes/Definitions/CharacterAttributes.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/CampFireEffect.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/CampFireEffect.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/ConsumeItemEffect.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/ConsumeItemEffect.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/DigestionEffect.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/DigestionEffect.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/EquipItemEffect.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/EquipItemEffect.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/Executions/AttributeBasedModifier.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/Executions/AttributeBasedModifier.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/Executions/DamageExecution.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/Executions/DamageExecution.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/Executions/HealthUpgradeExecution.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/Executions/HealthUpgradeExecution.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/HealingEffect.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/HealingEffect.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/HungryEffect.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/HungryEffect.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/PoisonedEffect.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/PoisonedEffect.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/StarvedEffect.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/StarvedEffect.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/UnequipItemEffect.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/UnequipItemEffect.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/WeaponDamageEffect.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/GameplayEffects/WeaponDamageEffect.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Modifiers/ModifierData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Modifiers/ModifierData.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Modifiers/ModifierReaction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/AttributeSystem/Modifiers/ModifierReaction.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Combat/DamageDealer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Combat/DamageDealer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/AI/EngagedInCombat.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/AI/EngagedInCombat.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/EnemySpawnPoint.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/EnemySpawnPoint.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Player/New Player Preset.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Player/New Player Preset.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Player/PhysicalConditions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Player/PhysicalConditions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/External/Free medieval weapons/Materials/Swords_low_Swords_OH_AlbedoTransparency.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/External/Free medieval weapons/Materials/Swords_low_Swords_OH_AlbedoTransparency.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/Data.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/Data/DeathBite.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/Data/DeathBite.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/Data/DeathBiteAnimatons.overrideController" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/Data/DeathBiteAnimatons.overrideController.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/Data/Ghoul.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/Data/Ghoul.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/Data/GhoulAnimations.overrideController" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/Data/GhoulAnimations.overrideController.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Player/ExperienceSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Common/ExperienceSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Player/ExperienceSystem.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Common/ExperienceSystem.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Player/PlayerCharacter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Player/PlayerCharacter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Player/PlayerCharacter.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Player/PlayerCharacter.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Common/GameplayTags/GameplayTagDefinition.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Common/GameplayTags/GameplayTagDefinition.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Project.Scripts.Characters.asmdef" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Characters/Project.Scripts.Characters.asmdef" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Common/GameplayTags/GameplayTagTree.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Common/GameplayTags/GameplayTagTree.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Common/GameplayTags/GameplayTagUtil.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Common/GameplayTags/GameplayTagUtil.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/GameManagement/GameInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/GameManagement/GameInstance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/GameManagement/Project.Scripts.GameManagement.asmdef" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/GameManagement/Project.Scripts.GameManagement.asmdef" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/CraftingSystem/ItemProducer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Items/CraftingSystem/ItemProducer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/CraftingSystem/Workbench.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Items/CraftingSystem/Workbench.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Definitions/Item Definition.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Definitions/Item Definition.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Definitions/ItemDefinition.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Definitions/ItemDefinition.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Definitions/ItemDefinition.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Definitions/ItemDefinition.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/AdventurerShield.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/AdventurerShield.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/AncientWarriorShield.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/AncientWarriorShield.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/BlizzardShield.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/BlizzardShield.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/GladiatorShield.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/GladiatorShield.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/GuardianShield.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/GuardianShield.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/KnightShield.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/KnightShield.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/PaladinShield.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/PaladinShield.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/SoldierShield.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/SoldierShield.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/SunlightShield.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/SunlightShield.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/VictoryShield.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Shields/VictoryShield.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Weapons.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Weapons/IronSword.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Equipments/Weapons/IronSword.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/AngelRoot.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/AngelRoot.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/Bone Dust.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/Bone Dust.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/DeathBiteEgg.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/DeathBiteEgg.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/DeathBitePoison.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/DeathBitePoison.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/Decadent Flesh.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/Decadent Flesh.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/HealingMushrooms.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/HealingMushrooms.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/Necrotic Mold.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/Necrotic Mold.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/Salt.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/Salt.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/SuspiciousMeat.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/SuspiciousMeat.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/UnderworldVeins.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/UnderworldVeins.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/Vial Fluid.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/Food/Vial Fluid.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/ItemData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Items/ItemData.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/MVP/Components/PlayerStatsView.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/MVP/Components/PlayerStatsView.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/MVP/Presenters/AttributeBarPresenter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/MVP/Presenters/AttributeBarPresenter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/MVP/Presenters/ItemSlotPresenter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/MVP/Presenters/ItemSlotPresenter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/Tooltip.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/Tooltip.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/TooltipSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/TooltipSystem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/UIBook.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/UIBook.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Util/Components/ScriptUtil.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Util/Components/ScriptUtil.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_AlterRoom.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_AlterRoom.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_AlterRoomAlt.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_AlterRoomAlt.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_BigRoom.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_BigRoom.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_CellarRoom.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_CellarRoom.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_CorridorCorner.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_CorridorCorner.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_CorridorCrossing.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_CorridorCrossing.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_CorridorStraight.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_CorridorStraight.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_CorridorWithSideRooms.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_CorridorWithSideRooms.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_Hallway.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_Hallway.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_LongStairs.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_LongStairs.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_MainLevel.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_MainLevel.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_SmallRoom.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_SmallRoom.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_StairCaseRoom.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_StairCaseRoom.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_TutorialSection.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/OcclusionCulling/Occlusion_TutorialSection.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Occlusion_MainLevel.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Occlusion_MainLevel.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/Common/3rdPersonCamera.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/Common/3rdPersonCamera.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/AltarRoom.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/AltarRoom.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/BigRoom.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/BigRoom.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/CellarRoom.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/CellarRoom.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/CorridorCorner.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/CorridorCorner.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/CorridorStraight.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/CorridorStraight.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/Hallway.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/Hallway.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/LongStaircase.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/LongStaircase.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/SmallRoom.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/SmallRoom.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/StaircaseRoom.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/Rooms/StaircaseRoom.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/StartingMap.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/Map/StartingMap.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/BakingScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/BakingScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Levels/MainLevel.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Levels/MainLevel.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main.unity" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main.unity.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene/NavMesh-NavMesh Surface.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene/NavMesh-NavMesh Surface.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Settings/PC_RPAsset.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/PC_RPAsset.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootContainer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootContainer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootDropParameters.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootDropParameters.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootTable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootTable.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootTables.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootTables/BasicUndeadCreatureLootTable.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootTables/BasicUndeadCreatureLootTable.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootTables/DeathBiteLootTable.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootTables/DeathBiteLootTable.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootTables/GenericLootTable.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootTables/GenericLootTable.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootTables/TreasureChestLootTable.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootTables/TreasureChestLootTable.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootTables/TutorialEnemyLootTable.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootTables/TutorialEnemyLootTable.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootTables/TutorialLootTable.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/Items/InventorySystem/LootContainers/LootTables/TutorialLootTable.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/MVP/Components/ProgressBar.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/MVP/Components/ProgressBar.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/MVP/Presenters/ExperienceBarPresenter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/MVP/Presenters/ExperienceBarPresenter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/Common/Player.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/Common/Player.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/Interactables/TreasureChest.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/Interactables/TreasureChest.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/UI/HUD.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/UI/HUD.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Prefabs/UI/UI.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Prefabs/UI/UI.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -262,7 +82,7 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/Z-Puyu/ProjectDungeonRPG.git&quot;,
+    &quot;url&quot;: &quot;https://github.com/Z-Puyu/Project-Supper-Stretch.git&quot;,
     &quot;accountId&quot;: &quot;1b6b5158-150e-4086-b22b-36cfcd15aac3&quot;
   }
 }</component>
@@ -281,6 +101,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/0b/65960d28/Dictionary`2.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/13/c859e9e6/KeyValuePair`2.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/16/e52aae14/Enum.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/1c/39f44ed5/Int32.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/7f/81e807a1/Enumerable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/aa/3af5e450/HashSet`1.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/bf/056add9c/Action.cs" root0="SKIP_HIGHLIGHTING" />
@@ -316,7 +137,6 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8db6ec373e6d40bd9d38c8037d358c4e46ae00/ab/f0a3bade/RuntimeMethodInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8db6ec373e6d40bd9d38c8037d358c4e46ae00/cf/e2422c3b/Array.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/fb1b42d0fa92462ab0380b5291df41af11600/d1/df488bce/NavMeshAgent.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Editor/ObjectCache.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/AI/AttackAction.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/AI/CacheCurrentTransformAction.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Project/Scripts/Characters/Enemies/AI/CollectNearbyObjectsWithTagAction.cs" root0="FORCE_HIGHLIGHTING" />
@@ -439,15 +259,13 @@
       <option name="PTY_MODE" value="Auto" />
       <method v="2" />
     </configuration>
-    <configuration name="Attach to Unity Editor &amp; Play" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="UNITY_ATTACH_AND_PLAY" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="26936">
+    <configuration name="Attach to Unity Editor &amp; Play" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="UNITY_ATTACH_AND_PLAY" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
-      <option name="pid" value="26936" />
+      <option name="pid" />
       <option name="projectPathOnTarget" />
       <option name="runtimes">
-        <list>
-          <MonoRuntime />
-        </list>
+        <list />
       </option>
       <option name="selectedOptions">
         <list />
@@ -582,6 +400,7 @@
       <workItem from="1751567825158" duration="2287000" />
       <workItem from="1751570751254" duration="219000" />
       <workItem from="1751571043996" duration="2715000" />
+      <workItem from="1751614155292" duration="3846000" />
     </task>
     <task id="LOCAL-00001" summary="Minor changes">
       <option name="closed" value="true" />
