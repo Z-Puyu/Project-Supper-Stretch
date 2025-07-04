@@ -33,6 +33,7 @@ public class AudioPlayer<S> : MonoBehaviour where S : Enum {
             return;       
         }
         
+        this.AudioSources[idx].Stop();
         this.AudioSources[idx].volume = volume;
         this.AudioSources[idx].Play();
     }
@@ -47,6 +48,7 @@ public class AudioPlayer<S> : MonoBehaviour where S : Enum {
     }
     
     public void Play(AudioResource clip, float volume = 1) {
+        this.RuntimeAudio.Stop();
         this.RuntimeAudio.resource = clip;
         this.RuntimeAudio.volume = volume;
         this.RuntimeAudio.loop = false;
