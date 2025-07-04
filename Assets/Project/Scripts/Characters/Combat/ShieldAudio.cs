@@ -14,8 +14,8 @@ public class ShieldAudio : AudioPlayer<ShieldAudio.Sound> {
     }
 
     private void Start() {
-        this.Shield.OnHeldUp += () => this.Play(Sound.Hold, 1);
-        this.Shield.OnBlocked += () => this.Play(Sound.Block, 1);
-        this.Shield.OnParried += () => this.Play(Sound.Parry, 1);       
+        this.Shield.OnHeldUp += () => this.Play(Sound.Hold);
+        this.Shield.OnBlocked += () => this.Play(Sound.Block);
+        this.Shield.OnParried += () => this.Play(Sound.Parry);       
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common;
 using Project.Scripts.Common.Input;
 using Project.Scripts.Items.Equipments;
@@ -40,9 +41,15 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     private Gesture State { get; set; } = Gesture.Idle;
     private int CurrentStage { get; set; }
     private bool CanAttack => this.State is Gesture.Idle or Gesture.PostAttack or Gesture.InAttack;
+    private bool IsFrozen { get; set; }
     
     public event UnityAction OnAttackStarted = delegate { };
     public event UnityAction OnAttackEnded = delegate { };
+
+    private void Start() {
+        GameEvents.OnPause += () => this.IsFrozen = true;
+        GameEvents.OnPlay += () => this.IsFrozen = false;
+    }
 
     private void CommitStage(int stage) {
         this.Animator.SetInteger(this.AnimatorComboCounter, stage);
@@ -53,7 +60,7 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     /// Commit a random attack animation.
     /// </summary>
     public void CommitRandomStage() {
-        if (!this.CanAttack) {
+        if (!this.CanAttack || this.IsFrozen) {
             return;
         }
         
@@ -65,7 +72,7 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     /// Commit the next attack animation.
     /// </summary>
     public void CommitNextStage() {
-        if (!this.CanAttack || !this.EquipmentSet.HasAny<DamageDealer>()) {
+        if (!this.CanAttack || this.IsFrozen || !this.EquipmentSet.HasAny<DamageDealer>()) {
             return;
         }
         
@@ -76,10 +83,18 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     }
     
     public void RegisterStage() {
+        if (this.IsFrozen) {
+            return;
+        }
+        
         this.State = Gesture.InAttack;
     }
 
     public void ConcludeStage() {
+        if (this.IsFrozen) {
+            return;
+        }
+        
         this.State = Gesture.PostAttack;
         this.OnAttackEnded.Invoke();
     }
@@ -88,13 +103,17 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     /// End the current combo and reset the states.
     /// </summary>
     public void EndCombo() {
+        if (this.IsFrozen) {
+            return;
+        }
+        
         this.Animator.SetInteger(this.AnimatorComboCounter, 0);
         this.CurrentStage = 0;
         this.State = Gesture.Idle;
     }
 
     private void ToggleBlocking(bool isBlocking) {
-        if (this.State is Gesture.PreAttack) {
+        if (this.State is Gesture.PreAttack || this.IsFrozen) {
             return;
         }
         

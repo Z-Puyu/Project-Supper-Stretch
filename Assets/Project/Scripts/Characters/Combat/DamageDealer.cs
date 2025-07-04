@@ -79,7 +79,8 @@ public class DamageDealer : MonoBehaviour {
         }
 
         // The attacker chooses what kind of damage to inflict.
-        this.CurrentTarget!.TakeDamage(new Damage(this.StartPosition, this.DamageEffect, this));
+        Vector3 hitPoint = this.transform.position;
+        this.CurrentTarget!.TakeDamage(new Damage(this.StartPosition, hitPoint, this.DamageEffect, this));
         this.CurrentTarget = null;
         this.HasTarget = false;
     }

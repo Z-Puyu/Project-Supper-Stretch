@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Project.Scripts.Characters.Combat;
 
-public readonly record struct Damage(Vector3 Origin, GameplayEffect? Effect, DamageDealer? Source = null, int Multiplier = 100) {
+public readonly record struct Damage(Vector3 Origin, Vector3 HitPoint, GameplayEffect? Effect, DamageDealer? Source = null, int Multiplier = 100) {
     public bool Exists => this.Multiplier > 0;
     
     public static Damage operator *(Damage damage, float multiplier) => damage with {

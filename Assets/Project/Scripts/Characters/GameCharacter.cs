@@ -60,6 +60,8 @@ public abstract class GameCharacter : MonoBehaviour {
     protected virtual void DyingFrom(GameObject? source) {
         Logging.Info($"{this.gameObject.name} killed by {(source ? source.name : "unknown source")}", this);
         this.Animator.SetBool(this.DeathAnimationParameter, true);
+        GameEvents.OnPause -= this.OnPause;
+        GameEvents.OnPlay -= this.OnPlay;
     }
 
     [Button("Debug: Kill")]

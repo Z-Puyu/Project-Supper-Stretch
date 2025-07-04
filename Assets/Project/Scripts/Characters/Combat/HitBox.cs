@@ -28,11 +28,11 @@ public class HitBox : MonoBehaviour {
         hasParried = false;
         bool blocked = false;
         if (this.EquipmentSet && this.EquipmentSet.HasAny(out BlockingZone? shield)) {
-            blocked = shield!.HasBlocked(damage.Origin, out hasParried);
+            blocked = shield!.HasBlocked(damage.HitPoint - damage.Origin, out hasParried);
         }
 
         foreach (BlockingZone blocker in this.PredefinedBlockingZones) {
-            if (!blocker.HasBlocked(damage.Origin, out hasParried)) {
+            if (!blocker.HasBlocked(damage.HitPoint - damage.Origin, out hasParried)) {
                 continue;
             }
 
