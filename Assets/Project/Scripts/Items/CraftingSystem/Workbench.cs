@@ -106,6 +106,21 @@ public class Workbench : MonoBehaviour {
 
         if (current is not null) {
             this.Cost -= current.BaseCraftCost;
+            foreach (Modifier modifier in current.Modifiers.GetModifiers()) {
+                if (this.Modifiers.TryGetValue(modifier, out int count)) {
+                    if (count > 1) {
+                        this.Modifiers[modifier] = count - 1;
+                    } else {
+                        this.Modifiers.Remove(modifier);
+                    }
+                }
+            }
+        }
+
+        foreach (Modifier modifier in next.Modifiers.GetModifiers()) {
+            if (!this.Modifiers.TryAdd(modifier, 1)) {
+                this.Modifiers[modifier] += 1;
+            }    
         }
         
         this.Recipe.Scheme = next;

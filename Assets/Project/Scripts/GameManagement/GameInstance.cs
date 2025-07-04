@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.Characters.Player;
 using Project.Scripts.Common;
+using Project.Scripts.Items.CraftingSystem;
 using Project.Scripts.Items.Definitions;
 using Project.Scripts.Map;
 using Project.Scripts.Util.Linq;
@@ -51,6 +53,8 @@ public class GameInstance : Singleton<GameInstance> {
 
     private void Start() {
         Resources.LoadAll<ItemDefinition>("").ForEach(asset => asset.name = asset.name);
+        Resources.LoadAll<AttributeDefinition>("").ForEach(asset => asset.name = asset.name);
+        Resources.LoadAll<SchemeDefinition>("").ForEach(asset => asset.name = asset.name);
         this.LoadGame();
     }
 
@@ -72,7 +76,10 @@ public class GameInstance : Singleton<GameInstance> {
         Object.Instantiate(this.UI);
         Object.Instantiate(this.PlayerHUD);
         this.GameOverScreenInstance = Object.Instantiate(this.GameOverScreen);
-        this.PlayerInstance.OnKilled += () => this.GameOverScreenInstance.gameObject.SetActive(true);
+        this.PlayerInstance.OnKilled += () => {
+            Cursor.visible = true;
+            this.GameOverScreenInstance.gameObject.SetActive(true);
+        };
     }
 
     private void InstantiateObjects() {

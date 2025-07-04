@@ -13,7 +13,7 @@ namespace Project.Scripts.Items.CraftingSystem;
 public class Scheme : GameplayTagNode {
     [field: SerializeField] private List<string> PossibleProductNames { get; set; } = [];
     [field: SerializeField] public int BaseCraftCost { get; private set; } = 1;
-    [field: SerializeField] public List<Modifier> Modifiers { get; private set; } = [];
+    [field: SerializeField] public List<ModifierData> Modifiers { get; private set; } = [];
     
     public override IList<GameplayTagNode> Children => [];
     

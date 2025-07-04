@@ -82,7 +82,9 @@ public sealed record class Item(ItemType Type, string Name, int Worth, ItemPrope
     }
 
     public string FormatAsText() {
-        return new StringBuilder().AppendJoin("\n\n", this.Properties.Select(prop => prop.FormatAsText())).ToString();
+        return new StringBuilder(this.Name).AppendLine()
+                                           .AppendJoin("\n\n", this.Properties.Select(prop => prop.FormatAsText()))
+                                           .ToString();
     }
 
     public string FormatAsText(ModifierLocalisationMapping mapping) {
