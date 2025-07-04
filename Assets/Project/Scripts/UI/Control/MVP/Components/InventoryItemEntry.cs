@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Items.Definitions;
 using Project.Scripts.UI.Control.MVP.Interfaces;
+using Project.Scripts.Util.Singleton;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -45,6 +46,7 @@ public class InventoryItemEntry : ListEntry, ISelectable, IPointerEnterHandler, 
     public override void OnRemove() {
         this.OnSelected = delegate { };
         this.OnDeselected = delegate { };
+        Singleton<TooltipSystem>.Instance.Hide();
         base.OnRemove();
     }
 

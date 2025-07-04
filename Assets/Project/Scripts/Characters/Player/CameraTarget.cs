@@ -1,3 +1,4 @@
+using System;
 using Project.Scripts.Common;
 using SaintsField;
 using UnityEngine;
@@ -15,11 +16,24 @@ public class CameraTarget : MonoBehaviour {
     private bool IsFrozen { get; set; }
 
     private void Start() {
-        GameEvents.OnPause += () => this.IsFrozen = true;
-        GameEvents.OnPlay += () => this.IsFrozen = false;
+        GameEvents.OnPause += this.Freeze;
+        GameEvents.OnPlay += this.Unfreeze;
         Quaternion rotation = this.transform.rotation;
         this.Pitch = rotation.eulerAngles.x;
         this.Yaw = rotation.eulerAngles.y;   
+    }
+
+    private void OnDestroy() {
+        GameEvents.OnPause -= this.Freeze;
+        GameEvents.OnPlay -= this.Unfreeze;   
+    }
+
+    private void Freeze() {
+        this.IsFrozen = true;
+    }
+    
+    private void Unfreeze() {
+        this.IsFrozen = false;   
     }
 
     private void LateUpdate() {

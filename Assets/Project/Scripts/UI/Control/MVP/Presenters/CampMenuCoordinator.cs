@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common;
 using Project.Scripts.Items;
@@ -6,6 +7,7 @@ using Project.Scripts.Items.CraftingSystem;
 using Project.Scripts.Items.InventorySystem;
 using Project.Scripts.UI.Control.MVP.Components;
 using Project.Scripts.Util.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,7 +22,7 @@ public class CampMenuCoordinator : MonoBehaviour, IPresenter {
     [NotNull] [field: SerializeField] private InventoryListPresenter? FoodInventoryPresenter { get; set; }
     [NotNull] [field: SerializeField] private Button? CookButton { get; set; }
     [NotNull] [field: SerializeField] private RecipePresenter? RecipeDescription { get; set; }
-    [NotNull] [field: SerializeField] private TextView? TimeRemaining { get; set; }
+    [NotNull] [field: SerializeField] private TextMeshProUGUI? TimeRemaining { get; set; }
 
     private void Start() {
         GameEvents.UI.OnGoBack += this.ReturnAllIngredients;
@@ -64,10 +66,14 @@ public class CampMenuCoordinator : MonoBehaviour, IPresenter {
         this.IngredientInventoryPresenter.Present(data.Inventory);
         this.FoodInventoryPresenter.Present(data.Inventory);
         this.CookButton.interactable = data.RemainingTime >= data.CraftDuration;
-        this.TimeRemaining.Content = $"Remaining Time: {data.RemainingTime}";
-        this.TimeRemaining.Refresh();
+        this.TimeRemaining.text = $"Remaining Time: {data.RemainingTime}";
         if (data.Workbench.Recipe is not null) {
             this.RecipeDescription.Present(data);
         }
+    }
+
+    private void OnDestroy() {
+        GameEvents.UI.OnGoBack -= this.ReturnAllIngredients;
+        CampFire.OnCampingSituationUpdated -= this.Present;
     }
 }

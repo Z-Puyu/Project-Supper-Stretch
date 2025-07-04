@@ -22,7 +22,9 @@ public class BlockingZone : MonoBehaviour {
     public event UnityAction OnParried = delegate { };
     
     private void Awake() {
-        this.Self = this.UseLocalCoordinates ? this.transform : this.transform.root;
+        this.Self = this.UseLocalCoordinates
+                ? this.transform
+                : this.transform.GetComponentInParent<Animator>().transform;
     }
 
     private void OnEnable() {
@@ -39,13 +41,13 @@ public class BlockingZone : MonoBehaviour {
         this.CanParry = false;
     }
 
-    public bool HasBlocked(Vector3 damageSource, out bool hasParried) {
+    public bool HasBlocked(Vector3 damageDirection, out bool hasParried) {
         if (!this.IsBlocking) {
             hasParried = false;
             return false;       
         }
         
-        float angle = Vector3.SignedAngle(this.Self.forward, damageSource - this.Self.position, this.Self.up);
+        float angle = Vector3.SignedAngle(this.Self.forward, -damageDirection, this.Self.up);
         hasParried = this.CanParry;
         bool blocked = angle < this.BlockingAngleRange.y && angle > this.BlockingAngleRange.x;
         if (!blocked) {

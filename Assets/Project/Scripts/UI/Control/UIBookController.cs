@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.Common;
 using Project.Scripts.Items.CraftingSystem;
@@ -26,5 +27,14 @@ public class UIBookController : MonoBehaviour {
         Inventory.OnOpen += this.Book.Open<InventoryCoordinator>;
         LootContainer.OnOpen += this.Book.Open<LootContainerCoordinator>;
         CampFire.OnOpen += this.Book.Open<CampMenuCoordinator>;
+    }
+
+    private void OnDestroy() {
+        GameEvents.UI.OnGoBack -= this.Book.PreviousPage;
+        GameEvents.UI.OnOpenPauseMenu = delegate { };
+        AttributeSet.OnOpen -= this.Book.Open<PlayerStatsPresenter>;
+        Inventory.OnOpen -= this.Book.Open<InventoryCoordinator>;
+        LootContainer.OnOpen -= this.Book.Open<LootContainerCoordinator>;
+        CampFire.OnOpen -= this.Book.Open<CampMenuCoordinator>;   
     }
 }

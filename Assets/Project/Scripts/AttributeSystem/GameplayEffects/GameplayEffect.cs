@@ -31,7 +31,7 @@ public class GameplayEffect : ScriptableObject {
         AttributeSet target, GameplayEffectExecutionArgs args, out IEnumerable<Modifier> outcome
     ) {
         return this.HasLevel
-                ? this.Executor.Execute(target, args, out outcome)
-                : this.Executor.Execute(target, args, out outcome, this.LevelEffect.Evaluate(args.Level));
+                ? this.Executor.Execute(target, args, out outcome, this.LevelEffect.Evaluate(args.Level))
+                : this.Executor.Execute(target, args, out outcome);
     }
 }

@@ -26,9 +26,10 @@ public class Tabs : MonoBehaviour {
         if (this.TabSelector.AllowMultipleSelection) {
             Logging.Warn("Should not allow multiple selection for tabs.", this);
         }
-
+        
         this.TabSelector.OnSelected += this.GoTo;
         this.TabSelector.OnDeselected += this.Close;
+        this.TabSelector.gameObject.SetActive(true);
         this.AllTabs.Where(tab => tab != this.CurrentTab).ForEach(tab => tab.SetActive(false));
     }
 

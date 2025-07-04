@@ -184,7 +184,7 @@ Transform:
   m_GameObject: {fileID: 5372033731331915987}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4, y: 0, z: 0}
+  m_LocalPosition: {x: -22, y: 7, z: -16}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -269,11 +269,11 @@ MonoBehaviour:
     branchId: -1
     isOnMainPath: 0
     localBounds:
-      m_Center: {x: 18, y: -8.1, z: 15.999995}
-      m_Extent: {x: 22, y: 12.1, z: 2.1000051}
+      m_Center: {x: 0, y: -0.10000038, z: -0.000004529953}
+      m_Extent: {x: 22, y: 13.1, z: 2.100005}
     worldBounds:
-      m_Center: {x: 18, y: -8.1, z: 15.999995}
-      m_Extent: {x: 22, y: 12.1, z: 2.1000051}
+      m_Center: {x: 0, y: -0.10000038, z: -0.000004529953}
+      m_Extent: {x: 22, y: 13.1, z: 2.100005}
     placementParameters:
       archetype: {fileID: 0}
       node:
@@ -665,7 +665,7 @@ MonoBehaviour:
     unityBehaviours: []
     vertexCount: 24
   additionalOccluders: []
-  volumeSize: {x: 46, y: 26, z: 6}
+  volumeSize: {x: 60, y: 40, z: 20}
   volumeBakeData: {fileID: 11400000, guid: 4ed9e679fd412624889a31d07bac81e4, type: 2}
   bakeCellSize: {x: 2, y: 2, z: 2}
   mergeDownsampleIterations: 1

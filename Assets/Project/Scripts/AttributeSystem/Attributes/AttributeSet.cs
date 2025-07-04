@@ -15,6 +15,7 @@ using Project.Scripts.Common.Input;
 using Project.Scripts.Util.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 namespace Project.Scripts.AttributeSystem.Attributes;
 
@@ -50,13 +51,26 @@ public class AttributeSet : MonoBehaviour, IAttributeReader, IPresentable, IPlay
         this.Id = Guid.Parse(this.Identifier);
     }
 
+    private void Freeze() {
+        this.IsFrozen = true;
+    }
+    
+    private void Unfreeze() {
+        this.IsFrozen = false;
+    }
+
     private void Start() {
-        GameEvents.OnPause += () => this.IsFrozen = true;
-        GameEvents.OnPlay += () => this.IsFrozen = false;
+        GameEvents.OnPause += this.Freeze;
+        GameEvents.OnPlay += this.Unfreeze;
         PreorderIterator<AttributeType> iterator = new PreorderIterator<AttributeType>(this.Source.Nodes);
         iterator.ForEach = attribute => this.Defined.Add(attribute.Name, attribute);
         this.Source.Traverse(iterator);
         this.NextUpdateTime = Time.time + 1;
+    }
+
+    private void OnDestroy() {
+        GameEvents.OnPause -= this.Freeze;
+        GameEvents.OnPlay -= this.Unfreeze;
     }
 
     public void Initialise(IEnumerable<AttributeInitialisationData> initial, params GameplayEffect[] effects) {
@@ -335,6 +349,14 @@ public class AttributeSet : MonoBehaviour, IAttributeReader, IPresentable, IPlay
     }
 
     public void BindInput(InputActions actions) {
-        actions.Player.OpenCharacterPanel.performed += _ => AttributeSet.OnOpen.Invoke(this);
+        actions.Player.OpenCharacterPanel.performed += this.OnOpenCharacterPanel;
+    }
+
+    private void OnOpenCharacterPanel(InputAction.CallbackContext _) {
+        AttributeSet.OnOpen.Invoke(this);
+    }
+
+    public void UnbindInput(InputActions actions) {
+        actions.Player.OpenCharacterPanel.performed -= this.OnOpenCharacterPanel;
     }
 }

@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common.Input;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Project.Scripts.Interaction;
 
@@ -101,6 +103,18 @@ public class Interactor : MonoBehaviour, IPlayerControllable {
     }
 
     public void BindInput(InputActions actions) {
-        actions.Player.Interact.performed += _ => this.Interact();
+        actions.Player.Interact.performed += this.OnInteract;
+    }
+
+    public void UnbindInput(InputActions actions) {
+        actions.Player.Interact.performed -= this.OnInteract;       
+    }
+
+    private void OnInteract(InputAction.CallbackContext _) {
+        this.Interact();
+    }
+
+    private void OnDestroy() {
+        InteractableObject.OnDestroyed -= this.Remove;      
     }
 }

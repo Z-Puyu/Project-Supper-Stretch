@@ -53,7 +53,7 @@ public class EnemyCharacter : GameCharacter<Enemy> {
     }
 
     protected override void OnPause() {
-        base.OnPause();
+        base.OnPause(); 
         if (this.TryGetComponent(out NavMeshAgent navmeshAgent)) {
             navmeshAgent.enabled = false;
         }

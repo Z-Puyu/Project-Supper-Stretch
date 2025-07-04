@@ -6,6 +6,7 @@ using Project.Scripts.GameManagement;
 using Project.Scripts.UI.Control.MVP;
 using Project.Scripts.Util.Singleton;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Project.Scripts.UI.Control;
 
@@ -16,6 +17,8 @@ public class UIBook : MonoBehaviour, IUserInterface {
     [field: SerializeField] private UserInterfaceAudio? Audio { get; set; }
 
     private void Start() {
+        this.Pages.Clear();
+        this.History.Clear();
         Singleton<GameInstance>.Instance.PlayerInstance.OnKilled += this.CloseAll;
         foreach (UIPage page in this.GetComponentsInChildren<UIPage>(includeInactive: true)) {
             this.AddNewPage(page);
@@ -78,7 +81,7 @@ public class UIBook : MonoBehaviour, IUserInterface {
         }
         
         if (this.History.Count == 1) {
-            GameEvents.OnPause.Invoke();
+            GameEvents.OnPause?.Invoke();
         }
     }
 
@@ -106,7 +109,7 @@ public class UIBook : MonoBehaviour, IUserInterface {
         }
 
         if (this.History.Count == 0) {
-            GameEvents.OnPlay.Invoke();
+            GameEvents.OnPlay?.Invoke();
         }
     }
 
@@ -132,10 +135,18 @@ public class UIBook : MonoBehaviour, IUserInterface {
             }
         }
         
-        GameEvents.OnPlay.Invoke();
+        GameEvents.OnPlay?.Invoke();
     }
 
     public void BindInput(InputActions actions) {
-        actions.UI.GoBack.performed += _ => this.PreviousPage();
+        actions.UI.GoBack.performed += this.OnGoBack;
+    }
+
+    public void UnbindInput(InputActions actions) {
+        actions.UI.GoBack.performed -= this.OnGoBack;   
+    }
+    
+    private void OnGoBack(InputAction.CallbackContext _) {
+        this.PreviousPage();
     }
 }

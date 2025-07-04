@@ -1,10 +1,12 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common;
 using Project.Scripts.Common.Input;
 using Project.Scripts.Items.Equipments;
 using SaintsField;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 using InputActions = Project.Scripts.Common.Input.InputActions;
 using Random = UnityEngine.Random;
 
@@ -40,9 +42,28 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     private Gesture State { get; set; } = Gesture.Idle;
     private int CurrentStage { get; set; }
     private bool CanAttack => this.State is Gesture.Idle or Gesture.PostAttack or Gesture.InAttack;
+    private bool IsFrozen { get; set; }
     
     public event UnityAction OnAttackStarted = delegate { };
     public event UnityAction OnAttackEnded = delegate { };
+
+    private void Start() {
+        GameEvents.OnPause += this.Freeze;
+        GameEvents.OnPlay += this.Unfreeze;
+    }
+
+    private void OnDestroy() {
+        GameEvents.OnPause -= this.Freeze;
+        GameEvents.OnPlay -= this.Unfreeze;
+    }
+
+    private void Freeze() {
+        this.IsFrozen = true;
+    }
+    
+    private void Unfreeze() {
+        this.IsFrozen = false;
+    }
 
     private void CommitStage(int stage) {
         this.Animator.SetInteger(this.AnimatorComboCounter, stage);
@@ -53,7 +74,7 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     /// Commit a random attack animation.
     /// </summary>
     public void CommitRandomStage() {
-        if (!this.CanAttack) {
+        if (!this.CanAttack || this.IsFrozen) {
             return;
         }
         
@@ -65,7 +86,7 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     /// Commit the next attack animation.
     /// </summary>
     public void CommitNextStage() {
-        if (!this.CanAttack || !this.EquipmentSet.HasAny<DamageDealer>()) {
+        if (!this.CanAttack || this.IsFrozen || !this.EquipmentSet.HasAny<DamageDealer>()) {
             return;
         }
         
@@ -76,10 +97,18 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     }
     
     public void RegisterStage() {
+        if (this.IsFrozen) {
+            return;
+        }
+        
         this.State = Gesture.InAttack;
     }
 
     public void ConcludeStage() {
+        if (this.IsFrozen) {
+            return;
+        }
+        
         this.State = Gesture.PostAttack;
         this.OnAttackEnded.Invoke();
     }
@@ -88,13 +117,17 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     /// End the current combo and reset the states.
     /// </summary>
     public void EndCombo() {
+        if (this.IsFrozen) {
+            return;
+        }
+        
         this.Animator.SetInteger(this.AnimatorComboCounter, 0);
         this.CurrentStage = 0;
         this.State = Gesture.Idle;
     }
 
     private void ToggleBlocking(bool isBlocking) {
-        if (this.State is Gesture.PreAttack) {
+        if (this.State is Gesture.PreAttack || this.IsFrozen) {
             return;
         }
         
@@ -114,8 +147,26 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     }
 
     public void BindInput(InputActions actions) {
-        actions.Player.RightHandAttack.performed += _ => this.CommitNextStage();
-        actions.Player.Block.performed += _ => this.ToggleBlocking(true);
-        actions.Player.Block.canceled += _ => this.ToggleBlocking(false);
+        actions.Player.RightHandAttack.performed += this.OnRightHandAttack;
+        actions.Player.Block.performed += this.OnBlock;
+        actions.Player.Block.canceled += this.OnUnblock;
+    }
+
+    private void OnRightHandAttack(InputAction.CallbackContext _) {
+        this.CommitNextStage();
+    }
+    
+    private void OnBlock(InputAction.CallbackContext _) {
+        this.ToggleBlocking(true);
+    }
+    
+    private void OnUnblock(InputAction.CallbackContext _) {
+        this.ToggleBlocking(false);
+    }
+
+    public void UnbindInput(InputActions actions) {
+        actions.Player.RightHandAttack.performed -= this.OnRightHandAttack;
+        actions.Player.Block.performed -= this.OnBlock;
+        actions.Player.Block.canceled -= this.OnUnblock;
     }
 }

@@ -32,10 +32,7 @@ MonoBehaviour:
         - Sashimi
         - Sushi
         <BaseCraftCost>k__BackingField: 1
-        <Modifiers>k__BackingField:
-        - <Target>k__BackingField: CharacterAttributes.ElementalResistance.Poison
-          <Method>k__BackingField: 0
-          <Value>k__BackingField: 50
+        <Modifiers>k__BackingField: []
     - rid: 1548064563266584738
       type: {class: Scheme, ns: Project.Scripts.Items.CraftingSystem, asm: Project.Scripts.Items}
       data:
@@ -48,30 +45,36 @@ MonoBehaviour:
         <BaseCraftCost>k__BackingField: 4
         <Modifiers>k__BackingField:
         - <Target>k__BackingField: CharacterAttributes.Satiation
-          <Method>k__BackingField: 2
-          <Value>k__BackingField: 15
-        - <Target>k__BackingField: CharacterAttributes.Health
-          <Method>k__BackingField: 2
+          <Method>k__BackingField: 1
           <Value>k__BackingField: 10
+          <Duration>k__BackingField: 0
+        - <Target>k__BackingField: CharacterAttributes.Health
+          <Method>k__BackingField: 1
+          <Value>k__BackingField: 10
+          <Duration>k__BackingField: 0
         - <Target>k__BackingField: CharacterAttributes.Toxin
-          <Method>k__BackingField: 2
+          <Method>k__BackingField: 1
           <Value>k__BackingField: -10
+          <Duration>k__BackingField: 0
     - rid: 1548064563266584739
       type: {class: Scheme, ns: Project.Scripts.Items.CraftingSystem, asm: Project.Scripts.Items}
       data:
         <Namespace>k__BackingField: CookingMethods
-        <Path>k__BackingField: Roasting
-        <Tag>k__BackingField: Roasting
+        <Path>k__BackingField: Grilling
+        <Tag>k__BackingField: Grilling
         <PossibleProductNames>k__BackingField:
         - Skewer
+        - Grill
         <BaseCraftCost>k__BackingField: 2
         <Modifiers>k__BackingField:
+        - <Target>k__BackingField: CharacterAttributes.Toxin
+          <Method>k__BackingField: 1
+          <Value>k__BackingField: -20
+          <Duration>k__BackingField: 0
         - <Target>k__BackingField: CharacterAttributes.ElementalResistance.Fire
           <Method>k__BackingField: 0
           <Value>k__BackingField: 20
-        - <Target>k__BackingField: CharacterAttributes.Toxin
-          <Method>k__BackingField: 2
-          <Value>k__BackingField: -20
+          <Duration>k__BackingField: 0
     - rid: 1548064563266584740
       type: {class: Scheme, ns: Project.Scripts.Items.CraftingSystem, asm: Project.Scripts.Items}
       data:
@@ -83,9 +86,15 @@ MonoBehaviour:
         - Dim Sum
         <BaseCraftCost>k__BackingField: 2
         <Modifiers>k__BackingField:
-        - <Target>k__BackingField: CharacterAttributes.Satiation
-          <Method>k__BackingField: 2
-          <Value>k__BackingField: 10
         - <Target>k__BackingField: CharacterAttributes.Toxin
-          <Method>k__BackingField: 2
-          <Value>k__BackingField: -10
+          <Method>k__BackingField: 1
+          <Value>k__BackingField: -15
+          <Duration>k__BackingField: 0
+        - <Target>k__BackingField: CharacterAttributes.ElementalResistance.Ice
+          <Method>k__BackingField: 0
+          <Value>k__BackingField: 15
+          <Duration>k__BackingField: 0
+        - <Target>k__BackingField: CharacterAttributes.ElementalResistance.Poison
+          <Method>k__BackingField: 0
+          <Value>k__BackingField: 10
+          <Duration>k__BackingField: 0
