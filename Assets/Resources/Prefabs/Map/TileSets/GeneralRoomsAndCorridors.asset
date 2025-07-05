@@ -15,8 +15,8 @@ MonoBehaviour:
   TileWeights:
     Weights:
     - Value: {fileID: 5894143431047852854, guid: bcf15fa352bbc7a47966dd6a59797078, type: 3}
-      MainPathWeight: 5
-      BranchPathWeight: 5
+      MainPathWeight: 12
+      BranchPathWeight: 12
       DepthWeightScale:
         serializedVersion: 2
         m_Curve:
@@ -99,8 +99,8 @@ MonoBehaviour:
         m_RotationOrder: 4
       TileSet: {fileID: 11400000}
     - Value: {fileID: 5894143431047852854, guid: 40b17d5ea085acf45ae8909a1a06935a, type: 3}
-      MainPathWeight: 5
-      BranchPathWeight: 5
+      MainPathWeight: 10
+      BranchPathWeight: 10
       DepthWeightScale:
         serializedVersion: 2
         m_Curve:
@@ -127,8 +127,8 @@ MonoBehaviour:
         m_RotationOrder: 4
       TileSet: {fileID: 11400000}
     - Value: {fileID: 5894143431047852854, guid: fa97670a2a4b135418fb04b7c8bad3f6, type: 3}
-      MainPathWeight: 5
-      BranchPathWeight: 5
+      MainPathWeight: 15
+      BranchPathWeight: 15
       DepthWeightScale:
         serializedVersion: 2
         m_Curve:
@@ -155,8 +155,8 @@ MonoBehaviour:
         m_RotationOrder: 4
       TileSet: {fileID: 11400000}
     - Value: {fileID: 5894143431047852854, guid: e763a66d1f60b0b4c806c0de19680b3e, type: 3}
-      MainPathWeight: 2
-      BranchPathWeight: 1
+      MainPathWeight: 1
+      BranchPathWeight: 2
       DepthWeightScale:
         serializedVersion: 2
         m_Curve:
@@ -183,8 +183,8 @@ MonoBehaviour:
         m_RotationOrder: 4
       TileSet: {fileID: 0}
     - Value: {fileID: 6161232767533829823, guid: d9bb0cc5e8afa5b40937abd68b12d0a2, type: 3}
-      MainPathWeight: 2
-      BranchPathWeight: 1
+      MainPathWeight: 1
+      BranchPathWeight: 2
       DepthWeightScale:
         serializedVersion: 2
         m_Curve:
@@ -212,7 +212,7 @@ MonoBehaviour:
       TileSet: {fileID: 0}
     - Value: {fileID: 5894143431047852854, guid: 24ef0095e649e77488d9a8d6049ef47e, type: 3}
       MainPathWeight: 3
-      BranchPathWeight: 3
+      BranchPathWeight: 5
       DepthWeightScale:
         serializedVersion: 2
         m_Curve:
