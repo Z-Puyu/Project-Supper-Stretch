@@ -54,6 +54,7 @@ The starting and hitting locations will be used to check if the damage is blocke
 - Improved combat action smoothness
 - Improved occlusion culling to reduce incorrect culling effects
 - Improved responsiveness of tooltips
+- Adjusted enemy AI detection sensitivity and spawn rate
 
 4 July 2025
 
