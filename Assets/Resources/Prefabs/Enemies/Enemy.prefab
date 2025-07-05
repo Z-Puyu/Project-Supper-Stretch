@@ -242,17 +242,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2338763738182679783, guid: 4711be97dbe12a948b28009a3c4abacf, type: 3}
+      propertyPath: <DetectionRadius>k__BackingField
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 6515065716296360349, guid: 4711be97dbe12a948b28009a3c4abacf, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7031320103961345704, guid: 4711be97dbe12a948b28009a3c4abacf, type: 3}
       propertyPath: m_Name
       value: SensorComponent
       objectReference: {fileID: 0}
     - target: {fileID: 8200872181876852007, guid: 4711be97dbe12a948b28009a3c4abacf, type: 3}
+      propertyPath: <DetectionRadius>k__BackingField
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 8200872181876852007, guid: 4711be97dbe12a948b28009a3c4abacf, type: 3}
       propertyPath: <EscapingDistance>k__BackingField
-      value: 100
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 8200872181876852007, guid: 4711be97dbe12a948b28009a3c4abacf, type: 3}
       propertyPath: <LineOfSightMask>k__BackingField.m_Bits
@@ -2194,7 +2202,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 3102320914029080481}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a9d39d6e91741588fbccbb960057628, type: 3}
   m_Name: 
@@ -2205,7 +2213,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 3102320914029080481}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a9d39d6e91741588fbccbb960057628, type: 3}
   m_Name: 
