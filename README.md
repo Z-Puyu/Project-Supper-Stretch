@@ -44,6 +44,15 @@ The starting and hitting locations will be used to check if the damage is blocke
 
 ## Changelog
 
+8 July 2025: General Enhancements
+
+- Adjusted ratio of room types in procedural maps
+- Added new room types
+- Adjusted enemy spawn rates
+- Added new enemy types
+- Added a simple boss fight
+- Fixed UI bugs
+
 5 July 2025: Hotfixes
 
 - Fixed a bug causing food items to not be reflected in the inventory after cooking
