@@ -80,6 +80,7 @@ namespace DunGen
 			if(visualsRoot != null)
 			{
 				var tileObj = GameObject.Instantiate(tile.Prefab, visualsRoot);
+				tileObj.name = $"DEBUG_VISUALS_{tile.Prefab.name}";
 				tileObj.transform.localPosition = tile.Placement.Position;
 				tileObj.transform.localRotation = tile.Placement.Rotation;
 
@@ -96,12 +97,11 @@ namespace DunGen
 			else
 				BranchPathTiles.Remove(tile);
 
-			GameObject tileInstance;
-			if(tileVisuals.TryGetValue(tile, out tileInstance))
+			if (tileVisuals.TryGetValue(tile, out var tileInstance))
 			{
 				GameObject.DestroyImmediate(tileInstance);
 				tileVisuals.Remove(tile);
-			}	
+			}
 		}
 
 		internal void ConnectOverlappingDoorways(float globalChance, DungeonFlow dungeonFlow, RandomStream randomStream)

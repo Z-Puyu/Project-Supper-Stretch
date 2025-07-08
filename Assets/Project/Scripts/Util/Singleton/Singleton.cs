@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using Project.Scripts.Util.Linq;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Project.Scripts.Util.Singleton;
@@ -35,6 +37,9 @@ public class Singleton<T> : MonoBehaviour where T : Component {
             return;
         }
 
+        Object.FindObjectsByType<T>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+              .Where(t => t != this)
+              .ForEach(Object.Destroy);
         if (this.ShouldNotDestroyOnLoad) {
             this.transform.SetParent(null);
             if (!Singleton<T>.instance) {

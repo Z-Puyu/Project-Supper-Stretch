@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SaintsField;
 using UnityEngine;
 using UnityEngine.Events;
@@ -8,11 +9,19 @@ namespace Project.Scripts.Interaction.ObjectDetection;
 public abstract class Sensor : MonoBehaviour {
     [field: SerializeField, Tag] private List<string> WatchedTags { get; set; } = [];
     [field: SerializeField] private List<GameObject> ToggleActivationByDetection { get; set; } = [];
-    
-    public event UnityAction<Collider> OnDetected = delegate { };
-    public event UnityAction<Collider> OnTargetLost = delegate { };
+
+    public event UnityAction<Collider>? OnDetected;
+    public event UnityAction<Collider>? OnTargetLost;
+
+    protected void OnDestroy() {
+        this.OnDetected = null;
+        this.OnTargetLost = null;       
+    }
 
     protected virtual bool IsValidTarget(Collider other) {
+        bool test1 = other.transform.root.gameObject != this.transform.root.gameObject;
+        bool test2 = this.WatchedTags.Count == 0;
+        bool test3 = this.WatchedTags.Exists(other.CompareTag);
         return other.transform.root.gameObject != this.transform.root.gameObject &&
                (this.WatchedTags.Count == 0 || this.WatchedTags.Exists(other.CompareTag));
     }
@@ -27,11 +36,11 @@ public abstract class Sensor : MonoBehaviour {
         }
 
         foreach (GameObject obj in this.ToggleActivationByDetection) {
-            obj.SetActive(!obj.activeInHierarchy);
+            obj.SetActive(true);
         }
 
         this.Register(other);
-        this.OnDetected.Invoke(other);
+        this.OnDetected?.Invoke(other);
     }
     
     protected void Forget(Collider other) {
@@ -41,10 +50,10 @@ public abstract class Sensor : MonoBehaviour {
 
         this.ToggleActivationByDetection.RemoveAll(obj => !obj);
         foreach (GameObject obj in this.ToggleActivationByDetection) {
-            obj.SetActive(!obj.activeInHierarchy);       
+            obj.SetActive(false);       
         }
             
         this.Unregister(other);
-        this.OnTargetLost.Invoke(other);
+        this.OnTargetLost?.Invoke(other);
     }
 }

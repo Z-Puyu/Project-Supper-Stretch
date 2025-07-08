@@ -1,9 +1,10 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common;
 using Project.Scripts.Common.Input;
 using Project.Scripts.Items.Equipments;
+using Project.Scripts.Util.Linq;
 using SaintsField;
+using SaintsField.Playa;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -22,13 +23,15 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
         Defensive
     }
     
-    [NotNull]
-    [field: SerializeField]
-    private Animator? Animator { get; set; }
-    
     [NotNull] [field: SerializeField] private EquipmentSet? EquipmentSet { get; set; }
     
     [field: SerializeField, MinValue(0)] private int ComboLength { get; set; } = 3;
+    
+    [NotNull]
+    [field: SerializeField, LayoutStart("Animator Settings", ELayout.Foldout)]
+    private Animator? Animator { get; set; }
+    
+    [field: SerializeField, Required] private GameObject? CharacterModel { get; set; }
     
     [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Int)]
     private int AnimatorComboCounter { get; set; }
@@ -39,13 +42,22 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Bool)]
     private int AnimatorBlockingStateParameter { get; set; }
     
+    [field: AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Trigger)]
+    private int AnimatorBlockTrigger { get; set; }
+    
     private Gesture State { get; set; } = Gesture.Idle;
     private int CurrentStage { get; set; }
     private bool CanAttack => this.State is Gesture.Idle or Gesture.PostAttack or Gesture.InAttack;
     private bool IsFrozen { get; set; }
-    
-    public event UnityAction OnAttackStarted = delegate { };
-    public event UnityAction OnAttackEnded = delegate { };
+
+    public event UnityAction? OnAttackStarted;
+    public event UnityAction? OnAttackEnded;
+
+    private void Awake() {
+        if (this.CharacterModel) {
+            this.CharacterModel.GetComponentsInChildren<HitBox>().ForEach(hitbox => hitbox.OnBlocked += this.ReactToBlock);
+        }
+    }
 
     private void Start() {
         GameEvents.OnPause += this.Freeze;
@@ -55,6 +67,8 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     private void OnDestroy() {
         GameEvents.OnPause -= this.Freeze;
         GameEvents.OnPlay -= this.Unfreeze;
+        this.OnAttackStarted = null;
+        this.OnAttackEnded = null;
     }
 
     private void Freeze() {
@@ -63,6 +77,10 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
     
     private void Unfreeze() {
         this.IsFrozen = false;
+    }
+    
+    private void ReactToBlock() {
+        this.Animator.SetTrigger(this.AnimatorBlockTrigger);
     }
 
     private void CommitStage(int stage) {
@@ -93,7 +111,7 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
         this.State = Gesture.PreAttack;
         this.CommitStage(this.CurrentStage % this.ComboLength + 1);
         this.CurrentStage += 1;
-        this.OnAttackStarted.Invoke();
+        this.OnAttackStarted?.Invoke();
     }
     
     public void RegisterStage() {
@@ -110,7 +128,7 @@ public class Combatant : MonoBehaviour, IPlayerControllable {
         }
         
         this.State = Gesture.PostAttack;
-        this.OnAttackEnded.Invoke();
+        this.OnAttackEnded?.Invoke();
     }
 
     /// <summary>

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Project.Scripts.Common.GameplayTags;
 using Project.Scripts.Items;
@@ -19,9 +20,16 @@ public class ItemSlotPresenter : UIPresenter<Item, ItemSlotView>, IDropHandler {
                                                                                   .OfType<ItemDefinition>()
                                                                                   .AllTags();
 
-    private event UnityAction OnItemRemoved = delegate { };
-    public event UnityAction<Item> OnItemReturned = delegate { };
-    public event UnityAction<Item> OnItemAdded = delegate { };
+    private event UnityAction? OnItemRemoved;
+    public event UnityAction<Item>? OnItemReturned;
+    public event UnityAction<Item>? OnItemAdded;
+
+    protected override void OnDestroy() {
+        base.OnDestroy();
+        this.OnItemRemoved = null;
+        this.OnItemReturned = null;
+        this.OnItemAdded = null;
+    }
 
     protected override void UpdateView(Item model) {
         if (this.TryGetComponent(out DragAndDrop dragAndDrop)) {
@@ -38,8 +46,8 @@ public class ItemSlotPresenter : UIPresenter<Item, ItemSlotView>, IDropHandler {
     private void Erase() {
         this.View.Clear();
         this.View.Refresh();
-        this.OnItemRemoved.Invoke();
-        this.OnItemRemoved = delegate { };
+        this.OnItemRemoved?.Invoke();
+        this.OnItemRemoved = null;
     }
 
     public void OnDrop(PointerEventData eventData) {
@@ -55,7 +63,7 @@ public class ItemSlotPresenter : UIPresenter<Item, ItemSlotView>, IDropHandler {
 
             this.Present(item);
             preview.Source.Drop();
-            this.OnItemAdded.Invoke(item);
+            this.OnItemAdded?.Invoke(item);
         } else {
             preview.Source.Drop(isSuccessful: false);
         }

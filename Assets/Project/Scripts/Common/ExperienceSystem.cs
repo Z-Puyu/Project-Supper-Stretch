@@ -25,17 +25,16 @@ public class ExperienceSystem : MonoBehaviour {
 
     public void AddExperience(int experience) {
         this.CurrentXp += experience;
-        Debug.Log($"Gained {experience} xp. Current: {this.CurrentXp} / {this.XpToNextLevel}");
-        if (this.CurrentXp >= this.XpToNextLevel) {
+        ExperienceSystem.OnExperienceChanged.Invoke(this);
+        while (this.CurrentXp >= this.XpToNextLevel) {
             this.LevelUp();
         }
-        
-        ExperienceSystem.OnExperienceChanged.Invoke(this);
     }
 
     private void LevelUp() {
         this.CurrentXp -= this.XpToNextLevel;
         this.CurrentLevel += 1;
         this.XpToNextLevel = Mathf.FloorToInt(this.LevellingCurve.Evaluate(this.CurrentLevel));
+        ExperienceSystem.OnExperienceChanged.Invoke(this);
     }
 }

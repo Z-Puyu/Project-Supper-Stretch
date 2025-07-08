@@ -12,9 +12,9 @@ public class RadioButtons : ToggleGroup {
 
     [field: SerializeField] private List<Toggle> Default { get; set; } = [];
     [field: SerializeField] public bool AllowMultipleSelection { get; private set; }
-    
-    public event UnityAction<int> OnSelected = delegate { };
-    public event UnityAction<int> OnDeselected = delegate { };
+
+    public event UnityAction<int>? OnSelected;
+    public event UnityAction<int>? OnDeselected;
 
     protected override void Awake() {
         base.Awake();
@@ -34,6 +34,12 @@ public class RadioButtons : ToggleGroup {
         }
     }
 
+    protected override void OnDestroy() {
+        base.OnDestroy();
+        this.OnSelected = null;
+        this.OnDeselected = null;
+    }
+
     private void OnButtonToggled(int index, bool toggled) {
         if (this.IsUpdating) {
             return;
@@ -43,7 +49,7 @@ public class RadioButtons : ToggleGroup {
         if (!this.AllowMultipleSelection && toggled) {
             this.CurrentSelection.ForEach(toggle => toggle.isOn = false);
             for (int i = 0; i < this.CurrentSelection.Count; i += 1) {
-                this.OnDeselected.Invoke(i);
+                this.OnDeselected?.Invoke(i);
             }
             
             this.CurrentSelection.Clear(); 
@@ -51,10 +57,10 @@ public class RadioButtons : ToggleGroup {
         
         if (toggled) {
             this.CurrentSelection.Add(this.Options[index]);
-            this.OnSelected.Invoke(index);
+            this.OnSelected?.Invoke(index);
         } else {
             this.CurrentSelection.Remove(this.Options[index]);
-            this.OnDeselected.Invoke(index);
+            this.OnDeselected?.Invoke(index);
         }
         
         this.IsUpdating = false;

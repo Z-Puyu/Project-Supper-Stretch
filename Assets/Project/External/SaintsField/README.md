@@ -3,6 +3,8 @@
 [![unity_version](https://github.com/TylerTemp/SaintsField/assets/6391063/c01626a1-9329-4c26-be31-372f8704df1d)](https://unity.com/download)
 [![license_mit](https://github.com/TylerTemp/SaintsField/assets/6391063/a093811a-5dbc-46ad-939e-a9e207ae5bfb)](https://github.com/TylerTemp/SaintsField/blob/master/LICENSE)
 [![openupm](https://img.shields.io/npm/v/today.comes.saintsfield?label=OpenUPM&registry_uri=https://package.openupm.com)](https://openupm.com/packages/today.comes.saintsfield/)
+[![Percentage of issues still open](https://isitmaintained.com/badge/open/TylerTemp/SaintsField.svg)](http://isitmaintained.com/project/TylerTemp/SaintsField "Percentage of issues still open")
+[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/TylerTemp/SaintsField.svg)](http://isitmaintained.com/project/TylerTemp/SaintsField "Average time to resolve an issue")
 [![openupm](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=Downloads&query=%24.downloads&suffix=%2Fmonth&url=https%3A%2F%2Fpackage.openupm.com%2Fdownloads%2Fpoint%2Flast-month%2Ftoday.comes.saintsfield)](https://openupm.com/packages/today.comes.saintsfield/)
 [![repo-stars](https://img.shields.io/github/stars/TylerTemp/SaintsField)](https://github.com/TylerTemp/SaintsField/)
 
@@ -101,10 +103,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**4.19.0**
+**4.21.0**
 
-1.  You can now use `$:ClassName.CallbackName` or `$:ClassName.FieldName` to call a static/const value/method in most place like `ShowIf/HideIf`, `EnableIf/DisableIf`, `RequiredIf`, `BelowImage/AboveImage` etc.
-2.  When a callback returns a `null` result, `AboveImage`, `BelowImage` now shows nothing, instead of giving an error notice.
+1.  UI Toolkit: Add `SaintsHashSet<T>` & `ReferenceHashSet<T>` data type as serializable `HashSet` [#251](https://github.com/TylerTemp/SaintsField/issues/251)
+2.  Saints XPath now can compare `[@{myProp} = false]` if `myProp` is a bool type
+3.  UI Toolkit: Fix `SaintsDictionary` paging button can not click
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -124,6 +127,12 @@ See [the full change log](https://github.com/TylerTemp/SaintsField/blob/master/C
     *   `<field />`, `<field.subField/>`, `<field.subField=formatControl />` read the value from the field first, if tag has sub-field, continue to read, then use `string.Format` if there is a `formatControl`. See the example below.
     *   `<container.Type />` for the class/struct name of the container of the field
     *   `<container.Type.BaseType />` for the class/struct name of the field's container's parent
+    *   `<index />`, `<index=formatControl />` for the index if the target is an array/list
+
+    Note about format control:
+
+    *   If the format contains `{}`, it will be used like a `string.Format`. E.g. `<field.subField=(--<color=red>{0}</color>--)/>` will be interpreted like `string.Format("(--<color=red>{0}</color>--)", this.subField)`.
+    *   Otherwise, it will be re-written to `{0:formatControl}`. E.g. `<index=D4/>` will be interpreted like `string.Format("{0:D4}", index)`.
 
     `null` means no label
 
@@ -249,6 +258,15 @@ public class SubField : MonoBehaviour
 ```
 
 [![video](https://github.com/user-attachments/assets/dc65d897-fcbf-4a40-b4aa-d99a8a4975a7)](https://github.com/user-attachments/assets/a6d93600-500b-4a0e-bf2d-9f2e8fb8bc32)
+
+Example of quoted fancy formatting:
+
+```csharp
+[RichLabel("<field=\">><color=yellow>{0}</color><<\"/> <index=\"[<color=blue>>></color>{0}<color=blue><<</color>]\"/>")]
+public string[] sindices;
+```
+
+![Image](https://github.com/user-attachments/assets/8232e42e-21ec-43ec-92c3-fbfeaebe4de1)
 
 #### `AboveRichLabel` / `BelowRichLabel` ####
 
@@ -4864,20 +4882,25 @@ public class CustomEventExample : SaintsMonoBehaviour
 
 A simple color palette tool to select a color from a list of colors.
 
+Use `Window` - `Saints` - `Color Palette` to manage the color palette.
+
 **Parameters**:
 
-*   `string[] names`: the display name of the palette. If null, it'll use all the palette in the project. If it starts with `$`, then a property/callback will be invoked,
-    which should either returns a string for the display name, or the `SaintsField.ColorPalette` instance.
+*   `string[] names`: the tags of the palette. If null, it'll use all the palette in the project. If it starts with `$`, then a property/callback will be invoked,
+    which should returns a string (or a collection of string) for the tags.
 *   Allow Multiple: No
 
 ```csharp
 [ColorPalette] public Color allPalette;
-[ColorPalette("TestPalette")] public Color fromOnePalette;
 ```
 
-[![video](https://github.com/user-attachments/assets/737e1f93-5860-433c-8add-09b4128f4854)](https://github.com/user-attachments/assets/47f0aebd-aa61-49a9-b4e6-fd1bf3ce31f8)
+[![video](https://github.com/user-attachments/assets/7cec6366-e731-4cd1-9d13-a6b0f0f2fa1c)](https://github.com/user-attachments/assets/e5b93ec2-ab77-47d9-9e3b-15f87fd5cecd)
 
-You can add/modify/remove color palette in the `Window/Saints/Color Palette` menu.
+`Window` - `Saints` - `Color Palette`:
+
+[![video](https://github.com/user-attachments/assets/526bb4e9-990b-4d7a-8bba-6293e880ee78)](https://github.com/user-attachments/assets/30c2613c-c8c5-4a3e-b188-fb03e8b06ee7)
+
+[![video](https://github.com/user-attachments/assets/f58da949-7d2a-4a52-b2d7-237d7747e88a)](https://github.com/user-attachments/assets/cbbe5269-09f3-49c1-ac02-5ea49d256d9d)
 
 #### `Searchable` ####
 
@@ -5932,6 +5955,41 @@ Compared to [Serialize Interfaces!](https://assetstore.unity.com/packages/tools/
 
 *   It supports UI Toolkits too.
 *   Many SaintsField attributes can work together with this one, especially these auto getters, validators etc.
+
+### `SaintsHashSet<>` / `ReferenceHashSet<>` ###
+
+> [!WARNING]
+> UI Toolkit only. (IMGUI will have only default drawer)
+
+A serializable `HashSet<>` for normal type and `SerializedReference` type. Duplicated element will have a warning color.
+
+You can use `SaintsHashSet` attribute to control paging & searching
+
+Parameters:
+
+*   `bool searchable = true`: `false` to disable the search function
+*   `int numberOfItemsPerPage = 0`: how many items per page. `0` for no paging
+
+```csharp
+public SaintsHashSet<string> stringHashSet;  // default
+
+[SaintsHashSet(numberOfItemsPerPage: 5)]  // paging control
+public SaintsHashSet<int> integerHashSet = new SaintsHashSet<int>
+{
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+};
+
+public interface IReference
+{
+    string Name { get; }
+}
+
+// ... implement of IReference omited here
+
+public ReferenceHashSet<IReference> refHashSet;
+```
+
+[![video](https://github.com/user-attachments/assets/0ff1ce5a-6432-4aba-bfda-d71f5f56a54f)](https://github.com/user-attachments/assets/8e01cb94-b8bb-49fb-ac58-384ec3c9c2a4)
 
 ## Addressable ##
 

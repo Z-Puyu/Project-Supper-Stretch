@@ -96,7 +96,9 @@ namespace DunGen
 			if (this == null)
 				return;
 
+#pragma warning disable 0219 // Ignore warning about unused variable in non-editor builds
 			bool isDirty = false;
+#pragma warning restore 0219
 
 			// Upgrade to StraighteningSettings
 			if (fileVersion < 1)

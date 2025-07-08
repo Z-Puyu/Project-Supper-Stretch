@@ -21,9 +21,14 @@ public class CharacterComponent : MonoBehaviour {
     public Component? Component { get; private set; }
     
     [field: SerializeField] private Transform? Anchor { get; set; }
+    private Vector3 PositionOffset { get; set; }
 
     private void Start() {
         this.Owner = this.GetComponentInParent<GameCharacter>();
+        if (this.Anchor) {
+            this.PositionOffset = this.transform.localPosition; 
+        }
+        
         if (!this.Owner) {
             Logging.Error("The character component is not attached to a game character", this);
             return;
@@ -39,13 +44,13 @@ public class CharacterComponent : MonoBehaviour {
                 this.gameObject.SetActive(true);
                 break;
             case LifeCycle.AlwaysAlive:
-                this.Owner.OnKilled += () => this.GetComponentsInChildren<Behaviour>()
+                this.Owner.OnKilled += () => this.GetComponents<Behaviour>()
                                                  .ForEach(behaviour => behaviour.enabled = false);
                 break;
         }
     }
 
-    private void WakeUp() {
+    private void WakeUp() { 
         this.gameObject.SetActive(true);
         this.GetComponentsInChildren<Behaviour>().Where(c => !c.enabled).ForEach(c => c.enabled = true);
         this.GetComponentsInChildren<Collider>().Where(c => !c.enabled).ForEach(c => c.enabled = true);
@@ -53,7 +58,7 @@ public class CharacterComponent : MonoBehaviour {
 
     private void Update() {
         if (this.Anchor) {
-            this.transform.position = this.Anchor.position;
+            this.transform.position = this.Anchor.position + this.PositionOffset;
         }
     }
 }

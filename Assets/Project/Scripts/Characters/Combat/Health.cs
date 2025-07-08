@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Util.Linq;
 using SaintsField;
 using UnityEngine;
@@ -19,14 +20,19 @@ public abstract class Health : MonoBehaviour {
     protected int Max { get; private set; }
     
     private GameObject? LastAttacker { get; set; }
-    
-    public event UnityAction<int> OnDamaged = delegate { };
-    public event UnityAction<GameObject?> OnDeath = delegate { };
+
+    public event UnityAction? OnDamaged;
+    public event UnityAction<GameObject?>? OnDeath;
     
     protected abstract bool IsAttributeBased { get; }
 
     protected virtual void Start() {
         this.Root.GetComponentsInChildren<HitBox>().ForEach(hitbox => hitbox.OnHit += this.TakeDamage);
+    }
+
+    protected void OnDestroy() {
+        this.OnDamaged = null;
+        this.OnDeath = null;
     }
 
     public virtual void Initialise() { }
@@ -35,7 +41,7 @@ public abstract class Health : MonoBehaviour {
         int @new = this.Max >= 0 ? Mathf.Clamp(health, 0, this.Max) : health;
         this.Current = @new;
         if (this.Current <= 0) {
-            this.OnDeath.Invoke(this.LastAttacker);
+            this.OnDeath?.Invoke(this.LastAttacker);
         }
     }
 
@@ -46,13 +52,9 @@ public abstract class Health : MonoBehaviour {
         }
     }
 
-    protected virtual void TakeDamage(Damage damage, HitBoxTag where = HitBoxTag.Generic) {
-        this.LastAttacker = damage.Source ? damage.Source.gameObject : null;
-        this.OnDamaged.Invoke(Random.Range(0, 2 * damage.Multiplier / 100));
-    }
-
-    public virtual void TakeDamage(int amount) {
-        this.OnDamaged.Invoke(amount);
+    protected virtual void TakeDamage(Damage damage, GameObject? source, HitBoxTag where = HitBoxTag.Generic) {
+        this.LastAttacker = source;
+        this.OnDamaged?.Invoke();
     }
 
     public abstract void Heal(int amount, GameObject? source);

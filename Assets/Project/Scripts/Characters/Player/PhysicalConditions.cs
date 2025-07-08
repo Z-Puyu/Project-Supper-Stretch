@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.GameplayEffects;
@@ -11,7 +12,7 @@ using Random = UnityEngine.Random;
 namespace Project.Scripts.Characters.Player;
 
 [DisallowMultipleComponent]
-public class PhysicalConditions : MonoBehaviour {
+public sealed class PhysicalConditions : MonoBehaviour {
     [NotNull]
     [field: SerializeField, Required] 
     private AttributeSet? AttributeSetComponent { set; get; }
@@ -46,14 +47,22 @@ public class PhysicalConditions : MonoBehaviour {
     private float NextPoisonUpdate { get; set; }
     private float NextHungerUpdate { get; set; }
     
-    public event UnityAction OnSatiated = delegate { };
-    public event UnityAction OnStarved = delegate { };
-    public event UnityAction OnFoodPoisoned = delegate { };
-    public event UnityAction OnPoisonCured = delegate { };
-    public event UnityAction OnHungry = delegate { };
+    public event UnityAction? OnSatiated;
+    public event UnityAction? OnStarved;
+    public event UnityAction? OnFoodPoisoned;
+    public event UnityAction? OnPoisonCured;
+    public event UnityAction? OnHungry;
 
     private AdvancedDropdownList<string> AllAttributes =>
             this.AttributeSetComponent ? this.AttributeSetComponent.AllAccessibleAttributes : [];
+
+    private void OnDestroy() {
+        this.OnSatiated = null;
+        this.OnStarved = null;
+        this.OnFoodPoisoned = null;
+        this.OnPoisonCured = null;
+        this.OnHungry = null;
+    }
 
     public void Initialise() {
         if (this.DigestionEffect) {
@@ -68,20 +77,20 @@ public class PhysicalConditions : MonoBehaviour {
         int satiation = this.AttributeSetComponent.ReadCurrent(this.HungerAttribute);
         if (satiation <= this.StarvedThreshold) {
             this.IsStarving = true;
-            this.OnStarved.Invoke();
+            this.OnStarved?.Invoke();
         } else if (satiation <= this.HungryThreshold) {
             this.IsStarving = false;
-            this.OnHungry.Invoke();
+            this.OnHungry?.Invoke();
         } else {
             this.IsStarving = false;
-            this.OnSatiated.Invoke();
+            this.OnSatiated?.Invoke();
         }
         
         int toxin = this.AttributeSetComponent.ReadCurrent(this.ToxinAttribute);
         if (toxin < this.SeriouslyPoisonedThreshold) {
-            this.OnPoisonCured.Invoke();
+            this.OnPoisonCured?.Invoke();
         } else {
-            this.OnFoodPoisoned.Invoke();
+            this.OnFoodPoisoned?.Invoke();
         }
     }
 
@@ -95,7 +104,7 @@ public class PhysicalConditions : MonoBehaviour {
 
     private void UpdateToxin(int old, int current) {
         if (old >= this.SeriouslyPoisonedThreshold && current < this.SeriouslyPoisonedThreshold) {
-            this.OnPoisonCured.Invoke();
+            this.OnPoisonCured?.Invoke();
             return;
         }
 
@@ -107,12 +116,12 @@ public class PhysicalConditions : MonoBehaviour {
             this.Audio.Play(CharacterAudio.Sound.Hurt);
         }
             
-        this.OnFoodPoisoned.Invoke();
+        this.OnFoodPoisoned?.Invoke();
     }
 
     private void UpdateHunger(int old, int current) {
         if (current > this.HungryThreshold && old <= this.HungryThreshold && this.HungryEffect) {
-            this.OnSatiated.Invoke();
+            this.OnSatiated?.Invoke();
             GameplayEffectExecutionArgs args = GameplayEffectExecutionArgs.Builder
                                                                           .From(this.AttributeSetComponent)
                                                                           .OfLevel(-1)
@@ -122,7 +131,7 @@ public class PhysicalConditions : MonoBehaviour {
         } 
         
         if (current <= this.HungryThreshold && old > this.HungryThreshold && this.HungryEffect) {
-            this.OnHungry.Invoke();
+            this.OnHungry?.Invoke();
             if (this.Audio) {
                 this.Audio.Play(CharacterAudio.Sound.Starving);
             }
@@ -136,7 +145,7 @@ public class PhysicalConditions : MonoBehaviour {
         }
         
         if (current <= this.StarvedThreshold && old > this.StarvedThreshold) {
-            this.OnStarved.Invoke();
+            this.OnStarved?.Invoke();
             if (this.Audio) {
                 this.Audio.Play(CharacterAudio.Sound.Starving);
             }

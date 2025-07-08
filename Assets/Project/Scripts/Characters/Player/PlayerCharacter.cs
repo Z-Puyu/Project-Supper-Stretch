@@ -17,7 +17,7 @@ using Object = UnityEngine.Object;
 namespace Project.Scripts.Characters.Player;
 
 public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
-    public static event UnityAction OnDungeonLevelCleared = delegate { }; 
+    public static event UnityAction? OnDungeonLevelCleared; 
     
     [NotNull] public InputActions? InputActions { get; private set; }
     [NotNull] [field: SerializeField] private PlayerMovement? Movement { get; set; }
@@ -83,16 +83,9 @@ public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
         Cursor.visible = false;
     }
 
-    protected override void OnHitFeedback(int severity) {
-        base.OnHitFeedback(severity);
-        if (this.Animator) {
-            this.Animator.SetInteger(this.HitFeedbackAnimationParameter, severity);
-        }
-    }
-
     private static void OnEnterDungeonRoom(DungenCharacter character, Tile from, Tile to) {
         if (to.Dungeon && to.Dungeon.MainPathTiles[^1] == to) {
-            PlayerCharacter.OnDungeonLevelCleared.Invoke();
+            PlayerCharacter.OnDungeonLevelCleared?.Invoke();
         }
     }
 

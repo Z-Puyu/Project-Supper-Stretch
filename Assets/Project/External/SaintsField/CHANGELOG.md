@@ -1,5 +1,33 @@
 # Changelog
 
+## 4.21.0 ##
+
+1.  UI Toolkit: Add `SaintsHashSet<T>` & `ReferenceHashSet<T>` data type as serializable `HashSet` [#251](https://github.com/TylerTemp/SaintsField/issues/251)
+2.  Saints XPath now can compare `[@{myProp} = false]` if `myProp` is a bool type
+3.  UI Toolkit: Fix `SaintsDictionary` paging button can not click
+
+## 4.20.1 ##
+
+Fix `ColorPalette` attribute arguments not working, fix its auto validatior.
+
+## 4.20.0 ##
+
+**Breaking Changes**: `ColorPalette` overhaul.
+
+NOTE: if you're using the previous `ColorPalette`, you WILL lose this palette data.
+
+`ColorPalette` now using a tag to mark every color. For UI Toolkit, it now also have a way much better UI for you to create palette with drag/drop support.
+
+This version removes the `group` idea. A color is only marked with many tags. In the feature version, it'll have main tags for you to easily grouping them.
+
+The search bar now also support `#RRGGBB` search. If you're using UI Toolkit, a nicely `TypeAhead` popup will show you the possible options.
+
+## 4.19.1 ##
+
+1.  Fix search function got `StackOverflow` when a target contains a looped-reference. [#250](https://github.com/TylerTemp/SaintsField/issues/250)
+2.  Add `<index/>`, `<index=D4/>` tag for rich label. If the property is in a list/array, the coresponding index value will be used for this tag
+3.  Add `{0:formatControl}` support for `<index/>` and `<field/>` tag like a Unity's standard `string.Format`. You can now even do weird shit like: `<field.subField=(--<color=red>{0}</color>--)/>` will be interpreted like `string.Format("(--<color=red>{0}</color>--)", this.subField)`.
+
 ## 4.19.0 ##
 
 1.  You can now use `$:ClassName.CallbackName` or `$:ClassName.FieldName` to call a static/const value/method in most place like `ShowIf/HideIf`, `EnableIf/DisableIf`, `RequiredIf`, `BelowImage/AboveImage` etc.

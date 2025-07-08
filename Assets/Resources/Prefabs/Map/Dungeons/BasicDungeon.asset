@@ -15,9 +15,9 @@ MonoBehaviour:
   globalPropGroupID_obsolete: 
   globalPropRanges_obsolete: []
   Length:
-    Min: 20
-    Max: 30
-  BranchMode: 0
+    Min: 80
+    Max: 120
+  BranchMode: 2
   BranchCount:
     Min: 1
     Max: 5
@@ -28,7 +28,7 @@ MonoBehaviour:
       Max: 3
   KeyManager: {fileID: 0}
   DoorwayConnectionChance: 1
-  RestrictConnectionToSameSection: 0
+  RestrictConnectionToSameSection: 1
   TileInjectionRules: []
   TileTagConnectionMode: 0
   TileConnectionTags:
@@ -110,12 +110,81 @@ MonoBehaviour:
       CanStraightenMainPath: 1
       OverrideCanStraightenBranchPaths: 0
       CanStraightenBranchPaths: 0
+  - Graph: {fileID: 11400000}
+    TileSets:
+    - {fileID: 11400000, guid: bd2af1c9f700be94b8de91fcd003c73b, type: 2}
+    NodeType: 0
+    Position: 0.22713506
+    Label: Next Level
+    Keys: []
+    Locks: []
+    LockPlacement: 0
+    StraighteningSettings:
+      OverrideStraightenChance: 0
+      StraightenChance: 0
+      OverrideCanStraightenMainPath: 0
+      CanStraightenMainPath: 1
+      OverrideCanStraightenBranchPaths: 0
+      CanStraightenBranchPaths: 0
+  - Graph: {fileID: 11400000}
+    TileSets:
+    - {fileID: 11400000, guid: bd2af1c9f700be94b8de91fcd003c73b, type: 2}
+    NodeType: 0
+    Position: 0.48092064
+    Label: Next Level
+    Keys: []
+    Locks: []
+    LockPlacement: 0
+    StraighteningSettings:
+      OverrideStraightenChance: 0
+      StraightenChance: 0
+      OverrideCanStraightenMainPath: 0
+      CanStraightenMainPath: 1
+      OverrideCanStraightenBranchPaths: 0
+      CanStraightenBranchPaths: 0
+  - Graph: {fileID: 11400000}
+    TileSets:
+    - {fileID: 11400000, guid: bd2af1c9f700be94b8de91fcd003c73b, type: 2}
+    NodeType: 0
+    Position: 0.72077525
+    Label: Next Level
+    Keys: []
+    Locks: []
+    LockPlacement: 0
+    StraighteningSettings:
+      OverrideStraightenChance: 0
+      StraightenChance: 0
+      OverrideCanStraightenMainPath: 0
+      CanStraightenMainPath: 1
+      OverrideCanStraightenBranchPaths: 0
+      CanStraightenBranchPaths: 0
   Lines:
   - Graph: {fileID: 11400000}
     DungeonArchetypes:
-    - {fileID: 11400000, guid: 338630df029fe9b4785df0d7b2144170, type: 2}
+    - {fileID: 11400000, guid: ab49565ec50caf340b50488f727dbc6f, type: 2}
     Position: 0
-    Length: 1
+    Length: 0.24954572
+    Keys: []
+    Locks: []
+  - Graph: {fileID: 11400000}
+    DungeonArchetypes:
+    - {fileID: 11400000, guid: ab49565ec50caf340b50488f727dbc6f, type: 2}
+    Position: 0.24954572
+    Length: 0.25378558
+    Keys: []
+    Locks: []
+  - Graph: {fileID: 11400000}
+    DungeonArchetypes:
+    - {fileID: 11400000, guid: ab49565ec50caf340b50488f727dbc6f, type: 2}
+    Position: 0.5033313
+    Length: 0.23985463
+    Keys: []
+    Locks: []
+  - Graph: {fileID: 11400000}
+    DungeonArchetypes:
+    - {fileID: 11400000, guid: ab49565ec50caf340b50488f727dbc6f, type: 2}
+    Position: 0.74318594
+    Length: 0.25681406
     Keys: []
     Locks: []
   currentFileVersion: 1

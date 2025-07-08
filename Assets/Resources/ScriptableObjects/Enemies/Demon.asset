@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98377ae193ac43759722acd1422c8e8f, type: 3}
+  m_Name: Demon
+  m_EditorClassIdentifier: 
+  <Attributes>k__BackingField:
+  - <Key>k__BackingField: CharacterAttributes.MaxHealth
+    <Value>k__BackingField: 125
+  - <Key>k__BackingField: CharacterAttributes.Health
+    <Value>k__BackingField: 125
+  - <Key>k__BackingField: CharacterAttributes.Damage.Physical
+    <Value>k__BackingField: 10
+  - <Key>k__BackingField: CharacterAttributes.Damage.Elemental.Dark
+    <Value>k__BackingField: 25
+  - <Key>k__BackingField: CharacterAttributes.ElementalResistance.Divine
+    <Value>k__BackingField: -25
+  - <Key>k__BackingField: CharacterAttributes.ElementalResistance.Fire
+    <Value>k__BackingField: -10
+  - <Key>k__BackingField: CharacterAttributes.ElementalResistance.Dark
+    <Value>k__BackingField: 100
+  - <Key>k__BackingField: CharacterAttributes.ElementalResistance.Ice
+    <Value>k__BackingField: 20
+  - <Key>k__BackingField: CharacterAttributes.ElementalResistance.Lightning
+    <Value>k__BackingField: 20
+  - <Key>k__BackingField: CharacterAttributes.ElementalResistance.Poison
+    <Value>k__BackingField: 100
+  <Name>k__BackingField: Demon
+  <Experience>k__BackingField: 500
+  <LootTable>k__BackingField: {fileID: 11400000, guid: 14d8081a653faf04d987075e532e5f2f, type: 2}
+  <IsBoss>k__BackingField: 1

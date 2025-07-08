@@ -64,5 +64,11 @@ public class LootTable : ScriptableObject, IEnumerable<KeyValuePair<ItemData, in
         foreach (KeyValuePair<ItemData, int> pair in this.Loots) {
             this.WeightCurves.TryAdd(pair.Key, AnimationCurve.Constant(0, 99, 1));       
         }
+
+        foreach (ItemData item in this.WeightCurves.Keys.AsEnumerable()) {
+            if (!this.Loots.ContainsKey(item)) {
+                this.WeightCurves.Remove(item); 
+            }
+        }
     }
 }

@@ -14,15 +14,15 @@ namespace Project.Scripts.Items.InventorySystem;
 
 [DisallowMultipleComponent]
 public class Inventory : MonoBehaviour, IPresentable, IPlayerControllable {
-    public static event UnityAction<Inventory> OnOpen = delegate { };
+    public static event UnityAction<Inventory>? OnOpen;
     
     [field: SerializeField] private EquipmentSet? EquipmentComponent { get; set; }
     [field: SerializeField] private AttributeSet? AttributeSetComponent { get; set; }
     public Dictionary<Item, int> Items { get; private init; } = [];
     
-    public event UnityAction<Inventory, KeyValuePair<Item, int>> OnInventoryChanged = delegate { };
-    public event UnityAction<Item> OnItemApplied = delegate { };
-    public event UnityAction OnItemConsumed = delegate { };
+    public event UnityAction<Inventory, KeyValuePair<Item, int>>? OnInventoryChanged;
+    public event UnityAction<Item>? OnItemApplied;
+    public event UnityAction? OnItemConsumed;
 
     public int this[Item item] => this.Count(item);
     public IEnumerable<KeyValuePair<Item, int>> this[Predicate<Item> predicate] => this.All(predicate);
@@ -41,6 +41,12 @@ public class Inventory : MonoBehaviour, IPresentable, IPlayerControllable {
         }
     }
 
+    private void OnDestroy() {
+        this.OnInventoryChanged = null;
+        this.OnItemApplied = null;
+        this.OnItemConsumed = null;
+    }
+
     private int Count(Item item) {
         return this.Items.GetValueOrDefault(item, 0);
     }
@@ -54,7 +60,7 @@ public class Inventory : MonoBehaviour, IPresentable, IPlayerControllable {
             this.Items[item] += copies;
         }
         
-        this.OnInventoryChanged.Invoke(this, new KeyValuePair<Item, int>(item, this.Items[item]));
+        this.OnInventoryChanged?.Invoke(this, new KeyValuePair<Item, int>(item, this.Items[item]));
     }
 
     public void Apply(Item item) {
@@ -62,9 +68,9 @@ public class Inventory : MonoBehaviour, IPresentable, IPlayerControllable {
             throw new ArgumentException($"No {item} in inventory.");
         }
         
-        this.OnItemApplied.Invoke(item);
+        this.OnItemApplied?.Invoke(item);
         if (item.Type.HasFlag(ItemFlag.Consumable)) {
-            this.OnItemConsumed.Invoke();
+            this.OnItemConsumed?.Invoke();
         }
         
         item.Process(this);
@@ -82,7 +88,7 @@ public class Inventory : MonoBehaviour, IPresentable, IPlayerControllable {
             this.Items[item] = remaining;
         }
             
-        this.OnInventoryChanged.Invoke(this, new KeyValuePair<Item, int>(item, remaining));
+        this.OnInventoryChanged?.Invoke(this, new KeyValuePair<Item, int>(item, remaining));
         return true;
     }
 
@@ -112,11 +118,10 @@ public class Inventory : MonoBehaviour, IPresentable, IPlayerControllable {
     }
     
     private void Open(InputAction.CallbackContext context) {
-        Inventory.OnOpen.Invoke(this);
+        Inventory.OnOpen?.Invoke(this);
     }
 
     public string FormatAsText() {
         return this.ToString();
     }
-    
 }

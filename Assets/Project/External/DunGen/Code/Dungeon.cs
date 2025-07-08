@@ -59,6 +59,8 @@ namespace DunGen
 		public ReadOnlyCollection<Branch> Branches { get; }
 		public DungeonGraph ConnectionGraph { get; private set; }
 
+		public TileInstanceSource TileInstanceSource { get; internal set; }
+
 		[SerializeField]
 		private DungeonFlow dungeonFlow;
 		[SerializeField]
@@ -104,7 +106,7 @@ namespace DunGen
 
 		internal void AddAdditionalDoor(Door door)
 		{
-			if (door != null)
+			if (door != null && !doors.Contains(door.gameObject))
 				doors.Add(door.gameObject);
 		}
 
@@ -161,6 +163,11 @@ namespace DunGen
 			}
 		}
 
+		public void Clear()
+		{
+			Clear(TileInstanceSource.DespawnTile);
+		}
+
 		public void Clear(Action<Tile> destroyTileDelegate)
 		{
 			// Destroy all tiles
@@ -196,10 +203,9 @@ namespace DunGen
 
 		public IEnumerator FromProxy(DungeonProxy proxyDungeon,
 			DungeonGenerator generator,
-			TileInstanceSource tileInstanceSource,
 			Func<bool> shouldSkipFrame)
 		{
-			Clear(tileInstanceSource.DespawnTile);
+			Clear();
 
 			var proxyToTileMap = new Dictionary<TileProxy, Tile>();
 
@@ -225,7 +231,7 @@ namespace DunGen
 			foreach (var tileProxy in proxyDungeon.AllTiles)
 			{
 				// Instantiate & re-position tile
-				var tileObj = tileInstanceSource.SpawnTile(tileProxy.PrefabTile, tileProxy.Placement.Position, tileProxy.Placement.Rotation);
+				var tileObj = TileInstanceSource.SpawnTile(tileProxy.PrefabTile, tileProxy.Placement.Position, tileProxy.Placement.Rotation);
 
 				// Add tile to lists
 				var tile = tileObj.GetComponent<Tile>();

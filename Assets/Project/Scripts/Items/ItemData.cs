@@ -18,9 +18,17 @@ public class ItemData : ScriptableObject {
     [field: SerializeReference, RichLabel(nameof(this.Label), true)] 
     public List<IItemPropertyData> ItemProperties { get; private set; } = [];
 
-    private AdvancedDropdownList<string> AllItemTypes => GameplayTagTree<ItemType>.Instances
-                                                                                  .OfType<ItemDefinition>()
-                                                                                  .AllTags(); 
-    
+    private AdvancedDropdownList<string> AllItemTypes {
+        get {
+            if (GameplayTagTree<ItemType>.Instances.Count == 0) {
+                Resources.LoadAll<ItemDefinition>("");
+            }
+
+            return GameplayTagTree<ItemType>.Instances
+                                            .OfType<ItemDefinition>()
+                                            .AllTags();
+        }
+    }
+
     private string Label(object obj, int _) => obj.GetType().Name;
 }

@@ -34,9 +34,10 @@ public class CharacterAudio : AudioPlayer<CharacterAudio.Sound> {
             Logging.Error($"{this.name} has no character!", this);
             return;
         }
-        
-        this.Character.GetComponentsInChildren<HitBox>().ForEach(hitbox => hitbox.OnHit += (_, _) => this.Play(Sound.Hit));
-        this.Character.HealthComponent!.OnDamaged += _ => {
+
+        this.Character.GetComponentsInChildren<HitBox>()
+            .ForEach(hitbox => hitbox.OnHit += (_, _, _) => this.Play(Sound.Hit));
+        this.Character.HealthComponent!.OnDamaged += () => {
             if (Random.Range(0, 2) == 0) {
                 this.Play(Sound.Hurt);
             }
