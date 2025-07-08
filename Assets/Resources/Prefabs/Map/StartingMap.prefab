@@ -9600,6 +9600,11 @@ MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 4345396436287507529, guid: 5064b663316a4ed4592dda64e29069cb, type: 3}
   m_PrefabInstance: {fileID: 5254469053204649335}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8411300049443804552 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4346377263417721087, guid: 5064b663316a4ed4592dda64e29069cb, type: 3}
+  m_PrefabInstance: {fileID: 5254469053204649335}
+  m_PrefabAsset: {fileID: 0}
 --- !u!23 &8414503360081794280 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 4336348493821657503, guid: 5064b663316a4ed4592dda64e29069cb, type: 3}
@@ -12127,6 +12132,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5731607375152180025}
     m_Modifications:
+    - target: {fileID: 3291373233883321939, guid: 745fa94a76a58464e9ea6b1d868880d1, type: 3}
+      propertyPath: BlockerSceneObjects.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3291373233883321939, guid: 745fa94a76a58464e9ea6b1d868880d1, type: 3}
+      propertyPath: 'BlockerSceneObjects.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8411300049443804552}
     - target: {fileID: 6442568631462199792, guid: 745fa94a76a58464e9ea6b1d868880d1, type: 3}
       propertyPath: m_Name
       value: Doorway
