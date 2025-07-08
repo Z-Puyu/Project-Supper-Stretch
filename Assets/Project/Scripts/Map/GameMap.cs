@@ -57,8 +57,9 @@ public class GameMap : MonoBehaviour {
 
         void onComplete(DungeonGenerator generator) {
             generator.CurrentDungeon.GetComponentsInChildren<EnemySpawnPoint>().ForEach(point => point.Spawn());
-            this.GetComponentsInChildren<GoalPoint>()
-                .Concat(generator.CurrentDungeon.GetComponentsInChildren<GoalPoint>()).Distinct()
+            this.GetComponentsInChildren<GoalPoint>(includeInactive: true) 
+                .Concat(generator.CurrentDungeon.GetComponentsInChildren<GoalPoint>(includeInactive: true))
+                .Distinct()
                 .ForEach(point => this.GoalPoints.Enqueue(point));
             if (this.GoalPoints.TryPeek(out GoalPoint result)) {
                 result.gameObject.SetActive(true);
