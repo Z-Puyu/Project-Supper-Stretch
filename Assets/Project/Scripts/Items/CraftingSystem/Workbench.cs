@@ -27,15 +27,23 @@ public class Workbench : MonoBehaviour {
                                                                               .OfType<SchemeDefinition>()
                                                                               .LeafTags();
     
-    public event Action<int, Item> OnCraft = delegate { };
-    public event Action<int, Recipe> OnRecipeChanged = delegate { };
+    public event Action<int, Item>? OnCraft;
+    public event Action<int, Recipe>? OnRecipeChanged;
 
     private void Start() {
         this.NewSession();
     }
 
+    private void OnDestroy() {
+        this.OnCraft = null;
+        this.OnRecipeChanged = null;
+    }
+
     private void NewSession() {
         this.Recipe = new Recipe();
+        this.Cost = 0;
+        this.Modifiers.Clear();
+        this.NotifyRecipeChange();
     }
 
     public void Put(Item ingredient) {
@@ -83,7 +91,7 @@ public class Workbench : MonoBehaviour {
             return;
         }
         
-        this.OnCraft.Invoke(0, product);
+        this.OnCraft?.Invoke(Mathf.CeilToInt(this.Cost), product);
         this.NewSession();
     }
 
@@ -134,6 +142,6 @@ public class Workbench : MonoBehaviour {
         }
         
         int cost = this.Recipe.IsEmpty ? 0 : Mathf.Max(1, Mathf.FloorToInt(this.Cost));
-        this.OnRecipeChanged.Invoke(cost, this.Recipe);
+        this.OnRecipeChanged?.Invoke(cost, this.Recipe);
     }
 }

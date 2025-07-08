@@ -1,12 +1,16 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using DunGen;
+using DunGen.Graph;
 using Project.Scripts.Characters.Enemies;
 using Project.Scripts.Common;
 using Project.Scripts.Util.Linq;
 using SaintsField.Playa;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 namespace Project.Scripts.Map;
 
@@ -16,6 +20,7 @@ public class GameMap : MonoBehaviour {
     [NotNull] [field: SerializeField] private RuntimeDungeon? RuntimeDungeon { get; set; }
     private Tile? LastTile { get; set; }
     [NotNull] private DungeonPositonAdaptor? PositonAdaptor { get; set; }
+    private Queue<GoalPoint> GoalPoints { get; init; } = [];
 
     [Button("Debug: Kill All Enemies")]
     private void DebugKill() {
@@ -37,9 +42,10 @@ public class GameMap : MonoBehaviour {
     }
 
     private void OnReachedGoal() {
-        this.RuntimeDungeon.Generator.CurrentDungeon
-            .GetComponentsInChildren<GoalPoint>(includeInactive: true)
-            .ForEach(point => point.gameObject.SetActive(true));
+        this.GoalPoints.Dequeue().gameObject.SetActive(false);
+        if (this.GoalPoints.TryPeek(out GoalPoint result)) {
+            result.gameObject.SetActive(true);
+        }
     }
 
     public void Begin(Action<DungeonGenerator>? onReady = null) {
@@ -51,6 +57,14 @@ public class GameMap : MonoBehaviour {
 
         void onComplete(DungeonGenerator generator) {
             generator.CurrentDungeon.GetComponentsInChildren<EnemySpawnPoint>().ForEach(point => point.Spawn());
+            this.GetComponentsInChildren<GoalPoint>(includeInactive: true) 
+                .Concat(generator.CurrentDungeon.GetComponentsInChildren<GoalPoint>(includeInactive: true))
+                .Distinct()
+                .ForEach(point => this.GoalPoints.Enqueue(point));
+            if (this.GoalPoints.TryPeek(out GoalPoint result)) {
+                result.gameObject.SetActive(true);
+            }
+            
             onReady?.Invoke(generator);
         } 
     }

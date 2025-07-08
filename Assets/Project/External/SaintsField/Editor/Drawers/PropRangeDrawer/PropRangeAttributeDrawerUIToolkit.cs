@@ -12,6 +12,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 #if SAINTSFIELD_NEWTONSOFT_JSON
 // using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 #endif
 
 namespace SaintsField.Editor.Drawers.PropRangeDrawer

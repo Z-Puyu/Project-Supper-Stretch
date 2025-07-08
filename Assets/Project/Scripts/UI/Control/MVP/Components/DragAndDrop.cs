@@ -1,3 +1,4 @@
+using System;
 using Project.Scripts.UI.Control.MVP.Interfaces;
 using SaintsField;
 using UnityEngine;
@@ -43,5 +44,11 @@ public class DragAndDrop : MonoBehaviour, IDraggable {
         }
         
         Object.Destroy(this.DragPreview!.gameObject);
+    }
+
+    private void OnDestroy() {
+        this.OnDragged = null;
+        this.OnDropped = null;
+        this.OnDropFailed = null;
     }
 }

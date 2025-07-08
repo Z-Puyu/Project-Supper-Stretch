@@ -11,6 +11,10 @@ public class CombatAnimationEventProxy : MonoBehaviour {
     [field: SerializeField, Required] 
     private Combatant? CombatComponent { get; set; }
     
+    [NotNull]
+    [field: SerializeField, Required]
+    private CombatKnockBack? KnockBackComponent { get; set; }
+    
     [field: SerializeField] private EquipmentSet? EquipmentSet { get; set; }    
     
     [field: SerializeField, SaintsDictionary("Slot", "Weapon")] 
@@ -19,9 +23,6 @@ public class CombatAnimationEventProxy : MonoBehaviour {
     private DamageDealer? CurrentWeapon { get; set; }
     
     [NotNull] [field: SerializeField] private Animator? Animator { get; set; }
-    
-    [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Int)]
-    private int KnockBackTrigger { get; set; }
 
     public void OnBlock(EquipmentSlot where) {
         if (this.EquipmentSet && this.EquipmentSet.HasAny(out BlockingZone? blocker)) {
@@ -46,18 +47,28 @@ public class CombatAnimationEventProxy : MonoBehaviour {
     }
 
     private void OnKnockBack() {
-        this.Animator.SetInteger(this.KnockBackTrigger, 1);
         this.CombatComponent.ConcludeStage();
+        if (this.CurrentWeapon) {
+            this.KnockBackComponent.ApplyKnockBack(this.CurrentWeapon.KnockbackStrength);
+        }
     }
 
     public void OnAttackPerformed(EquipmentSlot where) {
         if (!this.CurrentWeapon) {
             return;
         }
-
+        
         this.CombatComponent.RegisterStage();
         this.CurrentWeapon.TryPerformHit();
         this.CurrentWeapon = null;
+    }
+
+    public void OnApplyKnockBack(AnimationEvent @event) {
+        if (!this.CurrentWeapon) {
+            return;
+        }
+        
+        this.CurrentWeapon.KnockbackStrength = Random.Range(@event.floatParameter, @event.intParameter);
     }
 
     public void OnAttackCompleted() {

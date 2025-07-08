@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Project.Scripts.AttributeSystem.Attributes;
@@ -14,7 +15,7 @@ using UnityEngine.Events;
 namespace Project.Scripts.Characters.Combat;
 
 [DisallowMultipleComponent]
-public class DamageDealer : MonoBehaviour {
+public sealed class DamageDealer : MonoBehaviour {
     private AdvancedDropdownList<string> AllAttributes => GameplayTagTree<AttributeType>.Instances
                                                                                         .OfType<AttributeDefinition>()
                                                                                         .LeafTags();
@@ -37,26 +38,21 @@ public class DamageDealer : MonoBehaviour {
 
     [field: InfoBox("Damage calculation requires an attribute reader!", EMessageType.Error, nameof(this.IsInvalid))]
     private IAttributeReader? AttributeReader { get; set; }
-
-    [NotNull]
-    [field: SerializeField, Required]
-    private GameplayEffect? DamageEffect { get; set; }
     
-    private PlayerMovement? PlayerMovement { get; set; }
     private Vector3 StartPosition { get; set; }
+    public float KnockbackStrength { get; set; }
     
     private bool IsInvalid => this.GetComponentInParent<IAttributeReader>() == null;
     
-    public event UnityAction OnAttack = delegate { };
-    public event UnityAction OnBlocked = delegate { };
-    public event UnityAction OnKnockedBack = delegate { };
+    public event UnityAction? OnAttack;
+    public event UnityAction? OnBlocked;
+    public event UnityAction? OnKnockedBack;
 
     private void Awake() {
         if (!this.Owner) {
             this.Owner = this.transform.root.gameObject;
         }
         
-        this.PlayerMovement = this.GetComponentInParent<PlayerMovement>();
         this.AttributeReader = this.GetComponent<IAttributeReader>();
         if (this.AttributeReader == null) {
             Logging.Error($"{this.name} requires an {nameof(IAttributeReader)} to function!", this);
@@ -67,8 +63,14 @@ public class DamageDealer : MonoBehaviour {
         this.TargetDetector.enabled = false;
     }
 
+    private void OnDestroy() {
+        this.OnAttack = null;
+        this.OnBlocked = null;
+        this.OnKnockedBack = null;
+    }
+
     public void Enable() {
-        this.OnAttack.Invoke();
+        this.OnAttack?.Invoke();
         this.TargetDetector.enabled = true;
     }
 
@@ -80,16 +82,18 @@ public class DamageDealer : MonoBehaviour {
 
         // The attacker chooses what kind of damage to inflict.
         Vector3 hitPoint = this.transform.position;
-        this.CurrentTarget!.TakeDamage(new Damage(this.StartPosition, hitPoint, this.DamageEffect, this));
+        Damage dmg = new Damage(this.StartPosition, hitPoint, this.KnockbackStrength);
+        this.CurrentTarget!.TakeDamage(dmg, this.gameObject);
         this.CurrentTarget = null;
         this.HasTarget = false;
+        this.KnockbackStrength = 0;
     }
 
     public void Blocked(bool isBlockedByParry) {
         if (isBlockedByParry) {
-            this.OnKnockedBack.Invoke();
+            this.OnKnockedBack?.Invoke();
         } else {
-            this.OnBlocked.Invoke();
+            this.OnBlocked?.Invoke();
         }
         
         Logging.Info($"Damage by {this.transform.root.name} blocked!", this);

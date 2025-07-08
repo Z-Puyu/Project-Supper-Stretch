@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Interaction.ObjectDetection;
 using SaintsField;
 using UnityEngine;
@@ -26,28 +27,28 @@ public class InteractableObject : MonoBehaviour {
     private GameObject? PromptWidget { get; set; }
     
     private bool HasInteractorInRange { get; set; }
-    
+
     /// <summary>
     /// Invoked when the interactor enters the detection zone.
     /// </summary>
-    public event UnityAction OnApproached = delegate { };
-    
+    public event UnityAction? OnApproached;
+
     /// <summary>
     /// Invoked when the interactor leaves the detection zone.
     /// </summary>
-    public event UnityAction OnLeft = delegate { };
+    public event UnityAction? OnLeft;
     
     /// <summary>
     /// Invoked when the interactor looks at the object.
     /// </summary>
-    public event UnityAction<InteractableObject> OnActivated = delegate { };
+    public event UnityAction<InteractableObject>? OnActivated;
     
     /// <summary>
     /// Invoked when the interactor looks away from the object.
     /// </summary>
-    public event UnityAction OnDeactivated = delegate { };
+    public event UnityAction? OnDeactivated;
     
-    public event UnityAction<Interactor> OnInteraction = delegate { };
+    public event UnityAction<Interactor>? OnInteraction;
 
     private void Start() {
         this.Detector.OnDetected += this.OnInteractorDetected;
@@ -56,29 +57,37 @@ public class InteractableObject : MonoBehaviour {
     
     private void OnEnable() {
         if (this.HasInteractorInRange) {
-            this.OnApproached.Invoke();
+            this.OnApproached?.Invoke();
         }
     }
     
     private void OnDisable() {
         if (this.HasInteractorInRange) {
-            this.OnLeft.Invoke();
+            this.OnLeft?.Invoke();
         }
     }
 
+    private void OnDestroy() {
+        this.OnApproached = null;
+        this.OnLeft = null;
+        this.OnActivated = null;
+        this.OnDeactivated = null;
+        this.OnInteraction = null;
+    }   
+
     private void OnInteractorDetected(Collider actor) {
         this.HasInteractorInRange = true;
-        this.OnApproached.Invoke();
+        this.OnApproached?.Invoke();
     }
 
     private void OnInteractorOutOfRange(Collider actor) {
         this.Deactivate();
         this.HasInteractorInRange = false;
-        this.OnLeft.Invoke();
+        this.OnLeft?.Invoke();
     }
     
     public void Interact(Interactor interactor) {
-        this.OnInteraction.Invoke(interactor);
+        this.OnInteraction?.Invoke(interactor);
         if (!this.ShouldDestroyAfterInteraction) {
             return;
         }
@@ -93,7 +102,7 @@ public class InteractableObject : MonoBehaviour {
         }
         
         this.PromptWidget.SetActive(true);
-        this.OnActivated.Invoke(this);
+        this.OnActivated?.Invoke(this);
     }
 
     public void Deactivate() {
@@ -102,6 +111,6 @@ public class InteractableObject : MonoBehaviour {
         }
         
         this.PromptWidget.SetActive(false);
-        this.OnDeactivated.Invoke();
+        this.OnDeactivated?.Invoke();
     }
 }

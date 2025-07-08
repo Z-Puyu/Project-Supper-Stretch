@@ -93,15 +93,14 @@ namespace DunGen
 		private TagManager tagManager = new TagManager();
 
 
+#if UNITY_EDITOR
+
 		private void OnValidate()
 		{
-#if UNITY_EDITOR
-			if(defaultSocket == null)
+			if (defaultSocket == null)
 				defaultSocket = GetOrAddSocketByName("Default");
-#endif
 		}
 
-#if UNITY_EDITOR
 		private DoorwaySocket GetOrAddSocketByName(string name)
 		{
 			string path = AssetDatabase.GetAssetPath(this);

@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common;
 using SaintsField;
@@ -12,13 +13,17 @@ public abstract class UIPresenter<M, V> : MonoBehaviour, IPresenter where V : UI
     [field: SerializeField, Required] 
     protected V? View { get; private set; }
     
-    protected UnityAction OnRefresh { get; set; } = delegate { };
+    protected UnityAction? OnRefresh { get; set; }
     
     protected abstract void UpdateView(M model);
-    
+
+    protected virtual void OnDestroy() {
+        this.OnRefresh = null;
+    }
+
     public void Refresh() {
         this.View.Clear();
-        this.OnRefresh.Invoke();
+        this.OnRefresh?.Invoke();
     }
             
     public void Present(object model) {

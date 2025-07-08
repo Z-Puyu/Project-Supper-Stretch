@@ -2961,6 +2961,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2844863981311671559}
     - target: {fileID: 3407593847270750206, guid: 457dd3d6403cd074180b2acc760fdcd6, type: 3}
+      propertyPath: <CharacterModel>k__BackingField
+      value: 
+      objectReference: {fileID: 8622068247776109636}
+    - target: {fileID: 3407593847270750206, guid: 457dd3d6403cd074180b2acc760fdcd6, type: 3}
       propertyPath: <AnimatorComboCounter>k__BackingField
       value: 1895636814
       objectReference: {fileID: 0}
@@ -2975,8 +2979,34 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2255880814765893186, guid: 457dd3d6403cd074180b2acc760fdcd6, type: 3}
+      insertIndex: 2
+      addedObject: {fileID: 2310225178558058141}
   m_SourcePrefab: {fileID: 100100000, guid: 457dd3d6403cd074180b2acc760fdcd6, type: 3}
+--- !u!1 &5678633140921141148 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2255880814765893186, guid: 457dd3d6403cd074180b2acc760fdcd6, type: 3}
+  m_PrefabInstance: {fileID: 5872959340350071262}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2310225178558058141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5678633140921141148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 970b5c5839194053bfa72dcd69189e7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <RootTransform>k__BackingField: {fileID: 1435015714907449600}
+  <Rigidbody>k__BackingField: {fileID: 414616920984253660}
+  <NavMeshAgent>k__BackingField: {fileID: 0}
+  <Animator>k__BackingField: {fileID: 6172455072294468293}
+  <KnockbackStrengthParameter>k__BackingField: -857148020
+  <OnKnockedBackEvent>k__BackingField: {fileID: 0}
 --- !u!4 &6393121446593302094 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 664315519586856848, guid: 457dd3d6403cd074180b2acc760fdcd6, type: 3}
@@ -2987,7 +3017,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3407593847270750206, guid: 457dd3d6403cd074180b2acc760fdcd6, type: 3}
   m_PrefabInstance: {fileID: 5872959340350071262}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 5678633140921141148}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0fc31a05c9304b2ebf87f1e06474a893, type: 3}
@@ -5016,7 +5046,6 @@ MonoBehaviour:
     _saintsKeys: []
     _saintsValues: []
   <Animator>k__BackingField: {fileID: 6172455072294468293}
-  <KnockBackTrigger>k__BackingField: 0
 --- !u!114 &7753728540305146792
 MonoBehaviour:
   m_ObjectHideFlags: 0

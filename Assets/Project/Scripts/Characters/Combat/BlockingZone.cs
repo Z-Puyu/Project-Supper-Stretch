@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Common;
 using SaintsField;
@@ -6,7 +7,7 @@ using UnityEngine.Events;
 
 namespace Project.Scripts.Characters.Combat;
 
-public class BlockingZone : MonoBehaviour {
+public sealed class BlockingZone : MonoBehaviour {
     [field: SerializeField, MinMaxSlider(-180, 180)] 
     private Vector2Int BlockingAngleRange { get; set; }
     
@@ -17,9 +18,9 @@ public class BlockingZone : MonoBehaviour {
     public bool CanParry { get; set; }
     private bool IsBlocking { get; set; }
     
-    public event UnityAction OnHeldUp = delegate { };
-    public event UnityAction OnBlocked = delegate { };
-    public event UnityAction OnParried = delegate { };
+    public event UnityAction? OnHeldUp;
+    public event UnityAction? OnBlocked;
+    public event UnityAction? OnParried;
     
     private void Awake() {
         this.Self = this.UseLocalCoordinates
@@ -29,7 +30,7 @@ public class BlockingZone : MonoBehaviour {
 
     private void OnEnable() {
         Logging.Info($"{this.transform.root.name} is blocking!", this);
-        this.OnHeldUp.Invoke();
+        this.OnHeldUp?.Invoke();
         this.IsBlocking = true;
         this.CanParry = true;
         this.ParryWindowEnd = Time.time + this.ParryWindow;
@@ -39,6 +40,12 @@ public class BlockingZone : MonoBehaviour {
         Logging.Info($"{this.transform.root.name} finished blocking!", this);
         this.IsBlocking = false;
         this.CanParry = false;
+    }
+
+    private void OnDestroy() {
+        this.OnHeldUp = null;
+        this.OnBlocked = null;
+        this.OnParried = null;   
     }
 
     public bool HasBlocked(Vector3 damageDirection, out bool hasParried) {
@@ -54,9 +61,9 @@ public class BlockingZone : MonoBehaviour {
             return blocked;
         }
 
-        this.OnBlocked.Invoke();
+        this.OnBlocked?.Invoke();
         if (hasParried) {
-            this.OnParried.Invoke();
+            this.OnParried?.Invoke();
         }
 
         return blocked;

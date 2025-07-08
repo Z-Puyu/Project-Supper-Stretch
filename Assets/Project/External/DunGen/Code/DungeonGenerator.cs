@@ -336,9 +336,11 @@ namespace DunGen
 			}
 
 			CurrentDungeon = Root.GetComponent<Dungeon>();
+
 			if (CurrentDungeon == null)
 				CurrentDungeon = Root.AddComponent<Dungeon>();
 
+			CurrentDungeon.TileInstanceSource = tileInstanceSource;
 			CollisionManager.Initialize(this);
 
 			CurrentDungeon.DebugRender = DebugRender;
@@ -388,6 +390,7 @@ namespace DunGen
 			foreach (var tileInjection in tilesPendingInjection)
 				if (tileInjection.IsRequired)
 				{
+					tilePlacementResults.Add(new RequiredTileInjectionFailedResult(tileInjection.TileSet));
 					yield return Wait(InnerGenerate(true));
 					yield break;
 				}
@@ -408,10 +411,12 @@ namespace DunGen
 			ChangeStatus(GenerationStatus.InstantiatingTiles);
 
 			proxyDungeon.ConnectOverlappingDoorways(DungeonFlow.DoorwayConnectionChance, DungeonFlow, RandomStream);
-			yield return Wait(CurrentDungeon.FromProxy(proxyDungeon, this, tileInstanceSource, () => ShouldSkipFrame(false)));
+			yield return Wait(CurrentDungeon.FromProxy(proxyDungeon, this, () => ShouldSkipFrame(false)));
 
 			// Post-Processing
 			yield return Wait(PostProcess());
+
+			proxyDungeon.ClearDebugVisuals();
 
 			// Waiting one frame so objects are in their expected state
 			yield return null;
@@ -491,7 +496,7 @@ namespace DunGen
 			proxyDungeon = null;
 
 			if (CurrentDungeon != null)
-				CurrentDungeon.Clear(tileInstanceSource.DespawnTile);
+				CurrentDungeon.Clear();
 
 			useableTiles.Clear();
 			preProcessData.Clear();

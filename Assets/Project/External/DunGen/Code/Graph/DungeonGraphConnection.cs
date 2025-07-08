@@ -1,4 +1,9 @@
-﻿namespace DunGen
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace DunGen
 {
     public sealed class DungeonGraphConnection : DungeonGraphObject
     {

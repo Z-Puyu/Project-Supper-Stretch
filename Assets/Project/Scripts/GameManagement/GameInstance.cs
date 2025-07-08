@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using DunGen;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
+using Project.Scripts.Characters;
+using Project.Scripts.Characters.Enemies;
 using Project.Scripts.Characters.Player;
 using Project.Scripts.Common;
 using Project.Scripts.Items.CraftingSystem;
@@ -41,6 +44,7 @@ public class GameInstance : Singleton<GameInstance> {
     [field: SerializeField, LayoutEnd, Header("UI")]
     private GameObject? UI { get; set; }
     
+    [field: SerializeField] private GameOver? GameWinScreen { get; set; }
     [field: SerializeField] private GameOver? GameOverScreen { get; set; }
     [field: SerializeField] private GameObject? PlayerHUD { get; set; }
     [field: SerializeField] private LoadingScreen? LoadingScreen { get; set; }
@@ -52,6 +56,8 @@ public class GameInstance : Singleton<GameInstance> {
     [NotNull] public Transform? PlayerTransform { get; private set; }
     [NotNull] private LoadingScreen? LoadingScreenInstance { get; set; }
     [NotNull] private GameOver? GameOverScreenInstance { get; set; }
+    [NotNull] private GameOver? GameWinScreenInstance { get; set; }
+    private NavMeshSurface? NavMesh { get; set; }
 
     private void Start() {
         GameEvents.OnPause = delegate { };
@@ -77,14 +83,27 @@ public class GameInstance : Singleton<GameInstance> {
         this.LoadingScreenInstance.gameObject.SetActive(true);
     }
 
+    private void CheckGameVictory(Enemy deadEnemy, GameObject? _) {
+        if (!deadEnemy.IsBoss) {
+            return;
+        }
+
+        this.GameWinScreenInstance.gameObject.SetActive(true);
+        Cursor.visible = true;
+        GameEvents.OnPause?.Invoke();
+    }
+
     private void InitialiseUI() {
         Object.Instantiate(this.UI);
         Object.Instantiate(this.PlayerHUD);
         this.GameOverScreenInstance = Object.Instantiate(this.GameOverScreen);
+        this.GameWinScreenInstance = Object.Instantiate(this.GameWinScreen);
         this.PlayerInstance.OnKilled += () => {
             Cursor.visible = true;
             this.GameOverScreenInstance.gameObject.SetActive(true);
         };
+
+        GameCharacter<Enemy>.OnDeath += this.CheckGameVictory;
     }
 
     private void InstantiateObjects() {
@@ -92,11 +111,12 @@ public class GameInstance : Singleton<GameInstance> {
         Object.Instantiate(this.MainCamera);
         this.Eyes = Camera.main!.transform;
         this.VirtualCamera = Object.Instantiate(this.CinemachineCamera);
+        this.PlayerInstance = Object.Instantiate(this.Player).GetComponent<PlayerCharacter>();
         this.StartingMap = Object.Instantiate(this.MapGenerator);
-        Transform playerStart = GameObject.FindGameObjectWithTag("Player").transform;
-        this.PlayerInstance = Object.Instantiate(this.Player, playerStart.position, Quaternion.identity)
-                                    .GetComponent<PlayerCharacter>();
         this.PlayerTransform = this.PlayerInstance.transform;
+        this.PlayerTransform.SetParent(GameObject.FindGameObjectWithTag("PlayerStart").transform);
+        this.PlayerTransform.localPosition = Vector3.zero;
+        this.PlayerTransform.localRotation = Quaternion.identity;
         Logging.Info("Instantiating Objects... Done.", this);
     }
 
@@ -106,20 +126,24 @@ public class GameInstance : Singleton<GameInstance> {
     
     private void InitialiseLevel() {
         this.LoadingScreenInstance.FlashHintText("Generating Maps...");
-        Object.FindAnyObjectByType<NavMeshSurface>().BuildNavMesh();
+        this.NavMesh = Object.FindAnyObjectByType<NavMeshSurface>();
+        this.StartingMap.GetComponentInChildren<Tile>().RecalculateBounds();
         this.StartingMap.Begin(_ => this.BeginGame());
         Logging.Info("Initialising Map... Done.", this);
     }
 
     private void BeginGame() {
         this.LoadingScreenInstance.FlashHintText("Enabling Scripts...");
+        this.NavMesh!.BuildNavMesh();
         this.StartingMap.GetComponentsInChildren<GoalPoint>(includeInactive: true)
             .ForEach(point => point.gameObject.SetActive(true));
+        Object.FindObjectsByType<GameCharacter>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+              .ForEach(character => character.transform.SetParent(null));
         Object.FindObjectsByType<NavMeshAgent>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
               .ForEach(agent => agent.enabled = true);
         Object.FindObjectsByType<BehaviorGraphAgent>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
               .ForEach(agent => agent.enabled = true);
-        PlayerCharacter.OnDungeonLevelCleared += this.StartingMap.Generate;
+        // PlayerCharacter.OnDungeonLevelCleared += this.StartingMap.Generate;
         this.VirtualCamera!.Target.TrackingTarget =
                 this.PlayerInstance.GetComponentInChildren<CameraTarget>().transform;
         this.PlayerInstance.InitialiseComponents();
@@ -132,6 +156,7 @@ public class GameInstance : Singleton<GameInstance> {
     }
 
     private void OnDestroy() {
-        PlayerCharacter.OnDungeonLevelCleared -= this.StartingMap.Generate;
+        // PlayerCharacter.OnDungeonLevelCleared -= this.StartingMap.Generate;
+        GameCharacter<Enemy>.OnDeath -= this.CheckGameVictory;
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using SaintsField;
 using UnityEngine;
 
 namespace Project.Scripts.Characters.Animations.StateBehaviours;
@@ -13,8 +14,12 @@ public abstract class AnimatorStateBehaviour : StateMachineBehaviour {
         OnIK = 1 << 4
     }
     
-    [field: SerializeField]
-    private ExecutionTiming Timing { get; set; } = ExecutionTiming.OnEnter;
+    [field: SerializeField] private ExecutionTiming Timing { get; set; } = ExecutionTiming.OnEnter;
+    
+    [field: SerializeField, PropRange(0, 1), ShowIf(nameof(this.WillRunOnUpdate))] 
+    private float StartAt { get; set; }
+    
+    private bool WillRunOnUpdate => this.Timing.HasFlag(ExecutionTiming.OnUpdate);
 
     protected abstract void Execute(Animator animator, AnimatorStateInfo stateInfo, int layerIndex);
 
@@ -32,8 +37,10 @@ public abstract class AnimatorStateBehaviour : StateMachineBehaviour {
         if (!this.Timing.HasFlag(ExecutionTiming.OnUpdate)) {
             return;
         }
-        
-        this.Execute(animator, stateInfo, layerIndex);
+
+        if (stateInfo.normalizedTime >= this.StartAt) {
+            this.Execute(animator, stateInfo, layerIndex);
+        }
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state

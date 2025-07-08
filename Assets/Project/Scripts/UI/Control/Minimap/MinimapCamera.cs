@@ -16,7 +16,7 @@ public class MinimapCamera : Singleton<MinimapCamera> {
 
     private void Start() {
         this.CameraTransform = this.transform;
-        this.PlayerTransform = this.CameraTransform.root;
+        this.PlayerTransform = Singleton<GameInstance>.Instance.PlayerTransform;
         this.CurrentHeight = this.CameraTransform.position.y;
         this.NextLevel = this.PlayerTransform.position.y + this.HeightDivision;
         this.PreviousLevel = this.NextLevel - 2 * this.HeightDivision;

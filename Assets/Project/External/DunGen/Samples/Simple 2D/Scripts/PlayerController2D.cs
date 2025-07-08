@@ -6,14 +6,14 @@ namespace DunGen.Demo2D
 	{
 		public float MovementSpeed = 6f;
 
-		private new CircleCollider2D collider;
+		private CircleCollider2D playerCollider;
 		private RaycastHit2D[] hitBuffer;
 		private DungeonGenerator dungeonGenerator;
 
 
 		private void Start()
 		{
-			collider = GetComponent<CircleCollider2D>();
+			playerCollider = GetComponent<CircleCollider2D>();
 			hitBuffer = new RaycastHit2D[10];
 
 			var gen = UnityUtil.FindObjectByType<DunGen.Demo.Generator>();
@@ -43,7 +43,7 @@ namespace DunGen.Demo2D
 			float distance = MovementSpeed * Time.deltaTime;
 			Vector3 motion = direction * distance;
 
-			int hitCount = collider.Cast(direction, hitBuffer, distance);
+			int hitCount = playerCollider.Cast(direction, hitBuffer, distance);
 
 			for (int i = 0; i < hitCount; i++)
 			{

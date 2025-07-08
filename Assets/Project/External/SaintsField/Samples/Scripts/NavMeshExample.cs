@@ -2,6 +2,7 @@ using UnityEngine;
 using SaintsField.AiNavigation;
 
 #if SAINTSFIELD_AI_NAVIGATION
+using UnityEngine.AI;
 #endif
 
 namespace SaintsField.Samples.Scripts

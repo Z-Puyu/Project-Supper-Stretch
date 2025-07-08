@@ -25,13 +25,9 @@ public abstract class GameCharacter : MonoBehaviour {
     [field: AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Bool)]
     private int DeathAnimationParameter { get; set; }
     
-    [field: SerializeField, HideIf(nameof(this.Animator), null)]
-    [field: AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Int)]
-    protected int HitFeedbackAnimationParameter { get; private set; }
-    
     [field: SerializeField, Required] public Health? HealthComponent { get; private set; }
     
-    public event UnityAction OnKilled = delegate { };
+    public event UnityAction? OnKilled;
 
     protected virtual void Awake() {
         if (!this.Animator) {
@@ -53,10 +49,8 @@ public abstract class GameCharacter : MonoBehaviour {
 
         this.HealthComponent.Initialise();
         this.HealthComponent.OnDeath += this.DyingFrom;
-        this.HealthComponent.OnDamaged += this.OnHitFeedback;
+        this.OnPlay();
     }
-
-    protected virtual void OnHitFeedback(int severity) { }
     
     protected virtual void DyingFrom(GameObject? source) {
         Logging.Info($"{this.gameObject.name} killed by {(source ? source.name : "unknown source")}", this);
@@ -68,11 +62,12 @@ public abstract class GameCharacter : MonoBehaviour {
     [Button("Debug: Kill")]
     public virtual void Kill() {
         this.GetComponents<Component>().Where(c => c.GetType() != typeof(Transform)).ForEach(Object.Destroy);
-        this.Animator.GetComponents<Component>()
-            .Where(c => c.GetType() != typeof(Transform) && c.GetType() != typeof(Animator))
-            .ForEach(Object.Destroy);
         this.Animator.enabled = false;
-        this.OnKilled.Invoke();
+        this.Animator.GetComponents<Component>()
+            .Where(c => c.GetType() != typeof(Transform))
+            .ForEach(Object.Destroy);
+        
+        this.OnKilled?.Invoke();
     }
 
     protected virtual void OnPause() { }
@@ -82,6 +77,7 @@ public abstract class GameCharacter : MonoBehaviour {
     protected virtual void OnDestroy() {
         GameEvents.OnPause -= this.OnPause;
         GameEvents.OnPlay -= this.OnPlay;
+        this.OnKilled = null;
     }
 }
 

@@ -121,7 +121,9 @@ namespace DunGen.Generation
 			}
 			else
 			{
-				var tileObj = GameObject.Instantiate(tilePrefab, position, rotation, dungeonRoot.transform);
+				var tileObj = GameObject.Instantiate(tilePrefab, dungeonRoot.transform);
+				tileObj.transform.localPosition = position;
+				tileObj.transform.localRotation = rotation;
 
 				if (tileObj.TryGetComponent<Tile>(out var tile))
 				{

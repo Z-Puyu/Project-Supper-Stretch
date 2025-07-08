@@ -55,6 +55,7 @@ public class CampMenuCoordinator : MonoBehaviour, IPresenter {
         });
         this.Model.workbench.Craft();
         this.CookButton.interactable = false;
+        this.Present(this.Model);
     }
 
     public void Present(object model) {
@@ -65,7 +66,8 @@ public class CampMenuCoordinator : MonoBehaviour, IPresenter {
         this.Model = (data.Workbench, data.Inventory);
         this.IngredientInventoryPresenter.Present(data.Inventory);
         this.FoodInventoryPresenter.Present(data.Inventory);
-        this.CookButton.interactable = data.RemainingTime >= data.CraftDuration;
+        this.CookButton.interactable = !(data.Workbench.Recipe?.IsEmpty ?? true) && 
+                                       data.RemainingTime >= data.CraftDuration;
         this.TimeRemaining.text = $"Remaining Time: {data.RemainingTime}";
         if (data.Workbench.Recipe is not null) {
             this.RecipeDescription.Present(data);

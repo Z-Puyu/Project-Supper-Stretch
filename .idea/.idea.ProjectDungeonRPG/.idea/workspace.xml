@@ -43,7 +43,6 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///AIAssistantSnippet.." root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/ef44756a6ffb44f9af3b97ae39f99a934a000/11/64586e56/0200003Bpdb76.il" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/282112d2d6fa4dad81be5acb97f34dc671a00/a9/1e49524f/SerializedObjectBindingContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/316d3d2a3f8c4b19b769e5bc4918c7d79e2a00/15/14e73393/Editor.cs" root0="FORCE_HIGHLIGHTING" />
@@ -167,24 +166,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Attach to Unity Editor.Attach to Unity Editor &amp; Play.executor&quot;: &quot;Debug&quot;,
-    &quot;Attach to Unity Editor.Attach to Unity Editor.executor&quot;: &quot;Debug&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;com.codeium.enabled&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Hotfix&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;CodeInspectionSettingsId&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Attach to Unity Editor.Attach to Unity Editor & Play.executor": "Debug",
+    "Attach to Unity Editor.Attach to Unity Editor.executor": "Debug",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.codeium.enabled": "true",
+    "git-widget-placeholder": "Enhancements",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "CodeInspectionSettingsId",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor &amp; Play">
     <configuration name="Standalone Player" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="$PROJECT_DIR$/Build\ProjectDungeonRPG.exe" />
@@ -364,6 +363,15 @@
       <workItem from="1751642193805" duration="12896000" />
       <workItem from="1751661508605" duration="28000" />
       <workItem from="1751701632558" duration="894000" />
+      <workItem from="1751855296508" duration="11961000" />
+      <workItem from="1751876518981" duration="97000" />
+      <workItem from="1751876675313" duration="8015000" />
+      <workItem from="1751909550872" duration="6875000" />
+      <workItem from="1751978206471" duration="2169000" />
+      <workItem from="1751980985668" duration="2424000" />
+      <workItem from="1751985018781" duration="927000" />
+      <workItem from="1751986088422" duration="480000" />
+      <workItem from="1751986953460" duration="2195000" />
     </task>
     <task id="LOCAL-00001" summary="Minor changes">
       <option name="closed" value="true" />
@@ -480,6 +488,71 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="212" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Project/Scripts/Items/CraftingSystem/Workbench.cs</url>
+          <line>103</line>
+          <properties documentPath="F:\ProjectDungeonRPG\Assets\Project\Scripts\Items\CraftingSystem\Workbench.cs" containingFunctionPresentation="Method 'ChangeScheme'">
+            <startOffsets>
+              <option value="3245" />
+            </startOffsets>
+            <endOffsets>
+              <option value="3282" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="220" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Project/Scripts/Items/CraftingSystem/Workbench.cs</url>
+          <line>98</line>
+          <properties documentPath="F:\ProjectDungeonRPG\Assets\Project\Scripts\Items\CraftingSystem\Workbench.cs" containingFunctionPresentation="Method 'ChangeScheme'">
+            <startOffsets>
+              <option value="3107" />
+            </startOffsets>
+            <endOffsets>
+              <option value="3131" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="221" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Project/Scripts/Items/CraftingSystem/Workbench.cs</url>
+          <line>135</line>
+          <properties documentPath="F:\ProjectDungeonRPG\Assets\Project\Scripts\Items\CraftingSystem\Workbench.cs" containingFunctionPresentation="Method 'ChangeScheme'">
+            <startOffsets>
+              <option value="4341" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4367" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="222" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/MVP/Presenters/RecipePresenter.cs</url>
+          <line>16</line>
+          <properties documentPath="F:\ProjectDungeonRPG\Assets\Project\Scripts\UI\Control\MVP\Presenters\RecipePresenter.cs" containingFunctionPresentation="Method 'UpdateView'">
+            <startOffsets>
+              <option value="582" />
+            </startOffsets>
+            <endOffsets>
+              <option value="757" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="223" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Project/Scripts/UI/Control/Minimap/MinimapCamera.cs</url>
+          <line>41</line>
+          <properties documentPath="F:\ProjectDungeonRPG\Assets\Project\Scripts\UI\Control\Minimap\MinimapCamera.cs" containingFunctionPresentation="Method 'FollowPlayer'">
+            <startOffsets>
+              <option value="1923" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1961" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="228" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

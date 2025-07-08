@@ -1,6 +1,7 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
@@ -11,6 +12,7 @@ using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 #if SAINTSFIELD_NEWTONSOFT_JSON
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 #endif
 
 namespace SaintsField.Editor.Drawers.LayerDrawer

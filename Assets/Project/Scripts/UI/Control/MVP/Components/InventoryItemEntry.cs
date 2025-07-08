@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Items.Definitions;
 using Project.Scripts.UI.Control.MVP.Interfaces;
@@ -18,8 +19,8 @@ public class InventoryItemEntry : ListEntry, ISelectable, IPointerEnterHandler, 
     [NotNull] [field: SerializeField] private Button? SelectButton { get; set; }
     [NotNull] [field: SerializeField] private TooltipTrigger? TooltipTrigger { get; set; }
     
-    public event UnityAction OnDeselected = delegate { };
-    public event UnityAction OnSelected = delegate { };
+    public event UnityAction? OnDeselected;
+    public event UnityAction? OnSelected;
 
     public string ItemName { private get; set; } = string.Empty;
     public ItemType? ItemType { private get; set; }
@@ -28,9 +29,15 @@ public class InventoryItemEntry : ListEntry, ISelectable, IPointerEnterHandler, 
     public string Description { private get; set; } = string.Empty;
 
     private void Start() {
-        this.SelectButton.onClick.AddListener(this.OnSelected.Invoke);
+        this.SelectButton.onClick.AddListener(() => this.OnSelected?.Invoke());
     }
-    
+
+    private void OnDestroy() {
+        this.SelectButton.onClick.RemoveAllListeners();
+        this.OnDeselected = null;
+        this.OnSelected = null;
+    }
+
     public override void Refresh() {
         this.Nameplate.text = this.ItemName;
         this.TypeTag.sprite = this.ItemType!.Icon;

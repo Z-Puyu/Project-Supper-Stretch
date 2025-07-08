@@ -1,3 +1,5 @@
+using System;
+
 namespace DunGen
 {
 	public interface IKeyLock

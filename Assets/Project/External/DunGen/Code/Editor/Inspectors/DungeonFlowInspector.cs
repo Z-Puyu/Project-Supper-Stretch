@@ -1,6 +1,7 @@
 ﻿using DunGen.Editor.Validation;
 using DunGen.Graph;
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;

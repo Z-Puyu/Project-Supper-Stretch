@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Audio;
+using Project.Scripts.Characters.Combat;
 using Project.Scripts.Characters.Enemies.AI;
 using Project.Scripts.Items.InventorySystem.LootContainers;
 using Project.Scripts.Util.Components;
@@ -12,8 +14,14 @@ namespace Project.Scripts.Characters.Enemies;
 
 public class EnemyCharacter : GameCharacter<Enemy> {
     private static HashSet<EnemyCharacter> AggressiveEnemies { get; } = [];
-
+    
     [field: SerializeField] private EngagedInCombat? OnCombatStatusChanged { get; set; }
+    [NotNull] private NavMeshAgent? NavMeshAgent { get; set; }
+    
+    protected override void Awake() {
+        base.Awake();
+        this.NavMeshAgent = this.GetComponent<NavMeshAgent>();
+    }
     
     protected override void Start() {
         base.Start();
@@ -28,7 +36,8 @@ public class EnemyCharacter : GameCharacter<Enemy> {
         loot.Inject(this.CharacterData.LootTable!);
     }
 
-    private void OnDestroy() {
+    protected override void OnDestroy() {
+        base.OnDestroy();
         if (this.OnCombatStatusChanged) {
             this.OnCombatStatusChanged.Event -= this.RegisterEnemy;
         }
@@ -54,12 +63,12 @@ public class EnemyCharacter : GameCharacter<Enemy> {
 
     protected override void OnPause() {
         base.OnPause(); 
-        if (this.TryGetComponent(out NavMeshAgent navmeshAgent)) {
-            navmeshAgent.enabled = false;
-        }
-
         if (this.TryGetComponent(out BehaviorGraphAgent agent)) {
             agent.enabled = false;
+        }
+        
+        if (this.TryGetComponent(out NavMeshAgent navmeshAgent)) {
+            navmeshAgent.enabled = false;
         }
     }
     

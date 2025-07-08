@@ -31,9 +31,9 @@ public class EquipmentSet : MonoBehaviour {
     [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Bool)]
     private int DrawWeaponCondition { get; set; }
     
-    public event UnityAction<GameplayEffect, IEnumerable<Modifier>> OnEquipmentChanged = delegate { }; 
-    public event UnityAction OnEquip = delegate { };
-    public event UnityAction OnUnequip = delegate { };
+    public event UnityAction<GameplayEffect, IEnumerable<Modifier>>? OnEquipmentChanged; 
+    public event UnityAction? OnEquip;
+    public event UnityAction? OnUnequip;
 
     private void Awake() {
         foreach (EquipmentSocket socket in this.Root.GetComponentsInChildren<EquipmentSocket>()) {
@@ -52,6 +52,12 @@ public class EquipmentSet : MonoBehaviour {
                 this.AttributeSetComponent.AddEffect(effect, args);
             };
         }
+    }
+
+    private void OnDestroy() {
+        this.OnEquipmentChanged = null;
+        this.OnEquip = null;
+        this.OnUnequip = null;
     }
 
     public bool HasAny<T>(Predicate<Item>? predicate = null) where T : Component {
@@ -94,8 +100,8 @@ public class EquipmentSet : MonoBehaviour {
             this.Animator.SetBool(this.DrawWeaponCondition, true);
         }
         
-        this.OnEquipmentChanged.Invoke(property.GameplayEffectOnEquip, property.Modifiers);
-        this.OnEquip.Invoke();
+        this.OnEquipmentChanged?.Invoke(property.GameplayEffectOnEquip, property.Modifiers);
+        this.OnEquip?.Invoke();
         equipment.IsEquipped = true;
         return true;
     }
@@ -111,8 +117,8 @@ public class EquipmentSet : MonoBehaviour {
             this.Animator.SetBool(this.DrawWeaponCondition, false);
         }
 
-        this.OnEquipmentChanged.Invoke(property.GameplayEffectOnUnequip, property.Modifiers.Select(m => -m));
-        this.OnUnequip.Invoke();
+        this.OnEquipmentChanged?.Invoke(property.GameplayEffectOnUnequip, property.Modifiers.Select(m => -m));
+        this.OnUnequip?.Invoke();
         equipment.IsEquipped = false;
         return true;
     }

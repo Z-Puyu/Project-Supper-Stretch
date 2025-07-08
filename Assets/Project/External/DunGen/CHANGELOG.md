@@ -1,3 +1,20 @@
+## 2.18.3 - [2025/07/05]
+
+### Fixed
+- Fixed an issue causing tiles to spawn in the wrong position when the dungeon root object is not at the origin
+- Fixed an issue causing debug tile visualisation GameObjects to stick around after the dungeon has been generated when 'Pause Between Rooms' is greater than zero
+
+## 2.18.2 - [2025/07/02]
+
+### Added
+- The `Dungeon` class now has a reference to the `TileInstanceSource` used for tile pooling. There's now a parameterless `Clear()` function that will return all tiles to the pool and clear the dungeon
+
+### Fixed
+- The generation failure report window should now correctly display an error when a required tile could not be injected, causing the dungeon generation as a whole to fail
+- Fixed an issue where multiple copies of the same door prefab would be added to the `Dungeon` component's list of doors
+- Fixed a build error caused by `DunGenSettings` validation using editor-only methods
+- Fixed some build-only warnings
+
 ## 2.18.1 - [2025/06/17]
 
 ### Added

@@ -9,9 +9,6 @@ namespace Project.Scripts.UI.Control;
 
 [DisallowMultipleComponent, RequireComponent(typeof(Image), typeof(CanvasGroup), typeof(Canvas))]
 public class UIPage : MonoBehaviour {
-    public static event UnityAction OnActivated = delegate { };
-    public static event UnityAction OnDeactivated = delegate { };
-    
     [NotNull] public Canvas? Canvas { get; private set; }
     [NotNull] public CanvasGroup? CanvasGroup { get; private set; }
     [NotNull] public IPresenter? MainPresenter { get; private set; }
@@ -30,7 +27,6 @@ public class UIPage : MonoBehaviour {
         this.gameObject.SetActive(true);
         //Time.timeScale = 0;
         this.CanvasGroup.blocksRaycasts = true;
-        UIPage.OnActivated.Invoke();
     }
 
     public void Close() {
@@ -38,7 +34,6 @@ public class UIPage : MonoBehaviour {
         this.IsOpen = false;
         this.gameObject.SetActive(false);
         //Time.timeScale = 1;
-        UIPage.OnDeactivated.Invoke();
     }
 
     public void Refresh(IPresentable data) {

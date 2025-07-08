@@ -9,7 +9,7 @@ namespace Project.Scripts.Map;
 
 [DisallowMultipleComponent, RequireComponent(typeof(BoxCollider))]
 public class GoalPoint : MonoBehaviour {
-    public static event UnityAction OnReached = delegate { };
+    public static event UnityAction? OnReached;
     [field: SerializeField, Tag] private List<string> ActivatorTags { get; set; } = [];
     
     private void OnTriggerEnter(Collider other) {
@@ -17,7 +17,7 @@ public class GoalPoint : MonoBehaviour {
             return;
         }
 
-        GoalPoint.OnReached.Invoke();       
+        GoalPoint.OnReached?.Invoke();       
         Object.Destroy(this.gameObject);
     }
 }

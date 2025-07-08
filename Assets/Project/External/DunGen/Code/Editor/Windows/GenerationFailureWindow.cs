@@ -42,7 +42,8 @@ namespace DunGen.Editor.Windows
 		{
 			{ typeof(OutOfBoundsPlacementResult), "The tile was placed outside the bounding box of the dungeon. Increase the size of the 'Placement Bounds' in your dungeon generator settings, or turn off 'Restrict to Bounds?' if you don't need it." },
 			{ typeof(TileIsCollidingPlacementResult), "The tile placement collided with another tile. Tile collisions happen a lot naturally. You could potentially reduce collisions by: Reducing the size of your dungeon, adding more doorways to tiles, or adding more variety to your tile shapes to give DunGen more opportunity to succeed." },
-			{ typeof(NoMatchingDoorwayPlacementResult), "No matching doorway pairs were found when trying to attach one room to another. This can happen if you don't have enough doorways on your tiles, you have too restrictive conditions on which doorways are allowed to connect, or if the doorways are not aligned properly. Try adding more doorways to your tiles, or adjusting the doorway positions and restrictions." }
+			{ typeof(NoMatchingDoorwayPlacementResult), "No matching doorway pairs were found when trying to attach one room to another. This can happen if you don't have enough doorways on your tiles, you have too restrictive conditions on which doorways are allowed to connect, or if the doorways are not aligned properly. Try adding more doorways to your tiles, or adjusting the doorway positions and restrictions." },
+			{ typeof(RequiredTileInjectionFailedResult), "A required tile injection failed. This can happen if the tile injection rule has constraints that are too strict." }
 		};
 
 		public GenerationFailureReport GenerationFailureReport { get; set; }
@@ -295,6 +296,8 @@ namespace DunGen.Editor.Windows
 				return templatePlacementResult.TileTemplatePrefab;
 			else if (result is NoMatchingDoorwayPlacementResult noMatchingDoorwayPlacementResult)
 				return noMatchingDoorwayPlacementResult.FromTilePrefab;
+			else if(result is RequiredTileInjectionFailedResult requiredTileInjectionFailedResult)
+				return requiredTileInjectionFailedResult.InjectedTileSet;
 			else
 				return null;
 		}
