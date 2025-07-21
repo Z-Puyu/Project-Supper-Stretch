@@ -44,6 +44,12 @@ The starting and hitting locations will be used to check if the damage is blocke
 
 ## Changelog
 
+21 July 2025: Bug Fixes
+
+- Fixed an audio bug
+- Fixed some occlusion culling bugs
+- Fixed a bug causing the player to spawn in the void
+
 8 July 2025: General Enhancements
 
 - Adjusted ratio of room types in procedural maps
