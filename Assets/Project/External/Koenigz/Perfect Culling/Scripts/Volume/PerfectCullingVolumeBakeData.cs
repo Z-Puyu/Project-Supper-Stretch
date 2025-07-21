@@ -460,7 +460,11 @@ namespace Koenigz.PerfectCulling
 
         void SampleAtIndex(int index, List<ushort> indices, BitStreamReader bitStreamReader)
         {
-	        bitStreamReader.Reset(data[index].compressed);
+	        try {
+		        bitStreamReader.Reset(data[index].compressed);
+	        } catch (Exception e) {
+		        Debug.LogException(e, this);
+	        }
 
 	        ushort accumulator = 0;
 

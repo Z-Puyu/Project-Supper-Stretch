@@ -674,11 +674,6 @@ MonoBehaviour:
     vertexCount: 24
   - groupType: 0
     renderers:
-    - {fileID: 0}
-    unityBehaviours: []
-    vertexCount: 24
-  - groupType: 0
-    renderers:
     - {fileID: 1740294530744625484}
     unityBehaviours: []
     vertexCount: 24
@@ -815,11 +810,6 @@ MonoBehaviour:
   - groupType: 0
     renderers:
     - {fileID: 1729106908002988790}
-    unityBehaviours: []
-    vertexCount: 24
-  - groupType: 0
-    renderers:
-    - {fileID: 0}
     unityBehaviours: []
     vertexCount: 24
   - groupType: 0
@@ -1209,6 +1199,11 @@ MonoBehaviour:
     vertexCount: 24
   - groupType: 0
     renderers:
+    - {fileID: 2558787224122043645}
+    unityBehaviours: []
+    vertexCount: 24
+  - groupType: 0
+    renderers:
     - {fileID: 3105519874664393945}
     unityBehaviours: []
     vertexCount: 24
@@ -1219,12 +1214,12 @@ MonoBehaviour:
     vertexCount: 24
   - groupType: 0
     renderers:
-    - {fileID: 0}
+    - {fileID: 5078214157166348322}
     unityBehaviours: []
     vertexCount: 24
   - groupType: 0
     renderers:
-    - {fileID: 5078214157166348322}
+    - {fileID: 4779770729039618586}
     unityBehaviours: []
     vertexCount: 24
   - groupType: 0
@@ -1234,12 +1229,12 @@ MonoBehaviour:
     vertexCount: 24
   - groupType: 0
     renderers:
-    - {fileID: 0}
+    - {fileID: 4216250644800259643}
     unityBehaviours: []
     vertexCount: 24
   - groupType: 0
     renderers:
-    - {fileID: 4216250644800259643}
+    - {fileID: 1069373929853718370}
     unityBehaviours: []
     vertexCount: 24
   - groupType: 0
@@ -1414,11 +1409,6 @@ MonoBehaviour:
     vertexCount: 24
   - groupType: 0
     renderers:
-    - {fileID: 0}
-    unityBehaviours: []
-    vertexCount: 24
-  - groupType: 0
-    renderers:
     - {fileID: 2489912175975497092}
     unityBehaviours: []
     vertexCount: 24
@@ -1510,6 +1500,11 @@ MonoBehaviour:
   - groupType: 0
     renderers:
     - {fileID: 4125491577780928157}
+    unityBehaviours: []
+    vertexCount: 24
+  - groupType: 0
+    renderers:
+    - {fileID: 8880092725454181276}
     unityBehaviours: []
     vertexCount: 24
   - groupType: 0
@@ -1635,11 +1630,6 @@ MonoBehaviour:
   - groupType: 0
     renderers:
     - {fileID: 4942547394862540429}
-    unityBehaviours: []
-    vertexCount: 24
-  - groupType: 0
-    renderers:
-    - {fileID: 0}
     unityBehaviours: []
     vertexCount: 24
   - groupType: 0
@@ -1989,26 +1979,6 @@ MonoBehaviour:
     vertexCount: 1147
   - groupType: 0
     renderers:
-    - {fileID: 0}
-    unityBehaviours: []
-    vertexCount: 134
-  - groupType: 0
-    renderers:
-    - {fileID: 0}
-    unityBehaviours: []
-    vertexCount: 862
-  - groupType: 0
-    renderers:
-    - {fileID: 0}
-    unityBehaviours: []
-    vertexCount: 417
-  - groupType: 0
-    renderers:
-    - {fileID: 0}
-    unityBehaviours: []
-    vertexCount: 417
-  - groupType: 0
-    renderers:
     - {fileID: 3417377762026473787}
     unityBehaviours: []
     vertexCount: 134
@@ -2043,7 +2013,7 @@ MonoBehaviour:
     unityBehaviours: []
     vertexCount: 49
   additionalOccluders: []
-  volumeSize: {x: 14, y: 40, z: 32}
+  volumeSize: {x: 14, y: 40, z: 36}
   volumeBakeData: {fileID: 11400000, guid: 326dbc9531b29914b80d5354e082fe1d, type: 2}
   bakeCellSize: {x: 1, y: 2, z: 2}
   mergeDownsampleIterations: 1
@@ -5868,6 +5838,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 71064359ac2b0ad4a817a3cb249aaeb9, type: 3}
+--- !u!23 &1069373929853718370 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1323509466104075705, guid: 71064359ac2b0ad4a817a3cb249aaeb9, type: 3}
+  m_PrefabInstance: {fileID: 2056211214324636379}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &5312611157626690561 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6139266693591140058, guid: 71064359ac2b0ad4a817a3cb249aaeb9, type: 3}
@@ -8540,6 +8515,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 71064359ac2b0ad4a817a3cb249aaeb9, type: 3}
+--- !u!23 &2558787224122043645 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1323509466104075705, guid: 71064359ac2b0ad4a817a3cb249aaeb9, type: 3}
+  m_PrefabInstance: {fileID: 3592939793544788292}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5639893173751161604 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9194172587692563008, guid: 71064359ac2b0ad4a817a3cb249aaeb9, type: 3}
@@ -11408,6 +11388,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9194172587692563008, guid: 71064359ac2b0ad4a817a3cb249aaeb9, type: 3}
   m_PrefabInstance: {fileID: 5767744428571064227}
   m_PrefabAsset: {fileID: 0}
+--- !u!23 &4779770729039618586 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1323509466104075705, guid: 71064359ac2b0ad4a817a3cb249aaeb9, type: 3}
+  m_PrefabInstance: {fileID: 5767744428571064227}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5916864595931555361
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14127,6 +14112,11 @@ Transform:
 --- !u!1 &4346377263417721087 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6139266693591140058, guid: 71064359ac2b0ad4a817a3cb249aaeb9, type: 3}
+  m_PrefabInstance: {fileID: 7593739193226495525}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &8880092725454181276 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1323509466104075705, guid: 71064359ac2b0ad4a817a3cb249aaeb9, type: 3}
   m_PrefabInstance: {fileID: 7593739193226495525}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7635269272837387920

@@ -220,7 +220,6 @@ MonoBehaviour:
   <CharacterModel>k__BackingField: {fileID: 8622068247776109636}
   <Animator>k__BackingField: {fileID: 6172455072294468293}
   <DeathAnimationParameter>k__BackingField: 1293411866
-  <HitFeedbackAnimationParameter>k__BackingField: -1067290194
   <HealthComponent>k__BackingField: {fileID: 918074961689086898}
   <CharacterData>k__BackingField: {fileID: 11400000, guid: 932aecd0fa476384f9fb2272c7baf933, type: 2}
   <AttributeSet>k__BackingField: {fileID: 2237949048826024690}
@@ -1523,6 +1522,7 @@ MonoBehaviour:
   <HungerUpdateInterval>k__BackingField: 5
   <ToxinAttribute>k__BackingField: CharacterAttributes.Toxin
   <PoisonedEffect>k__BackingField: {fileID: 11400000, guid: e9fd5cf65df5ba44db68ba09babcef03, type: 2}
+  <DetoxificationEffect>k__BackingField: {fileID: 11400000, guid: d382a1ce7db1ff64d804ec7f988ebd7f, type: 2}
   <SeriouslyPoisonedThreshold>k__BackingField: 50
   <PoisonUpdateInterval>k__BackingField: 10
   <ChanceOfPoisoning>k__BackingField:
@@ -3006,7 +3006,6 @@ MonoBehaviour:
   <NavMeshAgent>k__BackingField: {fileID: 0}
   <Animator>k__BackingField: {fileID: 6172455072294468293}
   <KnockbackStrengthParameter>k__BackingField: -857148020
-  <OnKnockedBackEvent>k__BackingField: {fileID: 0}
 --- !u!4 &6393121446593302094 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 664315519586856848, guid: 457dd3d6403cd074180b2acc760fdcd6, type: 3}
@@ -5039,6 +5038,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <CombatComponent>k__BackingField: {fileID: 9136332409741104672}
+  <KnockBackComponent>k__BackingField: {fileID: 0}
   <EquipmentSet>k__BackingField: {fileID: 2844863981311671559}
   <PredefinedWeapons>k__BackingField:
     _keys: 
