@@ -38,7 +38,7 @@ public class PauseMenu : MonoBehaviour, IPresenter {
         this.ResumeButton.onClick.AddListener(this.Book.CloseAll);
         this.RestartButton.onClick.AddListener(() => {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-            Singleton<GameInstance>.Instance.LoadGame();
+            // Singleton<GameInstance>.Instance.LoadGame();
         });
         this.QuitButton.onClick.AddListener(Application.Quit);
     }

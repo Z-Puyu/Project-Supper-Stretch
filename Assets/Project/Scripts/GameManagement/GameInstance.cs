@@ -38,7 +38,7 @@ public class GameInstance : Singleton<GameInstance> {
     
     [NotNull]
     [field: LayoutEnd, SerializeField, Header("Player")]
-    private GameObject? Player { get; set; }
+    public PlayerCharacter? PlayerInstance { get; private set; }
     
     [NotNull]
     [field: SerializeField, LayoutEnd, Header("UI")]
@@ -52,7 +52,6 @@ public class GameInstance : Singleton<GameInstance> {
     [NotNull] public Transform? Eyes { get; private set; }
     [NotNull] private GameMap? StartingMap { get; set; }
     private CinemachineCamera? VirtualCamera { get; set; }
-    [NotNull] public PlayerCharacter? PlayerInstance { get; private set; }
     [NotNull] public Transform? PlayerTransform { get; private set; }
     [NotNull] private LoadingScreen? LoadingScreenInstance { get; set; }
     [NotNull] private GameOver? GameOverScreenInstance { get; set; }
@@ -111,12 +110,9 @@ public class GameInstance : Singleton<GameInstance> {
         Object.Instantiate(this.MainCamera);
         this.Eyes = Camera.main!.transform;
         this.VirtualCamera = Object.Instantiate(this.CinemachineCamera);
-        this.PlayerInstance = Object.Instantiate(this.Player).GetComponent<PlayerCharacter>();
         this.StartingMap = Object.Instantiate(this.MapGenerator);
+        this.PlayerInstance = Object.FindFirstObjectByType<PlayerCharacter>();
         this.PlayerTransform = this.PlayerInstance.transform;
-        this.PlayerTransform.SetParent(GameObject.FindGameObjectWithTag("PlayerStart").transform);
-        this.PlayerTransform.localPosition = Vector3.zero;
-        this.PlayerTransform.localRotation = Quaternion.identity;
         Logging.Info("Instantiating Objects... Done.", this);
     }
 
@@ -147,6 +143,9 @@ public class GameInstance : Singleton<GameInstance> {
         this.VirtualCamera!.Target.TrackingTarget =
                 this.PlayerInstance.GetComponentInChildren<CameraTarget>().transform;
         this.PlayerInstance.InitialiseComponents();
+        this.PlayerTransform.localPosition = Vector3.zero;
+        this.PlayerTransform.localRotation = Quaternion.identity;
+        this.PlayerTransform.SetParent(null);
         LeanTween.alphaCanvas(this.LoadingScreenInstance.GetComponent<CanvasGroup>(), 0, 2f)
                  .setOnComplete(() => {
                      this.LoadingScreenInstance.gameObject.SetActive(false);

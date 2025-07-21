@@ -35,6 +35,7 @@ public sealed class PhysicalConditions : MonoBehaviour {
     private string ToxinAttribute { get; set; } = string.Empty;
     
     [field: SerializeField] private GameplayEffect? PoisonedEffect { get; set; }
+    [field: SerializeField] private GameplayEffect? DetoxificationEffect { get; set; }
     [field: SerializeField] private int SeriouslyPoisonedThreshold { get; set; } = 50;
     [field: SerializeField] private int PoisonUpdateInterval { get; set; } = 10;
     
@@ -67,6 +68,10 @@ public sealed class PhysicalConditions : MonoBehaviour {
     public void Initialise() {
         if (this.DigestionEffect) {
             this.AttributeSetComponent.AddEffect(this.DigestionEffect, this.AttributeSetComponent);
+        }
+
+        if (this.DetoxificationEffect) {
+            this.AttributeSetComponent.AddEffect(this.DetoxificationEffect, this.AttributeSetComponent);
         }
         
         this.NextPoisonUpdate = Time.time + this.PoisonUpdateInterval;
@@ -163,6 +168,7 @@ public sealed class PhysicalConditions : MonoBehaviour {
         int maxToxin = this.AttributeSetComponent.ReadMax(this.ToxinAttribute);
         int chance = (int)this.ChanceOfPoisoning.Evaluate(toxin / (float)maxToxin);
         if (Random.Range(0, 100) >= chance) {
+            this.NextPoisonUpdate = Time.time + this.PoisonUpdateInterval;
             return;
         }
         
