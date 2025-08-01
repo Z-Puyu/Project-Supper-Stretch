@@ -19,7 +19,7 @@ public class ModifierLocalisationMapping : GameplayTagLocalisation<AttributeType
 
     protected override void Rewrite(AttributeType node, IDictionary<string, string> current) {
         foreach (ModifierType type in this.IncludedModifierTypes) {
-            string key = new ModifierKey(node.Name, type).ToString();
+            string key = new ModifierKey(node.Name, type, 0).ToString();
             if (current.TryGetValue(key, out string? value)) {
                 this.Entries.Add(key, value);
             } else {

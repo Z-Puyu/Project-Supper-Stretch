@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SceneViewPickerDrawer;
 using SaintsField.Editor.Utils;
 using UnityEditor;

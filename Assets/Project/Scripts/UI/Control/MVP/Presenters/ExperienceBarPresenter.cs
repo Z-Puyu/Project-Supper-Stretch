@@ -1,5 +1,3 @@
-using System;
-using Project.Scripts.Characters.Player;
 using Project.Scripts.Common;
 
 namespace Project.Scripts.UI.Control.MVP.Presenters;

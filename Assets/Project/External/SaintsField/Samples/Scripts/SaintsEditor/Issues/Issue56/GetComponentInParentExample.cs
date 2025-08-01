@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor.Issues.Issue56

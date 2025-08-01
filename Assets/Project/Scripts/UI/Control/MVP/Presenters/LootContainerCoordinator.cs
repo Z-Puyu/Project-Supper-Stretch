@@ -47,10 +47,10 @@ public class LootContainerCoordinator : MonoBehaviour, IPresenter {
         }
     }
 
-    public void Present(object model) {
+    public void Present(object? model) {
         if (model is not LootContainer.UIData data) {
             Logging.Error($"UI data type mismatch. Expect {nameof(LootContainer.UIData)}" + 
-                          $" but got {model.GetType().Name}", this);
+                          $" but got {model?.GetType().Name}", this);
             return;
         }
         

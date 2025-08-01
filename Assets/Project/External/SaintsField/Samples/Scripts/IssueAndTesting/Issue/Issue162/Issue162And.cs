@@ -1,4 +1,3 @@
-using SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue8;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue162

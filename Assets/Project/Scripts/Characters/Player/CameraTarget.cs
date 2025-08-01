@@ -1,4 +1,3 @@
-using System;
 using Project.Scripts.Common;
 using SaintsField;
 using UnityEngine;

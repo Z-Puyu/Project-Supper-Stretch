@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Audio;
-using Project.Scripts.Characters.Combat;
 using Project.Scripts.Characters.Enemies.AI;
 using Project.Scripts.Items.InventorySystem.LootContainers;
 using Project.Scripts.Util.Components;
