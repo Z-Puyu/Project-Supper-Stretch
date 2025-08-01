@@ -18,6 +18,7 @@ public class PauseMenu : MonoBehaviour, IPresenter {
     [NotNull] [field: SerializeField] private Button? ToInventoryButton { get; set; }
     [NotNull] [field: SerializeField] private Button? ResumeButton { get; set; }
     [NotNull] [field: SerializeField] private Button? RestartButton { get; set; }
+    [NotNull] [field: SerializeField] private Button? MainMenuButton { get; set; }
     [NotNull] [field: SerializeField] private Button? QuitButton { get; set; }
 
     private void Start() {
@@ -40,6 +41,8 @@ public class PauseMenu : MonoBehaviour, IPresenter {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             // Singleton<GameInstance>.Instance.LoadGame();
         });
+        
+        this.MainMenuButton.onClick.AddListener(() => SceneManager.LoadScene(0));
         this.QuitButton.onClick.AddListener(Application.Quit);
     }
 

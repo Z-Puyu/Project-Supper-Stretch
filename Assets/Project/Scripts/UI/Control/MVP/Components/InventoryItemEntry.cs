@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using Project.Scripts.Items.Definitions;
 using Project.Scripts.UI.Control.MVP.Interfaces;
@@ -32,7 +31,8 @@ public class InventoryItemEntry : ListEntry, ISelectable, IPointerEnterHandler, 
         this.SelectButton.onClick.AddListener(() => this.OnSelected?.Invoke());
     }
 
-    private void OnDestroy() {
+    protected override void OnDestroy() {
+        base.OnDestroy();
         this.SelectButton.onClick.RemoveAllListeners();
         this.OnDeselected = null;
         this.OnSelected = null;

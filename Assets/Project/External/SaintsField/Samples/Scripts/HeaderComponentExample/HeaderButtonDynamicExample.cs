@@ -3,7 +3,6 @@ using System.Collections;
 using System.Linq;
 using SaintsField.ComponentHeader;
 using SaintsField.Samples.Scripts.SaintsEditor;
-using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.HeaderComponentExample
 {

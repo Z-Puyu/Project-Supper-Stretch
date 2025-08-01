@@ -12,7 +12,7 @@ public abstract class ListEntry : UIView {
         Object.Destroy(this.gameObject);
     }
 
-    protected void OnDestroy() {
+    protected virtual void OnDestroy() {
         this.OnRemoved = null;
     }
 }

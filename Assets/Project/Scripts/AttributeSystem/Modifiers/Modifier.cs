@@ -17,7 +17,7 @@ public readonly record struct Modifier(ModifierKey Key, float Value, int Duratio
         ModifierType.BaseOffset => $"{this.Value:+#;-#;+#}",
         ModifierType.Multiplier => $"{this.Value:+#;-#;+#}%",
         ModifierType.FinalOffset => this.Duration > 0
-                ? $"{Mathf.CeilToInt(this.Value / this.Duration):+#;-#;+#}"
+                ? $"{this.Value / this.Duration:+#;-#;+#}"
                 : $"{this.Value:+#;-#;+#}",
         var _ => throw new ArgumentOutOfRangeException()
     };
@@ -35,10 +35,10 @@ public readonly record struct Modifier(ModifierKey Key, float Value, int Duratio
     public static Modifier From(ModifierData data) => new Modifier(data.Key, data.Value, data.Duration);
 
     public static Modifier Once(float value, string target, ModifierType type) =>
-            new Modifier(new ModifierKey(target, type), value);
+            new Modifier(new ModifierKey(target, type, 0), value);
 
     public static Modifier Of(float value, string target, ModifierType type, int duration) =>
-            new Modifier(new ModifierKey(target, type), value, duration);
+            new Modifier(new ModifierKey(target, type, duration), value, duration);
 
     public static IEnumerable<Modifier> Parse(Vector3 code, string target) {
         if (code == Vector3.zero) {
@@ -99,7 +99,7 @@ public readonly record struct Modifier(ModifierKey Key, float Value, int Duratio
             > 0 => this.Type == ModifierType.FinalOffset 
                     ? $"{this.ValueText} {this.TargetName} per second, for {this.Duration} seconds" 
                     : $"{this.ValueText} {this.TargetName} for {this.Duration} seconds",
-            < 0 when this.Type != ModifierType.FinalOffset => $"{this.ValueText} {this.TargetName} per second",
+            < 0 when this.Type == ModifierType.FinalOffset => $"{this.ValueText} {this.TargetName} per second",
             var _ => $"{this.ValueText} {this.TargetName}"
         };
     }

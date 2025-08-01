@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Project.Scripts.Common;
 using SaintsField;
 using Project.Scripts.Interaction;
 using Project.Scripts.Util.Components;
-using Project.Scripts.Util.Singleton;
 using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;

@@ -1,4 +1,3 @@
-using System;
 using Project.Scripts.UI.Control.MVP.Interfaces;
 using SaintsField;
 using UnityEngine;

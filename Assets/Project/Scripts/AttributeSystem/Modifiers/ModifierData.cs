@@ -25,7 +25,7 @@ public class ModifierData {
         this.Duration = duration;
     }
     
-    public ModifierKey Key => new ModifierKey(this.Target, this.Method);
+    public ModifierKey Key => new ModifierKey(this.Target, this.Method, this.Duration);
     
     private AdvancedDropdownList<string> AllTargets => GameplayTagTree<AttributeType>.Instances
                                                                                      .OfType<AttributeDefinition>()

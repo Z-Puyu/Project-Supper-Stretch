@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DunGen;
@@ -41,6 +40,7 @@ public class PlayerCharacter : GameCharacter<NewPlayerPreset> {
               .OfType<IUserInterface>()
               .ForEach(control => control.BindInput(this.InputActions));
         Logging.Info("Input bindings enabled", this);
+        GameEvents.UI.OnNextTutorial?.Invoke();
     }
 
     protected override void Start() {

@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Project.Scripts.Common.GameplayTags;
 using Project.Scripts.Items;

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Project.Scripts.AttributeSystem.Attributes;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
-using Project.Scripts.AttributeSystem.GameplayEffects;
-using Project.Scripts.Characters.Player;
 using Project.Scripts.Common;
 using Project.Scripts.Common.GameplayTags;
 using SaintsField;

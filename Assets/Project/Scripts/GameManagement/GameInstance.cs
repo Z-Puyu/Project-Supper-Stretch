@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using DunGen;
 using Project.Scripts.AttributeSystem.Attributes.Definitions;
 using Project.Scripts.Characters;
@@ -145,12 +144,12 @@ public class GameInstance : Singleton<GameInstance> {
         this.PlayerInstance.InitialiseComponents();
         this.PlayerTransform.localPosition = Vector3.zero;
         this.PlayerTransform.localRotation = Quaternion.identity;
-        this.PlayerTransform.SetParent(null);
         LeanTween.alphaCanvas(this.LoadingScreenInstance.GetComponent<CanvasGroup>(), 0, 2f)
                  .setOnComplete(() => {
                      this.LoadingScreenInstance.gameObject.SetActive(false);
                      this.PlayerInstance.EnableInput();
                  });
+        this.PlayerTransform.SetParent(null);
         Logging.Info("Enabling Scripts... Done.", this);
     }
 

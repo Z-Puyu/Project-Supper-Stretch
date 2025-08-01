@@ -1,5 +1,4 @@
-﻿using Project.Scripts.Common;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Project.Scripts.Characters.Combat;
 

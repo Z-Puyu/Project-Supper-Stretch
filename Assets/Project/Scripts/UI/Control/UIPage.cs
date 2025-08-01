@@ -2,7 +2,6 @@
 using Project.Scripts.Common;
 using Project.Scripts.UI.Control.MVP;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Project.Scripts.UI.Control;
@@ -27,6 +26,7 @@ public class UIPage : MonoBehaviour {
         this.gameObject.SetActive(true);
         //Time.timeScale = 0;
         this.CanvasGroup.blocksRaycasts = true;
+        this.MainPresenter.Present(null);
     }
 
     public void Close() {

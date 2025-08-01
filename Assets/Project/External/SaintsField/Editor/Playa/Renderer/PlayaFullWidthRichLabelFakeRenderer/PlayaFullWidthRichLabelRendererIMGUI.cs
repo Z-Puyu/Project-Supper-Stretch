@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;

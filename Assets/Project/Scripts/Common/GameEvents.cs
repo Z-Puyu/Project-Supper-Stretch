@@ -11,5 +11,6 @@ public static class GameEvents {
     public static class UI {
         public static Action? OnOpenPauseMenu = delegate { };
         public static Action? OnGoBack = delegate { };
+        public static Action? OnNextTutorial = delegate { };
     }
 }
