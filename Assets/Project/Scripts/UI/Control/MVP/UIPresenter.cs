@@ -25,10 +25,10 @@ public abstract class UIPresenter<M, V> : MonoBehaviour, IPresenter where V : UI
         this.OnRefresh?.Invoke();
     }
             
-    public void Present(object model) {
+    public void Present(object? model) {
         this.OnRefresh = delegate { };
         if (model is not M m) {
-            Logging.Warn($"UI data type mismatch. Expected {typeof(M).Name}, got {model.GetType().Name}.", this);
+            Logging.Warn($"UI data type mismatch. Expected {typeof(M).Name}, got {model?.GetType().Name}.", this);
             return;
         }
         

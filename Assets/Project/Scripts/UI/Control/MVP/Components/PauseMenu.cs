@@ -46,5 +46,5 @@ public class PauseMenu : MonoBehaviour, IPresenter {
         this.QuitButton.onClick.AddListener(Application.Quit);
     }
 
-    public void Present(object model) { }
+    public void Present(object? model) { }
 }

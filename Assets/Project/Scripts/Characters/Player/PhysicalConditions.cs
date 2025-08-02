@@ -155,6 +155,20 @@ public sealed class PhysicalConditions : MonoBehaviour {
             }
             
             this.IsStarving = true;
+            return;
+        }
+        
+        if (current > this.StarvedThreshold && old <= this.StarvedThreshold) {
+            this.IsStarving = false;
+            if (!this.HungryEffect) {
+                return;
+            }
+            
+            if (current <= this.HungryThreshold) {
+                this.OnHungry?.Invoke();
+            } else {
+                this.OnSatiated?.Invoke();
+            }
         }
     }
 

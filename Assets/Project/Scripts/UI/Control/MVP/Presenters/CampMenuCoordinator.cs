@@ -57,7 +57,7 @@ public class CampMenuCoordinator : MonoBehaviour, IPresenter {
         this.Present(this.Model);
     }
 
-    public void Present(object model) {
+    public void Present(object? model) {
         if (model is not CampFire.UIData data) {
             return;
         }
