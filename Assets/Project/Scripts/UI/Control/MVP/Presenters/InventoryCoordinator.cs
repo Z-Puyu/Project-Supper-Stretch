@@ -7,7 +7,7 @@ namespace Project.Scripts.UI.Control.MVP.Presenters;
 public class InventoryCoordinator : MonoBehaviour, IPresenter {
     [field: SerializeField] private List<InventoryListPresenter> InventoryTabs { get; set; } = [];
     
-    public void Present(object model) {
+    public void Present(object? model) {
         if (model is not Inventory inventory) {
             return;
         }

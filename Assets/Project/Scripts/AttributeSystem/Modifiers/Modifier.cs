@@ -17,7 +17,7 @@ public readonly record struct Modifier(ModifierKey Key, float Value, int Duratio
         ModifierType.BaseOffset => $"{this.Value:+#;-#;+#}",
         ModifierType.Multiplier => $"{this.Value:+#;-#;+#}%",
         ModifierType.FinalOffset => this.Duration > 0
-                ? $"{this.Value / this.Duration:+#;-#;+#}"
+                ? $"{this.Value / this.Duration:F2}"
                 : $"{this.Value:+#;-#;+#}",
         var _ => throw new ArgumentOutOfRangeException()
     };
