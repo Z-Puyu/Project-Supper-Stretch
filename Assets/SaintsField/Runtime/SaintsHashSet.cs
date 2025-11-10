@@ -1,0 +1,120 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+// using System.Runtime.Serialization;
+using SaintsField.Utils;
+using UnityEngine;
+
+// ReSharper disable once CheckNamespace
+namespace SaintsField
+{
+    [Serializable]
+    public class SaintsHashSet<T>: SaintsHashSetBase<T>
+    {
+
+        [SerializeField]
+        private List<SaintsWrap<T>> _saintsList = new List<SaintsWrap<T>>();
+
+#if UNITY_EDITOR
+        // ReSharper disable once UnusedMember.Local
+        private static string EditorPropertyName => nameof(_saintsList);
+#endif
+
+        #region Editor Interface
+
+        protected override int SerializedCount() => _saintsList.Count;
+
+        protected override void SerializedAdd(T key)
+        {
+            _saintsList.Add(new SaintsWrap<T>(key));
+        }
+
+        protected override bool SerializedRemove(T key)
+        {
+            int index = _saintsList.FindIndex(each => EqualityComparer<T>.Default.Equals(each.GetValue(), key));
+            if (index >= 0)
+            {
+                _saintsList.RemoveAt(index);
+                return true;
+            }
+
+            return false;
+        }
+
+        protected override T SerializedGetAt(int index) => _saintsList[index].GetValue();
+
+        protected override void SerializedClear() => _saintsList.Clear();
+        #endregion
+
+#if UNITY_EDITOR
+        private HashSet<SaintsWrap<T>> _editorWatchedKeys = new HashSet<SaintsWrap<T>>();
+        protected override void OnAfterDeserializeProcess()
+        {
+            IEnumerable<SaintsWrap<T>> extraKeys = _saintsList.Except(_editorWatchedKeys);
+            foreach (SaintsWrap<T> keyWrap in extraKeys)
+            {
+                // Debug.Log($"add key listener");
+                keyWrap.EditorOnAfterDeserializeChanged.AddListener(OnAfterDeserializeProcess);
+                _editorWatchedKeys.Add(keyWrap);
+            }
+            base.OnAfterDeserializeProcess();
+        }
+#endif
+
+        #region Constructor
+
+        public SaintsHashSet()
+        {
+            HashSet = new HashSet<T>();
+        }
+
+#if UNITY_2021_2_OR_NEWER
+        public SaintsHashSet(int capacity)
+        {
+            HashSet = new HashSet<T>(capacity);
+        }
+#endif
+
+        public SaintsHashSet(IEqualityComparer<T> comparer)
+        {
+            HashSet = new HashSet<T>(comparer);
+        }
+
+        public SaintsHashSet(IEnumerable<T> collection)
+        {
+            HashSet = new HashSet<T>(collection);
+        }
+
+        public SaintsHashSet(IEnumerable<T> collection, IEqualityComparer<T> comparer)
+        {
+            switch (collection)
+            {
+                case null:
+                    throw new ArgumentNullException(nameof(collection));
+                case SaintsHashSet<T> saintsSet:
+                    HashSet = new HashSet<T>(saintsSet.HashSet, comparer);
+                    return;
+                case HashSet<T> objSet:
+                    HashSet = new HashSet<T>(objSet, comparer);
+                    return;
+                case ICollection<T> objs:
+                    HashSet = new HashSet<T>(objs, comparer);
+                    return;
+                default:
+                    HashSet = new HashSet<T>(comparer);
+                    HashSet.UnionWith(collection);
+                    return;
+            }
+        }
+
+        // protected HashSet(SerializationInfo info, StreamingContext context) => HashSet.m_siInfo = info;
+#if UNITY_2021_2_OR_NEWER
+        public SaintsHashSet(int capacity, IEqualityComparer<T> comparer)
+        {
+            HashSet = new HashSet<T>(capacity, comparer);
+        }
+#endif
+
+        #endregion
+    }
+}
