@@ -69,5 +69,13 @@ namespace CommonFrameworks.Extensions {
             
             return comp.gameObject.AddComponent<T>();
         }
+        
+        public static bool HasComponent<T>(this GameObject obj) where T : Component {
+            return obj.GetComponent<T>();
+        }
+        
+        public static bool HasComponent<T>(this Component comp) where T : Component {
+            return comp.gameObject.GetComponent<T>();
+        }
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using SaintsField.Samples.Scripts.SaintsEditor.Issues;
 
 namespace CommonFrameworks.Trees {
     public sealed class TrieDictionary<K, T, V> : ITrie<KeyValuePair<K, V>, T>, IDictionary<K, V> where K : IEnumerable<T> {
@@ -10,11 +9,11 @@ namespace CommonFrameworks.Trees {
             internal IDictionary<T, Entry> Children { get; } = new Dictionary<T, Entry>();
             internal bool IsEndOfKey { get; set; }
             internal int Size { get; set; }
+            internal K Key { get; set; }
             internal V Value { get; set; }
         }
         
         private Entry Root { get; } = new Entry();
-        private Func<IEnumerable<T>, K> KeyProducer { get; }
         private T Separator { get; }
         private bool HasSeparator { get; }
         
@@ -24,15 +23,14 @@ namespace CommonFrameworks.Trees {
         
         private IEnumerable<KeyValuePair<K, V>> Entries => this.CachedEntries.Value;
 
-        public TrieDictionary(Func<IEnumerable<T>, K> keyProducer) {
-            this.KeyProducer = keyProducer;
+        public TrieDictionary() {
             this.CachedEntries =
                     new Lazy<IEnumerable<KeyValuePair<K, V>>>(() => this.PrefixSearch(Enumerable.Empty<T>()));
             this.CachedKeys = new Lazy<ICollection<K>>(() => this.Entries.Select(entry => entry.Key).ToArray());
             this.CachedValues = new Lazy<ICollection<V>>(() => this.Entries.Select(entry => entry.Value).ToArray());
         }
 
-        public TrieDictionary(Func<IEnumerable<T>, K> keyProducer, T separator) : this(keyProducer) {
+        public TrieDictionary(T separator) : this() {
             this.Separator = separator;
             this.HasSeparator = true;
         }
@@ -121,6 +119,7 @@ namespace CommonFrameworks.Trees {
             }
             
             path[^1].IsEndOfKey = true;
+            path[^1].Key = key;
             path[^1].Value = value;
             foreach (Entry entry in path) {
                 entry.Size += 1;
@@ -213,8 +212,7 @@ namespace CommonFrameworks.Trees {
                 }
 
                 if (curr.entry.IsEndOfKey) {
-                    K key = this.KeyProducer(curr.idx < elements.Count - 1 ? elements.Take(curr.idx + 1) : elements);
-                    entries.Add(new KeyValuePair<K, V>(key, curr.entry.Value));
+                    entries.Add(new KeyValuePair<K, V>(curr.entry.Key, curr.entry.Value));
                 } else {
                     foreach ((T element, Entry entry) in curr.entry.Children) {
                         stack.Push((element, entry, curr.idx + 1));

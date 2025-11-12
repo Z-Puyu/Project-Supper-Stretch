@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using Hierarchy_Designer.Runtime.Scripts;
 using UnityEditor;
 using UnityEngine;
 

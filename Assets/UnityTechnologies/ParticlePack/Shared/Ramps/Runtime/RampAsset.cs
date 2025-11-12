@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-
+namespace UnityTechnologies.ParticlePack.Shared.Ramps.Runtime {
     [CreateAssetMenu]
     public class RampAsset : ScriptableObject
     {
@@ -9,3 +9,4 @@
         public bool up = false;
         public bool overwriteExisting = true;
     }
+}

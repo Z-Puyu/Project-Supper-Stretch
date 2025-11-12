@@ -1,27 +1,26 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using CommonFrameworks.Flags;
 
 namespace CommonFrameworks.Trees {
-    public sealed class TrieSet<K, T> : ITrie<K, T> where K : IEnumerable<T> {
+    public sealed class TrieSet<K, T> : ITrie<K, T>, ISet<K> where K : IEnumerable<T> {
         private sealed class Node {
             internal IDictionary<T, Node> Children { get; } = new Dictionary<T, Node>();
             internal bool IsEndOfKey { get; set; }
             internal int Size { get; set; }
+            internal K Key { get; set; }
         }
 
         private Node Root { get; } = new Node();
-        private Func<IEnumerable<T>, K> KeyProducer { get; }
         private T Separator { get; }
         private bool HasSeparator { get; }
 
-        public TrieSet(Func<IEnumerable<T>, K> keyProducer) {
-            this.KeyProducer = keyProducer;
+        public TrieSet() {
+            this.Separator = default;
+            this.HasSeparator = false;
         }
 
-        public TrieSet(Func<IEnumerable<T>, K> keyProducer, T separator) : this(keyProducer) {
+        public TrieSet(T separator) {
             this.Separator = separator;
             this.HasSeparator = true;
         }
@@ -39,31 +38,9 @@ namespace CommonFrameworks.Trees {
             return this.GetEnumerator();
         }
 
-        public void Add(K item) {
-            if (item is null) {
-                return;
-            }
-
-            List<Node> path = new List<Node>();
-            Node curr = this.Root;
-            path.Add(curr);
-            foreach (T element in item) {
-                if (!curr.Children.TryGetValue(element, out Node node)) {
-                    node = new Node();
-                    curr.Children.Add(element, node);
-                }
-
-                curr = node;
-                path.Add(curr);
-            }
-
-            if (curr.IsEndOfKey) {
-                return;
-            }
-
-            curr.IsEndOfKey = true;
-            foreach (Node node in path) {
-                node.Size += 1;
+        void ICollection<K>.Add(K item) {
+            if (item is not null) {
+                this.Add(item);
             }
         }
 
@@ -81,7 +58,95 @@ namespace CommonFrameworks.Trees {
         }
 
         public bool Remove(K item) {
-            return item is not null && this.Remove(item.AsEnumerable());       
+            return item is not null && this.Remove(item.AsEnumerable());
+        }
+
+        #endregion
+
+        #region Set Semantics
+
+        public bool Add(K item) {
+            List<Node> path = new List<Node>();
+            Node curr = this.Root;
+            path.Add(curr);
+            foreach (T element in item) {
+                if (!curr.Children.TryGetValue(element, out Node node)) {
+                    node = new Node();
+                    curr.Children.Add(element, node);
+                }
+
+                curr = node;
+                path.Add(curr);
+            }
+
+            if (curr.IsEndOfKey) {
+                return false;
+            }
+
+            curr.IsEndOfKey = true;
+            curr.Key = item;
+            foreach (Node node in path) {
+                node.Size += 1;
+            }
+
+            return true;
+        }
+
+        public void ExceptWith(IEnumerable<K> other) {
+            ISet<K> set = other.ToHashSet();
+            foreach (K key in this.Where(key => set.Contains(key))) {
+                this.Remove(key);
+            }
+        }
+
+        public void IntersectWith(IEnumerable<K> other) {
+            ISet<K> set = other.ToHashSet();
+            foreach (K key in this.Where(key => !set.Contains(key))) {
+                this.Remove(key);
+            }
+        }
+
+        public bool IsProperSubsetOf(IEnumerable<K> other) {
+            return other.ToHashSet().IsProperSupersetOf(this);
+        }
+
+        public bool IsProperSupersetOf(IEnumerable<K> other) {
+            ISet<K> set = other.ToHashSet();
+            return this.Count > set.Count && this.IsSupersetOf(set);
+        }
+
+        public bool IsSubsetOf(IEnumerable<K> other) {
+            return other.ToHashSet().IsSupersetOf(this);
+        }
+
+        public bool IsSupersetOf(IEnumerable<K> other) {
+            return other.All(this.Contains);
+        }
+
+        public bool Overlaps(IEnumerable<K> other) {
+            return other.Any(this.Contains);
+        }
+
+        public bool SetEquals(IEnumerable<K> other) {
+            ISet<K> set = other.ToHashSet();
+            return this.IsSubsetOf(set) && set.IsSubsetOf(this);
+        }
+
+        public void SymmetricExceptWith(IEnumerable<K> other) {
+            ISet<K> set = other.ToHashSet();
+            foreach (K key in this.Where(key => set.Contains(key))) {
+                this.Remove(key);
+            }
+            
+            foreach (K key in set.Where(key => !this.Contains(key))) {
+                this.Add(key);
+            }
+        }
+
+        public void UnionWith(IEnumerable<K> other) {
+            foreach (K key in other) {
+                this.Add(key);
+            }
         }
 
         #endregion
@@ -91,13 +156,13 @@ namespace CommonFrameworks.Trees {
             if (prefix is null) {
                 return false;
             }
-            
+
             path.Add(this.Root);
             foreach (T element in prefix) {
                 if (!path[^1].Children.TryGetValue(element, out Node node)) {
                     return false;
                 }
-                
+
                 path.Add(node);
             }
 
@@ -133,7 +198,7 @@ namespace CommonFrameworks.Trees {
                 }
 
                 if (curr.node.IsEndOfKey) {
-                    keys.Add(this.KeyProducer(curr.idx < elements.Count - 1 ? elements.Take(curr.idx + 1) : elements));
+                    keys.Add(curr.node.Key);
                 } else {
                     foreach ((T element, Node node) in curr.node.Children) {
                         stack.Push((element, node, curr.idx + 1));
@@ -148,12 +213,12 @@ namespace CommonFrameworks.Trees {
             if (prefix is null) {
                 return false;
             }
-            
+
             T[] prefixArray = prefix.ToArray();
             if (!this.HasPath(prefixArray, out List<Node> path)) {
                 return false;
             }
-            
+
             path[^1].Children.Clear();
             path[^1].IsEndOfKey = false;
             int size = path[^1].Size;
@@ -165,18 +230,18 @@ namespace CommonFrameworks.Trees {
                     path[idx - 1].Children.Remove(element);
                     break;
                 }
-                
+
                 idx += 1;
             }
-            
+
             return true;
         }
 
         public bool Remove(IEnumerable<T> key) {
             if (key is null) {
-                return false;   
+                return false;
             }
-            
+
             T[] prefix = key.ToArray();
             if (!this.HasPath(prefix, out List<Node> path) || path.Count == 0) {
                 return false;
@@ -195,11 +260,11 @@ namespace CommonFrameworks.Trees {
                     path[idx - 1].Children.Remove(element);
                     break;
                 }
-                
+
                 idx += 1;
             }
 
-            return true;     
+            return true;
         }
     }
 }
