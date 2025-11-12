@@ -51,34 +51,9 @@ namespace CommonFrameworks.Flags {
             return indices;
         }
         
-        public IEnumerable<int> GetAllAbsent() {
-            List<int> indices = new List<int>();
-            for (int i = 0; i < 64; i += 1) {
-                if (!this.Has(1 << i)) {
-                    indices.Add(i);
-                }
-            }
-
-            return indices;
-        }
-        
         public bool HasAnyPresent(out int first) {
             for (int i = 0; i < 63; i += 1) {
                 if (((this.Value >> i) & 1) == 0) {
-                    continue;
-                }
-
-                first = i;
-                return true;
-            }
-
-            first = -1;
-            return false;
-        }
-        
-        public bool HasAnyAbsent(out int first) {
-            for (int i = 0; i < 63; i += 1) {
-                if (((this.Value >> i) & 1) != 0) {
                     continue;
                 }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using CommonFrameworks.Flags;
 
 namespace CommonFrameworks.Trees {
     public sealed class TrieSet<K, T> : ITrie<K, T> where K : IEnumerable<T> {
