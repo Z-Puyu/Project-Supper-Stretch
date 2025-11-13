@@ -27,6 +27,18 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
             };
         }
         
+        public bool Equals(ModifierValue other) {
+            return this.Magnitude.CompareTo(other.Magnitude) == 0;
+        }
+
+        public override bool Equals(object obj) {
+            return obj is ModifierValue other && this.Equals(other);
+        }
+
+        public override int GetHashCode() {
+            return this.Magnitude.GetHashCode();
+        }
+        
         public override string ToString() {
             return $"{this.Magnitude}";
         }
@@ -85,18 +97,6 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
 
         public static implicit operator ModifierValue(double value) {
             return new ModifierValue(value);
-        }
-
-        public bool Equals(ModifierValue other) {
-            return this.Magnitude.CompareTo(other.Magnitude) == 0;
-        }
-
-        public override bool Equals(object obj) {
-            return obj is ModifierValue other && this.Equals(other);
-        }
-
-        public override int GetHashCode() {
-            return this.Magnitude.GetHashCode();
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CommonFrameworks.CommonUtilities.Processors;
 using CommonFrameworks.Trees;
 using GameplayAbilitiesSystem.Runtime.Attributes;
@@ -10,14 +11,49 @@ using UnityEngine.Events;
 
 namespace GameplayAbilitiesSystem.Runtime.Modifiers {
     [DisallowMultipleComponent]
-    public class ModifierEnvironment : MonoBehaviour {
+    public class ModifierEnvironment : MonoBehaviour, IModifiable {
         private sealed class Node {
-            internal ModifierValue[] Modifiers { get; } = new ModifierValue[4] {
-                new ModifierValue(0),
+            internal ModifierValue[] Modifiers { get; } = {
                 new ModifierValue(0),
                 new ModifierValue(0),
                 new ModifierValue(0)
             };
+
+            private LinkedList<ModifierValue> Overrides { get; } = new LinkedList<ModifierValue>();
+
+            private Dictionary<ModifierValue, Stack<LinkedListNode<ModifierValue>>> OverrideRecords { get; } =
+                new Dictionary<ModifierValue, Stack<LinkedListNode<ModifierValue>>>();
+
+            internal bool HasOverride(out ModifierValue value) {
+                if (this.Overrides.Count == 0) {
+                    value = default;
+                    return false;
+                }
+                
+                value = this.Overrides.Last.Value;
+                return true;
+            }
+
+            internal void AddOverride(ModifierValue value) {
+                LinkedListNode<ModifierValue> node = this.Overrides.AddLast(value);
+                if (!this.OverrideRecords.TryGetValue(value, out Stack<LinkedListNode<ModifierValue>> nodes)) {
+                    nodes = new Stack<LinkedListNode<ModifierValue>>();
+                    this.OverrideRecords.Add(value, nodes);
+                }
+                
+                nodes.Push(node);
+            }
+            
+            internal void RemoveOverride(ModifierValue value) {
+                if (!this.OverrideRecords.TryGetValue(value, out Stack<LinkedListNode<ModifierValue>> nodes)) {
+                    return;
+                }
+                
+                this.Overrides.Remove(nodes.Pop());
+                if (nodes.Count == 0) {
+                    this.OverrideRecords.Remove(value);
+                }
+            }
         }
 
         [field: SerializeField] private bool IsGlobalEnvironment { get; set; }
@@ -40,7 +76,12 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
                 this.Modifiers.Add(modifier.Target, node);
             }
 
-            node.Modifiers[(int)modifier.Type] += modifier.Value;
+            if (modifier.Type == ModifierType.Override) {
+                node.AddOverride(modifier.Value);
+            } else {
+                node.Modifiers[(int)modifier.Type] += modifier.Value;
+            }
+
             this.OnModifierUpdated?.Invoke(modifier.Target);
         }
 
@@ -57,30 +98,53 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
         private Attribute Query(
             Attribute attribute, ModifierValue[] modifiers, IEnumerable<IProcessor<Attribute>> processors
         ) {
-            this.CollectModifiers(attribute.Id, modifiers);
             IProcessor<Attribute>[] processorList = processors.ToArray();
-            if (!this.IsGlobalEnvironment && this.ParentEnvironment) {
-                return this.ParentEnvironment.Query(attribute, modifiers, processorList);
-            }
-            
-            for (ModifierType op = ModifierType.Shift; op <= ModifierType.Override; op += 1) {
-                double value = modifiers[(int)op].ApplyTo(attribute.Value, op);
-                attribute = new Attribute(attribute.Source, attribute.Id, value, attribute.IsValueApproximated);
-                attribute = processorList.Aggregate(attribute, (current, processor) => processor.Process(current));
+            if (this.Modifiers.TryGetValue(attribute.Id, out Node node) &&
+                node.HasOverride(out ModifierValue @override)) {
+                attribute = update(@override, ModifierType.Override);
+            } else {
+                this.CollectModifiers(attribute.Id, modifiers);
+                if (!this.IsGlobalEnvironment && this.ParentEnvironment) {
+                    return this.ParentEnvironment.Query(attribute, modifiers, processorList);
+                }
+
+                for (ModifierType op = ModifierType.Shift; op < ModifierType.Override; op += 1) {
+                    attribute = update(modifiers[(int)op], op);
+                }
             }
 
             return attribute;
+
+            Attribute update(ModifierValue modifier, ModifierType op) {
+                double value = modifier.ApplyTo(attribute.Value, op);
+                attribute = new Attribute(attribute.Source, attribute.Id, value, attribute.IsValueApproximated);
+                return processorList.Aggregate(attribute, (current, processor) => processor.Process(current));
+            }
         }
 
         public Attribute Query(Attribute @base, IEnumerable<IProcessor<Attribute>> processors) {
             ModifierValue[] modifiers = {
                 new ModifierValue(0),
                 new ModifierValue(0),
-                new ModifierValue(0),
                 new ModifierValue(0)
             };
 
             return this.Query(@base, modifiers, processors);
+        }
+
+        public override string ToString() {
+            StringBuilder sb = new StringBuilder($"Modifiers on {this.gameObject.name}:\n", this.Modifiers.Count + 1);
+            foreach (KeyValuePair<AttributeKey, Node> entry in this.Modifiers) {
+                for (ModifierType op = ModifierType.Shift; op < ModifierType.Override; op += 1) {
+                    sb.Append($"|{entry.Key}:{op} = {entry.Value.Modifiers[(int)op]} ");
+                }
+
+                if (entry.Value.HasOverride(out ModifierValue @override)) {
+                    sb.AppendLine($"|{entry.Key}:{ModifierType.Override} = {@override}");
+                }
+            }
+            
+            return sb.ToString();
         }
     }
 }

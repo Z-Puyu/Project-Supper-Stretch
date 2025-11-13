@@ -63,8 +63,15 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
             return this.CompareTo(other) == 0;
         }
 
-        public static IEnumerable<AttributeType> GetAll() {
-            return Resources.LoadAll<AttributeType>("").OrderBy(a => a.Id);
+        internal AdvancedDropdownList<string> ToAdvancedDropdownList() {
+            if (this.IsLeaf) {
+                return new AdvancedDropdownList<string>(this.DisplayName, this.Id);
+            }
+
+            List<AdvancedDropdownList<string>> children =
+                    this.SubTypes.ConvertAll(child => child.ToAdvancedDropdownList());
+            children.Sort((a, b) => string.CompareOrdinal(a.displayName, b.displayName));
+            return new AdvancedDropdownList<string>(this.DisplayName, children);
         }
 
         public static IEnumerable<AttributeType> GetAllLeaves() {

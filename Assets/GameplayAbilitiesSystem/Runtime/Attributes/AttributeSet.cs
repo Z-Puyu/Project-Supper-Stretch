@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Text;
 using CommonFrameworks.CommonUtilities.Processors;
 using CommonFrameworks.Extensions;
 using CommonFrameworks.Trees;
@@ -10,10 +12,7 @@ using UnityEngine.Events;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes {
     [DisallowMultipleComponent]
-    public class AttributeSet : MonoBehaviour, IAttributeReader {
-        private IEnumerable<AttributeKey> keys;
-        private IEnumerable<double> values;
-
+    public sealed class AttributeSet : MonoBehaviour, IAttributeReader {
         private sealed class Node {
             internal double BaseValue { get; set; }
             internal double Value { get; set; }
@@ -23,6 +22,8 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         private TrieDictionary<AttributeKey, char, Node> Attributes { get; } =
             new TrieDictionary<AttributeKey, char, Node>('.');
 
+        [field: SerializeField] private AttributeTable DefaultBaseAttributes { get; set; }
+        
         [field: SerializeField]
         [field: InfoBox(
             "Attribute values are approximated by this after change." +
@@ -33,7 +34,17 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         [field: SerializeField, ReadOnly] private ModifierEnvironment ModifierEnvironment { get; set; }
 
         public event UnityAction<AttributeChange> OnAttributeUpdated;
-        
+
+        private void Awake() {
+            this.RegisterModifierEnvironment(this.GetInParentOrAddComponent<ModifierEnvironment>());
+        }
+
+        private void OnEnable() {
+            if (this.Attributes.Count == 0 && this.DefaultBaseAttributes) {
+                this.DefaultBaseAttributes.Initialise(this);
+            }
+        }
+
         private void RegisterModifierEnvironment(ModifierEnvironment environment) {
             if (this.ModifierEnvironment) {
                 this.ModifierEnvironment.OnModifierUpdated -= this.UpdateAttribute;
@@ -66,10 +77,6 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
             this.ModifierEnvironment = environment;
         }
 
-        private void Awake() {
-            this.RegisterModifierEnvironment(this.GetInParentOrAddComponent<ModifierEnvironment>());
-        }
-
         public double GetCurrent(AttributeKey key) {
             return this.Attributes.TryGetValue(key, out Node node) ? node.Value : 0;
         }
@@ -78,8 +85,37 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
             return this.GetCurrent(key) >= threshold;
         }
 
+        public void SetBase(AttributeKey key, double value) {
+            try {
+                this.Attributes[key].BaseValue = value;
+                this.UpdateAttribute(key);
+            } catch (KeyNotFoundException e) {
+                Debug.LogException(e, this);
+            }
+        }
+
+        public void Clear() {
+            this.Attributes.Clear();
+        }
+
+        internal void Initialise(AttributeType attributeType, double value) {
+            Node node = new Node();
+            node.Processors.AddRange(attributeType.Processors);
+            this.Attributes.Add(attributeType.Id, node);
+            this.SetBase(attributeType.Id, value);
+        }
+
         private void OnValidate() {
             this.RegisterModifierEnvironment(this.GetInParentOrAddComponent<ModifierEnvironment>());
+        }
+        
+        public override string ToString() {
+            StringBuilder sb = new StringBuilder($"Attributes on {this.gameObject.name}:\n", this.Attributes.Count + 1);
+            foreach (KeyValuePair<AttributeKey, Node> entry in this.Attributes) {
+                sb.AppendLine($"|{entry.Key}: {entry.Value.Value}");
+            }
+            
+            return sb.ToString();
         }
     }
 }
