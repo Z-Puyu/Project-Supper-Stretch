@@ -2,7 +2,7 @@ using System;
 using CommonFrameworks.CommonUtilities.CommonInterfaces;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
-    public abstract class Effect : IEffect<EffectTarget> {
+    internal abstract class Effect : IEffect<EffectTarget> {
         private EffectData SourceEffect { get; }
         protected EffectTarget Target { get; }
         private Action OnExecute { get; }

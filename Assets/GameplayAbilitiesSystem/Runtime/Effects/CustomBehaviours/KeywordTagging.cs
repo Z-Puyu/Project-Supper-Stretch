@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects.CustomBehaviours {
     [Serializable]
-    public sealed class KeywordTagging : EffectBehaviour {
+    internal sealed class KeywordTagging : EffectBehaviour {
         [field: SerializeField, TreeDropdown(nameof(this.GetAllKeywords))] 
         private List<string> KeywordsToAdd { get; set; } = new List<string>();
         

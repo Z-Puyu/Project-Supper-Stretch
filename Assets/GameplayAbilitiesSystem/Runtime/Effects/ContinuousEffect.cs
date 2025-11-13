@@ -4,7 +4,7 @@ using Timers.Runtime;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
-    public sealed class ContinuousEffect : TimedEffect {
+    internal sealed class ContinuousEffect : TimedEffect {
         public ContinuousEffect(
             EffectData sourceEffect, EffectTarget target, Action onExecute, Action onStop, double duration
         ) : base(sourceEffect, target, onExecute, onStop, duration) { }

@@ -3,7 +3,7 @@ using SaintsField;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects.Conditions {
-    public sealed class GameObjectTagCondition : Condition {
+    internal sealed class GameObjectTagCondition : Condition {
         [field: SerializeField, Tag]
         private List<string> PermissibleList { get; set; } = new List<string>();
 

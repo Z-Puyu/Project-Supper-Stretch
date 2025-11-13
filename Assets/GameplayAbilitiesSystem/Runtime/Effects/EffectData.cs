@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
     [Serializable]
-    public sealed class EffectData {
+    internal sealed class EffectData {
         internal enum Type { Instant, Periodic, Continuous }
 
         [field: LayoutStart("Effect Info", ELayout.Foldout)]
@@ -40,14 +40,14 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
 
         [field: SerializeField, Table, LayoutEnd("Effect Info"), LayoutStart("Effect Behaviours", ELayout.Foldout)]
         private List<EffectModifier> Modifiers { get; set; } = new List<EffectModifier>();
-        
-        [field: SerializeReference, ReferencePicker] 
+
+        [field: SerializeReference, ReferencePicker]
         private List<EffectBehaviour> CustomBehaviours { get; set; } = new List<EffectBehaviour>();
 
         [field: SerializeReference, ReferencePicker]
         private List<IPredicate<(EffectSource source, EffectTarget target)>> Conditions { get; set; } =
             new List<IPredicate<(EffectSource source, EffectTarget target)>>();
-        
+
         private bool IsInstant => this.Periodicity == Type.Instant;
         private bool IsPeriodic => this.Periodicity == Type.Periodic;
         private bool IsContinuous => this.Periodicity == Type.Continuous;
@@ -62,11 +62,12 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         }
 
         internal Effect Instantiate(EffectSource source, EffectTarget target) {
-            List<Modifier> modifiers = this.Modifiers.ConvertAll(modifier => modifier.CreateModifier(source, target));
+            List<Modifier> modifiers = this.Modifiers.Where(modifier => modifier.IsApplicable(source, target))
+                                           .ToList().ConvertAll(modifier => modifier.CreateModifier(source, target));
             List<EffectBehaviour> behaviours = this.CustomBehaviours.Where(behaviour =>
                     behaviour is not null && behaviour.IsApplicable(source, target)
             ).ToList();
-            
+
             return this.Periodicity switch {
                 Type.Instant => new InstantEffect(this, target, execute, null),
                 Type.Periodic => new PeriodicEffect(

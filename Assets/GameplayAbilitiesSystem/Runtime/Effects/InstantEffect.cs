@@ -1,7 +1,7 @@
 using System;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
-    public class InstantEffect : Effect {
+    internal sealed class InstantEffect : Effect {
         public InstantEffect(
             EffectData sourceEffect, EffectTarget target, Action onExecute, Action onStop
         ) : base(sourceEffect, target, onExecute, onStop) { }

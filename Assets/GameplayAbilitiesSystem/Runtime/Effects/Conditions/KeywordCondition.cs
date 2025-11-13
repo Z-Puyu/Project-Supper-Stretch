@@ -6,7 +6,7 @@ using SaintsField;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects.Conditions {
-    public sealed class KeywordCondition : Condition {
+    internal sealed class KeywordCondition : Condition {
         [field: SerializeField, TreeDropdown(nameof(this.GetAllKeywords))]
         private List<string> Required { get; set; } = new List<string>();
 

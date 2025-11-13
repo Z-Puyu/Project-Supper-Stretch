@@ -5,6 +5,8 @@ using UnityEngine;
 namespace GameplayAbilitiesSystem.Runtime.Effects.Conditions {
     [Serializable]
     public abstract class Condition : IPredicate<(EffectSource source, EffectTarget target)> {
+        private enum ConditionSubject { Source, Target, Both }
+        
         [field: SerializeField]
         private ConditionSubject ExaminedEntity { get; set; } = ConditionSubject.Target;
         

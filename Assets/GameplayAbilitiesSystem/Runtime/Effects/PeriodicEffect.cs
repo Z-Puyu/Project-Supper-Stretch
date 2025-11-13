@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
-    public sealed class PeriodicEffect : TimedEffect {
+    internal sealed class PeriodicEffect : TimedEffect {
         private float Interval { get; set; }
         private int TickCount { get; set; }
         private bool ShouldImmediatelyTickOnApply { get; set; }
