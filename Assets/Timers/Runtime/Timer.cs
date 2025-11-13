@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 namespace Timers.Runtime {
     public abstract class Timer : IDisposable {

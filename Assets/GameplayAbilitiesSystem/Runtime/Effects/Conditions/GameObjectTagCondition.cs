@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using CommonFrameworks.Extensions;
+using GameplayAbilitiesSystem.Runtime.Modifiers;
 using SaintsField;
 using UnityEngine;
 
@@ -10,14 +12,17 @@ namespace GameplayAbilitiesSystem.Runtime.Effects.Conditions {
         [field: SerializeField, Tag]
         private List<string> Blacklist { get; set; } = new List<string>();
 
-        protected override bool HoldsForSource(EffectSource source) {
-            return (this.PermissibleList.Count == 0 || this.PermissibleList.Exists(source.Object.CompareTag)) &&
-                   (this.Blacklist.Count == 0 || !this.Blacklist.Exists(source.Object.CompareTag));
+        public override bool Holds(EffectSource source) {
+            return source.Object.HasAnyTag(this.PermissibleList) && source.Object.HasNoneOfTags(this.Blacklist);
         }
-        
-        protected override bool HoldsForTarget(EffectTarget target) {
-            return (this.PermissibleList.Count == 0 || this.PermissibleList.Exists(target.CompareTag)) &&
-                   (this.Blacklist.Count == 0 || !this.Blacklist.Exists(target.CompareTag));
+
+        public override bool Holds(EffectTarget target) {
+            return target.HasAnyTag(this.PermissibleList) && target.HasNoneOfTags(this.Blacklist);
+        }
+
+        public override bool Holds(ModifierEnvironment environment) {
+            return base.Holds(environment) && environment.HasAnyTag(this.PermissibleList) &&
+                   environment.HasNoneOfTags(this.Blacklist);
         }
     }
 }

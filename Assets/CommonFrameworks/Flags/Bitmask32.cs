@@ -12,8 +12,8 @@ namespace CommonFrameworks.Flags {
             this.Value = value;
         }
 
-        public bool Has(int mask) {
-            return (this.Value & mask) == mask;
+        public bool Has(int flag) {
+            return (this.Value & flag) == flag;
         }
 
         public void Set(int index) {

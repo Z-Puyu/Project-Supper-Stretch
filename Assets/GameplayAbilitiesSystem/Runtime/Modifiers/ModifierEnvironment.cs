@@ -8,6 +8,7 @@ using SaintsField;
 using SaintsField.Playa;
 using UnityEngine;
 using UnityEngine.Events;
+using Attribute = GameplayAbilitiesSystem.Runtime.Attributes.Attribute;
 
 namespace GameplayAbilitiesSystem.Runtime.Modifiers {
     [DisallowMultipleComponent]
@@ -96,40 +97,42 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
         }
 
         private Attribute Query(
-            Attribute attribute, ModifierValue[] modifiers, IEnumerable<IProcessor<Attribute>> processors
+            ref AttributeQuery query, ModifierValue[] modifiers, IEnumerable<IProcessor<Attribute>> processors
         ) {
             IProcessor<Attribute>[] processorList = processors.ToArray();
-            if (this.Modifiers.TryGetValue(attribute.Id, out Node node) &&
+            if (this.Modifiers.TryGetValue(query.Id, out Node node) &&
                 node.HasOverride(out ModifierValue @override)) {
-                attribute = update(@override, ModifierType.Override);
+                update(ref query, @override, ModifierType.Override);
             } else {
-                this.CollectModifiers(attribute.Id, modifiers);
+                this.CollectModifiers(query.Id, modifiers);
                 if (!this.IsGlobalEnvironment && this.ParentEnvironment) {
-                    return this.ParentEnvironment.Query(attribute, modifiers, processorList);
+                    return this.ParentEnvironment.Query(ref query, modifiers, processorList);
                 }
 
                 for (ModifierType op = ModifierType.Shift; op < ModifierType.Override; op += 1) {
-                    attribute = update(modifiers[(int)op], op);
+                    update(ref query, modifiers[(int)op], op);
                 }
             }
 
-            return attribute;
+            return new Attribute(query.Source, query.Id, query.Value, query.IsValueApproximated);
 
-            Attribute update(ModifierValue modifier, ModifierType op) {
-                double value = modifier.ApplyTo(attribute.Value, op);
-                attribute = new Attribute(attribute.Source, attribute.Id, value, attribute.IsValueApproximated);
-                return processorList.Aggregate(attribute, (current, processor) => processor.Process(current));
+            void update(ref AttributeQuery q, ModifierValue modifier, ModifierType op) {
+                double value = modifier.ApplyTo(q.Value, op);
+                Attribute attribute = new Attribute(q.Source, q.Id, value, q.IsValueApproximated);
+                attribute = processorList.Aggregate(attribute, (current, processor) => processor.Process(current));
+                q.Value = attribute.Value;
+                q.IsValueApproximated = attribute.IsValueApproximated;
             }
         }
 
-        public Attribute Query(Attribute @base, IEnumerable<IProcessor<Attribute>> processors) {
+        internal Attribute Query(ref AttributeQuery query, IEnumerable<IProcessor<Attribute>> processors) {
             ModifierValue[] modifiers = {
                 new ModifierValue(0),
                 new ModifierValue(0),
                 new ModifierValue(0)
             };
 
-            return this.Query(@base, modifiers, processors);
+            return this.Query(ref query, modifiers, processors);
         }
 
         public override string ToString() {

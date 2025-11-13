@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommonFrameworks.CommonUtilities.Databases;
-using GameplayKeywordsSystem.Runtime;
 using SaintsField;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes {

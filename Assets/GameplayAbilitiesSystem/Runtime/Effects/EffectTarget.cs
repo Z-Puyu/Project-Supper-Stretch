@@ -1,11 +1,9 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using GameplayAbilitiesSystem.Runtime.Attributes;
 using GameplayAbilitiesSystem.Runtime.Modifiers;
 using GameplayKeywordsSystem.Runtime;
 using UnityEngine;
-using UnityEngine.Events;
 using Attribute = GameplayAbilitiesSystem.Runtime.Attributes.Attribute;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {

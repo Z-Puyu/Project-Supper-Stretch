@@ -1,25 +1,15 @@
 using System;
 using CommonFrameworks.CommonUtilities.CommonInterfaces;
-using UnityEngine;
+using GameplayAbilitiesSystem.Runtime.Modifiers;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects.Conditions {
     [Serializable]
-    public abstract class Condition : IPredicate<(EffectSource source, EffectTarget target)> {
-        private enum ConditionSubject { Source, Target, Both }
-        
-        [field: SerializeField]
-        private ConditionSubject ExaminedEntity { get; set; } = ConditionSubject.Target;
-        
-        protected abstract bool HoldsForSource(EffectSource source);
-        protected abstract bool HoldsForTarget(EffectTarget target);
+    public abstract class Condition : IPredicate<EffectSource>, IPredicate<EffectTarget>, IPredicate<ModifierEnvironment> {
+        public abstract bool Holds(EffectSource source);
+        public abstract bool Holds(EffectTarget target);
 
-        public bool Holds((EffectSource source, EffectTarget target) args) {
-            return this.ExaminedEntity switch {
-                ConditionSubject.Source => this.HoldsForSource(args.source),
-                ConditionSubject.Target => this.HoldsForTarget(args.target),
-                ConditionSubject.Both => this.HoldsForSource(args.source) && this.HoldsForTarget(args.target),
-                var _ => false
-            };
+        public virtual bool Holds(ModifierEnvironment environment) {
+            return true;
         }
     }
 }

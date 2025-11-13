@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace CommonFrameworks.Extensions {
@@ -76,6 +78,38 @@ namespace CommonFrameworks.Extensions {
         
         public static bool HasComponent<T>(this Component comp) where T : Component {
             return comp.gameObject.GetComponent<T>();
+        }
+        
+        public static bool HasAnyTag(this GameObject obj, List<string> tags) {
+            return tags.Count == 0 || tags.TrueForAll(obj.CompareTag);
+        }
+        
+        public static bool HasAnyTag(this GameObject obj, IEnumerable<string> tags) {
+            return obj.HasAnyTag(tags.ToList());
+        }
+        
+        public static bool HasAnyTag(this Component comp, List<string> tags) {
+            return tags.Count == 0 || tags.TrueForAll(comp.CompareTag);
+        }
+        
+        public static bool HasAnyTag(this Component comp, IEnumerable<string> tags) {
+            return comp.HasAnyTag(tags.ToList());
+        }
+
+        public static bool HasNoneOfTags(this GameObject obj, List<string> tags) {
+            return tags.Count == 0 || !tags.Exists(obj.CompareTag);
+        }
+        
+        public static bool HasNoneOfTags(this GameObject obj, IEnumerable<string> tags) {
+            return obj.HasNoneOfTags(tags.ToList());
+        }
+        
+        public static bool HasNoneOfTags(this Component comp, List<string> tags) {
+            return tags.Count == 0 || !tags.Exists(comp.CompareTag);
+        }
+        
+        public static bool HasNoneOfTags(this Component comp, IEnumerable<string> tags) {
+            return comp.HasNoneOfTags(tags.ToList());
         }
     }
 }

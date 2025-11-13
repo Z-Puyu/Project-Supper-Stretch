@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using Timers.Runtime;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {

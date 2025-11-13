@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace CommonFrameworks.Flags {
     public interface IFlag<T> {
-        public bool Has(T flags);
+        public bool Has(T flag);
         public void Set(T item);
         public void Unset(T item);
         public void Toggle(T item);

@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
-using CommonFrameworks.CommonUtilities.CommonInterfaces;
+using CommonFrameworks.Flags;
+using GameplayAbilitiesSystem.Runtime.Modifiers;
 using GameplayKeywordsSystem.Runtime;
 using SaintsField;
 using UnityEngine;
@@ -17,14 +17,22 @@ namespace GameplayAbilitiesSystem.Runtime.Effects.Conditions {
             return KeywordUtils.GetDropdownList();
         }
 
-        protected override bool HoldsForSource(EffectSource source) {
+        public override bool Holds(EffectSource source) {
             return this.Required.TrueForAll(keyword => source.Tags.Contains(keyword)) &&
                    this.Prohibited.TrueForAll(keyword => !source.Tags.Contains(keyword));
         }
 
-        protected override bool HoldsForTarget(EffectTarget target) {
+        public override bool Holds(EffectTarget target) {
             return this.Required.TrueForAll(keyword => target.HasTag(keyword)) &&
                    this.Prohibited.TrueForAll(keyword => !target.HasTag(keyword));
+        }
+
+        public override bool Holds(ModifierEnvironment environment) {
+            if (!base.Holds(environment) || !environment.TryGetComponent(out KeywordContainer container)) {
+                return false;
+            }
+            
+            return container.HasAnyOrEmpty(this.Required) && container.HasNone(this.Prohibited);
         }
     }
 }

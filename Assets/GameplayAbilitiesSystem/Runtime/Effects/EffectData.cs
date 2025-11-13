@@ -1,18 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommonFrameworks.CommonUtilities.CommonInterfaces;
 using GameplayAbilitiesSystem.Runtime.Attributes;
 using GameplayAbilitiesSystem.Runtime.Effects.CustomBehaviours;
 using GameplayAbilitiesSystem.Runtime.Modifiers;
 using SaintsField;
 using SaintsField.Playa;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
     [Serializable]
-    internal sealed class EffectData {
+    internal sealed class EffectData : ConditionalExecution {
         internal enum Type { Instant, Periodic, Continuous }
 
         [field: LayoutStart("Effect Info", ELayout.Foldout)]
@@ -43,22 +41,13 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
 
         [field: SerializeReference, ReferencePicker]
         private List<EffectBehaviour> CustomBehaviours { get; set; } = new List<EffectBehaviour>();
-
-        [field: SerializeReference, ReferencePicker]
-        private List<IPredicate<(EffectSource source, EffectTarget target)>> Conditions { get; set; } =
-            new List<IPredicate<(EffectSource source, EffectTarget target)>>();
-
+        
         private bool IsInstant => this.Periodicity == Type.Instant;
         private bool IsPeriodic => this.Periodicity == Type.Periodic;
         private bool IsContinuous => this.Periodicity == Type.Continuous;
 
         private AdvancedDropdownList<string> GetAllKeywords() {
             return AttributeUtils.GetDropdownList();
-        }
-
-        public bool IsApplicable(EffectSource source, EffectTarget target) {
-            return this.Conditions.Count == 0 ||
-                   this.Conditions.TrueForAll(condition => condition.Holds((source, target)));
         }
 
         internal Effect Instantiate(EffectSource source, EffectTarget target) {
@@ -84,7 +73,8 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
             }
 
             void stop() {
-                modifiers.ConvertAll(modifier => -modifier).ForEach(target.AddModifier);
+                modifiers.ConvertAll(modifier => new Modifier(modifier.Target, modifier.Type, -modifier.Value))
+                         .ForEach(target.AddModifier);
                 behaviours.ForEach(behaviour => behaviour.Stop());
             }
         }

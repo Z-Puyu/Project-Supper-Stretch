@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine.LowLevel;
-using UnityEngine.PlayerLoop;
 
 namespace CommonFrameworks.Extensions {
     public static class PlayerLoopExtensions {

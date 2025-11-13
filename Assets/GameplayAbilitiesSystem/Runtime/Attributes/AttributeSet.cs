@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,8 +68,8 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
             }
 
             double oldValue = node.Value;
-            Attribute @base = new Attribute(this, key, node.BaseValue, false);
-            this.PostAttributeUpdate(this.ModifierEnvironment.Query(@base, node.Processors));
+            AttributeQuery query = new AttributeQuery(this.gameObject, this, key, node.BaseValue, false);
+            this.PostAttributeUpdate(this.ModifierEnvironment.Query(ref query, node.Processors));
             this.OnAttributeUpdated?.Invoke(new AttributeChange(key, oldValue, node.Value));
         }
 
