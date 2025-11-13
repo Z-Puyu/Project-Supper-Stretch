@@ -1,4 +1,5 @@
 using GameplayAbilitiesSystem.Runtime.Attributes;
+using Unity.VisualScripting;
 
 namespace GameplayAbilitiesSystem.Runtime.Modifiers {
     public readonly struct Modifier {
@@ -10,6 +11,10 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
             this.Target = target;
             this.Type = type;
             this.Value = value;
+        }
+        
+        public static Modifier operator -(Modifier modifier) {
+            return new Modifier(modifier.Target, modifier.Type, -modifier.Value);
         }
     }
 }

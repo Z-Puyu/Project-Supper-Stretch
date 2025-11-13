@@ -1,8 +1,10 @@
+using System.Collections.Generic;
+
 namespace GameplayAbilitiesSystem.Runtime.Attributes {
     /// <summary>
     /// An interface for anything that can read attribute values from an owning game object.
     /// </summary>
-    public interface IAttributeReader {
+    public interface IAttributeReader : IEnumerable<Attribute> {
         /// <summary>
         /// Get the current value of an attribute.
         /// </summary>

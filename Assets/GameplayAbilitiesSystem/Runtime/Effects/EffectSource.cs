@@ -1,14 +1,21 @@
 using System.Collections.Generic;
 using GameplayAbilitiesSystem.Runtime.Attributes;
+using GameplayKeywordsSystem.Runtime;
+using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
-    public class EffectSource {
+    public sealed class EffectSource {
+        public GameObject Object { get; }
         public IAttributeReader Instigator { get; }
-        private readonly Dictionary<string, double> userData = new Dictionary<string, double>();
+        public ISet<Keyword> Tags { get; }
+        private readonly Dictionary<string, double> userData;
         public IReadOnlyDictionary<string, double> UserData => this.userData; 
         
-        internal EffectSource(IAttributeReader instigator) {
-            this.Instigator = instigator;
+        internal EffectSource(GameObject @object, IAttributeReader instigator, ISet<Keyword> tags) {
+            this.Object = @object;
+            this.Instigator = new ReadOnlyAttributeSet(instigator);
+            this.Tags = tags;
+            this.userData = new Dictionary<string, double>();
         }
 
         public EffectSource WithUserData(string key, double value) {

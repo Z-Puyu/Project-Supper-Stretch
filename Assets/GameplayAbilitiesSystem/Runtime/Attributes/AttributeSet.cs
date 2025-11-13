@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using CommonFrameworks.CommonUtilities.Processors;
 using CommonFrameworks.Extensions;
@@ -12,7 +14,7 @@ using UnityEngine.Events;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes {
     [DisallowMultipleComponent]
-    public sealed class AttributeSet : MonoBehaviour, IAttributeReader {
+    public sealed class AttributeSet : MonoBehaviour, IAttributeReader, IModifiable {
         private sealed class Node {
             internal double BaseValue { get; set; }
             internal double Value { get; set; }
@@ -82,7 +84,7 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         }
 
         public bool Has(double threshold, AttributeKey key) {
-            return this.GetCurrent(key) >= threshold;
+            return this.Attributes.TryGetValue(key, out Node node) && node.Value >= threshold;
         }
 
         public void SetBase(AttributeKey key, double value) {
@@ -108,7 +110,12 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         private void OnValidate() {
             this.RegisterModifierEnvironment(this.GetInParentOrAddComponent<ModifierEnvironment>());
         }
-        
+
+        public IEnumerator<Attribute> GetEnumerator() {
+            return this.Attributes.Select(entry => new Attribute(this, entry.Key, entry.Value.Value, true))
+                       .GetEnumerator();
+        }
+
         public override string ToString() {
             StringBuilder sb = new StringBuilder($"Attributes on {this.gameObject.name}:\n", this.Attributes.Count + 1);
             foreach (KeyValuePair<AttributeKey, Node> entry in this.Attributes) {
@@ -116,6 +123,14 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
             }
             
             return sb.ToString();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() {
+            return this.GetEnumerator();
+        }
+
+        public void AddModifier(Modifier modifier) {
+            this.ModifierEnvironment.AddModifier(modifier);
         }
     }
 }

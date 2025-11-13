@@ -1,12 +1,28 @@
-using System.Collections.Generic;
+using System;
 using CommonFrameworks.CommonUtilities.CommonInterfaces;
-using GameplayAbilitiesSystem.Runtime.Attributes;
-using GameplayAbilitiesSystem.Runtime.Modifiers;
-using SaintsField;
-using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
-    public abstract class Effect : ScriptableObject, IEffect<EffectSource, EffectTarget> {
-        public abstract void Apply(EffectSource source, EffectTarget target);
+    public abstract class Effect : IEffect<EffectTarget> {
+        private EffectData SourceEffect { get; }
+        protected EffectTarget Target { get; }
+        private Action OnExecute { get; }
+        private Action OnStop { get; }
+        public event Action OnCompleted;
+
+        protected Effect(EffectData sourceEffect, EffectTarget target, Action onExecute, Action onStop) {
+            this.SourceEffect = sourceEffect;
+            this.Target = target;
+            this.OnExecute = onExecute;
+            this.OnStop = onStop;
+        }
+
+        public virtual void Apply(EffectTarget target) {
+            this.OnExecute?.Invoke();
+        }
+        
+        public virtual void Stop() {
+            this.OnStop?.Invoke();
+            this.OnCompleted?.Invoke();
+        }
     }
 }
