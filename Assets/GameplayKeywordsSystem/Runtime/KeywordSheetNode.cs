@@ -5,18 +5,14 @@ using UnityEngine;
 
 namespace GameplayKeywordsSystem.Runtime {
     [Serializable]
-    public sealed class KeywordSheetNode : IComparable<KeywordSheetNode> {
-        [field: SerializeField, ReadOnly] internal string Name { get; private set; }
-        [field: SerializeField, ReadOnly] internal string Path { get; private set; }
+    internal sealed class KeywordSheetNode : IComparable<KeywordSheetNode> {
+        [field: SerializeField] internal string Name { get; private set; } = string.Empty;
+        [field: SerializeField, ReadOnly] internal string Path { get; set; } = string.Empty;
 
-        [field: SerializeField, ReadOnly]
+        [field: SerializeField, DefaultExpand, FieldDefaultExpand]
         internal List<KeywordSheetNode> Children { get; private set; } = new List<KeywordSheetNode>();
         
         internal bool IsLeaf => this.Children.Count == 0;
-        
-        internal KeywordSheetNode(string name, string fullName) {
-            this.Name = name.ToLower();
-        }
 
         private bool HasSameName(string name) {
             return string.Equals(this.Name.Trim(), name.Trim(), StringComparison.OrdinalIgnoreCase);
@@ -26,18 +22,6 @@ namespace GameplayKeywordsSystem.Runtime {
             node = this.Children.Find(child => child.HasSameName(childName));
             return node is not null;
         }
-        
-        internal KeywordSheetNode FindOrAddChild(List<string> path) {
-            string name = path[^1].ToLower();
-            KeywordSheetNode node = this.Children.Find(child => child.Name == name);
-            if (node is null) {
-                node = new KeywordSheetNode(name, string.Join('.', path).ToLower());
-                this.Children.Add(node);
-            }
-            
-            this.Children.Sort();
-            return node;
-        }
 
         internal AdvancedDropdownList<string> ToDropdownList() {
             if (this.IsLeaf) {
@@ -45,7 +29,7 @@ namespace GameplayKeywordsSystem.Runtime {
             }
             
             List<AdvancedDropdownList<string>> children = this.Children.ConvertAll(child => child.ToDropdownList());
-            children.Sort();
+            children.Sort((a, b) => string.Compare(a.displayName, b.displayName, StringComparison.OrdinalIgnoreCase));
             return new AdvancedDropdownList<string>(this.Name, children);
         }
 

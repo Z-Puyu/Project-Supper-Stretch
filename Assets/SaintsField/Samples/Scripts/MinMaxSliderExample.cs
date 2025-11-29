@@ -1,28 +1,34 @@
-﻿using UnityEngine;
+﻿using SaintsField.Playa;
+using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class MinMaxSliderExample: MonoBehaviour
+    public class MinMaxSliderExample: SaintsMonoBehaviour
     {
-        [MinMaxSlider(-1f, 3f, 0.3f)]
-        public Vector2 vector2Step03;
+        [OnValueChanged(":Debug.Log")]
+        [MinMaxSlider(-1f, 3f, 0.3f)] public Vector2 vector2Step03;
+        [MinMaxSlider(-1f, 3f, 0.3f), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public Vector2 vector2Step03Adapt;
+        [ShowInInspector, MinMaxSlider(-1f, 3f, 0.3f)]
+        private Vector2 ShowVector2Step03
+        {
+            get => vector2Step03;
+            set => vector2Step03 = value;
+        }
 
-        [MinMaxSlider(0, 20, 3)]
-        public Vector2Int vector2IntStep3;
+        [MinMaxSlider(0, 20, 3)] public Vector2Int vector2IntStep3;
+        [MinMaxSlider(0, 20, 3), Adapt(EUnit.Percent), OverlayText("<color=gray>%", end: true)] public Vector2Int vector2IntStep3Adapt;
+        [ShowInInspector, MinMaxSlider(0, 20, 3)]
+        private Vector2Int ShowVector2IntStep3
+        {
+            get => vector2IntStep3;
+            set => vector2IntStep3 = value;
+        }
 
-        [MinMaxSlider(-1f, 3f)]
-        public Vector2 vector2Free;
+        // [MinMaxSlider(-1f, 3f)]
+        // public Vector2 vector2Free;
 
         [MinMaxSlider(0, 20)]
         public Vector2Int vector2IntFree;
-
-        // not recommended
-        [SerializeField]
-        [MinMaxSlider(0, 100, minWidth:-1, maxWidth:-1)]
-        private Vector2Int _autoWidth;
-        [SerializeField]
-        [MinMaxSlider(-100f, 100f, minWidth:-1, maxWidth:-1)]
-        private Vector2 _autoWidthFloat;
 
         [field: SerializeField, MinMaxSlider(-100f, 100f)]
         public Vector2 OuterRange { get; private set; }
@@ -44,28 +50,6 @@ namespace SaintsField.Samples.Scripts
         [ReadOnly]
         [MinMaxSlider(-1f, 3f, 0.3f)]
         public Vector2 vector2Step03Disabled;
-
-        [FieldSeparator("Free")]
-
-        [MinMaxSlider(-5, 5, free: true)] public Vector2Int freeInt;
-        [MinMaxSlider(-5, 5, free: true), FieldBelowText("$" + nameof(freeFloat))] public Vector2 freeFloat;
-
-        [MinMaxSlider(-5, 6, step: 2, free: true), BelowButton(nameof(C))] public Vector2Int stepInt;
-        [MinMaxSlider(-5, 6, step: 0.5f, free: true)] public Vector2 stepFloat;
-
-        private void C()
-        {
-            stepInt = new Vector2Int(-100, 100);
-        }
-
-        public float freeMin;
-        public float freeMax;
-
-        [MinMaxSlider(nameof(freeMin), nameof(freeMax), step: 0.2f, free: true)] public Vector2 freeMinMax;
-        [MinMaxSlider(nameof(freeMin), nameof(freeMax), step: 0.2f)] public Vector2 nonFreeMinMax;
-
-        [MinMaxSlider(0, 10, free: true), FieldBelowText("$" + nameof(freeInput))] public Vector2 freeInput;
-        [MinMaxSlider(0, 10, free: true), FieldBelowText("$" + nameof(freeInputInt))] public Vector2Int freeInputInt;
 
         [MinMaxSlider(0, 1f)] public float incorrectType;
     }

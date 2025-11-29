@@ -13,7 +13,7 @@ namespace SaintsField.Editor.Utils
 {
     public static class SerializedUtils
     {
-        public static readonly char[] PathSplitSeparator = { '.' };
+        public static readonly char[] DotSplitSeparator = { '.' };
 
         public static SerializedProperty FindPropertyByAutoPropertyName(SerializedObject obj, string propName)
         {
@@ -65,7 +65,7 @@ namespace SaintsField.Editor.Utils
         public static (FieldOrProp fieldOrProp, object parent) GetFieldInfoAndDirectParent(SerializedProperty property)
         {
             string originPath = property.propertyPath;
-            string[] propPaths = originPath.Split(PathSplitSeparator);
+            string[] propPaths = originPath.Split(DotSplitSeparator);
             (bool arrayTrim, string[] propPathSegments) = TrimEndArray(propPaths);
             if (arrayTrim)
             {
@@ -78,7 +78,88 @@ namespace SaintsField.Editor.Utils
         public static (FieldOrProp fieldOrProp, object parent) GetFieldInfoAndDirectParentByPathSegments(
             SerializedProperty property, IEnumerable<string> pathSegments)
         {
-            object sourceObj = property.serializedObject.targetObject;
+            return GetFieldInfoAndParentListByPathSegments(property.serializedObject.targetObject, pathSegments)[0];
+            // object sourceObj = property.serializedObject.targetObject;
+            // FieldOrProp fieldOrProp = default;
+            //
+            // bool preNameIsArray = false;
+            // foreach (string propSegName in pathSegments)
+            // {
+            //     // Debug.Log($"check key {propSegName}");
+            //     if(propSegName == "Array")
+            //     {
+            //         preNameIsArray = true;
+            //         continue;
+            //     }
+            //     if (propSegName.StartsWith("data[") && propSegName.EndsWith("]"))
+            //     {
+            //         Debug.Assert(preNameIsArray);
+            //         // Debug.Log(propSegName);
+            //         // Debug.Assert(targetProp != null);
+            //         preNameIsArray = false;
+            //
+            //         int elemIndex = Convert.ToInt32(propSegName.Substring(5, propSegName.Length - 6));
+            //
+            //         object useObject;
+            //
+            //         if(fieldOrProp.FieldInfo is null && fieldOrProp.PropertyInfo is null)
+            //         {
+            //             useObject = sourceObj;
+            //         }
+            //         else
+            //         {
+            //             useObject = fieldOrProp.IsField
+            //                 // ReSharper disable once PossibleNullReferenceException
+            //                 ? fieldOrProp.FieldInfo.GetValue(sourceObj)
+            //                 : fieldOrProp.PropertyInfo.GetValue(sourceObj);
+            //         }
+            //
+            //         // Debug.Log($"Get index from obj {useObject}[{elemIndex}]");
+            //         sourceObj = Util.GetValueAtIndex(useObject, elemIndex).Item2;
+            //         // Debug.Log($"Get index from obj `{useObject}` returns {sourceObj}");
+            //         fieldOrProp = default;
+            //         // Debug.Log($"[index={elemIndex}]={targetObj}");
+            //         continue;
+            //     }
+            //
+            //     preNameIsArray = false;
+            //
+            //     // if (propSegName.StartsWith("<") && propSegName.EndsWith(">k__BackingField"))
+            //     // {
+            //     //     propSegName = propSegName.Substring(1, propSegName.Length - 17);
+            //     // }
+            //
+            //     // Debug.Log($"get obj {sourceObj}.{propSegName}")
+            //     //
+            //     if (sourceObj == null)  // TODO: better error handling
+            //     {
+            //         return (default, null);
+            //     }
+            //     // ;
+            //     // ReSharper disable once UseNegatedPatternInIsExpression
+            //     if (!(fieldOrProp.FieldInfo is null)
+            //         // ReSharper disable once UseNegatedPatternInIsExpression
+            //         || !(fieldOrProp.PropertyInfo is null))
+            //     {
+            //         sourceObj = fieldOrProp.IsField
+            //             // ReSharper disable once PossibleNullReferenceException
+            //             ? fieldOrProp.FieldInfo.GetValue(sourceObj)
+            //             : fieldOrProp.PropertyInfo.GetValue(sourceObj);
+            //         // Debug.Log($"get key {propSegName} sourceObj = {sourceObj}");
+            //     }
+            //
+            //     fieldOrProp = GetFileOrProp(sourceObj, propSegName);
+            // }
+            //
+            // return (fieldOrProp, sourceObj);
+        }
+
+        public static IReadOnlyList<(FieldOrProp fieldOrProp, object parent)> GetFieldInfoAndParentListByPathSegments(
+            object sourceObj, IEnumerable<string> pathSegments)
+        {
+            List<(FieldOrProp fieldOrProp, object parent)> results =
+                new List<(FieldOrProp fieldOrProp, object parent)>();
+            // object sourceObj = property.serializedObject.targetObject;
             FieldOrProp fieldOrProp = default;
 
             bool preNameIsArray = false;
@@ -132,7 +213,8 @@ namespace SaintsField.Editor.Utils
                 //
                 if (sourceObj == null)  // TODO: better error handling
                 {
-                    return (default, null);
+                    break;
+                    // return (default, null);
                 }
                 // ;
                 // ReSharper disable once UseNegatedPatternInIsExpression
@@ -148,14 +230,17 @@ namespace SaintsField.Editor.Utils
                 }
 
                 fieldOrProp = GetFileOrProp(sourceObj, propSegName);
+                results.Add((fieldOrProp, sourceObj));
             }
 
-            return (fieldOrProp, sourceObj);
+            results.Reverse();
+            return results;
+            // return (fieldOrProp, sourceObj);
         }
 
         public static string GetUniqueIdArray(SerializedProperty property)
         {
-            string[] paths = property.propertyPath.Split(PathSplitSeparator);
+            string[] paths = property.propertyPath.Split(DotSplitSeparator);
 
             (bool _, string[] propPathSegments) = TrimEndArray(paths);
             return $"{property.serializedObject.targetObject.GetInstanceID()}_{string.Join(".", propPathSegments)}";
@@ -164,7 +249,7 @@ namespace SaintsField.Editor.Utils
         public static (string error, SerializedProperty property) GetArrayProperty(SerializedProperty property)
         {
             // Debug.Log(property.propertyPath);
-            string[] paths = property.propertyPath.Split(PathSplitSeparator);
+            string[] paths = property.propertyPath.Split(DotSplitSeparator);
 
             (bool arrayTrim, string[] propPathSegments) = TrimEndArray(paths);
             if (!arrayTrim)
@@ -187,7 +272,7 @@ namespace SaintsField.Editor.Utils
             return ("", arrayProp);
         }
 
-        private static (bool trimed, string[] propPathSegs) TrimEndArray(string[] propPathSegments)
+        public static (bool trimed, string[] propPathSegs) TrimEndArray(string[] propPathSegments)
         {
 
             int usePathLength = propPathSegments.Length;
@@ -260,7 +345,7 @@ namespace SaintsField.Editor.Utils
 
         public static int PropertyPathIndex(string propertyPath)
         {
-            string[] propPaths = propertyPath.Split(PathSplitSeparator);
+            string[] propPaths = propertyPath.Split(DotSplitSeparator);
             // ReSharper disable once UseIndexFromEndExpression
             string lastPropPath = propPaths[propPaths.Length - 1];
             if (lastPropPath.StartsWith("data[") && lastPropPath.EndsWith("]"))
@@ -455,7 +540,7 @@ namespace SaintsField.Editor.Utils
                         Debug.Log($"#Search# nested search {so.name} with searchedObjects={string.Join(",", searchedObjects)}");
 #endif
 
-                        return SearchSoProp(so, token, searchedObjects);
+                        return SearchUnityObjectProp(so, token, searchedObjects);
                     }
                     return property.objectReferenceValue.name.ToLower().Contains(token);
                 case SerializedPropertyType.LayerMask:
@@ -565,9 +650,9 @@ namespace SaintsField.Editor.Utils
             }
         }
 
-        private static bool SearchSoProp(ScriptableObject so, string search, HashSet<object> searchedObjects)
+        public static bool SearchUnityObjectProp(UnityEngine.Object uObject, string search, HashSet<object> searchedObjects)
         {
-            if (!searchedObjects.Add(so))
+            if (!searchedObjects.Add(uObject))
             {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
                 Debug.Log($"#Search# skip {so.name} as already searched in searchedObjects={string.Join(",", searchedObjects)}");
@@ -576,7 +661,7 @@ namespace SaintsField.Editor.Utils
             }
 
             // ReSharper disable once ConvertToUsingDeclaration
-            using(SerializedObject serializedObject = new SerializedObject(so))
+            using(SerializedObject serializedObject = new SerializedObject(uObject))
             {
                 SerializedProperty iterator = serializedObject.GetIterator();
                 while (iterator.NextVisible(true))

@@ -6,17 +6,32 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.AnimatorParamDrawer;
+using SaintsField.Editor.Drawers.AnimatorStateDrawer;
+using SaintsField.Editor.Drawers.CurveRangeDrawer;
 using SaintsField.Editor.Drawers.DateTimeDrawer;
 using SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer;
 using SaintsField.Editor.Drawers.GuidDrawer;
+using SaintsField.Editor.Drawers.InputAxisDrawer;
 using SaintsField.Editor.Drawers.LayerDrawer;
+using SaintsField.Editor.Drawers.MinMaxSliderDrawer;
+using SaintsField.Editor.Drawers.ProgressBarDrawer;
+using SaintsField.Editor.Drawers.PropRangeDrawer;
+using SaintsField.Editor.Drawers.RateDrawer;
 using SaintsField.Editor.Drawers.ReferencePicker;
+using SaintsField.Editor.Drawers.SaintsDictionary;
 using SaintsField.Editor.Drawers.SceneDrawer;
+#if UNITY_2021_2_OR_NEWER
+using SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer;
+using SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer;
+#endif
+using SaintsField.Editor.Drawers.SortingLayerDrawer;
+using SaintsField.Editor.Drawers.TagDrawer;
 using SaintsField.Editor.Drawers.TimeSpanDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Linq;
+using SaintsField.Editor.Playa.Renderer.ListDrawerSettings;
 using SaintsField.Editor.Utils;
-using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -26,7 +41,7 @@ using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 {
-    public abstract partial class AbsRenderer
+    public abstract partial class AbsRenderer: IRichTextTagProvider
     {
         private const string ClassSaintsFieldPlaya = "saintsfield-playa";
         public const string ClassSaintsFieldEditingDisabled = "saintsfield-editing-disabled";
@@ -60,12 +75,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             root.AddToClassList(ClassSaintsFieldPlaya);
             bool hasAnyChildren = false;
 
-            (VisualElement aboveTarget, bool aboveNeedUpdate) = CreateAboveUIToolkit();
-            if (aboveTarget != null)
-            {
-                root.Add(aboveTarget);
-                hasAnyChildren = true;
-            }
             (VisualElement target, bool targetNeedUpdate) = CreateTargetUIToolkit(root);
             if (target != null)
             {
@@ -84,15 +93,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 root.Add(targetContainer);
                 hasAnyChildren = true;
             }
-            (VisualElement belowTarget, bool belowNeedUpdate) = CreateBelowUIToolkit();
-            if (belowTarget != null)
-            {
-                root.Add(belowTarget);
-                hasAnyChildren = true;
-            }
 
-            bool anyNeedUpdate = aboveNeedUpdate || targetNeedUpdate || belowNeedUpdate;
-            if (anyNeedUpdate)
+            if (targetNeedUpdate)
             {
                 UIToolkitUtils.OnAttachToPanelOnce(root, _ =>
                 {
@@ -100,7 +102,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     root.schedule.Execute(() => OnUpdateUIToolKit(_rootElement)).Every(100);
                 });
             }
-            if(anyNeedUpdate || hasAnyChildren)
+            if(targetNeedUpdate || hasAnyChildren)
             {
                 return _rootElement = root;
             }
@@ -108,17 +110,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return null;
         }
 
-        protected virtual (VisualElement target, bool needUpdate) CreateAboveUIToolkit()
-        {
-            return (null, false);
-        }
-
         protected abstract (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container);
-
-        protected virtual (VisualElement target, bool needUpdate) CreateBelowUIToolkit()
-        {
-            return (null, false);
-        }
 
         private static void MergeIntoGroup(Dictionary<string, VisualElement> groupElements, string groupBy, VisualElement root, VisualElement child)
         {
@@ -230,7 +222,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         public static readonly Color ReColor = EColor.EditorSeparator.GetColor();
 
         // before set: useful for struct editing that C# will mess-up and change the value of the reference you have
-        public static (VisualElement result, bool isNestedField) UIToolkitValueEdit(VisualElement oldElement, string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, bool neverNullable)
+        public static (VisualElement result, bool isNestedField) UIToolkitValueEdit(VisualElement oldElement,
+            string label, Type valueType, object value, Action<object> beforeSet, Action<object> setterOrNull,
+            bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
         {
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
             Debug.Log($"render start {label}/{valueType}/{value}");
@@ -242,6 +236,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
             // Color reColor = EColor.EditorSeparator.GetColor();
 
+            #region bool
             if (valueType == typeof(bool) || value is bool)
             {
                 if (oldElement is Toggle oldToggle)
@@ -287,8 +282,41 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region sbyte
             if (valueType == typeof(sbyte) || value is sbyte)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditSByte(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (sbyte) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case ProgressBarAttribute progressBarAttribute:
+                            return (ProgressBarAttributeDrawer.UIToolkitValueEditSByte(
+                                oldElement,
+                                progressBarAttribute,
+                                label,
+                                (sbyte) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
                 if (oldElement is IntegerField integerField)
                 {
                     integerField.SetValueWithoutNotify((sbyte)value);
@@ -332,8 +360,42 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region byte
             if (valueType == typeof(byte) || value is byte)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditByte(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (byte) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case ProgressBarAttribute progressBarAttribute:
+                            return (ProgressBarAttributeDrawer.UIToolkitValueEditByte(
+                                oldElement,
+                                progressBarAttribute,
+                                label,
+                                (byte) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
                 if (oldElement is IntegerField oldIntegerField)
                 {
                     oldIntegerField.SetValueWithoutNotify((byte)value);
@@ -377,8 +439,42 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region short
             if (valueType == typeof(short) || value is short)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditShort(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (short) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case ProgressBarAttribute progressBarAttribute:
+                            return (ProgressBarAttributeDrawer.UIToolkitValueEditShort(
+                                oldElement,
+                                progressBarAttribute,
+                                label,
+                                (short) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
                 if (oldElement is IntegerField oldIntegerField)
                 {
                     oldIntegerField.SetValueWithoutNotify((short)value);
@@ -421,8 +517,42 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
                 return (element, false);
             }
+            #endregion
+
+            #region ushort
             if (valueType == typeof(ushort) || value is ushort)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditUShort(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (ushort) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case ProgressBarAttribute progressBarAttribute:
+                            return (ProgressBarAttributeDrawer.UIToolkitValueEditUShort(
+                                oldElement,
+                                progressBarAttribute,
+                                label,
+                                (ushort) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
                 if (oldElement is IntegerField oldIntegerField)
                 {
                     oldIntegerField.SetValueWithoutNotify((ushort)value);
@@ -466,6 +596,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region int
             if (valueType == typeof(int) || value is int)
             {
                 foreach (Attribute each in allAttributes)
@@ -485,6 +618,79 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 labelGrayColor,
                                 inHorizontalLayout,
                                 allAttributes), false);
+                        case SortingLayerAttribute sortingLayerAttribute:
+                            return (SortingLayerAttributeDrawer.UIToolkitValueEditInt(
+                                oldElement,
+                                sortingLayerAttribute,
+                                label,
+                                (int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
+#if UNITY_2021_2_OR_NEWER
+                        case ShaderParamAttribute shaderParamAttribute:
+                            return (ShaderParamAttributeDrawer.UIToolkitValueEditInt(
+                                oldElement,
+                                shaderParamAttribute,
+                                label,
+                                (int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+#endif
+                        case RateAttribute rateAttribute:
+                            return (RateAttributeDrawer.UIToolkitValueEdit(
+                                oldElement,
+                                rateAttribute,
+                                label,
+                                (int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditInt(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case ProgressBarAttribute progressBarAttribute:
+                            return (ProgressBarAttributeDrawer.UIToolkitValueEditInt(
+                                oldElement,
+                                progressBarAttribute,
+                                label,
+                                (int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case AnimatorParamAttribute animatorParamAttribute:
+                            return (AnimatorParamAttributeDrawer.UIToolkitValueEditInt(
+                                oldElement,
+                                animatorParamAttribute,
+                                label,
+                                (int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
                     }
                 }
 
@@ -533,8 +739,30 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region unit
             if (valueType == typeof(uint) || value is uint)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditUInt(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (uint) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
 #if UNITY_2022_3_OR_NEWER
                 if (oldElement is UnsignedIntegerField oldUnsignedIntegerField)
                 {
@@ -613,8 +841,53 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
-            if ((valueType == typeof(long) || value is long) && allAttributes.All(each => each is not DateTimeAttribute && each is not TimeSpanAttribute))
+            #endregion
+
+            #region long
+            if (valueType == typeof(long) || value is long)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case DateTimeAttribute dateTimeAttribute:
+                            return (DateTimeAttributeDrawer.UIToolkitValueEdit(
+                                oldElement,
+                                label,
+                                valueType,
+                                value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
+                        case TimeSpanAttribute timeSpanAttribute:
+                            return (TimeSpanAttributeDrawer.UIToolkitValueEdit(
+                                oldElement,
+                                label,
+                                valueType,
+                                value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditLong(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (long) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
+
                 if (oldElement is LongField oldLongField)
                 {
                     oldLongField.SetValueWithoutNotify((long)value);
@@ -653,8 +926,29 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region ulong
             if (valueType == typeof(ulong) || value is ulong)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditULong(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (ulong) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
 #if UNITY_2022_3_OR_NEWER
                 ulong ulongRawValue = (ulong)value;
                 if (oldElement is UnsignedLongField oldLongField)
@@ -735,8 +1029,41 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region float
             if (valueType == typeof(float) || value is float)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditFloat(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (float) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case ProgressBarAttribute progressBarAttribute:
+                            return (ProgressBarAttributeDrawer.UIToolkitValueEditFloat(
+                                oldElement,
+                                progressBarAttribute,
+                                label,
+                                (float) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
                 if (oldElement is FloatField oldFloatField)
                 {
                     oldFloatField.SetValueWithoutNotify((float)value);
@@ -775,8 +1102,42 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region double
             if (valueType == typeof(double) || value is double)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case PropRangeAttribute propRangeAttribute:
+                            return (PropRangeAttributeDrawer.UIToolkitValueEditDouble(
+                                oldElement,
+                                propRangeAttribute,
+                                label,
+                                (double) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case ProgressBarAttribute progressBarAttribute:
+                            return (ProgressBarAttributeDrawer.UIToolkitValueEditDouble(
+                                oldElement,
+                                progressBarAttribute,
+                                label,
+                                (double) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
                 if (oldElement is DoubleField oldDoubleField)
                 {
                     oldDoubleField.SetValueWithoutNotify((double)value);
@@ -815,6 +1176,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region string
             if (valueType == typeof(string) || value is string)
             {
                 foreach (Attribute attribute in allAttributes)
@@ -853,6 +1217,90 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 labelGrayColor,
                                 inHorizontalLayout,
                                 allAttributes), false);
+                        case SortingLayerAttribute sortingLayerAttribute:
+                            return (SortingLayerAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                sortingLayerAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
+                        case TagAttribute tagAttribute:
+                            return (TagAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                tagAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
+                        case InputAxisAttribute inputAxisAttribute:
+                            return (InputAxisAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                inputAxisAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes), false);
+#if UNITY_2021_2_OR_NEWER
+                        case ShaderParamAttribute shaderParamAttribute:
+                            return (ShaderParamAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                shaderParamAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case ShaderKeywordAttribute shaderKeywordAttribute:
+                            return (ShaderKeywordAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                shaderKeywordAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+#endif
+
+                        case AnimatorParamAttribute animatorParamAttribute:
+                            return (AnimatorParamAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                animatorParamAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                        case AnimatorStateAttribute animatorStateAttribute:
+                            return (AnimatorStateAttributeDrawer.UIToolkitValueEditString(
+                                oldElement,
+                                animatorStateAttribute,
+                                label,
+                                (string) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
                     }
                 }
 
@@ -895,6 +1343,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region char
             if (valueType == typeof(char) || value is char)
             {
                 if (oldElement is TextField oldTextField)
@@ -961,8 +1412,30 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Vector2
             if (valueType == typeof(Vector2) || value is Vector2)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case MinMaxSliderAttribute minMaxSliderAttribute:
+                            return (MinMaxSliderAttributeDrawer.UIToolkitValueEditVector2(
+                                oldElement,
+                                minMaxSliderAttribute,
+                                label,
+                                (Vector2) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
                 if (oldElement is Vector2Field oldVector2Field)
                 {
                     oldVector2Field.SetValueWithoutNotify((Vector2)value);
@@ -1009,6 +1482,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Vector3
             if (valueType == typeof(Vector3) || value is Vector3)
             {
                 if (oldElement is Vector3Field oldVector3Field)
@@ -1058,6 +1534,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Vector4
             if (valueType == typeof(Vector4) || value is Vector4)
             {
                 if (oldElement is Vector4Field oldVector4Field)
@@ -1106,8 +1585,30 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Vector2Int
             if (valueType == typeof(Vector2Int) || value is Vector2Int)
             {
+                foreach (Attribute attribute in allAttributes)
+                {
+                    switch (attribute)
+                    {
+                        case MinMaxSliderAttribute minMaxSliderAttribute:
+                            return (MinMaxSliderAttributeDrawer.UIToolkitValueEditVector2Int(
+                                oldElement,
+                                minMaxSliderAttribute,
+                                label,
+                                (Vector2Int) value,
+                                beforeSet,
+                                setterOrNull,
+                                labelGrayColor,
+                                inHorizontalLayout,
+                                allAttributes,
+                                targets), false);
+                    }
+                }
+
                 if (oldElement is Vector2IntField oldVector2IntField)
                 {
                     oldVector2IntField.SetValueWithoutNotify((Vector2Int)value);
@@ -1154,6 +1655,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Vector3Int
             if (valueType == typeof(Vector3Int) || value is Vector3Int)
             {
                 if (oldElement is Vector3IntField oldVector3IntField)
@@ -1202,6 +1706,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Color
             if (valueType == typeof(Color) || value is Color)
             {
                 if (oldElement is ColorField oldColorField)
@@ -1249,6 +1756,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Bounds
             if (valueType == typeof(Bounds) || value is Bounds)
             {
                 if (oldElement is BoundsField oldBoundsField)
@@ -1297,6 +1807,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Rect
             if (valueType == typeof(Rect) || value is Rect)
             {
                 if (oldElement is RectField oldRectField)
@@ -1345,6 +1858,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region RectInt
             if (valueType == typeof(RectInt) || value is RectInt)
             {
                 if (oldElement is RectIntField oldRectIntField)
@@ -1393,6 +1909,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
                 return (element, false);
             }
+            #endregion
+
+            #region Enum
             if (valueType.BaseType == typeof(Enum) || value is Enum)
             {
                 // Debug.Log(string.Join(",", allAttributes));
@@ -1459,54 +1978,33 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 //
                 // return (element, false);
             }
+            #endregion
+
+            #region UnityEngine.Object
             if (typeof(Object).IsAssignableFrom(valueType) || value is Object)
             {
                 return (UIToolkitObjectFieldEdit(oldElement, label, valueType, (Object)value, beforeSet,
                     setterOrNull, labelGrayColor, inHorizontalLayout), false);
             }
+            #endregion
 
+            #region AnimationCurve
             if (typeof(AnimationCurve).IsAssignableFrom(valueType) || value is AnimationCurve)
             {
-
-                if (oldElement is CurveField curveField)
-                {
-                    curveField.SetValueWithoutNotify(value as AnimationCurve);
-                    return (null, false);
-                }
-                CurveField element = new CurveField(label)
-                {
-                    value = value as AnimationCurve,
-                };
-
-                if (labelGrayColor)
-                {
-                    element.labelElement.style.color = ReColor;
-                }
-                if (inHorizontalLayout)
-                {
-                    element.style.flexDirection = FlexDirection.Column;
-                }
-                else
-                {
-                    element.AddToClassList(CurveField.alignedFieldUssClassName);
-                }
-                if (setterOrNull == null)
-                {
-                    element.SetEnabled(false);
-                    element.AddToClassList(ClassSaintsFieldEditingDisabled);
-                }
-                else
-                {
-                    element.AddToClassList(SaintsPropertyDrawer.ClassAllowDisable);
-                    element.RegisterValueChangedCallback(evt =>
-                    {
-                        beforeSet?.Invoke(value);
-                        setterOrNull(evt.newValue);
-                    });
-                }
-                return (element, false);
+                return (CurveRangeAttributeDrawer.UIToolkitValueEdit(
+                    oldElement,
+                    label,
+                    (AnimationCurve) value,
+                    beforeSet,
+                    setterOrNull,
+                    labelGrayColor,
+                    inHorizontalLayout,
+                    allAttributes,
+                    targets), false);
             }
+            #endregion
 
+            #region Hash128
             if (typeof(Hash128).IsAssignableFrom(valueType) || value is Hash128)
             {
                 if (oldElement is Hash128Field hash128Field)
@@ -1547,7 +2045,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
                 return (element, false);
             }
+            #endregion
 
+            #region Gradient
             if (typeof(Gradient).IsAssignableFrom(valueType) || value is Gradient)
             {
                 if (oldElement is GradientField gradientField)
@@ -1589,7 +2089,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
                 return (element, false);
             }
-            
+            #endregion
+
+            #region DateTime
             if (valueType == typeof(DateTime) || value is DateTime || allAttributes.Any(each => each is DateTimeAttribute))
             {
                 return (DateTimeAttributeDrawer.UIToolkitValueEdit(
@@ -1603,6 +2105,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     inHorizontalLayout,
                     allAttributes), false);
             }
+            #endregion
+
+            #region TimeSpan
             if (valueType == typeof(TimeSpan) || value is TimeSpan || allAttributes.Any(each => each is TimeSpanAttribute))
             {
                 return (TimeSpanAttributeDrawer.UIToolkitValueEdit(
@@ -1616,7 +2121,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     inHorizontalLayout,
                     allAttributes), false);
             }
+            #endregion
 
+            #region LayerMask
             if (valueType == typeof(LayerMask) || value is LayerMask)
             {
                 if (allAttributes.Any(each => each is LayerAttribute))
@@ -1671,7 +2178,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 }
                 return (element, false);
             }
+            #endregion
 
+            #region GUID
             if (valueType == typeof(Guid) || value is Guid)
             {
                 return (GuidAttributeDrawer.UIToolkitValueEditGuid(
@@ -1684,6 +2193,40 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     inHorizontalLayout,
                     allAttributes), false);
             }
+            #endregion
+
+            #region AnimatorState
+
+            if (valueType == typeof(AnimatorState) || value is AnimatorState)
+            {
+                return (AnimatorStateAttributeDrawer.UIToolkitValueEditAnimatorState(
+                    oldElement,
+                    allAttributes.OfType<AnimatorStateAttribute>().FirstOrDefault() ?? new AnimatorStateAttribute(),
+                    label,
+                    (AnimatorState) value,
+                    beforeSet,
+                    setterOrNull,
+                    labelGrayColor,
+                    inHorizontalLayout,
+                    allAttributes,
+                    targets), false);
+            }
+            if (valueType == typeof(AnimatorStateBase) || value is AnimatorState)
+            {
+                return (AnimatorStateAttributeDrawer.UIToolkitValueEditAnimatorStateBase(
+                    oldElement,
+                    allAttributes.OfType<AnimatorStateAttribute>().FirstOrDefault() ?? new AnimatorStateAttribute(),
+                    label,
+                    (AnimatorStateBase) value,
+                    beforeSet,
+                    setterOrNull,
+                    labelGrayColor,
+                    inHorizontalLayout,
+                    allAttributes,
+                    targets), false);
+            }
+
+            #endregion
 
             bool valueIsNull = RuntimeUtil.IsNull(value);
 
@@ -1696,6 +2239,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 genTypes = genTypes.Prepend(valueType);
             }
 
+            #region Dictionary
             Type dictionaryInterface = typeof(IDictionary<,>);
             Type readonlyDictionaryInterface = typeof(IReadOnlyDictionary<,>);
             // ReSharper disable once NotAccessedVariable
@@ -1728,15 +2272,19 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     }
                 }
             }
-
             if(isNormalDictionary || isReadonlyDictionary)
             {
-#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
                 bool isReadOnly = !isNormalDictionary;
+                return (SaintsDictionaryDrawer.UIToolkitValueEdit(
+                    oldElement as Foldout, label, valueType, value, isReadOnly,
+                    dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor,
+                    inHorizontalLayout, allAttributes, targets), false);
+
+#if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
                 // Debug.Log($"MakeDictionaryView isReadOnly={isReadOnly}/{oldElement}");
                 return (MakeDictionaryView(oldElement as Foldout, label, valueType, value, isReadOnly,
                     dictionaryArgTypes[0], dictionaryArgTypes[1], beforeSet, setterOrNull, labelGrayColor,
-                    inHorizontalLayout, neverNullable), false);
+                    inHorizontalLayout, targets), false);
 #else  // WTF Unity, backport it!
                 // ReSharper disable once AssignNullToNotNullAttribute
                 object[] kvPairs = (value as IEnumerable).Cast<object>().ToArray();
@@ -1828,14 +2376,17 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 return (foldout, false);
 #endif
             }
+            #endregion
+
+            #region List
             if (value is IEnumerable enumerableValue)
             {
                 // Debug.Log($"oldElement={oldElement}, {oldElement is Foldout}");
-
-                return (MakeListView(oldElement as Foldout, label, valueType, enumerableValue,
+                return (ListDrawerSettingsRenderer.UIToolkitValueEdit(oldElement, label, valueType, enumerableValue,
                     enumerableValue.Cast<object>().ToArray(), beforeSet, setterOrNull, labelGrayColor,
-                    inHorizontalLayout, allAttributes, neverNullable), false);
+                    inHorizontalLayout, allAttributes, targets), false);
             }
+            #endregion
 
             // Debug.Log(valueType);
 
@@ -2036,7 +2587,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         beforeSet?.Invoke(value);
                         setterOrNull?.Invoke(obj);
                     }
-                }, neverNullable));
+                }));
                 genFoldout.Add(fieldsBodyNew);
                 // genFoldout.Add(new VisualElement
                 // {
@@ -2053,7 +2604,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                     // Debug.Log($"Expand value {value} -> {evt.newValue}");
                     bool expanded = evt.newValue;
                     payload.IsFullFilled = true;
-                    FillExpandIfNeeded(expanded, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, neverNullable);
+                    FillExpandIfNeeded(expanded, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout,targets);
                 });
 
                 // if (ExpandedValue.Contains(value))
@@ -2100,7 +2651,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             if (genFoldout.value && !payload.IsFullFilled)
             {
                 payload.IsFullFilled = true;
-                FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, neverNullable);
+                FillExpandIfNeeded(true, value, genFoldout, oldElement, beforeSet, setterOrNull, labelGrayColor, inHorizontalLayout, targets);
             }
 
             bool enabled = setterOrNull != null;
@@ -2114,8 +2665,9 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return (useOld ? null : genFoldout, true);
         }
 
-        private static void FillExpandIfNeeded(bool expanded, object value, Foldout genFoldout, VisualElement oldElement,
-            Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, bool neverNullable)
+        private static void FillExpandIfNeeded(bool expanded, object value, Foldout genFoldout,
+            VisualElement oldElement,
+            Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<object> targets)
         {
             const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
 
@@ -2251,7 +2803,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         labelGrayColor,
                         inHorizontalLayout,
                         ReflectCache.GetCustomAttributes(fieldInfo),
-                        neverNullable).result;
+                        targets).result;
                 }
                 // Debug.Log($"{name}: {result}: {fieldInfo.FieldType}");
                 // ReSharper disable once InvertIf
@@ -2348,7 +2900,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         labelGrayColor,
                         inHorizontalLayout,
                         ReflectCache.GetCustomAttributes(propertyInfo),
-                        neverNullable).result;
+                        targets).result;
                 }
 
                 // ReSharper disable once InvertIf
@@ -2362,7 +2914,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
 
         private static readonly Type[] SkipTypes = { typeof(IntPtr), typeof(UIntPtr), typeof(void) };
 
-        private static bool SkipTypeDrawing(Type checkType)
+        public static bool SkipTypeDrawing(Type checkType)
         {
             foreach (Type disallowType in SkipTypes)
             {
@@ -2435,7 +2987,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 : $"{type.Name}: <color=#{ColorUtility.ToHtmlStringRGB(EColor.Gray.GetColor())}>{type.Namespace}</color>";
         }
 
-        private static UIToolkitUtils.DropdownButtonField MakeTypeDropdown(string label, Type fieldType, object currentValue, Action<Type> setType, bool neverNullable)
+        private static UIToolkitUtils.DropdownButtonField MakeTypeDropdown(string label, Type fieldType,
+            object currentValue, Action<Type> setType)
         {
             // Debug.Log($"fieldType={fieldType} label={label} currentValue={currentValue}");
             UIToolkitUtils.DropdownButtonField dropdownButton = UIToolkitUtils.MakeDropdownButtonUIToolkit(label);
@@ -2445,7 +2998,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 .GetTypesDerivedFrom(fieldType)
                 .ToArray();
             AdvancedDropdownList<Type> dropdownList = new AdvancedDropdownList<Type>();
-            bool canBeNull = !fieldType.IsValueType && !neverNullable;
+            bool canBeNull = !fieldType.IsValueType;
             if(canBeNull)
             {
                 dropdownList.Add("[Null]", null);
@@ -2513,327 +3066,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             return dropdownButton;
         }
 
-        // private int _listCurPageIndex = 0;
-        // private List<int> _listItemIndexToOriginIndex;
-
-        private class ListViewPayload
-        {
-            public List<object> RawValues;
-            public List<int> ItemIndexToOriginIndex;
-            public object RawListValue;
-        }
-
-        private static Foldout MakeListView(Foldout oldElement, string label, Type valueType, object rawListValue, object[] listValue, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, bool neverNullable)
-        {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
-            Debug.Log($"render list start {listValue.Length}/{label}/{valueType}");
-#endif
-            Foldout foldout = oldElement;
-            if (foldout != null && !foldout.ClassListContains("saintsfield-list"))
-            {
-#if SAINTSFIELD_DEBUG
-                Debug.Log($"foldout mismatch for {rawListValue}, recreate");
-#endif
-                foldout = null;
-            }
-            if (foldout == null)
-            {
-                // Debug.Log($"Create new Foldout");
-                foldout = new Foldout
-                {
-                    text = label,
-                };
-                if (labelGrayColor)
-                {
-                    foldout.style.color = EColor.EditorSeparator.GetColor();
-                }
-                foldout.AddToClassList("saintsfield-list");
-                VisualElement foldoutContent = foldout.Q<VisualElement>(className: "unity-foldout__content");
-                if (foldoutContent != null)
-                {
-                    foldoutContent.style.marginLeft = 0;
-                }
-
-                if(setterOrNull != null)
-                {
-                    // nullable
-                    if(!neverNullable)
-                    {
-                        foldout.Q<Toggle>().Add(new Button(() =>
-                        {
-                            beforeSet?.Invoke(rawListValue);
-                            setterOrNull(null);
-                        })
-                        {
-                            // text = "x",
-                            tooltip = "Set to null",
-                            style =
-                            {
-                                position = Position.Absolute,
-                                // top = -EditorGUIUtility.singleLineHeight,
-                                top = 0,
-                                right = 0,
-                                width = EditorGUIUtility.singleLineHeight,
-                                height = EditorGUIUtility.singleLineHeight,
-
-                                backgroundImage = Util.LoadResource<Texture2D>("close.png"),
-#if UNITY_2022_2_OR_NEWER
-                                backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                                backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                                backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                                backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
-#else
-                                unityBackgroundScaleMode = ScaleMode.ScaleToFit,
-#endif
-                            },
-                        });
-                    }
-                }
-            }
-
-            ListView listView = foldout.Q<ListView>();
-            if (listView == null)
-            {
-                ListViewPayload payload = new ListViewPayload
-                {
-                    RawValues = listValue.ToList(),
-                    ItemIndexToOriginIndex = listValue.Select((_, index) => index).ToList(),
-                    RawListValue = rawListValue,
-                };
-                // Debug.Log($"Create new listView for {rawListValue}");
-                bool showAddRemoveFooter = true;
-                if(valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
-                {
-                    // Debug.Log("array");
-                }
-                else if (rawListValue is IList)
-                {
-                    // Debug.Log("IList");
-                }
-                else
-                {
-                    showAddRemoveFooter = false;
-                }
-                listView = new ListView
-                {
-                    selectionType = SelectionType.Multiple,
-                    virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
-                    // showBoundCollectionSize = listDrawerSettingsAttribute.NumberOfItemsPerPage <= 0,
-                    showBoundCollectionSize = false,
-                    showFoldoutHeader = false,
-                    headerTitle = label,
-                    showAddRemoveFooter = showAddRemoveFooter,
-                    reorderMode = ListViewReorderMode.Animated,
-                    reorderable = showAddRemoveFooter,
-                    style =
-                    {
-                        flexGrow = 1,
-                        position = Position.Relative,
-                    },
-                    itemsSource = listValue.Select((_, index) => index).ToList(),
-                    makeItem = () => new VisualElement(),
-
-                    userData = payload,
-                };
-
-                Type elementType = null;
-                foreach (Type eachType in ReflectUtils.GetSelfAndBaseTypesFromType(valueType))
-                {
-                    Type tryGetElementType = ReflectUtils.GetElementType(eachType);
-                    // Debug.Log($"{eachType}({eachType.IsGenericType}) -> {tryGetElementType}");
-                    if (tryGetElementType != eachType)
-                    {
-                        elementType = tryGetElementType;
-                        break;
-                    }
-                }
-
-                if (elementType == null)
-                {
-#if SAINTSFIELD_DEBUG
-                    Debug.LogError($"Failed to find element type in {valueType}");
-#endif
-                    elementType = typeof(object);
-                }
-
-                //
-                // Type elementType = ReflectUtils.GetElementType(valueType);
-                // Debug.Log(elementType.IsGenericType);
-                // if(elementType.IsGenericType)
-                // {
-                //     Debug.Log(elementType.GetGenericArguments()[0]);
-                // }
-                // Debug.Log($"elementType={elementType}");
-
-                void BindItem(VisualElement visualElement, int index)
-                {
-                    // int actualIndex = (int)listView.itemsSource[index];
-                    // Debug.Log($"{index} -> {actualIndex}");
-                    // Debug.Log($"index={index}, ItemIndexToOriginIndex={string.Join(",", payload.ItemIndexToOriginIndex)}");
-
-                    VisualElement firstChild = visualElement.Children().FirstOrDefault();
-
-                    int actualIndex = payload.ItemIndexToOriginIndex[index];
-                    object actualValue = payload.RawValues[actualIndex];
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
-                    Debug.Log($"list index={index}, elementType={elementType}, actualValue={actualValue}, rawValues={string.Join(",", payload.RawValues)}");
-#endif
-                    VisualElement item = UIToolkitValueEdit(
-                        firstChild,
-                        $"Element {actualIndex}",
-                        elementType,
-                        actualValue,
-                        null,
-//                         showAddRemoveFooter
-//                          ? newItemValue =>
-//                             {
-// #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
-//                                 Debug.Log($"List {actualIndex} set newValue {newItemValue}");
-// #endif
-//                                 IList rawListValueArray = (IList) payload.RawListValue;
-//                                 rawListValueArray[actualIndex] = newItemValue;
-//                                 payload.RawValues[actualIndex] = newItemValue;
-//                             }
-//                          : null,
-                        newItemValue =>
-                        {
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_RENDERER_VALUE_EDIT
-                            Debug.Log($"List {actualIndex} set newValue {newItemValue}");
-#endif
-                            IList rawListValueArray = (IList) payload.RawListValue;
-                            rawListValueArray[actualIndex] = newItemValue;
-                            payload.RawValues[actualIndex] = newItemValue;
-                            setterOrNull?.Invoke(rawListValueArray);
-                        },
-                        false,
-                        inHorizontalLayout,
-                        allAttributes, neverNullable).result;
-                    if (item != null)
-                    {
-                        visualElement.Clear();
-                        visualElement.Add(item);
-                    }
-                }
-
-                listView.bindItem = BindItem;
-
-                Button listViewAddButton = listView.Q<Button>("unity-list-view__add-button");
-                if(listViewAddButton != null)
-                {
-                    listViewAddButton.clickable = new Clickable(() =>
-                    {
-                        int oldSize = payload.RawValues.Count;
-                        int newSize = oldSize + 1;
-                        object addItem = elementType.IsValueType
-                            ? Activator.CreateInstance(elementType)
-                            : null;
-
-                        if (valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
-                        {
-                            beforeSet?.Invoke(rawListValue);
-                            Array newArray = Array.CreateInstance(elementType, newSize);
-                            payload.RawValues.Add(addItem);
-                            Array.Copy(payload.RawValues.ToArray(), newArray, oldSize);
-                            payload.RawListValue = newArray;
-                            setterOrNull?.Invoke(newArray);
-                        }
-                        else
-                        {
-                            IList rawListValueArray = (IList)payload.RawListValue;
-                            rawListValueArray.Add(addItem);
-                            payload.RawValues.Add(addItem);
-                            payload.ItemIndexToOriginIndex = payload.RawValues.Select((_, index) => index).ToList();
-                            listView.itemsSource = payload.ItemIndexToOriginIndex.ToList();
-                        }
-                    });
-                }
-
-                listView.itemsRemoved += objects =>
-                {
-                    List<int> removeIndexInRaw = objects
-                        .Select(removeIndex => payload.ItemIndexToOriginIndex[removeIndex])
-                        .OrderByDescending(each => each)
-                        .ToList();
-
-                    if(valueType == typeof(Array) || valueType.IsSubclassOf(typeof(Array)))
-                    {
-                        beforeSet?.Invoke(rawListValue);
-                        Array newArray = Array.CreateInstance(elementType, payload.RawValues.Count - removeIndexInRaw.Count);
-                        Array rawArray = (Array) payload.RawListValue;
-                        int copyIndex = 0;
-                        foreach ((object rawValue, int rawIndex) in rawArray.Cast<object>().WithIndex())
-                        {
-                            if (removeIndexInRaw.Contains(rawIndex))
-                            {
-                                continue;
-                            }
-
-                            newArray.SetValue(rawValue, copyIndex);
-                            copyIndex++;
-                        }
-                        // payload.RawValues.Add(addItem);
-                        // Array.Copy(payload.RawValues.ToArray(), newArray, oldSize);
-                        payload.RawListValue = newArray;
-                        setterOrNull?.Invoke(newArray);
-                    }
-                    else
-                    {
-                        IList rawListValueArray = (IList) payload.RawListValue;
-                        foreach (int removeIndex in removeIndexInRaw)
-                        {
-                            rawListValueArray.RemoveAt(removeIndex);
-                        }
-                    }
-                };
-
-                listView.itemIndexChanged += (first, second) =>
-                {
-                    int fromPropIndex = payload.ItemIndexToOriginIndex[first];
-                    int toPropIndex = payload.ItemIndexToOriginIndex[second];
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
-                    Debug.Log($"drag {fromPropIndex}({first}) -> {toPropIndex}({second}); ItemIndexToOriginIndex={string.Join(",", payload.ItemIndexToOriginIndex)}");
-#endif
-
-                    IList lis = (IList)payload.RawListValue;
-                    MoveArrayElement(lis, fromPropIndex, toPropIndex);
-                    // (lis[fromPropIndex], lis[toPropIndex]) = (lis[toPropIndex], lis[fromPropIndex]);
-                    // payload.RawValues = lis.Cast<object>().ToList();
-                    // (payload.RawValues[fromPropIndex], payload.RawValues[toPropIndex]) = (payload.RawValues[toPropIndex], payload.RawValues[fromPropIndex]);
-                    // (payload.ItemIndexToOriginIndex[fromPropIndex], payload.ItemIndexToOriginIndex[toPropIndex]) = (payload.ItemIndexToOriginIndex[toPropIndex], payload.ItemIndexToOriginIndex[fromPropIndex]);
-                    // payload.ItemIndexToOriginIndex = payload.RawValues.Select((_, index) => index).ToList();
-                    // listView.Rebuild();
-                };
-
-                foldout.Add(listView);
-            }
-
-            ListViewPayload oldPayload = (ListViewPayload)listView.userData;
-            oldPayload.RawValues = listValue.ToList();
-            oldPayload.RawListValue = rawListValue;
-
-            // Debug.Log($"Refresh count={listValue.Length}");
-            oldPayload.ItemIndexToOriginIndex = oldPayload.RawValues.Select((_, index) => index).ToList();
-            listView.itemsSource = oldPayload.ItemIndexToOriginIndex.ToList();
-#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SAINTS_EDITOR_NATIVE_PROPERTY_RENDERER
-            Debug.Log($"ItemIndexToOriginIndex={string.Join(",", oldPayload.ItemIndexToOriginIndex)}");
-#endif
-            // Debug.Log($"itemSource({listView.itemsSource.Count})={string.Join(",", listView.itemsSource)}");
-            // if (listValue.Length > 0)
-            // {
-            //     Debug.Log($"0 listValue={listValue[0]}; listView.itemsSource={listView.itemsSource[0]}");
-            // }
-            // listView.Rebuild();
-
-            return oldElement == null? foldout : null;
-        }
-
         private class DictionaryViewPayload
         {
             public object RawDictValue;
             private readonly PropertyInfo _keysProperty;
             private readonly PropertyInfo _indexerProperty;
             private readonly MethodInfo _removeMethod;
-            private readonly MethodInfo _containesKeyMethod;
+            private readonly MethodInfo _containersKeyMethod;
 
             public DictionaryViewPayload(object rawDictValue, PropertyInfo keysProperty, PropertyInfo indexerProperty,
                 MethodInfo removeMethod, MethodInfo containsKeyMethod)
@@ -2842,7 +3081,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 _keysProperty = keysProperty;
                 _indexerProperty = indexerProperty;
                 _removeMethod = removeMethod;
-                _containesKeyMethod = containsKeyMethod;
+                _containersKeyMethod = containsKeyMethod;
             }
 
             public IEnumerable<object> GetKeys() => ((IEnumerable)_keysProperty.GetValue(RawDictValue)).Cast<object>();
@@ -2850,11 +3089,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             public object GetValue(object key) => _indexerProperty.GetValue(RawDictValue, new[] { key });
             public void DeleteKey(object key) => _removeMethod.Invoke(RawDictValue, new[] { key });
             public void SetKeyValue(object key, object value) => _indexerProperty.SetValue(RawDictValue, value, new[] { key });
-            public bool ContainsKey(object key) => (bool)_containesKeyMethod.Invoke(RawDictValue, new[] { key });
+            public bool ContainsKey(object key) => (bool)_containersKeyMethod.Invoke(RawDictValue, new[] { key });
         }
 
 #if UNITY_2022_2_OR_NEWER && !SAINTSFIELD_DEBUG_UNITY_BROKEN_FALLBACK
-        private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue, bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, bool neverNullable)
+        private static Foldout MakeDictionaryView(Foldout oldElement, string label, Type valueType, object rawDictValue,
+            bool isReadOnly, Type dictKeyType, Type dictValueType, Action<object> beforeSet,
+            Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<object> targets)
         {
             // Debug.Log(dictKeyType);
             // Debug.Log(dictValueType);
@@ -2888,37 +3129,35 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                 if(setterOrNull != null)
                 {
                     // nullable
-                    if(!neverNullable)
+                    foldout.Q<Toggle>().Add(new Button(() =>
                     {
-                        foldout.Q<Toggle>().Add(new Button(() =>
+                        beforeSet?.Invoke(rawDictValue);
+                        setterOrNull(null);
+                    })
+                    {
+                        // text = "x",
+                        tooltip = "Set to null",
+                        style =
                         {
-                            beforeSet?.Invoke(rawDictValue);
-                            setterOrNull(null);
-                        })
-                        {
-                            // text = "x",
-                            tooltip = "Set to null",
-                            style =
-                            {
-                                position = Position.Absolute,
-                                // top = -EditorGUIUtility.singleLineHeight,
-                                top = 0,
-                                right = 0,
-                                width = EditorGUIUtility.singleLineHeight,
-                                height = EditorGUIUtility.singleLineHeight,
+                            position = Position.Absolute,
+                            // top = -EditorGUIUtility.singleLineHeight,
+                            top = 0,
+                            right = 0,
+                            width = EditorGUIUtility.singleLineHeight,
+                            height = EditorGUIUtility.singleLineHeight,
 
-                                backgroundImage = Util.LoadResource<Texture2D>("close.png"),
+                            backgroundImage = Util.LoadResource<Texture2D>("close.png"),
 #if UNITY_2022_2_OR_NEWER
-                                backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                                backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
-                                backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
-                                backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
+                            backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                            backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center),
+                            backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat),
+                            backgroundSize = new BackgroundSize(BackgroundSizeType.Contain),
 #else
-                                unityBackgroundScaleMode = ScaleMode.ScaleToFit,
+                            unityBackgroundScaleMode = ScaleMode.ScaleToFit,
 #endif
-                            },
-                        });
-                    }
+                        },
+                    });
+
                 }
             }
 
@@ -3049,7 +3288,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                                 // listView.itemsSource[sourceIndex] = newKey;
                                 key = newKey;
                                 keyChanged = true;
-                            }, false, true, Array.Empty<Attribute>(), neverNullable).result;
+                            }, false, true, Array.Empty<Attribute>(), targets).result;
 
                             if (editing != null)
                             {
@@ -3109,7 +3348,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         {
                             object refreshedKey = listView.itemsSource[elementIndex];
                             payload.SetKeyValue(refreshedKey, newValue);
-                        }, false, true, Array.Empty<Attribute>(), neverNullable).result;
+                        }, false, true, Array.Empty<Attribute>(), targets).result;
 
                         if (editing != null)
                         {
@@ -3240,7 +3479,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         false,
                         inHorizontalLayout,
                         Array.Empty<Attribute>(),
-                        neverNullable
+                        targets
                     ).result;
                     // ReSharper disable once InvertIf
                     if (r != null)
@@ -3277,7 +3516,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         false,
                         inHorizontalLayout,
                         Array.Empty<Attribute>(),
-                        neverNullable
+                        targets
                     ).result;
                     // ReSharper disable once InvertIf
                     if (r != null)
@@ -3386,6 +3625,141 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
 
             list[toIndex] = item;
+        }
+
+        public string GetLabel()
+        {
+            switch (FieldWithInfo.RenderType)
+            {
+                case SaintsRenderType.SerializedField:
+                case SaintsRenderType.InjectedSerializedField:
+                {
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
+                    if (SerializedUtils.IsOk(FieldWithInfo.SerializedProperty))
+                    {
+                        return FieldWithInfo.SerializedProperty.displayName;
+                    }
+
+                    return "";
+                }
+                case SaintsRenderType.NonSerializedField:
+                {
+                    if (FieldWithInfo.FieldInfo != null)
+                    {
+                        return ObjectNames.NicifyVariableName(FieldWithInfo.FieldInfo.Name);
+                    }
+
+                    return "";
+                }
+                case SaintsRenderType.Method:
+                    return ObjectNames.NicifyVariableName(FieldWithInfo.MethodInfo.Name);
+                case SaintsRenderType.NativeProperty:
+                    return ObjectNames.NicifyVariableName(FieldWithInfo.PropertyInfo.Name);
+                case SaintsRenderType.ClassStruct:
+                    return ObjectNames.NicifyVariableName(FieldWithInfo.ClassStructType.Name);
+                case SaintsRenderType.Other:
+                    return "";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(FieldWithInfo.RenderType), FieldWithInfo.RenderType, null);
+            }
+        }
+
+        public string GetContainerType()
+        {
+            return GetTargetType().Name;
+        }
+
+        private Type GetTargetType()
+        {
+            return FieldWithInfo.Targets[0].GetType();
+        }
+
+        public string GetContainerTypeBaseType()
+        {
+            return GetTargetType().BaseType?.Name ?? "";
+        }
+
+        public string GetIndex(string formatter)
+        {
+            switch (FieldWithInfo.RenderType)
+            {
+                case SaintsRenderType.SerializedField:
+                case SaintsRenderType.InjectedSerializedField:
+                {
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
+                    if (!SerializedUtils.IsOk(FieldWithInfo.SerializedProperty))
+                    {
+                        return "";
+                    }
+
+                    int propPath = SerializedUtils.PropertyPathIndex(FieldWithInfo.SerializedProperty.propertyPath);
+                    return propPath < 0 ? "" : propPath.ToString();
+                }
+                case SaintsRenderType.NonSerializedField:
+                case SaintsRenderType.Method:
+                case SaintsRenderType.NativeProperty:
+                case SaintsRenderType.ClassStruct:
+                case SaintsRenderType.Other:
+                    return "";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(FieldWithInfo.RenderType), FieldWithInfo.RenderType, null);
+            }
+        }
+
+        public string GetField(string rawContent, string tagName, string tagValue)
+        {
+            switch (FieldWithInfo.RenderType)
+            {
+                case SaintsRenderType.SerializedField:
+                case SaintsRenderType.InjectedSerializedField:
+                {
+                    if (!SerializedUtils.IsOk(FieldWithInfo.SerializedProperty))
+                    {
+                        return "";
+                    }
+
+                    bool hasError = false;
+
+                    (string error, int index, object value) result = Util.GetValue(FieldWithInfo.SerializedProperty, FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
+                    (string error, int index, object value) accResult = result;
+                    if (tagName == "field")
+                    {
+                        if (result.error != "")
+                        {
+                            hasError = true;
+                        }
+                    }
+                    else
+                    {
+                        string revName = tagName["field.".Length..];
+
+                        // string[] subFields = revName.Split(SerializedUtils.DotSplitSeparator);
+                        // object accParent = FieldWithInfo.Targets[0];
+
+                        (string error, object result) getOfValue = Util.GetOf<object>(revName, null, FieldWithInfo.SerializedProperty,
+                            FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
+
+                        hasError = getOfValue.error != "";
+                        accResult = (getOfValue.error, accResult.index, getOfValue.result);
+                    }
+
+                    // ReSharper disable once ConvertIfStatementToReturnStatement
+                    if (hasError)
+                    {
+                        return rawContent;
+                    }
+
+                    return RichTextDrawer.TagStringFormatter(accResult.value, tagValue);
+                }
+                case SaintsRenderType.NonSerializedField:
+                case SaintsRenderType.Method:
+                case SaintsRenderType.NativeProperty:
+                case SaintsRenderType.ClassStruct:
+                case SaintsRenderType.Other:
+                    return "";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(FieldWithInfo.RenderType), FieldWithInfo.RenderType, null);
+            }
         }
     }
 }

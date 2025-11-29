@@ -23,9 +23,9 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
         // is row click or not (row click need to close the dropdown)
         public readonly UnityEvent<object, bool, bool> OnClickedEvent = new UnityEvent<object, bool, bool>();
 
-        public readonly UnityEvent<TreeRowAbsElement> ScrollToElementEvent = new UnityEvent<TreeRowAbsElement>();
+        // public readonly UnityEvent<TreeRowAbsElement> ScrollToElementEvent = new UnityEvent<TreeRowAbsElement>();
 
-        public TreeRowAbsElement CurrentFocus { get; private set; }
+        private TreeRowAbsElement CurrentFocus { get; set; }
         private readonly bool _allowToggle;
 
         private readonly IReadOnlyList<TreeRowAbsElement> _flatList;
@@ -67,11 +67,12 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 curValues)
                 .ToArray();
 
-            VisualElement treeContainer = new VisualElement
+            ScrollView treeContainer = new ScrollView
             {
                 focusable = true,
             };
-             List<TreeRowAbsElement> flatList = new List<TreeRowAbsElement>();
+
+            List<TreeRowAbsElement> flatList = new List<TreeRowAbsElement>();
             foreach (TreeRowAbsElement treeRow in treeRowElements)
             {
                 treeContainer.Add(treeRow);
@@ -105,7 +106,17 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                 }
             });
 
-            RegisterCallback<AttachToPanelEvent>(_ => toolbarSearchField.Q<TextField>().Q("unity-text-input").Focus());
+            RegisterCallback<AttachToPanelEvent>(_ =>
+            {
+                toolbarSearchField.Q<TextField>().Q("unity-text-input").Focus();
+                if(CurrentFocus != null)
+                {
+                    treeContainer.schedule
+                        .Execute(() => treeContainer.ScrollTo(CurrentFocus))
+                        // This delay is required for no good reason...
+                        .StartingIn(100);
+                }
+            });
 
             toolbarSearchField.RegisterValueChangedCallback(evt =>
             {
@@ -226,7 +237,8 @@ namespace SaintsField.Editor.Drawers.TreeDropdownDrawer
                         treeRowAbsElement.SetNavigateHighlight(toFocus == treeRowAbsElement);
                     }
 
-                    ScrollToElementEvent.Invoke(CurrentFocus);
+                    // ScrollToElementEvent.Invoke(CurrentFocus);
+                    treeContainer.ScrollTo(CurrentFocus);
                 }
             }, TrickleDown.TrickleDown);
             RegisterCallback<KeyUpEvent>(e =>

@@ -1,9 +1,9 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using Hierarchy_Designer.Runtime.Scripts;
 using UnityEditor;
 using UnityEditor.ShortcutManagement;
 using UnityEditorInternal;
@@ -3725,7 +3725,7 @@ namespace HierarchyDesigner
     internal sealed class HD_IconOverride : EditorWindow
     {
         #region Properties
-        private const float TileSize = 25f;
+        private const float TileSize = 32f;
         private const float TilePadding = 5f;
 
         private GameObject targetGO;
@@ -3733,30 +3733,47 @@ namespace HierarchyDesigner
         private string search = string.Empty;
 
         private Vector2 scroll;
-        private List<Texture2D> builtinIcons = new();
-        private List<(Texture2D tex, string guid)> assetIcons = new();
-        private List<(Texture2D tex, string label)> componentIcons = new();
+
+        private static readonly List<Texture2D> s_BuiltinIcons = new List<Texture2D>();
+        private static readonly List<(Texture2D tex, string label)> s_ComponentIcons = new List<(Texture2D tex, string label)>();
+        private static readonly List<(Texture2D tex, string guid)> s_AssetIcons = new List<(Texture2D tex, string guid)>();
+        private static readonly List<(Texture2D tex, string guid)> s_AssetFiltered = new List<(Texture2D tex, string guid)>();
+
+        private static string[] s_AssetGuids;
+        private static int s_AssetGuidIndex;
+        private static bool s_AssetIndexing;
+        private static bool s_AssetIndexed;
+        private static bool s_AssetUpdateRegistered;
+        private static bool s_AssetFilterDirty;
+        private static string s_AssetSearchCache = string.Empty;
+        private static int s_AssetPage;
         #endregion
 
         #region Initialization
         public static void Open(GameObject go)
         {
             if (go == null) return;
+
             HD_IconOverride window = CreateInstance<HD_IconOverride>();
             window.titleContent = new GUIContent("Main Icon Override");
             window.targetGO = go;
             window.targetGlobalId = GlobalObjectId.GetGlobalObjectIdSlow(go).ToString();
-            window.position = new Rect(GUIUtility.GUIToScreenPoint(Event.current.mousePosition), new Vector2(560, 480));
-            window.minSize = new Vector2(420, 360);
+
+            Vector2 pos = Event.current != null
+                ? GUIUtility.GUIToScreenPoint(Event.current.mousePosition)
+                : new Vector2(100f, 100f);
+
+            window.position = new Rect(pos, new Vector2(560f, 480f));
+            window.minSize = new Vector2(420f, 360f);
             window.ShowAuxWindow();
             window.Focus();
         }
 
         private void OnEnable()
         {
-            GatherBuiltinIcons();
-            GatherComponentIcons();
-            GatherAssetIcons();
+            if (s_BuiltinIcons.Count == 0) EditorApplication.delayCall += GatherBuiltinIcons;
+            if (s_ComponentIcons.Count == 0) EditorApplication.delayCall += GatherComponentIcons;
+            EnsureAssetIndexingStarted();
         }
         #endregion
 
@@ -3764,12 +3781,32 @@ namespace HierarchyDesigner
         {
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                GUI.SetNextControlName("search");
-                search = GUILayout.TextField(search, GUI.skin.FindStyle("ToolbarSeachTextField") ?? EditorStyles.toolbarTextField, GUILayout.ExpandWidth(true));
-                if (GUILayout.Button("Clear", EditorStyles.toolbarButton, GUILayout.Width(60))) search = string.Empty;
+                GUIStyle tf = GUI.skin.FindStyle("ToolbarSeachTextField")
+                               ?? GUI.skin.FindStyle("ToolbarSearchTextField")
+                               ?? EditorStyles.toolbarTextField;
+
+                string newSearch = GUILayout.TextField(search, tf, GUILayout.ExpandWidth(true));
+                if (!string.Equals(newSearch, search, StringComparison.Ordinal))
+                {
+                    search = newSearch;
+                    s_AssetFilterDirty = true;
+                    s_AssetPage = 0;
+                }
+
+                if (GUILayout.Button("Clear", EditorStyles.toolbarButton, GUILayout.Width(60f)))
+                {
+                    if (!string.IsNullOrEmpty(search))
+                    {
+                        search = string.Empty;
+                        s_AssetFilterDirty = true;
+                        s_AssetPage = 0;
+                    }
+                }
+
                 using (new EditorGUI.DisabledScope(targetGO == null))
                 {
-                    if (GUILayout.Button(HD_Icon.Has(targetGlobalId) ? "Clear Override" : "No Override", EditorStyles.toolbarButton, GUILayout.Width(110)))
+                    bool has = HD_Icon.Has(targetGlobalId);
+                    if (GUILayout.Button(has ? "Clear Override" : "No Override", EditorStyles.toolbarButton, GUILayout.Width(110f)))
                     {
                         if (HD_Icon.Clear(targetGlobalId)) Close();
                     }
@@ -3777,11 +3814,15 @@ namespace HierarchyDesigner
             }
 
             scroll = EditorGUILayout.BeginScrollView(scroll);
+
             DrawSection("Common Component Icons", DrawComponentGrid);
-            GUILayout.Space(6);
+            GUILayout.Space(6f);
+
             DrawSection("Built-in / Editor Icons", DrawBuiltinGrid);
-            GUILayout.Space(6);
+            GUILayout.Space(6f);
+
             DrawSection("Project Textures", DrawAssetGrid);
+
             EditorGUILayout.EndScrollView();
         }
 
@@ -3789,13 +3830,14 @@ namespace HierarchyDesigner
         private void DrawSection(string label, Action drawer)
         {
             EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
-            GUILayout.Space(2);
+            GUILayout.Space(2f);
             drawer?.Invoke();
         }
 
         private void DrawBuiltinGrid()
         {
-            List<Texture2D> list = Filter(builtinIcons, t => t.name);
+            List<Texture2D> list = Filter(s_BuiltinIcons, t => t != null ? t.name : string.Empty);
+
             DrawIconGrid(list, t =>
             {
                 HD_Icon.SetBuiltin(targetGlobalId, t);
@@ -3805,47 +3847,134 @@ namespace HierarchyDesigner
 
         private void DrawAssetGrid()
         {
-            List<(Texture2D tex, string guid)> list = Filter(assetIcons, x => x.tex != null ? x.tex.name : string.Empty);
-            DrawIconGrid(list.Select(x => x.tex).ToList(), t =>
+            if (!s_AssetIndexed)
             {
-                string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(t));
-                HD_Icon.SetAsset(targetGlobalId, guid);
-                Close();
-            }, true);
+                EditorGUILayout.HelpBox("Indexing project textures...", MessageType.Info);
+
+                if (s_AssetGuids != null && s_AssetGuids.Length > 0)
+                {
+                    EditorGUILayout.LabelField(s_AssetGuidIndex + " / " + s_AssetGuids.Length + " processed", EditorStyles.miniLabel);
+                }
+
+                return;
+            }
+
+            List<(Texture2D tex, string guid)> list = GetFilteredAssetIcons();
+
+            if (list == null || list.Count == 0)
+            {
+                EditorGUILayout.HelpBox("No textures found for current filter.", MessageType.Info);
+                return;
+            }
+
+            const int PageSize = 256;
+
+            int total = list.Count;
+            int totalPages = Mathf.Max(1, Mathf.CeilToInt((float)total / PageSize));
+
+            if (s_AssetPage < 0) s_AssetPage = 0;
+            if (s_AssetPage >= totalPages) s_AssetPage = totalPages - 1;
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Page " + (s_AssetPage + 1) + " / " + totalPages, EditorStyles.miniLabel);
+            GUILayout.FlexibleSpace();
+
+            using (new EditorGUI.DisabledScope(s_AssetPage <= 0))
+            {
+                if (GUILayout.Button("Prev", EditorStyles.miniButtonLeft, GUILayout.Width(60f)))
+                {
+                    s_AssetPage--;
+                    GUI.FocusControl(null);
+                }
+            }
+
+            using (new EditorGUI.DisabledScope(s_AssetPage >= totalPages - 1))
+            {
+                if (GUILayout.Button("Next", EditorStyles.miniButtonRight, GUILayout.Width(60f)))
+                {
+                    s_AssetPage++;
+                    GUI.FocusControl(null);
+                }
+            }
+
+            EditorGUILayout.EndHorizontal();
+            GUILayout.Space(2f);
+
+            int start = s_AssetPage * PageSize;
+            int end = Mathf.Min(start + PageSize, total);
+
+            int perRow = Mathf.Max(1, Mathf.FloorToInt((position.width - 20f) / (TileSize + TilePadding)));
+            int i = start;
+
+            while (i < end)
+            {
+                EditorGUILayout.BeginHorizontal();
+
+                for (int c = 0; c < perRow && i < end; c++, i++)
+                {
+                    (Texture2D tex, string guid) = list[i];
+
+                    using (new EditorGUILayout.VerticalScope(GUILayout.Width(TileSize + TilePadding)))
+                    {
+                        Rect r = GUILayoutUtility.GetRect(TileSize, TileSize, GUILayout.ExpandWidth(false));
+
+                        if (tex != null) GUI.DrawTexture(r, tex, ScaleMode.ScaleToFit, true);
+
+                        if (GUI.Button(r, GUIContent.none, GUIStyle.none))
+                        {
+                            HD_Icon.SetAsset(targetGlobalId, guid);
+                            Close();
+                        }
+
+                        GUILayout.Label(tex != null ? tex.name : "(null)", EditorStyles.miniLabel, GUILayout.Width(TileSize + TilePadding));
+                    }
+                }
+
+                EditorGUILayout.EndHorizontal();
+                GUILayout.Space(2f);
+            }
         }
 
         private void DrawComponentGrid()
         {
-            List<(Texture2D tex, string label)> list = Filter(componentIcons, x => (x.label ?? string.Empty) + " " + (x.tex ? x.tex.name : string.Empty));
+            List<(Texture2D tex, string label)> list = Filter(s_ComponentIcons, x => (x.label ?? string.Empty) + " " + (x.tex != null ? x.tex.name : string.Empty));
+
             if (list == null || list.Count == 0)
             {
                 EditorGUILayout.HelpBox("No component icons found for current filter.", MessageType.Info);
                 return;
             }
 
-            int perRow = Mathf.Max(1, Mathf.FloorToInt((position.width - 20) / (TileSize + TilePadding)));
+            int perRow = Mathf.Max(1, Mathf.FloorToInt((position.width - 20f) / (TileSize + TilePadding)));
             int i = 0;
+
             while (i < list.Count)
             {
                 EditorGUILayout.BeginHorizontal();
+
                 for (int c = 0; c < perRow && i < list.Count; c++, i++)
                 {
                     (Texture2D tex, string label) = list[i];
+
                     using (new EditorGUILayout.VerticalScope(GUILayout.Width(TileSize + TilePadding)))
                     {
                         Rect r = GUILayoutUtility.GetRect(TileSize, TileSize, GUILayout.ExpandWidth(false));
+
                         if (tex != null) GUI.DrawTexture(r, tex, ScaleMode.ScaleToFit, true);
+
                         if (GUI.Button(r, GUIContent.none, GUIStyle.none))
                         {
                             HD_Icon.SetBuiltin(targetGlobalId, tex);
                             Close();
                         }
-                        GUILayout.Label(!string.IsNullOrEmpty(label) ? label : (tex ? tex.name : "(null)"),
-                            EditorStyles.miniLabel, GUILayout.Width(TileSize + TilePadding));
+
+                        string shown = !string.IsNullOrEmpty(label) ? label : (tex != null ? tex.name : "(null)");
+                        GUILayout.Label(shown, EditorStyles.miniLabel, GUILayout.Width(TileSize + TilePadding));
                     }
                 }
+
                 EditorGUILayout.EndHorizontal();
-                GUILayout.Space(2);
+                GUILayout.Space(2f);
             }
         }
 
@@ -3857,69 +3986,147 @@ namespace HierarchyDesigner
                 return;
             }
 
-            int perRow = Mathf.Max(1, Mathf.FloorToInt((position.width - 20) / (TileSize + TilePadding)));
+            int perRow = Mathf.Max(1, Mathf.FloorToInt((position.width - 20f) / (TileSize + TilePadding)));
             int i = 0;
+
             while (i < icons.Count)
             {
                 EditorGUILayout.BeginHorizontal();
+
                 for (int c = 0; c < perRow && i < icons.Count; c++, i++)
                 {
                     Texture2D tex = icons[i];
+
                     using (new EditorGUILayout.VerticalScope(GUILayout.Width(TileSize + TilePadding)))
                     {
                         Rect r = GUILayoutUtility.GetRect(TileSize, TileSize, GUILayout.ExpandWidth(false));
+
                         if (tex != null) GUI.DrawTexture(r, tex, ScaleMode.ScaleToFit, true);
+
                         if (GUI.Button(r, GUIContent.none, GUIStyle.none)) onPick?.Invoke(tex);
+
                         if (showName)
                         {
                             GUILayout.Label(tex != null ? tex.name : "(null)", EditorStyles.miniLabel, GUILayout.Width(TileSize + TilePadding));
                         }
                     }
                 }
+
                 EditorGUILayout.EndHorizontal();
-                GUILayout.Space(2);
+                GUILayout.Space(2f);
             }
         }
 
         private List<T> Filter<T>(IEnumerable<T> src, Func<T, string> key)
         {
             if (string.IsNullOrEmpty(search)) return src.ToList();
+
             string s = search.Trim().ToLowerInvariant();
             return src.Where(x => (key(x) ?? string.Empty).ToLowerInvariant().Contains(s)).ToList();
         }
 
-        private void GatherBuiltinIcons()
+        private static void EnsureAssetIndexingStarted()
         {
-            Texture2D[] all = Resources.FindObjectsOfTypeAll<Texture2D>();
-            foreach (var t in all)
+            if (s_AssetIndexed || s_AssetIndexing) return;
+
+            s_AssetGuids = AssetDatabase.FindAssets("t:Texture2D");
+            s_AssetGuidIndex = 0;
+            s_AssetIcons.Clear();
+
+            s_AssetIndexing = s_AssetGuids != null && s_AssetGuids.Length > 0;
+            s_AssetIndexed = !s_AssetIndexing;
+
+            if (s_AssetIndexing && !s_AssetUpdateRegistered)
             {
+                EditorApplication.update += ProcessAssetIndexing;
+                s_AssetUpdateRegistered = true;
+            }
+        }
+
+        private static void ProcessAssetIndexing()
+        {
+            if (!s_AssetIndexing)
+            {
+                if (s_AssetUpdateRegistered)
+                {
+                    EditorApplication.update -= ProcessAssetIndexing;
+                    s_AssetUpdateRegistered = false;
+                }
+
+                return;
+            }
+
+            int budget = 16;
+
+            while (budget > 0 && s_AssetGuidIndex < s_AssetGuids.Length)
+            {
+                string guid = s_AssetGuids[s_AssetGuidIndex++];
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+
+                if (tex != null && tex.width <= 256 && tex.height <= 256)
+                {
+                    s_AssetIcons.Add((tex, guid));
+                }
+
+                budget--;
+            }
+
+            if (s_AssetGuidIndex >= s_AssetGuids.Length)
+            {
+                s_AssetIndexing = false;
+                s_AssetIndexed = true;
+
+                s_AssetIcons.Sort((a, b) =>
+                {
+                    string an = a.tex != null ? a.tex.name : string.Empty;
+                    string bn = b.tex != null ? b.tex.name : string.Empty;
+                    return string.Compare(an, bn, StringComparison.Ordinal);
+                });
+
+                s_AssetFilterDirty = true;
+
+                if (s_AssetUpdateRegistered)
+                {
+                    EditorApplication.update -= ProcessAssetIndexing;
+                    s_AssetUpdateRegistered = false;
+                }
+            }
+        }
+
+        private static void GatherBuiltinIcons()
+        {
+            if (s_BuiltinIcons.Count > 0) return;
+
+            Texture2D[] all = Resources.FindObjectsOfTypeAll<Texture2D>();
+
+            for (int i = 0; i < all.Length; i++)
+            {
+                Texture2D t = all[i];
                 if (t == null) continue;
+
                 if (t.width <= 64 && t.height <= 64)
                 {
                     if (t.name.Contains(" Icon") || t.name.StartsWith("d_") || t.name.EndsWith(" Icon") || t.name.EndsWith(" Icon Small"))
-                        builtinIcons.Add(t);
+                    {
+                        s_BuiltinIcons.Add(t);
+                    }
                 }
             }
-            builtinIcons = builtinIcons.GroupBy(t => t != null ? t.name : string.Empty).Select(g => g.First()).OrderBy(t => t != null ? t.name : string.Empty).ToList();
+
+            List<Texture2D> dedup = s_BuiltinIcons
+                .GroupBy(t => t != null ? t.name : string.Empty)
+                .Select(g => g.First())
+                .OrderBy(t => t != null ? t.name : string.Empty)
+                .ToList();
+
+            s_BuiltinIcons.Clear();
+            s_BuiltinIcons.AddRange(dedup);
         }
 
-        private void GatherAssetIcons()
+        private static void GatherComponentIcons()
         {
-            assetIcons.Clear();
-            foreach (var guid in AssetDatabase.FindAssets("t:Texture2D"))
-            {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
-                Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
-                if (tex == null) continue;
-                if (tex.width <= 256 && tex.height <= 256)
-                    assetIcons.Add((tex, guid));
-            }
-            assetIcons = assetIcons.OrderBy(x => x.tex != null ? x.tex.name : string.Empty).ToList();
-        }
-
-        private void GatherComponentIcons()
-        {
-            componentIcons.Clear();
+            if (s_ComponentIcons.Count > 0) return;
 
             TryAddIconByName("DirectionalLight Icon", "Directional Light");
             TryAddIconByName("SpotLight Icon", "Spot Light");
@@ -4020,32 +4227,76 @@ namespace HierarchyDesigner
             TryAddIconByName("Sprite Icon", "Sprite");
             TryAddIconByName("PhysicsMaterial2D Icon", "Physics Material 2D");
 
-            componentIcons = componentIcons
+            List<(Texture2D tex, string label)> filtered = s_ComponentIcons
                 .Where(x => x.tex != null)
                 .GroupBy(x => x.tex)
                 .Select(g => g.First())
                 .OrderBy(x => x.label)
                 .ToList();
+
+            s_ComponentIcons.Clear();
+            s_ComponentIcons.AddRange(filtered);
         }
 
-        private void TryAddIconByName(string iconName, string label)
+        private static void TryAddIconByName(string iconName, string label)
         {
             GUIContent c = EditorGUIUtility.IconContent(iconName);
-            Texture2D tex = c?.image as Texture2D;
+            Texture2D tex = c != null ? c.image as Texture2D : null;
             if (tex != null) AddComponentIcon(tex, label);
         }
 
-        private void TryAddIconByType(string qualifiedTypeName, string fallbackLabel)
+        private static void TryAddIconByType(string qualifiedTypeName, string fallbackLabel)
         {
             Type t = Type.GetType(qualifiedTypeName);
             if (t == null) return;
-            Texture2D icon = EditorGUIUtility.ObjectContent(null, t)?.image as Texture2D;
+
+            GUIContent c = EditorGUIUtility.ObjectContent(null, t);
+            Texture2D icon = c != null ? c.image as Texture2D : null;
+
             if (icon != null) AddComponentIcon(icon, fallbackLabel);
         }
 
-        private void AddComponentIcon(Texture2D tex, string label)
+        private static void AddComponentIcon(Texture2D tex, string label)
         {
-            componentIcons.Add((tex, label));
+            s_ComponentIcons.Add((tex, label));
+        }
+
+        private List<(Texture2D tex, string guid)> GetFilteredAssetIcons()
+        {
+            if (!s_AssetFilterDirty && string.Equals(s_AssetSearchCache, search, StringComparison.Ordinal))
+            {
+                return s_AssetFiltered;
+            }
+
+            s_AssetFiltered.Clear();
+
+            string s = string.IsNullOrEmpty(search) ? null : search.Trim().ToLowerInvariant();
+
+            if (string.IsNullOrEmpty(s))
+            {
+                for (int i = 0; i < s_AssetIcons.Count; i++)
+                {
+                    s_AssetFiltered.Add(s_AssetIcons[i]);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < s_AssetIcons.Count; i++)
+                {
+                    Texture2D tex = s_AssetIcons[i].tex;
+                    string name = tex != null ? tex.name : string.Empty;
+
+                    if (!string.IsNullOrEmpty(name) && name.ToLowerInvariant().Contains(s))
+                    {
+                        s_AssetFiltered.Add(s_AssetIcons[i]);
+                    }
+                }
+            }
+
+            s_AssetSearchCache = search;
+            s_AssetFilterDirty = false;
+
+            return s_AssetFiltered;
         }
         #endregion
     }

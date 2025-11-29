@@ -77,11 +77,17 @@ namespace HierarchyDesigner
         {
             if (rec.source == "builtin")
             {
-                foreach (var t in Resources.FindObjectsOfTypeAll<Texture2D>())
-                    if (t != null && t.name == rec.value) return t;
-
                 GUIContent c = EditorGUIUtility.IconContent(rec.value);
-                return c?.image as Texture2D;
+                Texture2D t1 = c != null ? c.image as Texture2D : null;
+                if (t1 != null) return t1;
+
+                Texture2D[] all = Resources.FindObjectsOfTypeAll<Texture2D>();
+                for (int i = 0; i < all.Length; i++)
+                {
+                    Texture2D t2 = all[i];
+                    if (t2 != null && t2.name == rec.value) return t2;
+                }
+                return null;
             }
             if (rec.source == "asset")
             {

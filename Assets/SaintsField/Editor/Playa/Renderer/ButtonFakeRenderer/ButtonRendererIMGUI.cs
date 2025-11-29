@@ -33,20 +33,22 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
 
             if (string.IsNullOrEmpty(buttonAttribute.Label))
             {
-                return new[] {new RichTextDrawer.RichTextChunk
-                {
-                    Content = ObjectNames.NicifyVariableName(methodInfo.Name),
-                }};
+                return new[] {new RichTextDrawer.RichTextChunk(content: ObjectNames.NicifyVariableName(methodInfo.Name)),
+                // {
+                //     Content = ObjectNames.NicifyVariableName(methodInfo.Name),
+                // }
+                };
             }
 
             if (!buttonAttribute.IsCallback)
             {
                 if (string.IsNullOrEmpty(buttonAttribute.Label))
                 {
-                    return new[] {new RichTextDrawer.RichTextChunk
-                    {
-                        Content = ObjectNames.NicifyVariableName(methodInfo.Name),
-                    }};
+                    return new[] {new RichTextDrawer.RichTextChunk(content: ObjectNames.NicifyVariableName(methodInfo.Name))
+                    // {
+                    //     Content = ObjectNames.NicifyVariableName(methodInfo.Name),
+                    // }
+                    };
                 }
 
                 // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
@@ -59,7 +61,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 return _cachedRichTextChunksIMGUI;
             }
 
-            (string error, string result) = Util.GetOf<string>(buttonAttribute.Label, null, FieldWithInfo.SerializedProperty, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]);
+            (string error, string result) = Util.FlatGetOf<string>(buttonAttribute.Label, null, FieldWithInfo.SerializedProperty, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]);
 
             if (error != "")
             {
@@ -67,10 +69,11 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 Debug.LogError(error);
 #endif
 
-                return new[] {new RichTextDrawer.RichTextChunk
-                {
-                    Content = ObjectNames.NicifyVariableName(methodInfo.Name),
-                }};
+                return new[] {new RichTextDrawer.RichTextChunk(content: ObjectNames.NicifyVariableName(methodInfo.Name)),
+                    // {
+                    //     Content = ObjectNames.NicifyVariableName(methodInfo.Name),
+                    // }
+                };
             }
 
             if (result == _cachedCallbackLabelIMGUI)

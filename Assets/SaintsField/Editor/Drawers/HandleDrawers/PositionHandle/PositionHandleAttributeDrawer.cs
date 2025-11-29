@@ -108,6 +108,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
 
             public string Error;
             public Vector3 Center;
+            public Quaternion Rotation;
             public Util.TargetWorldPosInfo TargetWorldPosInfo;
 
             public string Id;
@@ -143,12 +144,15 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             }
 
             Vector3 worldPos = positionHandleInfo.Center;
+            Quaternion rotation = Tools.pivotRotation == PivotRotation.Local
+                ? positionHandleInfo.Rotation
+                : Quaternion.identity;
 
             // ReSharper disable once ConvertToUsingDeclaration
             using (EditorGUI.ChangeCheckScope changed = new EditorGUI.ChangeCheckScope())
             {
                 // Debug.Log(worldPos);
-                Vector3 newTargetPosition = Handles.PositionHandle(worldPos, Quaternion.identity);
+                Vector3 newTargetPosition = Handles.PositionHandle(worldPos, rotation);
                 // ReSharper disable once InvertIf
                 if (changed.changed)
                 {
@@ -178,6 +182,7 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             if (positionHandleInfo.TargetWorldPosInfo.IsTransform)
             {
                 positionHandleInfo.Center = positionHandleInfo.TargetWorldPosInfo.Transform.position;
+                positionHandleInfo.Rotation = positionHandleInfo.TargetWorldPosInfo.Transform.rotation;
                 // Debug.Log(positionHandleInfo.Center);
                 positionHandleInfo.Error = "";
                 return;
@@ -194,9 +199,28 @@ namespace SaintsField.Editor.Drawers.HandleDrawers.PositionHandle
             }
 
             positionHandleInfo.Center = positionHandleInfo.TargetWorldPosInfo.WorldPos;
+            positionHandleInfo.Rotation = GetRotate(positionHandleInfo.TargetWorldPosInfo.Space, positionHandleInfo.SerializedProperty);
 
             // Debug.Log(positionHandleInfo.Center);
             positionHandleInfo.Error = "";
+        }
+
+        private static Quaternion GetRotate(Transform space, SerializedProperty serializedProperty)
+        {
+            if (space != null)
+            {
+                return space.rotation;
+            }
+
+            switch (serializedProperty.serializedObject.targetObject)
+            {
+                case GameObject go:
+                    return go.transform.rotation;
+                case Component comp:
+                    return comp.transform.rotation;
+                default:
+                    return Quaternion.identity;
+            }
         }
     }
 }

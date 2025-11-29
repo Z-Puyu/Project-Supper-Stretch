@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;
@@ -85,6 +86,7 @@ namespace SaintsField.Editor.Playa.Renderer
             bool isSaintsSerialized = FieldWithInfo.PlayaAttributes.Any(each => each is SaintsSerializedAttribute);
 
             (string error, object value) = GetValue(FieldWithInfo);
+            // Debug.Log($"error={error}, value={value}");
 
             VisualElement container = new VisualElement
             {
@@ -122,7 +124,8 @@ namespace SaintsField.Editor.Playa.Renderer
 
             Type fieldType = GetFieldType(FieldWithInfo);
             string labelName = NoLabel ? null : GetNiceName(FieldWithInfo);
-            (VisualElement result, bool isNestedField) = UIToolkitValueEdit(null, labelName, fieldType, value, null, setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), isSaintsSerialized);
+            // FieldWithInfo.Targets;
+            (VisualElement result, bool isNestedField) = UIToolkitValueEdit(null, labelName, fieldType, value, null, setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), FieldWithInfo.Targets);
 
             _onSearchFieldUIToolkit.AddListener(Search);
             container.RegisterCallback<DetachFromPanelEvent>(_ => _onSearchFieldUIToolkit.RemoveListener(Search));
@@ -184,9 +187,13 @@ namespace SaintsField.Editor.Playa.Renderer
             }
         }
 
+        private string _preRichLabelXml;
+        private RichTextDrawer _richTextDrawer;
+
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {
             PreCheckResult preCheckResult = base.OnUpdateUIToolKit(root);
+            // Debug.Log(preCheckResult.RichLabelXml);
             if (!RenderField)
             {
                 return preCheckResult;
@@ -194,7 +201,15 @@ namespace SaintsField.Editor.Playa.Renderer
 
             VisualElement container= root.Q<VisualElement>(NameContainer());
 
+            if (preCheckResult.HasRichLabel && _preRichLabelXml != preCheckResult.RichLabelXml || preCheckResult.RichLabelXml.Contains("<field"))
+            {
+                _preRichLabelXml = preCheckResult.RichLabelXml;
+                IEnumerable<RichTextDrawer.RichTextChunk> chunks = RichTextDrawer.ParseRichXmlWithProvider(preCheckResult.RichLabelXml, this);
+                UIToolkitUtils.SetLabel(UIToolkitUtils.TryFindLabel(container), chunks, _richTextDrawer ??= new RichTextDrawer());
+            }
+
             (string error, object value) = GetValue(FieldWithInfo);
+            // Debug.Log($"error={error}, value={value}");
 
             string nameErrorBox = NameErrorBox();
             NativeFieldPropertyRendererErrorField errorHelpBox = container.Q<NativeFieldPropertyRendererErrorField>(nameErrorBox);
@@ -276,7 +291,7 @@ namespace SaintsField.Editor.Playa.Renderer
 
                 bool isSaintsSerialized = FieldWithInfo.PlayaAttributes.Any(each => each is SaintsSerializedAttribute);
 
-                (VisualElement result, bool isNestedField) = UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, null, userData.Setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), isSaintsSerialized);
+                (VisualElement result, bool _) = UIToolkitValueEdit(fieldElementOrNull, NoLabel? null: GetNiceName(FieldWithInfo), GetFieldType(FieldWithInfo), value, null, userData.Setter, !isSaintsSerialized, InAnyHorizontalLayout, ReflectCache.GetCustomAttributes((MemberInfo)FieldWithInfo.PropertyInfo ?? FieldWithInfo.FieldInfo), FieldWithInfo.Targets);
                 // Debug.Log($"Not equal create for value={value}: {result}/{result==null}");
                 if(result != null)
                 {

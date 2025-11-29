@@ -96,13 +96,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.3.0**
+**5.4.5**
 
-1.  You can now serialize a `Guid` type directly using "Extended Serialization"
-2.  You can now use `[Guid]` on `string` to pick a guid
-3.  `ShowInInspector` now shows the correct `Guid` type
-4.  `ShowInInspector` now can work with `[Guid]` of a string type
-5.  Fix `SaintsDictionary` drop element gives cast error [#338](https://github.com/TylerTemp/SaintsField/issues/338)
+1.  Improve: `MinValue` & `MaxValue` now behaves more naturally if you use both attributes together
+2.  Fix: `MinMaxSlider` did not check the callback boundary automaticlly when edited (used to require a ctrl/cmd+s)
+3.  Fix: `Table` incorrect indent
+4.  Fix: Serialized Data might incorrectly read `null` value when `Instantiate` a prefab
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -153,6 +152,8 @@ Parameters:
 
         `aqua`, `black`, `blue`, `brown`, `cyan`, `darkblue`, `fuchsia`, `green`, `gray`, `grey`, `lightblue`, `lime`, `magenta`, `maroon`, `navy`, `olive`, `orange`, `purple`, `red`, `silver`, `teal`, `white`, `yellow`
 
+    *   Standard [Unity Pre-Set Color Presets](https://docs.unity3d.com/6000.2/Documentation/ScriptReference/Color.html) (Unity 6.2 as a reference), e.g. `darkViolet`, `hotPink`
+
     *   Some extra colors from [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes/blob/master/Assets/NaughtyAttributes/Scripts/Core/Utility/EColor.cs):
 
         `clear`, `pink`, `indigo`, `violet`
@@ -175,7 +176,7 @@ Parameters:
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
 using SaintsField.Playa;
 
-[LabelText("<color=lame>It's Labeled!")]
+[LabelText("<color=lime>It's Labeled!")]
 public List<string> myList;
 
 [LabelText("$" + nameof(MethodLabel))]
@@ -231,7 +232,6 @@ public string[] sindices;
 ```
 
 ![Image](https://github.com/user-attachments/assets/8232e42e-21ec-43ec-92c3-fbfeaebe4de1)
-
 
 #### `FieldLabelText`/`NoLabel` ####
 
@@ -652,7 +652,7 @@ public bool toggle;
 
 #### `FieldSeparator` / `FieldBelowSeparator` ####
 
-> [!TIPS]
+> [!TIP]
 > Only use this if you can not enable `SaintsEditor`
 
 Draw text, separator, spaces for field on above / below with rich text & dynamic text support.
@@ -1495,7 +1495,7 @@ Parameters:
 *   `string extraSearch = null`: set a callback function to use your custom search. If not match, use the default search.
 *   `string overrideSearch = null`: set a callback function as a custom search. When present, ignore `extraSearch` and default search.
 
-`delayedSearch` only works for IMGUI. For UI Toolkit, it already has a debounced search, which means:
+Note about input:
 
 *   When input anything, it'll wait for 0.6 seconds for next input, then perform the actual searching
 *   You can always use `Enter` to search immediately
@@ -1531,9 +1531,9 @@ In UI Toolkit you can also see the async searching which does not block the edit
 
 `extraSearch` & `overrideSearch` uses the following signiture:
 
-*   `bool CustomSearch(T item, int index, IReadOnlyList<SaintsField.Playa.ListSearchToken> seachToken)`
-*   `bool CustomSearch(T item, IReadOnlyList<SaintsField.Playa.ListSearchToken> seachToken)`
-*   `bool CustomSearch(int index, IReadOnlyList<SaintsField.Playa.ListSearchToken> seachToken)`
+*   `bool CustomSearch(T item, int index, IReadOnlyList<SaintsField.Playa.ListSearchToken> searchToken)`
+*   `bool CustomSearch(T item, IReadOnlyList<SaintsField.Playa.ListSearchToken> searchToken)`
+*   `bool CustomSearch(int index, IReadOnlyList<SaintsField.Playa.ListSearchToken> searchToken)`
 
 `ListSearchToken` is a struct of:
 
@@ -1595,6 +1595,15 @@ public Weapon[] weapons;
 You can now search as you want, both your custom search & serialized property search:
 
 [![video](https://github.com/user-attachments/assets/a32b3592-68f6-4207-8142-3d895c926de1)](https://github.com/user-attachments/assets/d7fd4e08-355f-460b-88fb-2e874f58cb01)
+
+**ShowInInspector** is supported with this attribute.
+
+```csharp
+[ShowInInspector, ListDrawerSettings(numberOfItemsPerPage: 5)]
+private List<MyStruct> FullFeatures = new List<MyStruct>{ /*...*/ };
+```
+
+![](https://github.com/user-attachments/assets/c5a24f62-60f5-4fd4-8603-f7db9d985907)
 
 #### `Table` ####
 
@@ -1934,12 +1943,27 @@ private void DictExternalAdd()
 
 [![video](https://github.com/user-attachments/assets/dd3e7add-36f3-4f59-918c-58022d68cac6)](https://github.com/user-attachments/assets/57baefa0-144c-4c7f-8100-dd7b102d3935)
 
-**Supported Attributes**
+**Supported Attributes**: `ShowInInspector` can work together with the following attributes
 
 *   `DateTime`
 *   `TimeSpan`
 *   `Layer`
+*   `SortingLayer`
 *   `Guid`
+*   `Tag`
+*   `InputAxis`
+*   `ShaderParam`
+*   `ShaderKeyword`
+*   `Rate`
+*   `PropRange`
+*   `MinMaxSlider`
+*   `ProgressBar`
+*   `LabelText`
+*   `AnimParams`
+*   `AnimState`
+*   `CurveRange`
+*   `ListDrawerSettings`
+*   `SaintsDictionary`
 
 ### Numerical ###
 
@@ -1972,6 +1996,8 @@ using SaintsField;
 #### `PropRange` ####
 
 Very like Unity's `Range` but allow you to dynamically change the range, plus allow to set range step.
+
+Supports int, uint, short, ushort, byte, sbyte, long, ulong, float, double
 
 For each argument:
 
@@ -2022,7 +2048,6 @@ For each argument:
 *   `int|float step=1|-1f`: the step of the slider, `<= 0` means no limit. By default, int type use `1` and float type use `-1f`
 *   `float minWidth=50f`: (IMGUI Only) the minimum width of the value label. `< 0` for auto size (not recommended)
 *   `float maxWidth=50f`: (IMGUI Only) the maximum width of the value label. `< 0` for auto size (not recommended)
-*   `bool free=false`: `true` to allow you manually input the value without getting limited by the slider (and the min/max value).
 
 *   AllowMultiple: No
 
@@ -2043,11 +2068,6 @@ public Vector2 vector2Free;
 [MinMaxSlider(0, 20)]
 public Vector2Int vector2IntFree;
 
-// not recommended
-[SerializeField]
-[MinMaxSlider(0, 100, minWidth:-1, maxWidth:-1)]
-private Vector2Int _autoWidth;
-
 [field: SerializeField, MinMaxSlider(-100f, 100f)]
 public Vector2 OuterRange { get; private set; }
 
@@ -2067,14 +2087,6 @@ public float DynamicMax { get; private set; }
 ```
 
 [![video](https://github.com/TylerTemp/SaintsField/assets/6391063/3da0ea31-d830-4ac6-ab1d-8305764162f5)](https://github.com/TylerTemp/SaintsField/assets/6391063/2ffb659f-a5ed-4861-b1ba-65771db5ab47)
-
-Example of free input mode:
-
-```csharp
-[MinMaxSlider(0, 10, free: true)] public Vector2 freeInput;
-```
-
-[![video](https://github.com/user-attachments/assets/6843ae58-0742-402b-a96a-5ae6ce531271)](https://github.com/user-attachments/assets/00ef50ba-98bd-4812-8664-8066b31c769a)
 
 #### `ProgressBar` ####
 
@@ -2182,28 +2194,18 @@ to get more useful info from the state, you can use `AnimatorStateBase`/`Animato
 
 *   `AnimationClip animationClip` is the actual animation clip of the state (can be null). It has a `length` value for the length of the clip. For more detail see [Unity Doc of AnimationClip](https://docs.unity3d.com/ScriptReference/AnimationClip.html)
 
-Special Note: using `AniamtorState`/`AnimatorStateBase` with `OnValueChanged`, you can get a `AnimatorStateChanged` on the callback (rather than the value of the field).
-This is because `AnimatorState` expected any class/struct with satisfied fields.
+Special Note: using `AniamtorState`/`AnimatorStateBase` with `OnValueChanged`, you will get a `AnimatorState` on the callback.
 
 ```csharp
 using SaintsField;
 
-[AnimatorState, OnValueChanged(nameof(OnChanged))]
+[AnimatorState]
 public string stateName;
 
-#if UNITY_EDITOR
-[AnimatorState, OnValueChanged(nameof(OnChangedState))]
-#endif
+[AnimatorState(nameof(MyAnimator))]  // you can specific an animator
 public AnimatorState state;
 
-// This does not have a `animationClip`, thus it won't include a resource when serialized: only pure data.
-[AnimatorState, OnValueChanged(nameof(OnChangedState))]
 public AnimatorStateBase stateBase;
-
-private void OnChanged(string changedValue) => Debug.Log(changedValue);
-#if UNITY_EDITOR
-private void OnChangedState(AnimatorStateChanged changedValue) => Debug.Log($"layerIndex={changedValue.layerIndex}, AnimatorControllerLayer={changedValue.layer}, AnimatorState={changedValue.state}, animationClip={changedValue.animationClip}, subStateMachineNameChain={string.Join("/", changedValue.subStateMachineNameChain)}");
-#endif
 ```
 
 ![animator_state](https://github.com/TylerTemp/SaintsField/assets/6391063/8ee35de5-c7d5-4f0d-b8b7-8feeac41c31d)
@@ -2708,6 +2710,13 @@ private void ChangedAnyType(object anyObj, int index=-1)
 {
     Debug.Log($"changed={anyObj}@{index}");
 }
+```
+
+You can use static method too (see the syntax in the end of the document)
+
+```csharp
+// Call `Debug.Log(oj)` on changed
+[OnValueChanged(":Debug.Log")] public Object oj;
 ```
 
 #### `OnArraySizeChanged` ####
@@ -3640,125 +3649,130 @@ public Vector2Int v2Value;
 
 [![video](https://github.com/user-attachments/assets/fdf756bc-b548-4047-a667-b15887055b2e)](https://github.com/user-attachments/assets/bc3b3387-08b7-45da-9597-1333edb31c95)
 
-#### `PlayaArraySize` ####
-
-**Deprecated**. Use `ArraySize` instead.
-
 ### Miscellaneous ###
 
-#### `Dropdown` ####
+#### `TreeDropdown` ####
 
-A dropdown selector. Supports reference type, sub-menu, separator, and disabled select item.
+A tree dropdown selector. Supports reference type, sub-menu, separator, search, and disabled select item, plus icon.
 
-If you want a searchable dropdown, see `AdvancedDropdown`.
+This is the same as `AdvancedDropdown`, except it uses a tree view to pick.
 
-*   `string funcName=null` callback function. Must return a `DropdownList<T>`.
+> [!WARNING]
+> UI Toolkit only.
+
+**Arguments**
+
+*   `string funcName=null` callback function. Must return either a `AdvancedDropdownList<T>` or a `IEnumerable<object>` (list/array etc.).
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
-*   `bool slashAsSub=true` treat `/` as a sub item.
-
-    Note: In `IMGUI`, this just replace `/` to Unicode [`\u2215` Division Slash ∕](https://www.compart.com/en/unicode/U+2215), and WILL have a little bit of overlap with nearby characters.
-
+    When omitted, it will try to find all the static values from the field type.
+    You can use `../` to get upward callback/property for a callback
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
 *   AllowMultiple: No
 
-If you're using UI Toolkit, the search box can also search the path too (rather than just the value).
-
-**Example**
+See `AdvancedDropdown` for more usage
 
 ```csharp
 using SaintsField;
 
-[Dropdown(nameof(GetDropdownItems))] public float _float;
+[TreeDropdown(nameof(AdvDropdown))] public int drops;
 
-public GameObject _go1;
-public GameObject _go2;
-[Dropdown(nameof(GetDropdownRefs))] public GameObject _refs;
-
-private DropdownList<float> GetDropdownItems()
+public AdvancedDropdownList<int> AdvDropdown()
 {
-    return new DropdownList<float>
+    return new AdvancedDropdownList<int>
     {
-        { "1", 1.0f },
-        { "2", 2.0f },
-        { "3/1", 3.1f },
-        { "3/2", 3.2f },
-    };
-}
-
-private DropdownList<GameObject> GetDropdownRefs => new DropdownList<GameObject>
-{
-    {_go1.name, _go1},
-    {_go2.name, _go2},
-    {"NULL", null},
-};
-```
-
-![dropdown](https://github.com/TylerTemp/SaintsField/assets/6391063/aa0da4aa-dfe1-4c41-8d70-e49cc674bd42)
-
-To control the separator and disabled item
-
-```csharp
-using SaintsField;
-
-[Dropdown(nameof(GetDropdownItems))]
-public Color color;
-
-private DropdownList<Color> GetDropdownItems()
-{
-    return new DropdownList<Color>
-    {
-        { "Black", Color.black },
-        { "White", Color.white },
-        DropdownList<Color>.Separator(),
-        { "Basic/Red", Color.red, true },  // the third arg means it's disabled
-        { "Basic/Green", Color.green },
-        { "Basic/Blue", Color.blue },
-        DropdownList<Color>.Separator("Basic/"),
-        { "Basic/Magenta", Color.magenta },
-        { "Basic/Cyan", Color.cyan },
+        // a grouped value
+        new AdvancedDropdownList<int>("First Half")
+        {
+            // with icon
+            new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
+            // no icon
+            new AdvancedDropdownList<int>("Tuesday", 2),
+        },
+        new AdvancedDropdownList<int>("Second Half")
+        {
+            new AdvancedDropdownList<int>("Wednesday")
+            {
+                new AdvancedDropdownList<int>("Morning", 3, icon: "star.png"),
+                new AdvancedDropdownList<int>("Afternoon", 8),
+            },
+            new AdvancedDropdownList<int>("Thursday", 4, true, icon: "star.png"),
+        },
+        // direct value
+        new AdvancedDropdownList<int>("Friday", 5, true),
+        AdvancedDropdownList<int>.Separator(),
+        new AdvancedDropdownList<int>("Saturday", 6, icon: "star.png"),
+        new AdvancedDropdownList<int>("Sunday", 7, icon: "star.png"),
     };
 }
 ```
 
-And you can always manually add it:
+![](https://github.com/user-attachments/assets/fcfd2932-0850-43af-8a93-5c3d1979240a)
 
-```csharp
-DropdownList<Color> dropdownList = new DropdownList<Color>();
-dropdownList.Add("Black", Color.black);  // add an item
-dropdownList.Add("White", Color.white, true);  // and a disabled item
-dropdownList.AddSeparator();  // add a separator
-```
-
-![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
-
-The look in the UI Toolkit with `slashAsSub: false`:
-
-![dropdown_ui_toolkit](https://github.com/TylerTemp/SaintsField/assets/6391063/e6788204-ff04-4096-a37a-26d68e852737)
-
-Finally, using it on an `enum` to select one `enum` without needing to specify the callback function.
-
-If you add `RichLabel` to the `enum`, the item name will be changed to the `RichLabel` content.
+Example of up-walk
 
 ```csharp
 [Serializable]
-public enum MyEnum
+public struct Down
 {
-    [RichLabel("1")]  // RichLabel is optional. Just for you to have more fancy control
-    First,
-    [RichLabel("2")]
-    Second,
-    [RichLabel("3")]
-    Third,
-    [RichLabel("4/0")]
-    ForthZero,
-    [RichLabel("4/1")]
-    ForthOne,
+    [TreeDropdown("../../" + nameof(options))]  // Up walk 2 levels
+    public string stringV;
 }
 
-[Dropdown] public MyEnum myEnumDropdown;
+[Serializable]
+public struct MyStruct
+{
+    [TreeDropdown("../" + nameof(options))]  // Up walk 1 level
+    public string stringV;
+    public Down down;
+}
+
+public List<string> options;
+
+public MyStruct myStruct;
 ```
 
-![image](https://github.com/user-attachments/assets/46ddc541-8773-4571-9aeb-f3fe25c5f783)
+![](https://github.com/user-attachments/assets/c9f42bf2-632a-496a-8ffc-74b2abbaceb9)
+
+#### `OptionsTreeDropdown` / `PairsTreeDropdown` ####
+
+Like `OptionsDropdown` / `PairsDropdown`, but in a tree view
+
+> [!WARNING]
+> UI Toolkit only.
+
+```csharp
+use SaintsField;
+
+[OptionsTreeDropdown(EUnique.Disable, "Hor/Left", "Hor/Right", "Vert/Top", "Vert/Bottom", "Center")]
+public string[] treeOpt;
+```
+
+![](https://github.com/user-attachments/assets/443b95f6-7010-4fea-a62a-40eaed1e5c22)
+
+```csharp
+use SaintsField;
+
+public enum Direction
+{
+    None,
+    Left,
+    Right,
+    Up,
+    Down,
+    Center,
+}
+
+[PairsTreeDropdown("negative/1", -1, "negative/2", 2, "negative/3", -3, "zero", 0, "positive/1", 1, "positive/2", 2, "positive/3", 3)]
+public int treeIntOpt;
+
+// useful if you don't want the entire enum
+[PairsTreeDropdown(EUnique.Disable, "Hor/<-", Direction.Left, "Hor/->", Direction.Right, "Vert/↑", Direction.Up, "Vert/↓", Direction.Down)]
+public Direction[] treeDireOpt;
+```
+
+![](https://github.com/user-attachments/assets/d7aab70a-df72-4527-9cd4-16cb9e91ab9b)
+
+![](https://github.com/user-attachments/assets/63fb22dd-5aaa-4e7a-9b0b-ac15270316f7)
 
 #### `AdvancedDropdown` ####
 
@@ -3784,6 +3798,7 @@ A dropdown selector. Supports reference type, sub-menu, separator, search, and d
 *   `string funcName=null` callback function. Must return either a `AdvancedDropdownList<T>` or a `IEnumerable<object>` (list/array etc.).
     When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
     When omitted, it will try to find all the static values from the field type.
+    You can use `../` to get upward callback/property for a callback
 *   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
 *   AllowMultiple: No
 
@@ -3944,61 +3959,30 @@ Also, using on a type like `Color` to pick a pre-defined static value:
 
 ![image](https://github.com/user-attachments/assets/404d4cd6-b4bf-4521-b633-2dd745ec4de1)
 
-#### `TreeDropdown` ####
-
-A tree dropdown selector. Supports reference type, sub-menu, separator, search, and disabled select item, plus icon.
-
-This is the same as `AdvancedDropdown`, except it uses a tree view to pick.
-
-> [!WARNING]
-> UI Toolkit only.
-
-**Arguments**
-
-*   `string funcName=null` callback function. Must return either a `AdvancedDropdownList<T>` or a `IEnumerable<object>` (list/array etc.).
-    When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
-    When omitted, it will try to find all the static values from the field type.
-*   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
-*   AllowMultiple: No
-
-See `AdvancedDropdown` for more usage
+Example of up-walk
 
 ```csharp
-using SaintsField;
-
-[TreeDropdown(nameof(AdvDropdown))] public int drops;
-
-public AdvancedDropdownList<int> AdvDropdown()
+[Serializable]
+public struct Down
 {
-    return new AdvancedDropdownList<int>
-    {
-        // a grouped value
-        new AdvancedDropdownList<int>("First Half")
-        {
-            // with icon
-            new AdvancedDropdownList<int>("Monday", 1, icon: "eye.png"),
-            // no icon
-            new AdvancedDropdownList<int>("Tuesday", 2),
-        },
-        new AdvancedDropdownList<int>("Second Half")
-        {
-            new AdvancedDropdownList<int>("Wednesday")
-            {
-                new AdvancedDropdownList<int>("Morning", 3, icon: "star.png"),
-                new AdvancedDropdownList<int>("Afternoon", 8),
-            },
-            new AdvancedDropdownList<int>("Thursday", 4, true, icon: "star.png"),
-        },
-        // direct value
-        new AdvancedDropdownList<int>("Friday", 5, true),
-        AdvancedDropdownList<int>.Separator(),
-        new AdvancedDropdownList<int>("Saturday", 6, icon: "star.png"),
-        new AdvancedDropdownList<int>("Sunday", 7, icon: "star.png"),
-    };
+    [AdvancedDropdown("../../" + nameof(options))]  // Up walk 2 levels
+    public string stringV;
 }
+
+[Serializable]
+public struct MyStruct
+{
+    [AdvancedDropdown("../" + nameof(options))]  // Up walk 1 level
+    public string stringV;
+    public Down down;
+}
+
+public List<string> options;
+
+public MyStruct myStruct;
 ```
 
-![](https://github.com/user-attachments/assets/fcfd2932-0850-43af-8a93-5c3d1979240a)
+![](https://github.com/user-attachments/assets/c9f42bf2-632a-496a-8ffc-74b2abbaceb9)
 
 
 #### `OptionsDropdown` / `PairsDropdown` ####
@@ -4042,46 +4026,256 @@ public Direction[] direOpt;
 
 ![](https://github.com/user-attachments/assets/01501513-d00d-4320-94e9-6c76a81a3c2a)
 
-#### `OptionsTreeDropdown` / `PairsTreeDropdown` ####
+#### `Dropdown` ####
 
-Like `OptionsDropdown` / `PairsDropdown`, but in a tree view
+A dropdown selector. Supports reference type, sub-menu, separator, and disabled select item.
 
-> [!WARNING]
-> UI Toolkit only.
+If you want a searchable dropdown, see `AdvancedDropdown`.
+
+*   `string funcName=null` callback function. Must return a `DropdownList<T>`.
+    When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
+*   `bool slashAsSub=true` treat `/` as a sub item.
+
+    Note: In `IMGUI`, this just replace `/` to Unicode [`\u2215` Division Slash ∕](https://www.compart.com/en/unicode/U+2215), and WILL have a little bit of overlap with nearby characters.
+
+*   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
+*   AllowMultiple: No
+
+If you're using UI Toolkit, the search box can also search the path too (rather than just the value).
+
+**Example**
 
 ```csharp
-use SaintsField;
+using SaintsField;
 
-[OptionsTreeDropdown(EUnique.Disable, "Hor/Left", "Hor/Right", "Vert/Top", "Vert/Bottom", "Center")]
-public string[] treeOpt;
-```
+[Dropdown(nameof(GetDropdownItems))] public float _float;
 
-![](https://github.com/user-attachments/assets/443b95f6-7010-4fea-a62a-40eaed1e5c22)
+public GameObject _go1;
+public GameObject _go2;
+[Dropdown(nameof(GetDropdownRefs))] public GameObject _refs;
 
-```csharp
-use SaintsField;
-
-public enum Direction
+private DropdownList<float> GetDropdownItems()
 {
-    None,
-    Left,
-    Right,
-    Up,
-    Down,
-    Center,
+    return new DropdownList<float>
+    {
+        { "1", 1.0f },
+        { "2", 2.0f },
+        { "3/1", 3.1f },
+        { "3/2", 3.2f },
+    };
 }
 
-[PairsTreeDropdown("negative/1", -1, "negative/2", 2, "negative/3", -3, "zero", 0, "positive/1", 1, "positive/2", 2, "positive/3", 3)]
-public int treeIntOpt;
-
-// useful if you don't want the entire enum
-[PairsTreeDropdown(EUnique.Disable, "Hor/<-", Direction.Left, "Hor/->", Direction.Right, "Vert/↑", Direction.Up, "Vert/↓", Direction.Down)]
-public Direction[] treeDireOpt;
+private DropdownList<GameObject> GetDropdownRefs => new DropdownList<GameObject>
+{
+    {_go1.name, _go1},
+    {_go2.name, _go2},
+    {"NULL", null},
+};
 ```
 
-![](https://github.com/user-attachments/assets/d7aab70a-df72-4527-9cd4-16cb9e91ab9b)
+![dropdown](https://github.com/TylerTemp/SaintsField/assets/6391063/aa0da4aa-dfe1-4c41-8d70-e49cc674bd42)
 
-![](https://github.com/user-attachments/assets/63fb22dd-5aaa-4e7a-9b0b-ac15270316f7)
+To control the separator and disabled item
+
+```csharp
+using SaintsField;
+
+[Dropdown(nameof(GetDropdownItems))]
+public Color color;
+
+private DropdownList<Color> GetDropdownItems()
+{
+    return new DropdownList<Color>
+    {
+        { "Black", Color.black },
+        { "White", Color.white },
+        DropdownList<Color>.Separator(),
+        { "Basic/Red", Color.red, true },  // the third arg means it's disabled
+        { "Basic/Green", Color.green },
+        { "Basic/Blue", Color.blue },
+        DropdownList<Color>.Separator("Basic/"),
+        { "Basic/Magenta", Color.magenta },
+        { "Basic/Cyan", Color.cyan },
+    };
+}
+```
+
+And you can always manually add it:
+
+```csharp
+DropdownList<Color> dropdownList = new DropdownList<Color>();
+dropdownList.Add("Black", Color.black);  // add an item
+dropdownList.Add("White", Color.white, true);  // and a disabled item
+dropdownList.AddSeparator();  // add a separator
+```
+
+![color](https://github.com/TylerTemp/SaintsField/assets/6391063/d7f8c9c1-ba43-4c2d-b53c-f6b0788202e6)
+
+The look in the UI Toolkit with `slashAsSub: false`:
+
+![dropdown_ui_toolkit](https://github.com/TylerTemp/SaintsField/assets/6391063/e6788204-ff04-4096-a37a-26d68e852737)
+
+Finally, using it on an `enum` to select one `enum` without needing to specify the callback function.
+
+If you add `RichLabel` to the `enum`, the item name will be changed to the `RichLabel` content.
+
+```csharp
+[Serializable]
+public enum MyEnum
+{
+    [RichLabel("1")]  // RichLabel is optional. Just for you to have more fancy control
+    First,
+    [RichLabel("2")]
+    Second,
+    [RichLabel("3")]
+    Third,
+    [RichLabel("4/0")]
+    ForthZero,
+    [RichLabel("4/1")]
+    ForthOne,
+}
+
+[Dropdown] public MyEnum myEnumDropdown;
+```
+
+![image](https://github.com/user-attachments/assets/46ddc541-8773-4571-9aeb-f3fe25c5f783)
+
+#### `ValueButtons` ####
+
+Like tree dropdown, but this will list all options as buttons
+
+Parameters:
+
+*   `string funcName=null` callback function. Must return either a `OptionDropdownList<T>` or a `IEnumerable` (list/array etc.).
+
+    When using on an `enum`, you can omit this parameter, and the dropdown will use the enum values as the dropdown items.
+
+    When using on a `bool`, you can omit thiss parameter, and a `True`, a `False` button will show.
+
+    When omitted, it will try to find all the static values from the field type.
+
+*   `EUnique unique=EUnique.None`: When using on a list/array, a duplicated option can be removed if `Enique.Remove`, or disabled if `EUnique.Disable`. No use for non-list/array.
+*   Allow Multiple: No
+
+Use property/field/function as options
+
+```csharp
+using SaintsField;
+
+public List<string> stringItems;
+[ValueButtons(nameof(stringItems))] public string clickAButton;
+
+[GetComponentInChildren] public Transform[] transOpts;
+[ValueButtons(nameof(transOpts))] public Transform transformSelect;  // This will use the object's `.ToString()` as button label
+
+// Use a function (list, array, etc.)
+private IEnumerable<Transform> GetTransOpts() => transOpts; // list, array, anything that is IEnumerable
+[ValueButtons(nameof(GetTransOpts))] public Transform transformCallback;
+```
+
+![](https://github.com/user-attachments/assets/33fc3acb-5511-4b93-a472-239bebb105b4)
+
+You can also control the enable/disable using callback
+
+```csharp
+using SaintsField;
+
+// Use OptionList for a bit more control
+private OptionList<Transform> GetTransAdvanced()
+{
+    OptionList<Transform> result = new OptionList<Transform>
+    {
+        {transOpts[0].name, transOpts[0]},  // inline add
+    };
+
+    // direct add
+    result.Add(transOpts[1].name, transOpts[1], true);  // true means disabled
+    // rich tags are supported
+    result.Add($"<color={EColor.Aquamarine}><icon=star.png/> {transOpts[1].name}", transOpts[2]);
+    result.Add(transOpts[3].name, transOpts[3]);
+    return result;
+}
+[ValueButtons(nameof(GetTransAdvanced))] public Transform transformAdvanced;
+```
+
+![](https://github.com/user-attachments/assets/e8679a49-3899-4797-bf58-5f51c44bb699)
+
+Using on an `enum` to pick one value
+
+Note: this does not allow bitwise/flags select. It only select one value. For `Flags`, please check `EnumToggleButtons`
+
+```csharp
+using SaintsField;
+
+// Use on enum
+[Serializable]
+public enum EnumOpt
+{
+    First,
+    Second,
+    Third,
+    [InspectorName("<color=lime><label/>")]  // change name is supported
+    Forth,
+}
+[ValueButtons] public EnumOpt myEnum;
+```
+
+![](https://github.com/user-attachments/assets/83eefee7-5d0a-4c88-84d7-95a97c56f860)
+
+Using on a bool to toggle `True`/`False`
+
+```csharp
+using SaintsField;
+
+// Use on bool
+[ValueButtons] public bool myBool;
+```
+
+![](https://github.com/user-attachments/assets/b89c8137-f967-4a1b-8e90-4d449801c3e9)
+
+Using on a type without callback to get all the static/const values
+
+```csharp
+using SaintsField;
+
+// Use to get const/static from type
+[ValueButtons] public Color unityColors;
+```
+
+![](https://github.com/user-attachments/assets/4b76bb2b-f2fd-4efb-a879-71eef57c7444)
+
+#### `OptionsValueButtons` / `PairsValueButtons` ####
+
+Select an option directly in the attribute.
+
+```csharp
+[OptionsValueButtons(0.5f, 1f, 1.5f, 2f, 2.5f, 3f)]
+public float floatOpt;
+```
+
+![](https://github.com/user-attachments/assets/b9eb7bab-cac4-42f0-bb0b-ba281b398008)
+
+Or add labels for these values
+
+```csharp
+[PairsValueButtons(
+        "<icon=d_scrollleft/>", Direction.Left,
+        "<icon=d_scrollup/>", Direction.Up,
+        "<icon=d_scrollright/>", Direction.Right,
+        "<icon=d_scrolldown/>", Direction.Down
+    )]
+public Direction direct;
+
+[PairsValueButtons(
+    "<color=brown>Broken", 0,
+    "<color=green>Normal", 1,
+    "<color=blue>Rare", 2,
+    "<color=yellow>Legend", 3
+)]
+public int quality;
+```
+
+![](https://github.com/user-attachments/assets/cefb9072-badc-4105-9455-ba8891b42235)
 
 #### `EnumToggleButtons` ####
 
@@ -6476,13 +6670,18 @@ using SaintsField;
 
 ![](https://github.com/user-attachments/assets/8ef121c0-9762-49ad-915b-cf83e1ef79f9)
 
-See [DictInterface](https://github.com/TylerTemp/SaintsField/blob/master/Samples~/Scripts/IssueAndTesting/Issue/Issue241DictInterface.cs) as an example of making an `SerializedReference` dictionary.
+`[SaintsDictionary]` can work with `[ShowInInspector]`
 
-![Image](https://github.com/user-attachments/assets/7b252440-c11d-4bd0-b206-4808cd4c3c01)
+```csharp
+[ShowInInspector, SaintsDictionary(numberOfItemsPerPage: 5)]
+private Dictionary<int, string> FullFeature
+{
+    get => _plainDict;
+    set => _plainDict = value;
+}
+```
 
-See [SaintsDictFiller](https://github.com/TylerTemp/SaintsField/blob/master/Samples~/Scripts/SaintsDictExamples/SaintsDictFillerExample.cs) as an example of making dictionary with auto getters.
-
-[![video](https://github.com/user-attachments/assets/ce2efb49-2723-4e43-a3a7-9969f229f591)](https://github.com/user-attachments/assets/38dcb22c-d30f-40d4-bd6b-420aa1b41588)
+![](https://github.com/user-attachments/assets/f2a71a7c-57be-4745-b519-fb196ab7af22)
 
 ### `SaintsInterface<>` ###
 
@@ -7388,6 +7587,28 @@ public partial class SerDictionaryExample : MonoBehaviour
 
 ![](https://github.com/user-attachments/assets/37166a71-cd58-4765-aec4-5c9aabdb02b1)
 
+### `HashSet<>` ###
+
+> [!WARNING]
+> This feature is still experimental
+
+You can mark a `HashSet` directly for serialization. SaintsField will internally use `SaintsHashSet` to serialize it.
+
+It support serializable types, abstract class/struct types, and interface types as element type.
+
+```csharp
+// Note the `partial`!
+public partial class SerDictionaryExample : MonoBehaviour
+{
+    [SaintsSerialized]
+    public HashSet<string> stringHashSet;
+    [SaintsSerialized]
+    public HashSet<IInterface1> refHashSet;
+}
+```
+
+![](https://github.com/user-attachments/assets/31bcdf71-419a-4eb6-a57f-31030fe6d0b0)
+
 ### `interface`  ###
 
 > [!WARNING]
@@ -7560,7 +7781,7 @@ public partial class SerTimeSpanExample : MonoBehaviour
 
 ![](https://github.com/user-attachments/assets/cd6b1135-6935-4366-940a-6f0c2a550c2f)
 
-### `Guid`  ###
+### `Guid` ###
 
 > [!WARNING]
 > This feature is still experimental
@@ -8168,9 +8389,6 @@ Go to `Window` - `Saints` to enable/disable functions you want
 
     #"Disable AI Navigation"
     -define:SAINTSFIELD_AI_NAVIGATION_DISABLED
-
-    #"Disable UI Toolkit"
-    -define:SAINTSFIELD_UI_TOOLKIT_DISABLE
 
     #"Enable SaintsEditor project wide"
     -define:SAINTSFIELD_SAINTS_EDITOR_APPLY

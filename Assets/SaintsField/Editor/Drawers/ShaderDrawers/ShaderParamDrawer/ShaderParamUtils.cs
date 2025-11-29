@@ -1,9 +1,13 @@
 #if UNITY_2021_2_OR_NEWER
 using System;
 using System.Collections.Generic;
+using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
+using SaintsField.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
 {
@@ -84,6 +88,65 @@ namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderParamDrawer
                 yield return new ShaderCustomInfo(propertyName, propertyDescription, propertyType,
                     Shader.PropertyToID(propertyName));
             }
+        }
+
+        public static void MakeDropdown<T>(T curValue, Shader shader, ShaderPropertyType? shaderPropertyType, VisualElement root, Action<T> onValueChangedCallback)
+        {
+            bool isString = typeof(T) == typeof(string);
+
+            AdvancedDropdownList<ShaderCustomInfo> dropdown = new AdvancedDropdownList<ShaderCustomInfo>();
+            if (isString)
+            {
+                dropdown.Add("[Empty String]", new ShaderCustomInfo("", "", default, -1));
+                dropdown.AddSeparator();
+            }
+
+            bool selected = false;
+            ShaderCustomInfo selectedInfo = default;
+            foreach (ShaderCustomInfo shaderCustomInfo in GetShaderInfo(shader, shaderPropertyType))
+            {
+                // dropdown.Add(path, (path, index));
+                dropdown.Add(shaderCustomInfo.GetString(false), shaderCustomInfo);
+                // ReSharper disable once InvertIf
+                if (isString && shaderCustomInfo.PropertyName == (string)(object)curValue
+                    || !isString && shaderCustomInfo.PropertyID == (int)(object)curValue)
+                {
+                    selected = true;
+                    selectedInfo = shaderCustomInfo;
+                }
+            }
+
+            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
+            {
+                CurValues = selected ? new object[] { selectedInfo } : Array.Empty<object>(),
+                DropdownListValue = dropdown,
+                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+            };
+
+            (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
+
+            SaintsTreeDropdownUIToolkit sa = new SaintsTreeDropdownUIToolkit(
+                metaInfo,
+                root.worldBound.width,
+                maxHeight,
+                false,
+                (curItem, _) =>
+                {
+                    ShaderCustomInfo shaderCustomInfo = (ShaderCustomInfo)curItem;
+                    if (isString)
+                    {
+                        onValueChangedCallback.Invoke((T)(object)shaderCustomInfo.PropertyName);
+                    }
+                    else
+                    {
+                        onValueChangedCallback.Invoke((T)(object)shaderCustomInfo.PropertyID);
+                    }
+
+                    return new[] { curItem };
+                }
+            );
+
+            UnityEditor.PopupWindow.Show(worldBound, sa);
         }
     }
 }

@@ -17,8 +17,7 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes.Processors {
         [field: SerializeReference, ReferencePicker, ShowIf(nameof(this.HasMaxValue))] 
         private IAttributeMagnitude MaxValue { get; set; }
         
-        protected override Attribute TryProcess(Attribute data, out bool isSuccessful) {
-            isSuccessful = true;
+        protected override bool TryProcess(Attribute data, out Attribute result) {
             double clampedValue = data.Value;
             if (this.HasMinValue) {
                 clampedValue = Math.Max(this.MinValue.Evaluate(data.Source, null), clampedValue);
@@ -28,7 +27,8 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes.Processors {
                 clampedValue = Math.Min(this.MaxValue.Evaluate(data.Source, null), clampedValue);
             }
             
-            return new Attribute(data.Source, data.Id, clampedValue, false);
+            result = new Attribute(data.Source, data.Id, clampedValue, false);
+            return true;
         }
     }
 }

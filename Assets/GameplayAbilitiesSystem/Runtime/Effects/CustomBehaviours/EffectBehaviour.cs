@@ -1,5 +1,5 @@
 using System;
-using CommonFrameworks.CommonUtilities.CommonInterfaces;
+using CommonFrameworks.CommonUtilities;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects.CustomBehaviours {
     [Serializable]

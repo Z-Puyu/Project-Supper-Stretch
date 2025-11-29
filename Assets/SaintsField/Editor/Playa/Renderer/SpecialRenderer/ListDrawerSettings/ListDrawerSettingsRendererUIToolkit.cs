@@ -13,7 +13,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
+namespace SaintsField.Editor.Playa.Renderer.ListDrawerSettings
 {
     public partial class ListDrawerSettingsRenderer
     {
@@ -101,6 +101,9 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             public string SearchText;
             public double DebounceSearchTime;
             public List<int> CachedFullSources;
+
+            public List<int> ItemIndexToPropertyIndex;
+            public int CurPageIndex;
         }
 
         private AsyncSearchItems _asyncSearchItems;
@@ -404,11 +407,12 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 CachedFullSources = new List<int>(fullList),
                 SearchText = "",
                 DebounceSearchTime = double.MaxValue,
+
+                ItemIndexToPropertyIndex = Enumerable.Range(0, property.arraySize).ToList(),
+                CurPageIndex = 0,
             };
 
             // int numberOfItemsPerPage = 0;
-            int curPageIndex = 0;
-            List<int> itemIndexToPropertyIndex = Enumerable.Range(0, property.arraySize).ToList();
 
             VisualElement MakeItem()
             {
@@ -423,12 +427,12 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                 Debug.Log(($"bind: {index}, propIndex: {itemIndexToPropertyIndex[index]}, itemIndexes={string.Join(", ", itemIndexToPropertyIndex)}"));
 #endif
-                if(index >= itemIndexToPropertyIndex.Count)
+                if(index >= _asyncSearchItems.ItemIndexToPropertyIndex.Count)
                 {
                     return;
                 }
 
-                int propIndex = itemIndexToPropertyIndex[index];
+                int propIndex = _asyncSearchItems.ItemIndexToPropertyIndex[index];
                 if(propIndex >= property.arraySize)
                 {
                     return;
@@ -752,13 +756,13 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 pagePreButton.SetEnabled(pagingInfo.CurPageIndex > 0);
                 pageNextButton.SetEnabled(pagingInfo.CurPageIndex < pagingInfo.PageCount - 1);
 
-                itemIndexToPropertyIndex.Clear();
-                itemIndexToPropertyIndex.AddRange(pagingInfo.IndexesCurPage);
+                _asyncSearchItems.ItemIndexToPropertyIndex.Clear();
+                _asyncSearchItems.ItemIndexToPropertyIndex.AddRange(pagingInfo.IndexesCurPage);
 
-                curPageIndex = pagingInfo.CurPageIndex;
+                _asyncSearchItems.CurPageIndex = pagingInfo.CurPageIndex;
 
                 pageLabel.text = $" / {pagingInfo.PageCount}";
-                pageField.SetValueWithoutNotify(curPageIndex + 1);
+                pageField.SetValueWithoutNotify(_asyncSearchItems.CurPageIndex + 1);
 
                 List<int> curPageItems = pagingInfo.IndexesCurPage;
 
@@ -802,7 +806,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
                 arraySize = newSize;
                 numberOfItemsTotalField.SetValueWithoutNotify(arraySize);
-                UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
+                UpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value);
             }
 
             // result.TrackPropertyValue(property, p =>
@@ -821,11 +825,11 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
             pagePreButton.clicked += () =>
             {
-                UpdatePage(curPageIndex - 1, numberOfItemsPerPageField.value);
+                UpdatePage(_asyncSearchItems.CurPageIndex - 1, numberOfItemsPerPageField.value);
             };
             pageNextButton.clicked += () =>
             {
-                UpdatePage(curPageIndex + 1, numberOfItemsPerPageField.value);
+                UpdatePage(_asyncSearchItems.CurPageIndex + 1, numberOfItemsPerPageField.value);
             };
             pageField.RegisterValueChangedCallback(evt => UpdatePage(evt.newValue - 1, numberOfItemsPerPageField.value));
             numberOfItemsTotalField.RegisterValueChangedCallback(e =>
@@ -857,7 +861,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 {
                     property.arraySize = newSize;
                     property.serializedObject.ApplyModifiedProperties();
-                    UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
+                    UpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value);
                 }
                 else
                 {
@@ -871,7 +875,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                 Debug.Log($"update number of items per page {newValueClamp}");
 #endif
-                UpdatePage(curPageIndex, newValueClamp);
+                UpdatePage(_asyncSearchItems.CurPageIndex, newValueClamp);
             }
 
             numberOfItemsPerPageField.RegisterValueChangedCallback(evt => UpdateNumberOfItemsPerPage(evt.newValue));
@@ -880,7 +884,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
             {
                 property.arraySize += 1;
                 property.serializedObject.ApplyModifiedProperties();
-                int totalVisiblePage = Mathf.CeilToInt((float)itemIndexToPropertyIndex.Count / numberOfItemsPerPageField.value);
+                int totalVisiblePage = Mathf.CeilToInt((float)_asyncSearchItems.ItemIndexToPropertyIndex.Count / numberOfItemsPerPageField.value);
                 UpdatePage(totalVisiblePage - 1, numberOfItemsPerPageField.value);
                 // numberOfItemsPerPageLabel.text = $" / {property.arraySize} Items";
                 numberOfItemsTotalField.SetValueWithoutNotify(property.arraySize);
@@ -891,7 +895,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 // int[] sources = listView.itemsSource.Cast<int>().ToArray();
                 List<int> curRemoveObjects = objects.ToList();
 
-                foreach (int index in curRemoveObjects.Select(removeIndex => itemIndexToPropertyIndex[removeIndex]).OrderByDescending(each => each))
+                foreach (int index in curRemoveObjects.Select(removeIndex => _asyncSearchItems.ItemIndexToPropertyIndex[removeIndex]).OrderByDescending(each => each))
                 {
                     // Debug.Log(index);
                     property.DeleteArrayElementAtIndex(index);
@@ -907,7 +911,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 Debug.Log($"removed update page to {curPageIndex}");
 #endif
 
-                listView.schedule.Execute(() => UpdatePage(curPageIndex, numberOfItemsPerPageField.value));
+                listView.schedule.Execute(() => UpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value));
             };
 
             if (listDrawerSettingsAttribute.NumberOfItemsPerPage != 0)
@@ -983,14 +987,14 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                 }
 
                 property.serializedObject.ApplyModifiedProperties();
-                UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
+                UpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value);
             });
             #endregion
 
             listView.itemIndexChanged += (first, second) =>
             {
-                int fromPropIndex = itemIndexToPropertyIndex[first];
-                int toPropIndex = itemIndexToPropertyIndex[second];
+                int fromPropIndex = _asyncSearchItems.ItemIndexToPropertyIndex[first];
+                int toPropIndex = _asyncSearchItems.ItemIndexToPropertyIndex[second];
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                 Debug.Log($"drag {fromPropIndex}({first}) -> {toPropIndex}({second})");
 #endif
@@ -1018,7 +1022,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                         return;
                     }
 
-                    int propIndex = itemIndexToPropertyIndex[selectedIndex];
+                    int propIndex = _asyncSearchItems.ItemIndexToPropertyIndex[selectedIndex];
                     if(propIndex >= property.arraySize)
                     {
                         return;
@@ -1044,7 +1048,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                         return;
                     }
 
-                    int propIndex = itemIndexToPropertyIndex[selectedIndex];
+                    int propIndex = _asyncSearchItems.ItemIndexToPropertyIndex[selectedIndex];
                     if(propIndex >= property.arraySize)
                     {
                         return;
@@ -1082,7 +1086,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
                     if (loadingImage.style.visibility != Visibility.Visible)
                     {
                         loadingImage.style.visibility = Visibility.Visible;
-                        UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
+                        UpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value);
                     }
 
                     if (_asyncSearchItems.SourceGenerator.MoveNext())
@@ -1096,7 +1100,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 #if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
                             Debug.Log($"#Search# add search results {string.Join(", ", currentValue)}");
 #endif
-                            UpdatePage(curPageIndex, numberOfItemsPerPageField.value);
+                            UpdatePage(_asyncSearchItems.CurPageIndex, numberOfItemsPerPageField.value);
                         }
                     }
                     else
@@ -1159,6 +1163,7 @@ namespace SaintsField.Editor.Playa.Renderer.SpecialRenderer.ListDrawerSettings
 
             return result;
         }
+
     }
 }
 #endif

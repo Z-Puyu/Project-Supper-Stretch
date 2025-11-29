@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using CommonFrameworks.CommonUtilities.CommonInterfaces;
+using CommonFrameworks.CommonUtilities;
 using SaintsField;
 using UnityEngine;
 

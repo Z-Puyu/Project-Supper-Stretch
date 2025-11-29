@@ -1,10 +1,11 @@
 ﻿using System;
-using UnityEngine;
+using SaintsField.Playa;
 
 namespace SaintsField.Samples.Scripts
 {
-    public class RateExample: MonoBehaviour
+    public class RateExample: SaintsMonoBehaviour
     {
+        [OnValueChanged(":Debug.Log")]
         [Rate(0, 5)] public int rate0To5;
         [Rate(1, 5)] public int rate1To5;
         [Rate(2, 5)] public int rate3To5;
@@ -21,5 +22,14 @@ namespace SaintsField.Samples.Scripts
 
         [ReadOnly]
         [Rate(1, 5)] public int rate1To5Disabled;
+
+        [Separator]
+        [ShowInInspector, Rate(0, 5)]
+        public int ShowRate0To5
+        {
+            get => rate0To5;
+            set => rate0To5 = value;
+        }
+
     }
 }

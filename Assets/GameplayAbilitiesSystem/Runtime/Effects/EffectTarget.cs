@@ -8,16 +8,16 @@ using Attribute = GameplayAbilitiesSystem.Runtime.Attributes.Attribute;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(AttributeSet), typeof(ModifierEnvironment), typeof(KeywordContainer))]
+    [RequireComponent(typeof(AttributeSet), typeof(ModifierEnvironment), typeof(TaggableMonoBehaviour))]
     public sealed class EffectTarget : MonoBehaviour, IAttributeReader, IModifiable {
         private AttributeSet AttributeSet { get; set; }
         private ModifierEnvironment ModifierEnvironment { get; set; }
-        private KeywordContainer KeywordContainer { get; set; }
+        private TaggableMonoBehaviour TaggableMonoBehaviour { get; set; }
         
         private void Awake() {
             this.AttributeSet = this.GetComponent<AttributeSet>();
             this.ModifierEnvironment = this.GetComponent<ModifierEnvironment>();
-            this.KeywordContainer = this.GetComponent<KeywordContainer>();
+            this.TaggableMonoBehaviour = this.GetComponent<TaggableMonoBehaviour>();
         }
         
         public double GetCurrent(AttributeKey key) {
@@ -41,15 +41,15 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         }
 
         internal void Tag(Keyword keyword) {
-            this.KeywordContainer.Add(keyword);
+            this.TaggableMonoBehaviour.Add(keyword);
         }
         
         internal void Untag(Keyword keyword) {
-            this.KeywordContainer.Remove(keyword);
+            this.TaggableMonoBehaviour.Remove(keyword);
         }
         
         internal bool HasTag(Keyword keyword) {
-            return this.KeywordContainer.Contains(keyword);
+            return this.TaggableMonoBehaviour.Contains(keyword);
         }
     }
 }

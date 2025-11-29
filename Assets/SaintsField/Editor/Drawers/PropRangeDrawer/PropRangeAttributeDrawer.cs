@@ -40,12 +40,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             float minValue;
             if (propRangeAttribute.MinCallback == null)
             {
-                minValue = propRangeAttribute.Min;
+                minValue = (float)propRangeAttribute.Min;
             }
             else
             {
                 (string getError, float getValue) =
-                    Util.GetOf(propRangeAttribute.MinCallback, 0f, property, info, parentTarget);
+                    Util.FlatGetOf(propRangeAttribute.MinCallback, 0f, property, info, parentTarget);
                 error = getError;
                 minValue = getValue;
             }
@@ -53,12 +53,12 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             float maxValue;
             if (propRangeAttribute.MaxCallback == null)
             {
-                maxValue = propRangeAttribute.Max;
+                maxValue = (float)propRangeAttribute.Max;
             }
             else
             {
                 (string getError, float getValue) =
-                    Util.GetOf(propRangeAttribute.MaxCallback, 0f, property, info, parentTarget);
+                    Util.FlatGetOf(propRangeAttribute.MaxCallback, 0f, property, info, parentTarget);
                 error = getError;
                 maxValue = getValue;
             }
@@ -86,12 +86,55 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
                 IsFloat = isFloat,
                 MinValue = minValue,
                 MaxValue = maxValue,
-                Step = propRangeAttribute.Step,
+                Step = (float)propRangeAttribute.Step,
                 Error = error,
             };
         }
 
-        private static (string error, double value) GetPreValue(double value, AdaptAttribute adaptAttribute)
+        public static (string error, int value) GetPreValue(int value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetIntValuePre(value);
+        }
+        public static (string error, uint value) GetPreValue(uint value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetUIntValuePre(value);
+        }
+
+        public static (string error, long value) GetPreValue(long value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetLongValuePre(value);
+        }
+
+        public static (string error, ulong value) GetPreValue(ulong value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetULongValuePre(value);
+        }
+
+        public static (string error, double value) GetPreValue(double value, AdaptAttribute adaptAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (adaptAttribute == null)
@@ -101,8 +144,18 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
 
             return AdaptAttributeDrawer.GetDoubleValuePre(value);
         }
+        public static (string error, float value) GetPreValue(float value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
 
-        private static (string error, double value) GetPostValue(double value, AdaptAttribute adaptAttribute)
+            return AdaptAttributeDrawer.GetFloatValuePre(value);
+        }
+
+        public static (string error, double value) GetPostValue(double value, AdaptAttribute adaptAttribute)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (adaptAttribute == null)
@@ -111,6 +164,57 @@ namespace SaintsField.Editor.Drawers.PropRangeDrawer
             }
 
             return AdaptAttributeDrawer.GetDoubleValuePost(value);
+        }
+        public static (string error, float value) GetPostValue(float value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetFloatValuePost(value);
+        }
+
+        public static (string error, int value) GetPostValue(int value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetIntValuePost(value);
+        }
+        public static (string error, long value) GetPostValue(long value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetLongValuePost(value);
+        }
+        public static (string error, ulong value) GetPostValue(ulong value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetULongValuePost(value);
+        }
+        public static (string error, uint value) GetPostValue(uint value, AdaptAttribute adaptAttribute)
+        {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (adaptAttribute == null)
+            {
+                return ("", value);
+            }
+
+            return AdaptAttributeDrawer.GetUIntValuePost(value);
         }
 
         private static float GetValue(MetaInfo metaInfo, float newValue)

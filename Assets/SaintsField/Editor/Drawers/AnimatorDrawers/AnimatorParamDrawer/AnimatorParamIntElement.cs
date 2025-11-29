@@ -2,17 +2,41 @@
 using System.Collections.Generic;
 using SaintsField.Editor.UIToolkitElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 
-namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
+namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
 {
     public class AnimatorParamIntElement: IntDropdownElement
     {
         private IReadOnlyList<AnimatorControllerParameter> _animatorParameters;
 
-        public void BindAnimatorParameters(IReadOnlyList<AnimatorControllerParameter> animatorParameters)
+        private Animator _cachedAnimator;
+
+        public void BindAnimatorParameters(Animator animator, IReadOnlyList<AnimatorControllerParameter> animatorParameters)
         {
+            _cachedAnimator = animator;
             _animatorParameters = animatorParameters;
             RefreshDisplay();
+        }
+
+        private VisualElement _boundTarget;
+
+        public void BindBound(VisualElement target) => _boundTarget = target;
+
+        public AnimatorParamIntElement()
+        {
+            Button.clicked += OnDropdown;
+        }
+
+        private void OnDropdown()
+        {
+            AnimatorParamUtils.ShowDropdown(false, value, _animatorParameters, _cachedAnimator, (_boundTarget ?? this).worldBound,
+                SetDropdownResult);
+        }
+
+        private void SetDropdownResult(AnimatorControllerParameter animatorControllerParameter)
+        {
+            value = animatorControllerParameter.nameHash;
         }
 
         public override void SetValueWithoutNotify(int newValue)
@@ -39,6 +63,27 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
             }
 
             Label.text = $"<color=red>?</color> ({CachedValue})";
+        }
+    }
+
+    public class AnimatorParamIntField: BaseField<int>
+    {
+        public readonly AnimatorParamIntElement AnimatorParamIntElement;
+        public AnimatorParamIntField(string label, AnimatorParamIntElement visualInput) : base(label, visualInput)
+        {
+            AnimatorParamIntElement = visualInput;
+            visualInput.BindBound(this);
+        }
+
+        public override void SetValueWithoutNotify(int newValue)
+        {
+            AnimatorParamIntElement.SetValueWithoutNotify(newValue);
+        }
+
+        public override int value
+        {
+            get => AnimatorParamIntElement.value;
+            set => AnimatorParamIntElement.value = value;
         }
     }
 }

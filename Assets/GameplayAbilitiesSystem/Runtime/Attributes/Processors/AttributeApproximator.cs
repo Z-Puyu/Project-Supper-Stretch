@@ -10,13 +10,12 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes.Processors {
         [field: SerializeField]
         private ApproximationPolicy ApproximationPolicy { get; set; } = ApproximationPolicy.RoundToNearest;
         
-        protected override Attribute TryProcess(Attribute data, out bool isSuccessful) {
+        protected override bool TryProcess(Attribute data, out Attribute result) {
             if (data.IsValueApproximated) {
-                isSuccessful = false;
-                return data;
+                result = data;
+                return false;
             }
             
-            isSuccessful = true;
             double value = this.ApproximationPolicy switch {
                 ApproximationPolicy.RoundToNearest => Math.Round(data.Value, (int)this.PrecisionLevel),
                 ApproximationPolicy.RoundDown => Math.Floor(data.Value * Math.Pow(10, (int)this.PrecisionLevel)) / 
@@ -28,7 +27,8 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes.Processors {
                 var _ => data.Value
             };
 
-            return new Attribute(data.Source, data.Id, value, true);
+            result = new Attribute(data.Source, data.Id, value, true);
+            return true;
         }
     }
 }

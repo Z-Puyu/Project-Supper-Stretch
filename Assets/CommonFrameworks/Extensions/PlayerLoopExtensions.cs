@@ -15,10 +15,15 @@ namespace CommonFrameworks.Extensions {
                 return false;
             }
 
-            loop.subSystemList ??= new PlayerLoopSystem[] { };
-            Array.Resize(ref loop.subSystemList, loop.subSystemList.Length + 1);
-            int pos = Math.Clamp(index, 0, loop.subSystemList.Length - 1);
-            (loop.subSystemList as IList<PlayerLoopSystem>).Insert(pos, subsystem);
+            if (loop.subSystemList is null) {
+                loop.subSystemList = new[] { subsystem };
+            } else {
+                List<PlayerLoopSystem> list = new List<PlayerLoopSystem>(loop.subSystemList);
+                int pos = Math.Clamp(index, 0, loop.subSystemList.Length - 1);
+                list.Insert(pos, subsystem);
+                loop.subSystemList = list.ToArray();
+            }
+
             return true;
         }
 

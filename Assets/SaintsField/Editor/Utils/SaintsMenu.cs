@@ -17,7 +17,7 @@ namespace SaintsField.Editor.Utils
 {
     public static class SaintsMenu
     {
-        const string MENU_ROOT =
+        private const string MenuRoot =
 #if SAINTSFIELD_DEBUG
             "Saints/"
 #else
@@ -29,7 +29,7 @@ namespace SaintsField.Editor.Utils
 
         #region Config
 
-        [MenuItem(MENU_ROOT + "Create or Edit SaintsField Config")]
+        [MenuItem(MenuRoot + "Create or Edit SaintsField Config")]
         public static void CreateOrEditSaintsFieldConfig()
         {
             SaintsFieldConfig saintsFieldConfig;
@@ -69,13 +69,13 @@ namespace SaintsField.Editor.Utils
 
 
         #region UI Toolkit
-#if SAINTSFIELD_UI_TOOLKIT_DISABLE
-        [MenuItem("Window/Saints/Enable UI Toolkit Support")]
-        public static void UIToolkit() => RemoveCompileDefine("SAINTSFIELD_UI_TOOLKIT_DISABLE");
-#else
-        [MenuItem("Window/Saints/Disable UI Toolkit Support")]
-        public static void UIToolkit() => AddCompileDefine("SAINTSFIELD_UI_TOOLKIT_DISABLE");
-#endif
+// #if SAINTSFIELD_UI_TOOLKIT_DISABLE
+//         [MenuItem("Window/Saints/Enable UI Toolkit Support")]
+//         public static void UIToolkit() => RemoveCompileDefine("SAINTSFIELD_UI_TOOLKIT_DISABLE");
+// #else
+//         [MenuItem("Window/Saints/Disable UI Toolkit Support")]
+//         public static void UIToolkit() => AddCompileDefine("SAINTSFIELD_UI_TOOLKIT_DISABLE");
+// #endif
 
         #region IMGUI decorators
 
@@ -296,14 +296,14 @@ namespace SaintsField.Editor.Utils
 
 #if SAINTSFIELD_CODE_ANALYSIS
 
-        [MenuItem(MENU_ROOT + "Disable Code Analysis")]
+        [MenuItem(MenuRoot + "Disable Code Analysis")]
         public static void DisableCodeAnalysis()
         {
             RemoveCompileDefine("SAINTSFIELD_CODE_ANALYSIS");
         }
 #else
 
-        [MenuItem(MENU_ROOT + "Enable Code Analysis...")]
+        [MenuItem(MenuRoot + "Enable Code Analysis...")]
         public static void EnableCodeAnalysis()
         {
             bool codyAnalysisFound = AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName.StartsWith("Microsoft.CodeAnalysis.CSharp,"));
@@ -340,7 +340,7 @@ namespace SaintsField.Editor.Utils
 
 #if SAINTSFIELD_SERIALIZED
 
-        [MenuItem(MENU_ROOT + "Extended Serialization/Disable This Feature")]
+        [MenuItem(MenuRoot + "Extended Serialization/Disable This Feature")]
         public static void DisableExtendedSerialization()
         {
             RemoveCompileDefine("SAINTSFIELD_SERIALIZED");
@@ -349,14 +349,14 @@ namespace SaintsField.Editor.Utils
         #region SAINTSFIELD_SERIALIZED_DEBUG
 #if SAINTSFIELD_SERIALIZED_DEBUG
 
-        [MenuItem(MENU_ROOT + "Extended Serialization/Disable Debug")]
+        [MenuItem(MenuRoot + "Extended Serialization/Disable Debug")]
         public static void DisableExtendedSerializationDebug()
         {
             RemoveCompileDefine("SAINTSFIELD_SERIALIZED_DEBUG");
         }
 #else
 
-        [MenuItem(MENU_ROOT + "Extended Serialization/Enable Debug")]
+        [MenuItem(MenuRoot + "Extended Serialization/Enable Debug")]
         public static void EnableExtendedSerializationDebug()
         {
             AddCompileDefine("SAINTSFIELD_SERIALIZED_DEBUG");
@@ -366,7 +366,7 @@ namespace SaintsField.Editor.Utils
         #endregion
 
 #else
-        [MenuItem(MENU_ROOT + "Enable Extended Serialization")]
+        [MenuItem(MenuRoot + "Enable Extended Serialization")]
         public static void EnableExtendedSerialization()
         {
             AddCompileDefine("SAINTSFIELD_SERIALIZED");
@@ -376,7 +376,7 @@ namespace SaintsField.Editor.Utils
         #endregion
 
 #if SAINTSFIELD_DEBUG
-        [MenuItem(MENU_ROOT + "IMGUI Debugger" )]
+        [MenuItem(MenuRoot + "IMGUI Debugger" )]
         public static void OpenIMGUIDebugger()
         {
             EditorWindow.GetWindow(Type.GetType("UnityEditor.GUIViewDebuggerWindow,UnityEditor")).Show();

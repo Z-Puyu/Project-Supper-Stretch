@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,6 +9,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Utils;
 using SaintsField.Utils;
 using UnityEditor;
+using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
 {
@@ -45,7 +47,7 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             }
         }
 
-        public static AdvancedDropdownMetaInfo GetMetaInfo(SerializedProperty property, PathedDropdownAttribute advancedDropdownAttribute, FieldInfo field, object parentObj, bool isImGui)
+        public static AdvancedDropdownMetaInfo GetMetaInfo(SerializedProperty property, PathedDropdownAttribute advancedDropdownAttribute, FieldInfo field, object parentObj, bool isImGui, bool flat=false)
         {
             string funcName = advancedDropdownAttribute.FuncName;
 
@@ -77,12 +79,29 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
             else if (funcName is null)
             {
                 Type elementType = SerializedUtils.IsArrayOrDirectlyInsideArray(property)? ReflectUtils.GetElementType(field.FieldType): field.FieldType;
-                if(elementType.IsEnum)
+                if (elementType == typeof(bool))
+                {
+                    AdvancedDropdownList<object> boolDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Enum": "")
+                    {
+                        {"True", true },
+                        {"False", false },
+                    };
+
+                    error = "";
+                    dropdownListValue = boolDropdown;
+                }
+                else if(elementType.IsEnum)
                 {
                     AdvancedDropdownList<object> enumDropdown = new AdvancedDropdownList<object>(isImGui? "Pick an Enum": "");
                     foreach ((object enumValue, string enumLabel, string enumRichLabel)  in Util.GetEnumValues(elementType))
                     {
-                        enumDropdown.Add(enumRichLabel ?? enumLabel, enumValue);
+                        if (flat)
+                        {
+                            enumDropdown.Add(new AdvancedDropdownList<object>(enumRichLabel ?? enumLabel, enumValue));
+                        }
+                        else {
+                            enumDropdown.Add(enumRichLabel ?? enumLabel, enumValue);
+                        }
                     }
 
                     error = "";
@@ -156,14 +175,22 @@ namespace SaintsField.Editor.Drawers.AdvancedDropdownDrawer
                 error = getOfError;
                 if (obj is IAdvancedDropdownList getOfDropdownListValue)
                 {
+                    getOfDropdownListValue.SelfCompact();
                     dropdownListValue = getOfDropdownListValue;
                 }
-                else if (obj is IEnumerable<object> ieObj)
+                else if (obj is IEnumerable ieObj)
                 {
                     AdvancedDropdownList<object> list = new AdvancedDropdownList<object>(isImGui? "Pick an item": "");
                     foreach (object each in ieObj)
                     {
-                        list.Add($"{each}", each);
+                        if (flat)
+                        {
+                            list.Add(new AdvancedDropdownList<object>($"{each}", each));
+                        }
+                        else
+                        {
+                            list.Add($"{each}", each);
+                        }
                     }
 
                     dropdownListValue = list;

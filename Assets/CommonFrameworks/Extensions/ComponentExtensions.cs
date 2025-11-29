@@ -4,6 +4,91 @@ using UnityEngine;
 
 namespace CommonFrameworks.Extensions {
     public static class ComponentExtensions {
+        #region Component Getters
+
+        public static T GetClosestComponentInChildren<T>(this GameObject obj) where T : Component {
+            Queue<Transform> queue = new Queue<Transform>();
+            queue.Enqueue(obj.transform);
+            while (queue.TryDequeue(out Transform curr)) {
+                if (curr.TryGetComponent(out T component)) {
+                    return component;
+                }
+                
+                foreach (Transform child in curr) {
+                    queue.Enqueue(child);
+                }
+            }
+            
+            return null;
+        }
+        
+        public static T GetClosestComponentInChildren<T>(this Component comp) where T : Component {
+            return comp.gameObject.GetClosestComponentInChildren<T>();
+        }
+
+        public static T GetClosestComponentInProperChildren<T>(this GameObject obj) where T : Component {
+            Queue<Transform> queue = new Queue<Transform>();
+            foreach (Transform child in obj.transform) {
+                queue.Enqueue(child);
+            }
+            
+            while (queue.TryDequeue(out Transform curr)) {
+                if (curr.TryGetComponent(out T component)) {
+                    return component;
+                }
+                
+                foreach (Transform child in curr) {
+                    queue.Enqueue(child);
+                }
+            }
+            
+            return null;
+        }
+        
+        public static T GetClosestComponentInProperChildren<T>(this Component comp) where T : Component {
+            return comp.gameObject.GetClosestComponentInProperChildren<T>();
+        }
+        
+        public static T GetComponentInProperChildren<T>(this GameObject obj) where T : Component {
+            return (from Transform child in obj.transform select child.GetComponentInChildren<T>(true))
+                    .FirstOrDefault(component => component);
+        }
+        
+        public static T GetEnabledComponentInProperChildren<T>(this GameObject obj) where T : Component {
+            return (from Transform child in obj.transform select child.GetComponentInChildren<T>(false))
+                    .FirstOrDefault(component => component);
+        }
+        
+        public static T GetComponentInProperChildren<T>(this Component comp) where T : Component {
+            return comp.gameObject.GetComponentInProperChildren<T>();
+        }
+        
+        public static T GetEnabledComponentInProperChildren<T>(this Component comp) where T : Component {
+            return comp.gameObject.GetEnabledComponentInProperChildren<T>();
+        }
+        
+        public static T GetComponentInProperParent<T>(this GameObject obj) where T : Component {
+            Transform parent = obj.transform.parent;
+            return parent ? parent.GetComponentInParent<T>(true) : null;
+        }
+        
+        public static T GetEnabledComponentInProperParent<T>(this GameObject obj) where T : Component {
+            Transform parent = obj.transform.parent;
+            return parent ? parent.GetComponentInParent<T>(false) : null;
+        }
+        
+        public static T GetComponentInProperParent<T>(this Component comp) where T : Component {
+            return comp.gameObject.GetComponentInProperParent<T>();
+        }
+
+        public static T GetEnabledComponentInProperParent<T>(this Component comp) where T : Component {
+            return comp.gameObject.GetEnabledComponentInProperParent<T>();
+        }
+
+        #endregion
+
+        #region Get-Or-Add Operations
+
         public static T GetOrAddComponent<T>(this GameObject obj) where T : Component {
             return obj.TryGetComponent(out T component) ? component : obj.AddComponent<T>();
         }
@@ -31,47 +116,49 @@ namespace CommonFrameworks.Extensions {
             T component = comp.GetComponentInChildren<T>(true);
             return component ? component : comp.gameObject.AddComponent<T>();
         }
+
+        public static T GetClosestInChildrenOrAddComponent<T>(this GameObject obj) where T : Component {
+            T component = obj.GetClosestComponentInChildren<T>();
+            return component ? component : obj.AddComponent<T>();
+        }
+        
+        public static T GetClosestInChildrenOrAddComponent<T>(this Component comp) where T : Component {
+            return comp.gameObject.GetClosestInChildrenOrAddComponent<T>();
+        }
         
         public static T GetInProperParentOrAddComponent<T>(this GameObject obj) where T : Component {
-            if (!obj.transform.parent) {
-                return obj.GetOrAddComponent<T>();    
-            }
-            
-            T component = obj.transform.parent.GetComponentInParent<T>(true);
+            T component = obj.GetComponentInProperParent<T>();
             return component ? component : obj.AddComponent<T>();
         }
         
         public static T GetInProperParentOrAddComponent<T>(this Component comp) where T : Component {
-            if (!comp.transform.parent) {
-                return comp.GetOrAddComponent<T>();    
-            }
-            
-            T component = comp.transform.parent.GetComponentInParent<T>(true);
+            T component = comp.GetComponentInProperParent<T>();
             return component ? component : comp.gameObject.AddComponent<T>();
         }
 
         public static T GetInProperChildrenOrAddComponent<T>(this GameObject obj) where T : Component {
-            foreach (Transform child in obj.transform) {
-                T component = child.GetComponentInChildren<T>(true);
-                if (component) {
-                    return component;
-                }
-            }
-            
-            return obj.AddComponent<T>();
+            T component = obj.GetComponentInProperChildren<T>();
+            return component ? component : obj.AddComponent<T>();
         }
 
         public static T GetInProperChildrenOrAddComponent<T>(this Component comp) where T : Component {
-            foreach (Transform child in comp.transform) {
-                T component = child.GetComponentInChildren<T>(true);
-                if (component) {
-                    return component;
-                }
-            }
-            
-            return comp.gameObject.AddComponent<T>();
+            T component = comp.GetComponentInProperChildren<T>();
+            return component ? component : comp.gameObject.AddComponent<T>();
+        }
+
+        public static T GetClosestInProperChildrenOrAddComponent<T>(this GameObject obj) where T : Component {
+            T component = obj.GetClosestComponentInChildren<T>();
+            return component ? component : obj.AddComponent<T>();
         }
         
+        public static T GetClosestInProperChildrenOrAddComponent<T>(this Component comp) where T : Component {
+            return comp.gameObject.GetClosestInProperChildrenOrAddComponent<T>();
+        }
+
+        #endregion
+
+        #region Component Validators
+
         public static bool HasComponent<T>(this GameObject obj) where T : Component {
             return obj.GetComponent<T>();
         }
@@ -80,36 +167,73 @@ namespace CommonFrameworks.Extensions {
             return comp.gameObject.GetComponent<T>();
         }
         
-        public static bool HasAnyTag(this GameObject obj, List<string> tags) {
-            return tags.Count == 0 || tags.TrueForAll(obj.CompareTag);
-        }
+        public static bool TryGetComponentInChildren<T>(this GameObject obj, out T component) where T : Component {
+            component = obj.GetComponentInChildren<T>(true);
+            return component;
+        } 
         
-        public static bool HasAnyTag(this GameObject obj, IEnumerable<string> tags) {
-            return obj.HasAnyTag(tags.ToList());
-        }
-        
-        public static bool HasAnyTag(this Component comp, List<string> tags) {
-            return tags.Count == 0 || tags.TrueForAll(comp.CompareTag);
-        }
-        
-        public static bool HasAnyTag(this Component comp, IEnumerable<string> tags) {
-            return comp.HasAnyTag(tags.ToList());
+        public static bool TryGetEnabledComponentInChildren<T>(this GameObject obj, out T component) where T : Component {
+            component = obj.GetComponentInChildren<T>(false);
+            return component;
         }
 
-        public static bool HasNoneOfTags(this GameObject obj, List<string> tags) {
-            return tags.Count == 0 || !tags.Exists(obj.CompareTag);
+        public static bool TryGetComponentInProperChildren<T>(this GameObject obj, out T component)
+                where T : Component {
+            component = obj.GetComponentInProperChildren<T>();
+            return component;
         }
         
-        public static bool HasNoneOfTags(this GameObject obj, IEnumerable<string> tags) {
-            return obj.HasNoneOfTags(tags.ToList());
+        public static bool TryGetComponentInChildren<T>(this Component self, out T component)
+                where T : Component {
+            return self.gameObject.TryGetComponentInChildren(out component);
         }
         
-        public static bool HasNoneOfTags(this Component comp, List<string> tags) {
-            return tags.Count == 0 || !tags.Exists(comp.CompareTag);
+        public static bool TryGetEnabledComponentInChildren<T>(this Component self, out T component)
+                where T : Component {
+            return self.gameObject.TryGetEnabledComponentInChildren(out component);
         }
         
-        public static bool HasNoneOfTags(this Component comp, IEnumerable<string> tags) {
-            return comp.HasNoneOfTags(tags.ToList());
+        public static bool TryGetComponentInProperChildren<T>(this Component self, out T component)
+                where T : Component {
+            return self.gameObject.TryGetComponentInProperChildren(out component);
         }
+        
+        public static bool TryGetComponentInParent<T>(this GameObject obj, out T component) where T : Component {
+            component = obj.GetComponentInParent<T>(true);
+            return component;
+        }
+        
+        public static bool TryGetEnabledComponentInParent<T>(this GameObject obj, out T component) where T : Component {
+            component = obj.GetComponentInParent<T>(false);
+            return component;
+        }
+        
+        public static bool TryGetComponentInParent<T>(this Component self, out T component) where T : Component {
+            return self.gameObject.TryGetComponentInParent(out component);
+        }
+        
+        public static bool TryGetEnabledComponentInParent<T>(this Component self, out T component) where T : Component {
+            return self.gameObject.TryGetEnabledComponentInParent(out component);
+        }
+        
+        public static bool TryGetComponentInProperParent<T>(this GameObject obj, out T component) where T : Component {
+            component = obj.GetComponentInProperParent<T>();
+            return component;
+        }
+        
+        public static bool TryGetEnabledComponentInProperParent<T>(this GameObject obj, out T component) where T : Component {
+            component = obj.GetEnabledComponentInProperParent<T>();
+            return component;
+        }
+        
+        public static bool TryGetComponentInProperParent<T>(this Component self, out T component) where T : Component {
+            return self.gameObject.TryGetComponentInProperParent(out component);
+        }
+        
+        public static bool TryGetEnabledComponentInProperParent<T>(this Component self, out T component) where T : Component {
+            return self.gameObject.TryGetEnabledComponentInProperParent(out component);
+        }
+
+        #endregion
     }
 }

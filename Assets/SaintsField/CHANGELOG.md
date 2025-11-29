@@ -1,5 +1,82 @@
 # Changelog
 
+## 5.4.5 ##
+
+1.  Improve: `MinValue` & `MaxValue` now behaves more naturally if you use both attributes together
+2.  Fix: `MinMaxSlider` did not check the callback boundary automaticlly when edited (used to require a ctrl/cmd+s)
+3.  Fix: `Table` incorrect indent
+4.  Fix: Serialized Data might incorrectly read `null` value when `Instantiate` a prefab
+
+## 5.4.3 ##
+
+1.  Add: `[SaintsDictionary]` now works with `ShowInInspector`
+2.  Fix: `SaintsDictionary` the input element was a bit out of area
+3.  Fix: `ListDrawerSettings` in `ShowInInspector`, the searching function was not case-insensetive
+4.  Fix: `SaintsDictionary` failed to take an initial value if you create one at runtime
+
+## 5.4.2 ##
+
+1.  Fix: `PositionHandle` now use editor's "Tool Handle Rotation" value [#332](https://github.com/TylerTemp/SaintsField/discussions/332)
+2.  Fix: handles not using `space` when it's a callback
+3.  Fix: `ShowInInspector` with list/array now finally have the size input which has been missing for, decades...
+4.  Add: `ShowInInspector` now works with `ListDrawerSettings`
+
+## 5.4.1 ##
+
+1.  Fix: `Expandable` foldout icon incorrect status
+2.  Fix: `SaintsEditorWindow` failed to use code analysisUtils to get a correct order
+3.  Add: You can use `../` to walk upward to get a callback/property for dropdowns [#336](https://github.com/TylerTemp/SaintsField/discussions/336)
+
+## 5.4.0 ##
+
+1.  Add: `HashSet` now supported in "Extended Serialization"
+2.  Add: `AdvancedDropdown`/`TreeDropdown` now merge empty paging to a compact mode
+3.  Add: `ValueButtons`, `OptionsValueButtons`, `PairsValueButtons` to pick a value directly from the field buttons
+4.  Fix: When ordering fields, using the first name matched method order when all the method's matching failed
+5.  Fix: `InfoBox`, `Separator` not work on a bare method (no `ShowInInspector`, no `Button`)
+
+## 5.3.5 ##
+
+1.  Fix: fix a bug that block the building
+2.  Fix: fix multiple attributes that does not work with (or get called on inspecting) `OnValueChanged`:
+    *   `DateTime`
+    *   `TimeSpan`
+    *   `Layer`
+    *   `SortingLayer`
+    *   `Guid`
+    *   `Tag`
+    *   `InputAxis`
+    *   `ShaderParam`
+    *   `ShaderKeyword`
+    *   `Rate`
+    *   `PropRange`
+    *   `MinMaxSlider`
+    *   `ProgressBar`
+    *   `AnimParams`
+    *   `AnimState`
+    *   `CurveRange`
+3.  Add: `ShowInInspector` now works with `CurveRange`
+4.  Add: `OnValueChanged` now support static method calling, syntax example: `[OnValueChanged(":Debug.Log")]`
+
+## 5.3.4 ##
+
+1.  Fix: `ShowInInspector` show empty label.
+2.  Add: `ShowInInspector` now works with `AnimatorParams`, `AnimatorState`
+
+## 5.3.2 ##
+
+1.  Add: `ShowInInspector` now works with `MinMaxSlider`, `ProgressBar`, `LabelText`
+2.  Breaking Changes: argument `free` from `MinMaxSlider` is now removed for the sake of complexity
+3.  Fix: `LabelText` now work like the old `RichLabel`, the `<label/>`, `<field/>` now works as expected
+4.  Add: more colors for `EColor`
+
+## 5.3.1 ##
+
+1.  Fix: `TreeDropdown` search bar now pinned on the top
+2.  Fix: `TreeDropdown` did not scroll to current selected value if the list is long
+3.  `PropRange` now supports `uint`, `short`, `ushort`, `byte`, `sbyte`, `long`, `ulong`
+4.  Add: `ShowInInspector` now works with `ShaderParam`, `ShaderKeyword`, `Rate`, `PropRange`
+
 ## 5.3.0 ##
 
 1.  You can now serialize a `Guid` type directly using "Extended Serialization"

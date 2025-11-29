@@ -149,30 +149,66 @@ namespace SaintsField.Utils
 
             return (true, serializedProp);
         }
+        public static (bool assign, SaintsHashSet<T> result) OnBeforeSerializeHashSet<T>(SaintsHashSet<T> serializedProp, object obj)
+        {
+            if (obj == null)
+            {
+                // Debug.Log("OnBeforeSerializeDictionary skip null");
+                // return (true, new SaintsDictionary<TKey, TValue>());
+                return (false, null);
+            }
 
-        // public static void OnBeforeSerializeArray<T>(ref SaintsSerializedProperty[] toFill, ref T[] objList, Type elementType)
-        // {
-        //     // Debug.Log($"OnBeforeSerializeArray toFill={toFill}, objList={objList}, elementType={elementType}");
-        //     // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-        //     if (objList == null)
-        //     {
-        //         objList = Array.Empty<T>();
-        //     }
-        //
-        //     OnBeforeSerializeCollection(ref toFill, objList, elementType);
-        // }
+            // ReSharper disable once UseNegatedPatternInIsExpression
+            if (!(obj is HashSet<T> originDic))
+            {
+                // Debug.Log("OnBeforeSerializeDictionary not dictionary");
+                return (false, null);
+            }
 
-        // public static void OnBeforeSerializeList<T>(ref SaintsSerializedProperty[] toFill, ref List<T> objList, Type elementType)
-        // {
-        //     // Debug.Log($"OnBeforeSerializeArray toFill={toFill}, objList={objList}, elementType={elementType}");
-        //     // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-        //     if (objList == null)
-        //     {
-        //         objList = new List<T>();
-        //     }
-        //
-        //     OnBeforeSerializeCollection(ref toFill, objList, elementType);
-        // }
+            foreach (T originKv in originDic)
+            {
+                serializedProp.Add(originKv);
+            }
+
+            foreach (T removeKey in serializedProp.Except(originDic).ToArray())
+            {
+                serializedProp.Remove(removeKey);
+            }
+
+            // Debug.Log($"OnBeforeSerializeDictionary inplace modified {string.Join(", ", serializedProp.Select(each => $"{each.Key}:{each.Value}"))} to {string.Join(", ", serializedProp.Select(each => $"{each.Key}:{each.Value}"))}");
+
+            return (true, serializedProp);
+        }
+        public static (bool assign, ReferenceHashSet<T> result) OnBeforeSerializeReferenceHashSet<T>(ReferenceHashSet<T> serializedProp, object obj)
+        {
+            if (obj == null)
+            {
+                // Debug.Log("OnBeforeSerializeDictionary skip null");
+                // return (true, new SaintsDictionary<TKey, TValue>());
+                return (false, null);
+            }
+
+            // ReSharper disable once UseNegatedPatternInIsExpression
+            if (!(obj is HashSet<T> originDic))
+            {
+                // Debug.Log("OnBeforeSerializeDictionary not dictionary");
+                return (false, null);
+            }
+
+            foreach (T originKv in originDic)
+            {
+                serializedProp.Add(originKv);
+            }
+
+            foreach (T removeKey in serializedProp.Except(originDic).ToArray())
+            {
+                serializedProp.Remove(removeKey);
+            }
+
+            // Debug.Log($"OnBeforeSerializeDictionary inplace modified {string.Join(", ", serializedProp.Select(each => $"{each.Key}:{each.Value}"))} to {string.Join(", ", serializedProp.Select(each => $"{each.Key}:{each.Value}"))}");
+
+            return (true, serializedProp);
+        }
 
         public static void OnBeforeSerializeCollection<T>(ref SaintsSerializedProperty[] toFill, IReadOnlyList<T> objList, Type elementType)
         {
@@ -321,76 +357,200 @@ namespace SaintsField.Utils
             }
         }
 
-        // public static void OnBeforeSerializeCollectionDateTime(ref long[] toFill, IReadOnlyList<DateTime> objList)
-        // {
-        //     Debug.Assert(objList != null);
-        //     bool inPlace = toFill != null && toFill.Length == objList.Count;
-        //
-        //     long[] results;
-        //     // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-        //     if (inPlace)
-        //     {
-        //         results = Array.Empty<long>();
-        //     }
-        //     else
-        //     {
-        //         results = new long[objList.Count];
-        //     }
-        //
-        //     for (int i = 0; i < objList.Count; i++)
-        //     {
-        //         if (inPlace)
-        //         {
-        //             toFill[i]  = OnBeforeSerializeDateTime(objList[i]);
-        //         }
-        //         else
-        //         {
-        //             results[i] = OnBeforeSerializeDateTime(objList[i]);
-        //         }
-        //     }
-        //
-        //     if (!inPlace)
-        //     {
-        //         toFill = results;
-        //     }
-        // }
-        //
-        // public static void OnBeforeSerializeCollectionTimeSpan(ref long[] toFill, IReadOnlyList<TimeSpan> objList)
-        // {
-        //     Debug.Assert(objList != null);
-        //     bool inPlace = toFill != null && toFill.Length == objList.Count;
-        //
-        //     long[] results;
-        //     // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-        //     if (inPlace)
-        //     {
-        //         results = Array.Empty<long>();
-        //     }
-        //     else
-        //     {
-        //         results = new long[objList.Count];
-        //     }
-        //
-        //     for (int i = 0; i < objList.Count; i++)
-        //     {
-        //         if (inPlace)
-        //         {
-        //             toFill[i]  = OnBeforeSerializeTimeSpan(objList[i]);
-        //         }
-        //         else
-        //         {
-        //             results[i] = OnBeforeSerializeTimeSpan(objList[i]);
-        //         }
-        //     }
-        //
-        //     if (!inPlace)
-        //     {
-        //         toFill = results;
-        //     }
-        // }
+        public static void OnBeforeSerializeCollectionHashSet<T>(ref SaintsHashSet<T>[] toFill, HashSet<T>[] objList)
+        {
+            Debug.Assert(objList != null);
+            bool inPlace = toFill != null && toFill.Length == objList.Length;
 
-        // public static DateTime OnAfterDeserializeDateTime(long tick) => new DateTime(tick);
-        // public static TimeSpan OnAfterDeserializeTimeSpan(long tick) => new TimeSpan(tick);
+            SaintsHashSet<T>[] results;
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (inPlace)
+            {
+                results = Array.Empty<SaintsHashSet<T>>();
+            }
+            else
+            {
+                results = new SaintsHashSet<T>[objList.Length];
+            }
+
+            List<SaintsHashSet<T>> serRef =
+                new List<SaintsHashSet<T>>(toFill ?? Array.Empty<SaintsHashSet<T>>());
+            if(serRef.Count < objList.Length)
+            {
+                for(int i = serRef.Count; i < objList.Length; i++)
+                {
+                    serRef.Add(new SaintsHashSet<T>());
+                }
+            }
+
+            for (int i = 0; i < objList.Length; i++)
+            {
+                (bool assign, SaintsHashSet<T> result) = OnBeforeSerializeHashSet(serRef[i], objList[i]);
+                // ReSharper disable once InvertIf
+                if(assign)
+                {
+                    if (inPlace)
+                    {
+                        toFill[i] = result;
+                    }
+                    else
+                    {
+                        results[i] = result;
+                    }
+                }
+            }
+
+            if (!inPlace)
+            {
+                toFill = results;
+            }
+        }
+        public static void OnBeforeSerializeCollectionHashSet<T>(ref SaintsHashSet<T>[] toFill, List<HashSet<T>> objList)
+        {
+            Debug.Assert(objList != null);
+            bool inPlace = toFill != null && toFill.Length == objList.Count;
+
+            SaintsHashSet<T>[] results;
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (inPlace)
+            {
+                results = Array.Empty<SaintsHashSet<T>>();
+            }
+            else
+            {
+                results = new SaintsHashSet<T>[objList.Count];
+            }
+
+            List<SaintsHashSet<T>> serRef =
+                new List<SaintsHashSet<T>>(toFill ?? Array.Empty<SaintsHashSet<T>>());
+            if(serRef.Count < objList.Count)
+            {
+                for(int i = serRef.Count; i < objList.Count; i++)
+                {
+                    serRef.Add(new SaintsHashSet<T>());
+                }
+            }
+
+            for (int i = 0; i < objList.Count; i++)
+            {
+                (bool assign, SaintsHashSet<T> result) = OnBeforeSerializeHashSet(serRef[i], objList[i]);
+                // ReSharper disable once InvertIf
+                if(assign)
+                {
+                    if (inPlace)
+                    {
+                        toFill[i] = result;
+                    }
+                    else
+                    {
+                        results[i] = result;
+                    }
+                }
+            }
+
+            if (!inPlace)
+            {
+                toFill = results;
+            }
+        }
+
+        public static void OnBeforeSerializeCollectionReferenceHashSet<T>(ref ReferenceHashSet<T>[] toFill, HashSet<T>[] objList)
+        {
+            Debug.Assert(objList != null);
+            bool inPlace = toFill != null && toFill.Length == objList.Length;
+
+            ReferenceHashSet<T>[] results;
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (inPlace)
+            {
+                results = Array.Empty<ReferenceHashSet<T>>();
+            }
+            else
+            {
+                results = new ReferenceHashSet<T>[objList.Length];
+            }
+
+            List<ReferenceHashSet<T>> serRef =
+                new List<ReferenceHashSet<T>>(toFill ?? Array.Empty<ReferenceHashSet<T>>());
+            if(serRef.Count < objList.Length)
+            {
+                for(int i = serRef.Count; i < objList.Length; i++)
+                {
+                    serRef.Add(new ReferenceHashSet<T>());
+                }
+            }
+
+            for (int i = 0; i < objList.Length; i++)
+            {
+                (bool assign, ReferenceHashSet<T> result) = OnBeforeSerializeReferenceHashSet(serRef[i], objList[i]);
+                // ReSharper disable once InvertIf
+                if(assign)
+                {
+                    if (inPlace)
+                    {
+                        toFill[i] = result;
+                    }
+                    else
+                    {
+                        results[i] = result;
+                    }
+                }
+            }
+
+            if (!inPlace)
+            {
+                toFill = results;
+            }
+        }
+        public static void OnBeforeSerializeCollectionReferenceHashSet<T>(ref ReferenceHashSet<T>[] toFill, List<HashSet<T>> objList)
+        {
+            Debug.Assert(objList != null);
+            bool inPlace = toFill != null && toFill.Length == objList.Count;
+
+            ReferenceHashSet<T>[] results;
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (inPlace)
+            {
+                results = Array.Empty<ReferenceHashSet<T>>();
+            }
+            else
+            {
+                results = new ReferenceHashSet<T>[objList.Count];
+            }
+
+            List<ReferenceHashSet<T>> serRef =
+                new List<ReferenceHashSet<T>>(toFill ?? Array.Empty<ReferenceHashSet<T>>());
+            if(serRef.Count < objList.Count)
+            {
+                for(int i = serRef.Count; i < objList.Count; i++)
+                {
+                    serRef.Add(new ReferenceHashSet<T>());
+                }
+            }
+
+            for (int i = 0; i < objList.Count; i++)
+            {
+                (bool assign, ReferenceHashSet<T> result) = OnBeforeSerializeReferenceHashSet(serRef[i], objList[i]);
+                // ReSharper disable once InvertIf
+                if(assign)
+                {
+                    if (inPlace)
+                    {
+                        toFill[i] = result;
+                    }
+                    else
+                    {
+                        results[i] = result;
+                    }
+                }
+            }
+
+            if (!inPlace)
+            {
+                toFill = results;
+            }
+        }
+
 
         public static (bool ok, T result) OnAfterDeserialize<T>(SaintsSerializedProperty saintsSerializedProperty, Type targetType)
         {
@@ -498,6 +658,64 @@ namespace SaintsField.Utils
                     return (false, null);
             }
         }
+        public static (bool assign, HashSet<T> result) OnAfterDeserializeHashSet<T>(object originValue, SaintsHashSet<T> saintsSerializedProperty)
+        {
+            switch (originValue)
+            {
+                case null:
+                {
+                    // Debug.Log($"OnAfterDeserializeDictionary to new dictionary");
+                    return (false, null);
+                }
+                case HashSet<T> originalHashSet:
+                {
+                    foreach (T kv in saintsSerializedProperty)
+                    {
+                        originalHashSet.Add(kv);
+                    }
+
+                    foreach (T removeKey in originalHashSet.Except(saintsSerializedProperty).ToArray())
+                    {
+                        originalHashSet.Remove(removeKey);
+                    }
+
+                    // Debug.Log($"OnAfterDeserializeDictionary inplace {string.Join(", ", originDictionary.Select(each => $"{each.Key}:{each.Value}"))} with {string.Join(", ", saintsSerializedProperty.Select(each => $"{each.Key}:{each.Value}"))}");
+                    return (true, originalHashSet);
+                }
+                default:
+                    // Debug.Log($"OnAfterDeserializeDictionary skip {originValue}");
+                    return (false, null);
+            }
+        }
+        public static (bool assign, HashSet<T> result) OnAfterDeserializeReferenceHashSet<T>(object originValue, ReferenceHashSet<T> saintsSerializedProperty)
+        {
+            switch (originValue)
+            {
+                case null:
+                {
+                    // Debug.Log($"OnAfterDeserializeDictionary to new dictionary");
+                    return (false, null);
+                }
+                case HashSet<T> originalHashSet:
+                {
+                    foreach (T kv in saintsSerializedProperty)
+                    {
+                        originalHashSet.Add(kv);
+                    }
+
+                    foreach (T removeKey in originalHashSet.Except(saintsSerializedProperty).ToArray())
+                    {
+                        originalHashSet.Remove(removeKey);
+                    }
+
+                    // Debug.Log($"OnAfterDeserializeDictionary inplace {string.Join(", ", originDictionary.Select(each => $"{each.Key}:{each.Value}"))} with {string.Join(", ", saintsSerializedProperty.Select(each => $"{each.Key}:{each.Value}"))}");
+                    return (true, originalHashSet);
+                }
+                default:
+                    // Debug.Log($"OnAfterDeserializeDictionary skip {originValue}");
+                    return (false, null);
+            }
+        }
 
 
         public static (bool filled, T[] result) OnAfterDeserializeArray<T>(T[] toFill, SaintsSerializedProperty[] saintsSerializedProperties, Type elementType)
@@ -547,7 +765,6 @@ namespace SaintsField.Utils
 
             return (canFill, results);
         }
-
         public static (bool filled, List<Dictionary<TKey, TValue>> result) OnAfterDeserializeDictionaryList<TKey, TValue>(List<Dictionary<TKey, TValue>> toFill, SaintsDictionary<TKey, TValue>[] saintsSerializedProperties)
         {
             bool canFill = toFill != null && toFill.Count == saintsSerializedProperties.Length;
@@ -571,6 +788,100 @@ namespace SaintsField.Utils
                 }
             }
 
+            return (canFill, results);
+        }
+
+        public static (bool filled, HashSet<T>[] result) OnAfterDeserializeHashSetArray<T>(HashSet<T>[] toFill, SaintsHashSet<T>[] saintsSerializedProperties)
+        {
+            bool canFill = toFill != null && toFill.Length == saintsSerializedProperties.Length;
+            HashSet<T>[] results = new HashSet<T>[saintsSerializedProperties.Length];
+            for (int i = 0; i < saintsSerializedProperties.Length; i++)
+            {
+                (bool assign, HashSet<T> result) = OnAfterDeserializeHashSet(canFill? toFill[i]: results[i], saintsSerializedProperties[i]);
+                if(assign)
+                {
+                    if (canFill)
+                    {
+                        toFill[i] = result;
+                    }
+                    else
+                    {
+                        results[i] = result;
+                    }
+                }
+            }
+
+            return (canFill, results);
+        }
+        public static (bool filled, List<HashSet<T>> result) OnAfterDeserializeHashSetList<T>(List<HashSet<T>> toFill, SaintsHashSet<T>[] saintsSerializedProperties)
+        {
+            bool canFill = toFill != null && toFill.Count == saintsSerializedProperties.Length;
+            List<HashSet<T>> results = Enumerable.Range(0, saintsSerializedProperties.Length)
+                .Select(_ => new HashSet<T>())
+                .ToList();
+
+            for (int i = 0; i < saintsSerializedProperties.Length; i++)
+            {
+                (bool assign, HashSet<T> result) = OnAfterDeserializeHashSet(canFill? toFill[i]: results[i], saintsSerializedProperties[i]);
+                if(assign)
+                {
+                    if (canFill)
+                    {
+                        toFill[i] = result;
+                    }
+                    else
+                    {
+                        results[i] = result;
+                    }
+                }
+            }
+            return (canFill, results);
+        }
+
+        public static (bool filled, HashSet<T>[] result) OnAfterDeserializeReferenceHashSetArray<T>(HashSet<T>[] toFill, ReferenceHashSet<T>[] saintsSerializedProperties)
+        {
+            bool canFill = toFill != null && toFill.Length == saintsSerializedProperties.Length;
+            HashSet<T>[] results = new HashSet<T>[saintsSerializedProperties.Length];
+            for (int i = 0; i < saintsSerializedProperties.Length; i++)
+            {
+                (bool assign, HashSet<T> result) = OnAfterDeserializeHashSet(canFill? toFill[i]: results[i], saintsSerializedProperties[i]);
+                if(assign)
+                {
+                    if (canFill)
+                    {
+                        toFill[i] = result;
+                    }
+                    else
+                    {
+                        results[i] = result;
+                    }
+                }
+            }
+
+            return (canFill, results);
+        }
+        public static (bool filled, List<HashSet<T>> result) OnAfterDeserializeReferenceHashSetList<T>(List<HashSet<T>> toFill, ReferenceHashSet<T>[] saintsSerializedProperties)
+        {
+            bool canFill = toFill != null && toFill.Count == saintsSerializedProperties.Length;
+            List<HashSet<T>> results = Enumerable.Range(0, saintsSerializedProperties.Length)
+                .Select(_ => new HashSet<T>())
+                .ToList();
+
+            for (int i = 0; i < saintsSerializedProperties.Length; i++)
+            {
+                (bool assign, HashSet<T> result) = OnAfterDeserializeHashSet(canFill? toFill[i]: results[i], saintsSerializedProperties[i]);
+                if(assign)
+                {
+                    if (canFill)
+                    {
+                        toFill[i] = result;
+                    }
+                    else
+                    {
+                        results[i] = result;
+                    }
+                }
+            }
             return (canFill, results);
         }
         // public static (bool filled, DateTime[] result) OnAfterDeserializeArrayDateTime(DateTime[] toFill, long[] saintsSerializedProperties)

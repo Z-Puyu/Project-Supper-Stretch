@@ -461,10 +461,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce92818c712eaf2479662905942921d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isDefaultListener: 1
-  bOverrideScalingFactor: 0
-  scalingFactor: -1
-  listenerId: 0
 --- !u!114 &29054850
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -477,18 +473,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bd7b7c660c25b641834b45bf20d9279, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_listeners:
-    initialListenerList: []
-    useDefaultListeners: 1
-  isEnvironmentAware: 0
-  isStaticObject: 0
-  usePositionOffsetData: 0
-  m_positionOffsetData:
-    KeepMe: 0
-    positionOffset: {x: 0, y: 0, z: 0}
-  scalingFactor: 1
-  m_posOffsetData: {fileID: 0}
-  listenerMask: 1
 --- !u!1 &30182316
 GameObject:
   m_ObjectHideFlags: 0
@@ -1175,6 +1159,12 @@ MonoBehaviour:
     - {fileID: 0}
     - {fileID: 0}
     - {fileID: 0}
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &98296081
 GameObject:
   m_ObjectHideFlags: 0
@@ -1575,10 +1565,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad86e441ce542e0887c679b8a0366f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <_maxValue>k__BackingField: 0
-  <_minValue>k__BackingField: 0
-  <_range>k__BackingField: {x: 0, y: 0}
-  <intRange>k__BackingField: {x: 0, y: 0}
+  <_maxValue>k__BackingField: 83
+  <_minValue>k__BackingField: 31
+  <_range>k__BackingField: {x: 31, y: 60.66871}
+  <intRange>k__BackingField: {x: 36, y: 36}
   wrongMin: 0
   wrongMax: 0
   errorRange: {x: 0, y: 0}
@@ -1780,9 +1770,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 011f8a5e302940a09cf45aaeba4c0a4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.DateTimeExample
-  dt: 638960797701510000
-  d1: 0
-  l: 0
+  dt: 638990632366560000
 --- !u!1 &206032195
 GameObject:
   m_ObjectHideFlags: 0
@@ -2350,6 +2338,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   naCenterMessageCanvas: {fileID: 0}
   centerMessageCanvas: {fileID: 0}
+--- !u!1 &259742170
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 259742171}
+  m_Layer: 0
+  m_Name: Obj1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &259742171
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 259742170}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1451422003}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &272545721
 GameObject:
   m_ObjectHideFlags: 0
@@ -2708,8 +2727,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0134a10044b2475886a64552e7a8f4ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sortingLayerString: New Layer 3
-  _sortingLayerInt: 0
+  _sortingLayerString: New Layer 2
+  _sortingLayerInt: 1
   _sortingLayerDisabled: 0
 --- !u!4 &301131439
 Transform:
@@ -2863,13 +2882,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 305475998}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0.36129093, y: -0.18856753, z: -0.23673193, w: 0.881969}
   m_LocalPosition: {x: 0.99, y: -0.42, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1318514131}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -46.6, y: -13.6, z: -24.17}
 --- !u!114 &305476000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2895,7 +2914,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 308851078}
-  - component: {fileID: 308851077}
+  - component: {fileID: 308851079}
   m_Layer: 0
   m_Name: PropRange
   m_TagString: Untagged
@@ -2903,33 +2922,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &308851077
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 308851076}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ab24fcecf85459b8c5c812cbe6c7870, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  min: 10
-  max: 21
-  rangeFloat: 10
-  rangeInt: 18
-  rangeFloatStep: 14
-  rangeIntStep: 20
-  normalRange: 7
-  normalFloatRange: 0.73
-  normalDoubleRange: 6.75
-  normalLongRange: 0
-  myRange:
-    min: 0
-    max: 37
-    rangeFloat: 17.2
-  rangeFloatDisabled: 17.62
 --- !u!4 &308851078
 Transform:
   m_ObjectHideFlags: 0
@@ -2945,6 +2937,54 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &308851079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 308851076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ab24fcecf85459b8c5c812cbe6c7870, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.RangeExample
+  intMin: -2147483648
+  intMax: 2147483647
+  intRange: 22605056
+  intRangeAdapt: 0
+  byteMin: 0
+  byteMax: 255
+  byteRange: 101
+  sbyteMin: -128
+  sbyteMax: 127
+  sbyteRange: 42
+  shortMin: -32768
+  shortMax: 32767
+  shortRange: 11679
+  uShortMin: 0
+  uShortMax: 65535
+  ushortRange: 0
+  uIntMin: 0
+  uIntMax: 4294967295
+  uIntRange: 3247414272
+  uIntAdapt: 7
+  floatMin: -3.4028235e+38
+  floatMax: 3.4028235e+38
+  floatRange: 1.9664557e+38
+  floatAdapt: 0.6
+  doubleMin: -8.988465674311579e+307
+  doubleMax: 8.988465674311579e+307
+  doubleRange: 6.730057563419542e+307
+  doubleAdapt: 0.8
+  longMin: -4611686018427387904
+  longMax: 4611686018427387903
+  longRange: 3452769426670092288
+  longAdapt: 8
+  ulongMin: 0
+  ulongMax: 18446744073709551615
+  ulongRange: 17149015788212977664
+  ulongAdapt: 7
 --- !u!1 &325018645
 GameObject:
   m_ObjectHideFlags: 0
@@ -3171,15 +3211,48 @@ MonoBehaviour:
   saintsListGo:
     value: []
     _saintsList: []
-    _saintsSerializedVersion: 1
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   gameObjects1: []
   gameObjects2:
     value: []
     _saintsList: []
-    _saintsSerializedVersion: 1
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   references:
     version: 2
     RefIds: []
+--- !u!1 &354567779
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 354567780}
+  m_Layer: 0
+  m_Name: Obj2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &354567780
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 354567779}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1712558647}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &363987720
 GameObject:
   m_ObjectHideFlags: 0
@@ -3240,19 +3313,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f535381981f961458dc90594ffd0000, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitializationSettings: {fileID: 11400000, guid: 9f5202af46b37f943b2374477f000754, type: 2}
-  basePath: 
-  language: 
-  defaultPoolSize: 0
-  lowerPoolSize: 0
-  streamingPoolSize: 0
-  memoryCutoffThreshold: 0
-  monitorPoolSize: 0
-  monitorQueuePoolSize: 0
-  callbackManagerBufferSize: 0
-  spatialAudioPoolSize: 0
-  maxSoundPropagationDepth: 0
-  engineLogging: 0
 --- !u!4 &365509338
 Transform:
   m_ObjectHideFlags: 0
@@ -3536,20 +3596,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: beb4de7d3962b7e4794821da0e688603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Animator>k__BackingField: {fileID: 380193380}
-  animator:
+  <MyAnimator>k__BackingField: {fileID: 380193380}
+  animatorState:
     <layerIndex>k__BackingField: 0
-    <stateNameHash>k__BackingField: 0
-    <stateName>k__BackingField: 
-    <stateSpeed>k__BackingField: 0
+    <stateNameHash>k__BackingField: -1198717087
+    <stateName>k__BackingField: Sub2State
+    <stateSpeed>k__BackingField: 1
     <stateTag>k__BackingField: 
     <animationClip>k__BackingField: {fileID: 0}
-    <subStateMachineNameChain>k__BackingField: []
-  animStateName: Idle
-  animStateDisabled: Idle
-  animParamName: Trigger
-  animParamHash: 0
-  animParamHashes: c136d6d572017303c136d6d572017303
+    <subStateMachineNameChain>k__BackingField:
+    - SubStateMachine1
+    - Sub1-2
+  animatorStateBase:
+    <layerIndex>k__BackingField: 0
+    <stateNameHash>k__BackingField: -1198717087
+    <stateName>k__BackingField: Sub2State
+    <stateSpeed>k__BackingField: 1
+    <stateTag>k__BackingField: 
+    <subStateMachineNameChain>k__BackingField:
+    - SubStateMachine2
+    - Sub2-2
+  animStateName: Sub2State
+  animStateDisabled: 
+  animParamName: Some Bool
+  animParamHash: -1473725520
+  animParamHashes: b0bb28a8
   animParamNameDisable: 
 --- !u!95 &380193380
 Animator:
@@ -4141,6 +4212,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b95dd2a9a1143674188d99e54bd6979a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsArrayRefExample
+  inters:
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 2
+  refSub1:
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &428673597
 GameObject:
   m_ObjectHideFlags: 0
@@ -5802,6 +5884,37 @@ Transform:
   - {fileID: 1044114291}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &597926528
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 597926529}
+  m_Layer: 0
+  m_Name: Obj2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &597926529
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 597926528}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1451422003}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &599044141
 GameObject:
   m_ObjectHideFlags: 0
@@ -6177,7 +6290,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toggleDict:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -6207,6 +6319,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value: 0
       valueField:
@@ -6236,6 +6349,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   toggleTable:
   - b1: 0
     b2: 0
@@ -12794,7 +12909,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iDict:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - valueField:
         propertyType: 4
@@ -12804,11 +12918,12 @@ MonoBehaviour:
         stringValue: 
         V: {fileID: 0}
         VRef:
-          rid: 6921583427232728040
+          rid: 169648641493696654
         IsVRef: 1
       valueArray: []
       valueList: []
       wrapType: 1
+    _wrapTypeKey: 1
     _saintsValues:
     - valueField:
         propertyType: 4
@@ -12823,13 +12938,15 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 1
+    _wrapTypeValue: 1
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
-    - rid: 6921583427232728040
-      type: {class: Issue241DictInterface/Key1, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
+    - rid: 169648641493696654
+      type: {class: Issue241DictInterface/Key2, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
       data:
-        k1: 
+        k2: 
     - rid: 6921583427232728041
       type: {class: Issue241DictInterface/Value2, ns: SaintsField.Samples.Scripts.IssueAndTesting.Issue, asm: today.comes.saintsfield.Samples}
       data:
@@ -12883,7 +13000,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   eToState:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -12913,6 +13029,21 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    - value: 2
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652844
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
         <layerIndex>k__BackingField: 0
@@ -12956,8 +13087,30 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    - value:
+        <layerIndex>k__BackingField: 0
+        <stateNameHash>k__BackingField: 0
+        <stateName>k__BackingField: 
+        <stateSpeed>k__BackingField: 0
+        <stateTag>k__BackingField: 
+        <animationClip>k__BackingField: {fileID: 0}
+        <subStateMachineNameChain>k__BackingField: []
+      valueField:
+        propertyType: 4
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: 6921583410868652846
+        IsVRef: 1
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   eToV3:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -12987,6 +13140,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value: {x: 0, y: 0, z: 0}
       valueField:
@@ -13016,8 +13170,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   eToStateOld:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -13033,6 +13188,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
         <layerIndex>k__BackingField: 0
@@ -13055,8 +13211,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   eToV3Old:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -13072,6 +13229,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value: {x: 0, y: 0, z: 0}
       valueField:
@@ -13087,8 +13245,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   myStructToGameObject:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value:
         key: 
@@ -13106,6 +13265,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
         ss: 
@@ -13123,6 +13283,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
@@ -13939,13 +14101,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5230f2d1430c07e4e95b1b00e4727da5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shaderParamString: 
-  shaderParamInt: 0
-  shaderParamFilter: 0
-  targetRenderer: {fileID: 0}
-  shaderParamRenderer: 0
-  shaderParamMat: 0
-  shaderParamShader: 0
+  shaderParamString: _MetallicGlossMap
+  shaderParamInt: 562
+  shaderParamFilter: 432
+  targetRenderer: {fileID: 836531684}
+  shaderParamRenderer: 569
+  shaderParamMat: 583
+  shaderParamShader: 591
   readOnlyField: 
 --- !u!1 &841111314
 GameObject:
@@ -14290,8 +14452,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d407124ea7fa70439314f30bdd341b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Testing.TimeSpanExample
-  dt: 1692123560000
-  expanded: 1692123560000
+  dt: 77523560000
+  expanded: 216123560000
   d1: 0
   l: 0
 --- !u!1 &847311490
@@ -15684,15 +15846,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   saintsArrayGo:
     value: []
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   gameObjects2:
   - value:
     - {fileID: 0}
     - {fileID: 0}
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   gameObjects2Nest:
     value: []
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   gameObjects4: []
   _arrSize:
     value: 0000000000000000
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
+  pagging:
+    _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &965251183
 GameObject:
   m_ObjectHideFlags: 0
@@ -18135,7 +18316,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   oneField:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -18151,6 +18331,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
         f1: 
@@ -18167,8 +18348,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   oneFields:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -18184,6 +18366,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
       - f1: 
@@ -18200,8 +18383,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   twoField:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -18217,6 +18401,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
         f1: 
@@ -18234,8 +18419,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   twoFields:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -18251,6 +18437,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
       - f1: 
@@ -18268,8 +18455,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   oneFieldAttr:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -18285,6 +18473,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
         f1: 
@@ -18301,8 +18490,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   oneFieldLabel:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -18318,6 +18508,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value:
         f1: 
@@ -18334,6 +18525,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
@@ -19361,75 +19554,11 @@ MonoBehaviour:
   bool12AndEnum1Show: 
   bool12AndEnum12Show: 
   bool123AndEnum1Show: 
---- !u!1 &1249628711
+--- !u!1 &1249628711 stripped
 GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 2236897022136926204, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+  m_PrefabInstance: {fileID: 5780055921679939290}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1249628712}
-  - component: {fileID: 1249628713}
-  m_Layer: 0
-  m_Name: MinMaxSlider
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1249628712
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1249628711}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.0420375, y: 3.0811484, z: 0.025987599}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1249628713
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1249628711}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90aa17b125d44e1aa40a2101379471a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  vector2Step03: {x: 0.20000005, y: 1.1000001}
-  vector2IntStep3: {x: 9, y: 12}
-  vector2Free: {x: 0.9935274, y: 3}
-  vector2IntFree: {x: 8, y: 18}
-  _autoWidth: {x: 38, y: 61}
-  _autoWidthFloat: {x: -46.925564, y: -1.6181221}
-  <OuterRange>k__BackingField: {x: -67.96116, y: 0}
-  _innerRange: {x: -29, y: -20}
-  <DynamicMin>k__BackingField: 0
-  <DynamicMax>k__BackingField: 7.82
-  _propRange: {x: 2.2776697, y: 4.871682}
-  _propLeftRange: {x: 20.226538, y: 46.925568}
-  _propRightRange: {x: -67.16942, y: -37.510193}
-  vector2Step03Disabled: {x: 0, y: 0}
-  freeInt: {x: -68, y: -37}
-  freeFloat: {x: -2.5112529, y: 0.64408696}
-  stepInt: {x: -101, y: 55}
-  stepFloat: {x: -4, y: 4}
-  freeMin: -0.33
-  freeMax: 3.46
-  freeMinMax: {x: 0, y: 2}
-  nonFreeMinMax: {x: 0, y: 2.6000001}
-  freeInput: {x: -9.570033, y: 20}
-  freeInputInt: {x: 0, y: 10}
-  incorrectType: 0
 --- !u!1 &1250645939
 GameObject:
   m_ObjectHideFlags: 0
@@ -19757,6 +19886,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   integerHashSet:
     _saintsList:
     - value: 1
@@ -19899,8 +20030,12 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   _arr:
   - _saintsList: []
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   references:
     version: 2
     RefIds:
@@ -19961,6 +20096,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 1
+    _saintsSerializedVersion: 2
+    _wrapType: 1
   noPolymorphism:
     _saintsList:
     - value:
@@ -19979,6 +20116,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   polymorphism:
     _saintsList:
     - value:
@@ -20013,6 +20152,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 1
+    _saintsSerializedVersion: 2
+    _wrapType: 1
   references:
     version: 2
     RefIds:
@@ -20110,6 +20251,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c2ca16b3131ec84b80578c42b1cc1dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1314259149
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1314259150}
+  m_Layer: 0
+  m_Name: Obj3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1314259150
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1314259149}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1451422003}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1315195531
 GameObject:
   m_ObjectHideFlags: 0
@@ -20472,7 +20644,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minValue: -5
   maxValue: 35
-  fValue: 14.5
+  fValue: 8.747229
 --- !u!1 &1338113061
 GameObject:
   m_ObjectHideFlags: 0
@@ -20568,6 +20740,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   naCarConfig: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
   carConfig: {fileID: 11400000, guid: b3b1d932cbd95044fa45428a599046b1, type: 2}
+--- !u!1 &1350119076
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1350119077}
+  - component: {fileID: 1350119078}
+  m_Layer: 0
+  m_Name: Issue344BoxIndent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1350119077
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1350119076}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1350119078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1350119076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56615ab2f7d08384cb69cb27b0faa746, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue344BoxIndent
 --- !u!1 &1350909637
 GameObject:
   m_ObjectHideFlags: 0
@@ -20597,7 +20813,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50a944f54e0f41ed8aebd21ecf823272, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputAxis: Mouse ScrollWheel
+  inputAxis: Jump
   inputAxisDisabled: 
 --- !u!4 &1350909639
 Transform:
@@ -21370,6 +21586,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   so: {fileID: 11400000, guid: 275a3353781dc1f43991962aba65223c, type: 2}
   go: {fileID: 1173326076}
+--- !u!1 &1450095401
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1450095402}
+  m_Layer: 0
+  m_Name: Obj3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1450095402
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1450095401}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1712558647}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1451086361
 GameObject:
   m_ObjectHideFlags: 0
@@ -21400,6 +21647,70 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1310105965}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1451422001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1451422003}
+  - component: {fileID: 1451422002}
+  m_Layer: 0
+  m_Name: ValueButtons
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1451422002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1451422001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 774fb341ae404c778c68e533864a2a5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.ValueButtonsExample
+  clickAButton: 
+  stringItems:
+  - <icon=lightMeter/greenLight/>Where
+  - Are
+  - The <color=red>Wild Roses
+  - <icon="lightMeter/redLight"/>Grow
+  transOpts:
+  - {fileID: 1451422003}
+  - {fileID: 259742171}
+  - {fileID: 597926529}
+  - {fileID: 1314259150}
+  transformSelect: {fileID: 259742171}
+  transformCallback: {fileID: 0}
+  transformAdvanced: {fileID: 1314259150}
+  myBool: 0
+  myEnum: 3
+  unityColors: {r: 0.9411765, g: 0.9725491, b: 1, a: 1}
+--- !u!4 &1451422003
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1451422001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 259742171}
+  - {fileID: 597926529}
+  - {fileID: 1314259150}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1452621600
 GameObject:
@@ -22424,7 +22735,41 @@ Transform:
   - {fileID: 2036189592}
   - {fileID: 1152718068}
   - {fileID: 1528962970}
+  - {fileID: 2128148720}
+  - {fileID: 2020411938}
+  - {fileID: 1350119077}
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1487457131
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1487457132}
+  m_Layer: 0
+  m_Name: Obj1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1487457132
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1487457131}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1712558647}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1490458620
 GameObject:
@@ -23115,7 +23460,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue338.Issue338SaintsDictionary
   sd:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -23131,6 +23475,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value: []
       valueField:
@@ -23155,6 +23500,8 @@ MonoBehaviour:
         IsVRef: 0
       valueList: []
       wrapType: 2
+    _wrapTypeValue: 2
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
@@ -23451,11 +23798,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03e9d21f73989ab4f8df899ed2b1ded2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shaderKeywordString: 
-  shaderKeywordIndex: 
-  targetRenderer: {fileID: 0}
+  shaderKeywordString: _LIGHT_LAYERS
+  shaderKeywordIndex: _RENDER_PASS_ENABLED
+  targetRenderer: {fileID: 1548456366}
   shaderKeywordRenderer: 
-  shaderKeywordMat: 
+  shaderKeywordMat: EVALUATE_SH_MIXED
   shaderKeywordShader: 
   readOnlyField: 
 --- !u!1 &1551141621
@@ -23733,7 +24080,7 @@ GameObject:
   - component: {fileID: 1571298209}
   - component: {fileID: 1571298210}
   m_Layer: 0
-  m_Name: RichLabel
+  m_Name: FieldRichLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24203,7 +24550,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16b93420e64dc4344bb5175e401a2a00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _scriptable: {fileID: 11400000, guid: 5dcd8b430bc10e34fbd4fe61b80fd79e, type: 2}
+  _scriptable: {fileID: 11400000, guid: c6db5fae10aeea14181290c123996b10, type: 2}
 --- !u!1 &1625509856
 GameObject:
   m_ObjectHideFlags: 0
@@ -24954,7 +25301,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colors:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 3
       valueField:
@@ -24970,6 +25316,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value: {r: 0, g: 0, b: 0, a: 0}
       valueField:
@@ -24985,6 +25332,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
@@ -25200,13 +25549,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1709981029}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.1792369, y: -0.016651828, z: -0.32517698, w: 0.9283624}
   m_LocalPosition: {x: -1.973491, y: -0.27872813, z: -1.5562701}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 529722623}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 18.782, y: -8.962, z: -40.093}
 --- !u!23 &1709981031
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -25311,6 +25660,56 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   directChild: {fileID: 393988620}
   searchChildren: []
+--- !u!1 &1712558645
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1712558647}
+  - component: {fileID: 1712558646}
+  m_Layer: 0
+  m_Name: OptionsValueButtons
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1712558646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1712558645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 931991ef3ad9b85468636a537794d340, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.OptionsValueButtonsExample
+  floatOpt: 0
+  direct: 2
+  quality: 1
+--- !u!4 &1712558647
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1712558645}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1487457132}
+  - {fileID: 354567780}
+  - {fileID: 1450095402}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1727355572
 GameObject:
   m_ObjectHideFlags: 0
@@ -25743,7 +26142,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
-    _saintsSerializedVersion: 1
+    _saintsSerializedVersion: 2
+    _wrapType: 4
   references:
     version: 2
     RefIds:
@@ -25913,8 +26313,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   upLimit: 5
-  min0Max: 5
-  fMinMax10: 10
+  min0Max: 3
+  fMinMax10: 9.15
 --- !u!1 &1774553391
 GameObject:
   m_ObjectHideFlags: 0
@@ -25960,14 +26360,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::DictionaryEnumLabel
   dropEnums: 1
-  buttonEnums: 0
+  buttonEnums: 2
   flagsEnums: 1
   treeEnums: 0
   flagsTreeEnums: 0
   namedEnumDict:
-    saintsSerializedVersion: 1
     _saintsKeys:
-    - value: 0
+    - value: 2
       valueField:
         propertyType: 4
         propertyPath: 
@@ -25981,8 +26380,9 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
-    - value: 0
+    - value: 2
       valueField:
         propertyType: 4
         propertyPath: 
@@ -25996,6 +26396,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
@@ -27148,20 +27550,20 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
+      time: -1
+      value: -1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
@@ -27174,18 +27576,18 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0
@@ -27580,10 +27982,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f447d0d25d4a4bc19aaeac0ff720e887, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rate0To5: 2
+  rate0To5: 5
   rate1To5: 1
   rate3To5: 2
-  rate0To5Rich: 2
+  rate0To5Rich: 1
   rate:
     rate: 5
   rate1To5Disabled: 4
@@ -33204,15 +33606,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44f420c4e1d44beb9a9861f26742c404, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myHp: 6
-  myMp: 65.85
-  minValue: -5
-  maxValue: 30
-  fValue: 10.25
-  stamina: 123
+  myHp: 5
+  myMp: 54.95
+  minValue: 3
+  maxValue: 77
+  fValue: 44.100002
+  stamina: 69
   highStamina: 150
   maxStamina: 200
-  myHpDisabled: 6
+  myHpDisabled: 0
 --- !u!1 &1965382813
 GameObject:
   m_ObjectHideFlags: 0
@@ -33662,7 +34064,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1487eefb5f6f5394eac6331f72576aff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  number: 02000000f4ffffff1e000000
+  number: 02000000f4ffffff02000000
 --- !u!1 &1990568726
 GameObject:
   m_ObjectHideFlags: 0
@@ -33867,79 +34269,60 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   genDict:
-    saintsSerializedVersion: 1
-    _saintsKeys:
-    - value: a
-      valueField:
-        propertyType: 4
-        propertyPath: 
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: b
-      valueField:
-        propertyType: 4
-        propertyPath: 
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    _saintsValues:
-    - value: {fileID: 2137894679}
-      valueField:
-        propertyType: 4
-        propertyPath: 
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
-    - value: {fileID: 2009324526}
-      valueField:
-        propertyType: 4
-        propertyPath: 
-        longValue: 0
-        uLongValue: 0
-        stringValue: 
-        V: {fileID: 0}
-        VRef:
-          rid: -2
-        IsVRef: 0
-      valueArray: []
-      valueList: []
-      wrapType: 4
+    _saintsKeys: []
+    _wrapTypeKey: 4
+    _saintsValues: []
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   dict:
-    saintsSerializedVersion: 1
-    _saintsKeys: []
-    _saintsValues: []
+    _saintsKeys:
+    - value: 0
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeKey: 4
+    _saintsValues:
+    - value:
+        myStringField: 
+        myIntField: 
+      valueField:
+        propertyType: 0
+        propertyPath: 
+        longValue: 0
+        uLongValue: 0
+        stringValue: 
+        V: {fileID: 0}
+        VRef:
+          rid: -2
+        IsVRef: 0
+      valueArray: []
+      valueList: []
+      wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   genDictValueArray:
-    saintsSerializedVersion: 1
     _saintsKeys: []
+    _wrapTypeKey: 4
     _saintsValues: []
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   genDictValueList:
-    saintsSerializedVersion: 1
     _saintsKeys: []
+    _wrapTypeKey: 4
     _saintsValues: []
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   kvPagin10:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -34081,6 +34464,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value: 0
       valueField:
@@ -34222,14 +34606,20 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   keyWidthControl:
-    saintsSerializedVersion: 1
     _saintsKeys: []
+    _wrapTypeKey: 4
     _saintsValues: []
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   valueWidthControl:
-    saintsSerializedVersion: 1
     _saintsKeys: []
+    _wrapTypeKey: 4
     _saintsValues: []
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
@@ -34378,6 +34768,61 @@ MonoBehaviour:
   constTrueDisable: 
   staticTrueDisable: 
   sub: 
+--- !u!1 &2020411937
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2020411938}
+  - component: {fileID: 2020411940}
+  m_Layer: 0
+  m_Name: TestUpWalk
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2020411938
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020411937}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2020411940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020411937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 530e57493b16c9d4687daefbb3d17585, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.TestUpWalk
+  options:
+  - Hey
+  - Jude
+  - don't
+  - be
+  - afraid
+  myStruct:
+    stringV: 
+    down:
+      stringV: 
+      oldDownV: 
 --- !u!1 &2023712051
 GameObject:
   m_ObjectHideFlags: 0
@@ -34512,7 +34957,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.Issue314ExpandableDictionary
   expand:
-    saintsSerializedVersion: 1
     _saintsKeys:
     - value: 0
       valueField:
@@ -34528,6 +34972,7 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeKey: 4
     _saintsValues:
     - value: {fileID: 1131818498}
       valueField:
@@ -34543,6 +34988,8 @@ MonoBehaviour:
       valueArray: []
       valueList: []
       wrapType: 4
+    _wrapTypeValue: 4
+    saintsSerializedVersion: 2
   references:
     version: 2
     RefIds:
@@ -35283,8 +35730,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b125f4fbe8ad481381078d2c01910ed8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tag: 
-  _tag2: Finish
+  _tag: Respawn
+  _tag2: MainCamera
   _tagDisabled: 
 --- !u!1 &2118423071
 GameObject:
@@ -35394,6 +35841,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2128148719
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2128148720}
+  - component: {fileID: 2128148721}
+  m_Layer: 0
+  m_Name: TestCompactDropdown
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2128148720
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128148719}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1486592967}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2128148721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128148719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd29898237258cd4bb2775b8681e1ef0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: today.comes.saintsfield.Samples::SaintsField.Samples.Scripts.IssueAndTesting.Issue.TestCompactDropdown
+  d: 2
+  t: 0
 --- !u!1 &2134144047
 GameObject:
   m_ObjectHideFlags: 0
@@ -36765,12 +37258,64 @@ PrefabInstance:
       value: 6921583410452630252
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: absDict._wrapTypeKey
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: dymDict._wrapTypeKey
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: 'managedReferences[-2]'
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: absDict._wrapTypeValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: dymDict._wrapTypeValue
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._wrapTypeKey
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDict._wrapTypeKey
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: valueInject._wrapTypeValue
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDict._wrapTypeValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDictLis._wrapTypeKey
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: serializableDict._wrapTypeKey
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: interfaceDictLis._wrapTypeValue
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: serializableDict._wrapTypeValue
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: valueInject._saintsKeys.Array.size
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: serializableDictArrVal._wrapTypeKey
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: interfaceDict._saintsKeys.Array.size
@@ -36779,6 +37324,10 @@ PrefabInstance:
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: valueInject._saintsValues.Array.size
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
+      propertyPath: serializableDictArrVal._wrapTypeValue
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7616367572993081390, guid: 9b4fc799f92bb774c8bd6791729712e6, type: 3}
       propertyPath: interfaceDict._saintsValues.Array.size
@@ -37790,6 +38339,99 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1001 &5780055921679939290
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1502395440989431318, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.0420375
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502395440989431318, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.0811484
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502395440989431318, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.025987599
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502395440989431318, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502395440989431318, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502395440989431318, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502395440989431318, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502395440989431318, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502395440989431318, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502395440989431318, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2236897022136926204, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: m_Name
+      value: MinMaxSlider
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: vector2Step03.x
+      value: -0.1561566
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: vector2Step03.y
+      value: 1.3438435
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: vector2IntStep3.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: vector2IntStep3.y
+      value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: vector2Step03Adapt.x
+      value: -0.65060246
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: vector2Step03Adapt.y
+      value: 0.5493976
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: vector2IntStep3Adapt.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: vector2IntStep3Adapt.y
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5437241698913408585, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
+      propertyPath: vector2Step03Disabled.y
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 432a990d6bfaca9429610be094186a2b, type: 3}
 --- !u!1001 &6004775636325262729
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38075,6 +38717,10 @@ PrefabInstance:
       value: SaintsField.Samples.Scripts.ColorToggleTextExample, today.comes.saintsfield.Samples
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
+      propertyPath: saintsArray.Array.data[0]._wrapType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: saintsDict._saintsValues.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -38192,7 +38838,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: saintsArray.Array.data[0]._saintsSerializedVersion
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3271665409483885876, guid: 92e25943252bce8499e438fcd88eaa51, type: 3}
       propertyPath: saintsDict._saintsKeys.Array.data[0].valueField.VRef
@@ -38565,6 +39211,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7009332967656986138, guid: 6b9a9a67031221c4eb3c7bd702c98cf5, type: 3}
+      propertyPath: guidString
+      value: af843e0d-e3ba-41d3-9cf8-072a166abcca
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -38629,7 +39279,7 @@ SceneRoots:
   - {fileID: 1030583577}
   - {fileID: 4747155408333943610}
   - {fileID: 185980176}
-  - {fileID: 1249628712}
+  - {fileID: 5780055921679939290}
   - {fileID: 440518747}
   - {fileID: 1383904219}
   - {fileID: 69899267}
@@ -38684,3 +39334,5 @@ SceneRoots:
   - {fileID: 365509338}
   - {fileID: 1994419023}
   - {fileID: 9085240210978108763}
+  - {fileID: 1451422003}
+  - {fileID: 1712558647}

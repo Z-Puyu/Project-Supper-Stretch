@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Hierarchy_Designer.Runtime.Scripts;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;

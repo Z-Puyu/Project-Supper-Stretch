@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using CommonFrameworks.CommonUtilities.Components;
+using CommonFrameworks.CommonUtilities;
 using SaintsField;
 using UnityEngine;
 

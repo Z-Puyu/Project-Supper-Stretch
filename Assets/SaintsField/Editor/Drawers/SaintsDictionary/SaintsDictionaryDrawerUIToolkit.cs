@@ -332,27 +332,27 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             return (keysField, keysParent);
         }
 
-        private class AsyncSearchItems
+        private class AsyncSearchItems<TKey>
         {
             public bool Started;
             public bool Finished;
-            public IEnumerator<int> SourceGenerator;
+            public IEnumerator<TKey> SourceGenerator;
             public string KeySearchText;
             public string ValueSearchText;
             public double DebounceSearchTime;
 
-            public List<int> HitTargetIndexes;
-            public List<int> CachedHitTargetIndexes;
+            public List<TKey> HitTargetIndexes;
+            public List<TKey> CachedHitTargetIndexes;
 
             public int PageIndex;
             public int Size;
             public int TotalPage = 1;
             public int NumberOfItemsPerPage;
 
-            public readonly HashSet<Image> LoadingImages = new HashSet<Image>();
+            public readonly HashSet<VisualElement> LoadingImages = new HashSet<VisualElement>();
         }
 
-        private AsyncSearchItems _asyncSearchItems;
+        private AsyncSearchItems<int> _asyncSearchItems;
 
         private const float DebounceTime = 0.6f;
 
@@ -389,17 +389,16 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             }
 
             (FieldInfo keysField, object keysParent) = GetTargetInfo(propKeysNameCompact, rawType, fieldValue);
-
             Debug.Assert(keysField != null, $"Failed to get keys field {propKeysNameCompact} from {property.propertyPath}");
             Type keyType = ReflectUtils.GetElementType(keysField.FieldType);
+            IReadOnlyList<Attribute> injectedKeyAttributes = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(KeyAttributeAttribute));
+            WrapType keyWrapType = SaintsWrapUtils.EnsureWrapType(property.FindPropertyRelative("_wrapTypeKey"), keysField, injectedKeyAttributes);
 
             (FieldInfo valuesField, object valuesParent) = GetTargetInfo(propValuesNameCompact, rawType, fieldValue);
-
             Debug.Assert(valuesField != null, $"Failed to get values field from {property.propertyPath}");
             Type valueType = ReflectUtils.GetElementType(valuesField.FieldType);
-
-            IReadOnlyList<Attribute> injectedKeyAttributes = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(KeyAttributeAttribute));
             IReadOnlyList<Attribute> injectedValueAttributes = SaintsWrapUtils.GetInjectedPropertyAttributes(info, typeof(ValueAttributeAttribute));
+            WrapType valueWrapType = SaintsWrapUtils.EnsureWrapType(property.FindPropertyRelative("_wrapTypeValue"), valuesField, injectedValueAttributes);
 
             IntegerField totalCountFieldTop = container.Q<IntegerField>(name: NameTotalCount(property));
             totalCountFieldTop.SetValueWithoutNotify(keysProp.arraySize);
@@ -454,11 +453,9 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             SaintsDictionaryAttribute saintsDictionaryAttribute = saintsAttribute as SaintsDictionaryAttribute;
 
             int initNumberOfItemsPerPage = saintsDictionaryAttribute?.NumberOfItemsPerPage ?? -1;
-            List<int> initTargets = initNumberOfItemsPerPage <= 0
-                ? new List<int>(Enumerable.Range(0, keysProp.arraySize))
-                : new List<int>(Enumerable.Range(0, keysProp.arraySize).Take(initNumberOfItemsPerPage));
+            List<int> initTargets = new List<int>(Enumerable.Range(0, keysProp.arraySize));
 
-            _asyncSearchItems = new AsyncSearchItems
+            _asyncSearchItems = new AsyncSearchItems<int>
             {
                 Started = true,
                 Finished = true,
@@ -490,6 +487,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 // List<int> useIndexes = new List<int>(itemIndexToPropertyIndex);
                 // ReSharper disable once AccessToModifiedClosure
                 List<int> refreshedHitTargetIndexes = new List<int>(_asyncSearchItems.Started? _asyncSearchItems.HitTargetIndexes: _asyncSearchItems.CachedHitTargetIndexes);
+                // Debug.Log($"_asyncSearchItems.Started={_asyncSearchItems.Started}? {string.Join(",", _asyncSearchItems.HitTargetIndexes)}: {string.Join(",", _asyncSearchItems.CachedHitTargetIndexes)}");
                 if (nowArraySize != _asyncSearchItems.Size)
                 {
                     _asyncSearchItems.Size = nowArraySize;
@@ -533,6 +531,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     int endIndex = Mathf.Min((curPageIndex + 1) * numberOfItemsPerPage, refreshedHitTargetIndexes.Count);
                     itemIndexToPropertyIndex = refreshedHitTargetIndexes.GetRange(startIndex, endIndex - startIndex);
                     int totalPage = Mathf.Max(1, Mathf.CeilToInt(refreshedHitTargetIndexes.Count / (float)numberOfItemsPerPage));
+                    // Debug.Log($"get total page {totalPage} from {refreshedHitTargetIndexes.Count} / {numberOfItemsPerPage}");
 
                     // pageField.SetValueWithoutNotify(curPageIndex + 1);
 
@@ -619,14 +618,20 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 name = "Keys",
                 // title = "Keys",
                 stretchable = keyWidth.Type == ResponsiveType.None,
-                width = MakeLength(saintsDictionaryAttribute?.KeyWidth ?? default),
+                width = MakeLength(keyWidth),
                 makeHeader = () =>
                 {
                     VisualElement header = new VisualElement();
                     string keyLabel = GetKeyLabel(saintsDictionaryAttribute);
                     if(!string.IsNullOrEmpty(keyLabel))
                     {
-                        header.Add(new Label(keyLabel));
+                        header.Add(new Label(keyLabel)
+                        {
+                            style =
+                            {
+                                marginLeft = 4,
+                            },
+                        });
                     }
                     ToolbarSearchField keySearch = new ToolbarSearchField
                     {
@@ -687,7 +692,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     };
                     element.Add(keyContainer);
 
-                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(keysField, keyType, elementProp, injectedKeyAttributes, this, this, keysParent);
+                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(keyWrapType, keysField, keyType, elementProp, injectedKeyAttributes, this, this, keysParent);
                     keyContainer.Add(resultElement);
 
                     keyContainer.TrackPropertyValue(keysProp, _ =>
@@ -742,7 +747,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                 name = "Values",
                 // title = "Values",
                 stretchable = valueWidth.Type == ResponsiveType.None,
-                width = MakeLength(saintsDictionaryAttribute?.ValueWidth ?? default),
+                width = MakeLength(valueWidth),
                 makeHeader = () =>
                 {
                     VisualElement header = new VisualElement();
@@ -751,7 +756,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                     if(!string.IsNullOrEmpty(valueLabel))
                     {
-                        header.Add(new Label(valueLabel));
+                        header.Add(new Label(valueLabel)
+                        {
+                            style =
+                            {
+                                marginLeft = 4,
+                            },
+                        });
                     }
 
                     // header.Add(new Label("Values"));
@@ -797,7 +808,13 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
                     }, TrickleDown.TrickleDown);
                     return header;
                 },
-                makeCell = () => new VisualElement(),
+                makeCell = () => new VisualElement
+                {
+                    style =
+                    {
+                        marginRight = 4,
+                    }
+                },
                 bindCell = (element, elementIndex) =>
                 {
                     int propIndex = itemIndexToPropertyIndex[elementIndex];
@@ -809,7 +826,7 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
 
                     // Debug.Log($"elementProp={elementProp.propertyPath}, valuesField={valuesField}, valueType={valueType}, valuesParent={valuesParent}/{valuesParent.GetType()}");
 
-                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(valuesField, valueType, elementProp, injectedValueAttributes, this, this, valuesParent);
+                    VisualElement resultElement = SaintsWrapUtils.CreateCellElement(valueWrapType, valuesField, valueType, elementProp, injectedValueAttributes, this, this, valuesParent);
 
                     element.Add(resultElement);
 
@@ -1071,6 +1088,8 @@ namespace SaintsField.Editor.Drawers.SaintsDictionary
             }).Every(1);
             // Debug.Log($"{string.Join(",", itemIndexToPropertyIndex)}");
         }
+
+
 
         // private bool _asyncSearchBusy;
 

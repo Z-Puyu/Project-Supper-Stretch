@@ -128,7 +128,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                             false,
                             InAnyHorizontalLayout,
                             Array.Empty<Attribute>(),
-                            false
+                            FieldWithInfo.Targets
                         ).result;
                         // ReSharper disable once InvertIf
                         if (r != null)
@@ -190,7 +190,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                         false,
                         InAnyHorizontalLayout,
                         ReflectCache.GetCustomAttributes(FieldWithInfo.MethodInfo),
-                        false
+                        FieldWithInfo.Targets
                     ).result;
                     if (r != null)
                     {
@@ -288,8 +288,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 name = ButtonLabelContainerName(FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]),
             };
             buttonElement.Add(buttonLabelContainer);
-            foreach (VisualElement element in new RichTextDrawer().DrawChunksUIToolKit(RichTextDrawer.ParseRichXml(buttonText,
-                         FieldWithInfo.MethodInfo.Name, null, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0])))
+            foreach (VisualElement element in new RichTextDrawer().DrawChunksUIToolKit(RichTextDrawer.ParseRichXmlWithProvider(buttonText, this)))
             {
                 buttonLabelContainer.Add(element);
             }
@@ -415,7 +414,7 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             // ReSharper disable once InvertIf
             if(!string.IsNullOrEmpty(labelCallback))
             {
-                (string error, string result) = Util.GetOf<string>(labelCallback, null,
+                (string error, string result) = Util.FlatGetOf<string>(labelCallback, null,
                     FieldWithInfo.SerializedProperty, FieldWithInfo.MethodInfo, FieldWithInfo.Targets[0]);
                 // Debug.Log($"{error}/{result}");
                 if (error != "")

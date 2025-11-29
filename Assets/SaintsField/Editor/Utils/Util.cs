@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using SaintsField.Condition;
 using SaintsField.Editor.Linq;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Playa;
 using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.Events;
@@ -62,6 +64,11 @@ namespace SaintsField.Editor.Utils
         public static int PositiveMod(int x, int m)
         {
             int r = x % m;
+            return r < 0 ? r + m : r;
+        }
+        public static long PositiveMod(long x, long m)
+        {
+            long r = x % m;
             return r < 0 ? r + m : r;
         }
 
@@ -162,6 +169,43 @@ namespace SaintsField.Editor.Utils
             return Mathf.Min(newValue, end);
         }
 
+        public static double BoundDoubleStep(double curValue, double start, double end, double step)
+        {
+            double distance = curValue - start;
+            float floatStep = (float)(distance / step);
+            int stepDown = Mathf.FloorToInt(floatStep);
+            int stepUp = Mathf.CeilToInt(floatStep);
+            int stepRound = Mathf.RoundToInt(floatStep);
+
+            double newValue = start + stepDown * step;
+            if (stepRound == stepUp && stepRound != stepDown)  // go up, but ensure it's not over end boundary
+            {
+                if (!(end - newValue < step)) // has space
+                {
+                    newValue = start + stepUp * step;
+                }
+            }
+
+            // var newValue = start + stepRound * step;
+            return newValue;
+        }
+
+        public static double DoubleClamp(double value, double min, double max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (value > max)
+            {
+                return max;
+            }
+
+            return value;
+        }
+
         public static int BoundIntStep(float curValue, float start, float end, int step)
         {
             int useStart = Mathf.CeilToInt(start);
@@ -171,6 +215,136 @@ namespace SaintsField.Editor.Utils
             int stepRound = Mathf.RoundToInt(distance / step);
             int newValue = useStart + stepRound * step;
             return Mathf.Clamp(newValue, useStart, useEnd);
+        }
+
+
+
+        public static int BoundIntStep(int curValue, int start, int end, int step)
+        {
+            int distance = curValue - start;
+            int fineStep = distance / step;
+
+            int left = PositiveMod(distance, step);
+            int halfStep = step / 2;
+
+            int newValue = start + fineStep * step;
+            // Debug.Log($"cur={curValue}, newValue={newValue}; step={step}");
+
+            if (left > halfStep && end - step >= newValue)
+            {
+                newValue += step;
+                // Debug.Log($"pump {step} newValue={newValue}");
+            }
+
+            return newValue;
+        }
+
+        public static long BoundLongStep(long curValue, long start, long end, long step)
+        {
+            long distance = curValue - start;
+            long fineStep = distance / step;
+
+            long left = PositiveMod(distance, step);
+            long halfStep = step / 2;
+
+            long newValue = start + fineStep * step;
+            // Debug.Log($"cur={curValue}, newValue={newValue}; step={step}");
+
+            if (left > halfStep && end - step >= newValue)
+            {
+                newValue += step;
+                // Debug.Log($"pump {step} newValue={newValue}");
+            }
+
+            return newValue;
+        }
+
+        public static long ClampLong(long value, long min, long max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (value > max)
+            {
+                return max;
+            }
+
+            return value;
+        }
+
+        public static ulong BoundULongStep(ulong curValue, ulong start, ulong end, ulong step)
+        {
+            ulong distance = curValue - start;
+            ulong fineStep = distance / step;
+
+            ulong left = distance % step;
+            ulong halfStep = step / 2;
+
+            ulong newValue = start + fineStep * step;
+            // Debug.Log($"cur={curValue}, newValue={newValue}; step={step}");
+
+            if (left > halfStep && end - step >= newValue)
+            {
+                newValue += step;
+                // Debug.Log($"pump {step} newValue={newValue}");
+            }
+
+            return newValue;
+        }
+
+        public static ulong ClampULong(ulong value, ulong min, ulong max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (value > max)
+            {
+                return max;
+            }
+
+            return value;
+        }
+
+        public static uint BoundUIntStep(uint curValue, uint start, uint end, uint step)
+        {
+            uint distance = curValue - start;
+            uint fineStep = distance / step;
+
+            uint left = distance % step;
+            uint halfStep = step / 2;
+
+            uint newValue = start + fineStep * step;
+            // Debug.Log($"cur={curValue}, newValue={newValue}; step={step}");
+
+            if (left > halfStep && end - step >= newValue)
+            {
+                newValue += step;
+                // Debug.Log($"pump {step} newValue={newValue}");
+            }
+
+            return ClampUInt(newValue, start, end);
+        }
+
+        public static uint ClampUInt(uint value, uint min, uint max)
+        {
+            if (value < min)
+            {
+                return min;
+            }
+
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (value > max)
+            {
+                return max;
+            }
+
+            return value;
         }
 
         public static SerializedUtils.FieldOrProp GetWrapProp(IWrapProp wrapProp)
@@ -598,7 +772,25 @@ namespace SaintsField.Editor.Utils
             if (by.StartsWith(":"))
             {
                 // ReSharper disable once ReplaceSubstringWithRangeIndexer
-                return GetOfStatic(by.Substring(1), defaultValue,property, memberInfo, target);
+                return GetOfStatic(by.Substring(1), defaultValue, property, memberInfo, target);
+            }
+
+            if (target == null)
+            {
+                return ("Target is null", defaultValue);
+            }
+
+            return by.Contains(".")
+                ? AccGetOf(by, defaultValue, property, target)
+                : FlatGetOf(by, defaultValue, property, memberInfo, target);
+        }
+
+        public static (string error, T result) FlatGetOf<T>(string by, T defaultValue, SerializedProperty property, MemberInfo memberInfo, object target)
+        {
+            if (by.StartsWith(":"))
+            {
+                // ReSharper disable once ReplaceSubstringWithRangeIndexer
+                return GetOfStatic(by.Substring(1), defaultValue, property, memberInfo, target);
             }
 
             if (target == null)
@@ -651,6 +843,102 @@ namespace SaintsField.Editor.Utils
             return ($"No field or method named `{by}` found on `{target}`", defaultValue);
         }
 
+        private static (string error, T result) AccGetOf<T>(string by, T defaultValue, SerializedProperty property,
+            object parent)
+        {
+            string accBy = by;
+            // SerializedProperty accProperty = property;
+            object accParent = parent;
+            if (by.StartsWith("../"))
+            {
+                string error;
+                (error, accBy, accParent) = UpwardWalk(by, property, parent);
+                if (error != "")
+                {
+                    return (error, defaultValue);
+                }
+            }
+
+            // Don't use this: the memberInfo need to change
+            // if (!accBy.Contains("."))
+            // {
+            //     return FlatGetOf(accBy, defaultValue, property, memberInfo, accParent);
+            // }
+
+            // Debug.Log($"looking for {accBy} in {accParent}");
+
+            // MemberInfo accMemberInfo = memberInfo;
+            (string error, T result) thisResult = ("No Attributes", defaultValue);
+
+            foreach (string attrName in accBy.Split(SerializedUtils.DotSplitSeparator))
+            {
+                MemberInfo accMemberInfo = null;
+                foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(accParent))
+                {
+                    MemberInfo[] members = type.GetMember(attrName,
+                        BindingFlags.Public | BindingFlags.NonPublic |
+                        BindingFlags.Instance | BindingFlags.Static |
+                        BindingFlags.FlattenHierarchy);
+                    if (members.Length <= 0)
+                    {
+                        continue;
+                    }
+                    accMemberInfo = members[0];
+                    break;
+                }
+
+                thisResult = FlatGetOf(attrName, defaultValue, property, accMemberInfo, accParent);
+                // Debug.Log($"{attrName} = {thisResult.result}({thisResult.error})");
+                if (thisResult.error != "")
+                {
+                    return thisResult;
+                }
+                accParent = thisResult.result;
+            }
+            return thisResult;
+
+        }
+
+        // this can not walk out of the
+        private static (string error, string by, object parent) UpwardWalk(string by, SerializedProperty property, object parent)
+        {
+            Debug.Assert(by.StartsWith("../"));
+            string[] split = by.Split("../");
+
+            int splitCount = split.Length;
+
+            int upWalkCount = splitCount - 1;
+            string leftBy = split[splitCount - 1];
+
+            string originPath = property.propertyPath;
+            string[] propPaths = originPath.Split(SerializedUtils.DotSplitSeparator);
+            (bool arrayTrim, string[] propPathSegments) = SerializedUtils.TrimEndArray(propPaths);
+            if (arrayTrim)
+            {
+                propPaths = propPathSegments;
+            }
+
+            IReadOnlyList<(SerializedUtils.FieldOrProp fieldOrProp, object parent)> walkable = SerializedUtils.GetFieldInfoAndParentListByPathSegments(property.serializedObject.targetObject, propPaths);
+            if (walkable.Count < upWalkCount - 1)  // skip self
+            {
+                return (
+                    $"Can not walk upward for {upWalkCount} steps when only {walkable.Count} parents found: {string.Join(", ", walkable.Select(each => each.parent))}",
+                    null, null);
+            }
+
+            (SerializedUtils.FieldOrProp _, object walkParent) = walkable[upWalkCount];
+
+            // Debug.Log($"upWalkCount-1={upWalkCount-1}");
+            // foreach ((SerializedUtils.FieldOrProp fieldOrProp, object fieldParent)  in walkable)
+            // {
+            //     Debug.Log($"{fieldOrProp}, {fieldParent}");
+            // }
+
+            // return (leftBy parent);
+
+            return ("", leftBy, walkParent);
+        }
+
         private static (string error, T result) ConvertTo<T>(object genResult, T defaultValue)
         {
             T finalResult;
@@ -677,6 +965,7 @@ namespace SaintsField.Editor.Utils
                     catch (InvalidCastException e)
                     {
                         Debug.LogException(e);
+                        Debug.LogError($"{genResult} -> {typeof(T)}");
                         return (e.Message, defaultValue);
                     }
                 }
@@ -689,6 +978,7 @@ namespace SaintsField.Editor.Utils
                 }
                 catch (InvalidCastException e)
                 {
+                    Debug.LogError($"Failed to convert {genResult} to type {typeof(T)}");
                     Debug.LogException(e);
                     return (e.Message, defaultValue);
                 }
@@ -851,13 +1141,22 @@ namespace SaintsField.Editor.Utils
             List<string> errors = new List<string>();
             foreach (MethodInfo methodInfo in methodInfos)
             {
-                (string error, object returnValue) = InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target);
-                if (error == "")
+                if(methodInfo.Name == fieldOrMethod)
                 {
-                    return ConvertTo(returnValue, defaultValue);
-                }
+                    (string error, object returnValue) =
+                        InvokeMethodInfo(methodInfo, defaultValue, property, memberInfo, target);
+                    if (error == "")
+                    {
+                        return ConvertTo(returnValue, defaultValue);
+                    }
 
-                errors.Add(error);
+                    errors.Add(error);
+                }
+            }
+
+            if (errors.Count == 0)
+            {
+                return ($"No method/field/property {fieldOrMethod} found", defaultValue);
             }
 
             string finalError = string.Join("\n", errors);
@@ -1435,7 +1734,7 @@ namespace SaintsField.Editor.Utils
                 {
                     (string error, object getResult) = conditionStringTarget.Contains(".")
                         ? AccGetOf<object>(conditionStringTarget, null, property, target)
-                        : GetOf<object>(conditionStringTarget, null, property, info, target);
+                        : FlatGetOf<object>(conditionStringTarget, null, property, info, target);
 
                     if (error != "")
                     {
@@ -1459,7 +1758,7 @@ namespace SaintsField.Editor.Utils
                     else
                     {
                         (string errorValue, object callbackResult) =
-                            GetOf<object>((string)value, null, property, info, target);
+                            FlatGetOf<object>((string)value, null, property, info, target);
                         if (errorValue != "")
                         {
                             errors.Add(errorValue);
@@ -1524,38 +1823,7 @@ namespace SaintsField.Editor.Utils
             return (Array.Empty<string>(), callbackBoolResults);
         }
 
-        private static (string error, T result) AccGetOf<T>(string by, T defaultValue, SerializedProperty property,
-            object parent)
-        {
-            object accParent = parent;
-            // MemberInfo accMemberInfo = memberInfo;
-            (string error, T result) thisResult = ("No Attributes", defaultValue);
 
-            foreach (string attrName in by.Split(SerializedUtils.PathSplitSeparator))
-            {
-                MemberInfo accMemberInfo = null;
-                foreach (Type type in ReflectUtils.GetSelfAndBaseTypesFromInstance(accParent))
-                {
-                    MemberInfo[] members = type.GetMember(attrName,
-                        BindingFlags.Public | BindingFlags.NonPublic |
-                        BindingFlags.Instance | BindingFlags.Static |
-                        BindingFlags.FlattenHierarchy);
-                    if (members.Length <= 0) continue;
-                    accMemberInfo = members[0];
-                    break;
-                }
-
-                thisResult = GetOf(attrName, defaultValue, property, accMemberInfo, accParent);
-                // Debug.Log($"{attrName} = {thisResult.result}");
-                if (thisResult.error != "")
-                {
-                    return thisResult;
-                }
-                accParent = thisResult.result;
-            }
-            return thisResult;
-
-        }
 
         public static void BindEventWithValue(UnityEventBase unityEventBase, MethodInfo methodInfo, Type[] invokeRequiredTypeArr, object target, object value)
         {
@@ -1796,6 +2064,7 @@ namespace SaintsField.Editor.Utils
                 return ("", -1, rawValue);
             }
 
+            // Debug.Log($"get value at {arrayIndex} from rawValue {((IEnumerable)rawValue).Cast<object>().Count()}");
             (string indexError, object indexResult) = GetValueAtIndex(rawValue, arrayIndex);
             if (indexError != "")
             {
@@ -1952,6 +2221,7 @@ namespace SaintsField.Editor.Utils
 
             public Transform Transform;
             public Vector3 WorldPos;
+            public Transform Space;
 
             public override string ToString()
             {
@@ -1967,32 +2237,13 @@ namespace SaintsField.Editor.Utils
 
         public static TargetWorldPosInfo GetPropertyTargetWorldPosInfoSpace(string space, SerializedProperty property, MemberInfo info, object parent)
         {
-            try
-            {
-                SerializedPropertyType _ = property.propertyType;
-            }
-            catch (InvalidCastException)
+            if (!SerializedUtils.IsOk(property))
             {
                 return new TargetWorldPosInfo
                 {
                     Error = $"Property disposed",
                 };
             }
-            catch (NullReferenceException)
-            {
-                return new TargetWorldPosInfo
-                {
-                    Error = $"Property disposed",
-                };
-            }
-            catch (ObjectDisposedException)
-            {
-                return new TargetWorldPosInfo
-                {
-                    Error = $"Property disposed",
-                };
-            }
-
 
             switch (property.propertyType)
             {
@@ -2073,6 +2324,7 @@ namespace SaintsField.Editor.Utils
                     Error = "",
                     IsTransform = false,
                     WorldPos = v3Value,
+                    // WorldRot = Quaternion.identity,
                 };
             }
 
@@ -2092,10 +2344,11 @@ namespace SaintsField.Editor.Utils
                     Error = "",
                     IsTransform = false,
                     WorldPos = container.TransformPoint(v3Value),
+                    // WorldRot = container.rotation,
                 };
             }
 
-            (string callbackError, int _, object value) = GetValue(property, info, parent);
+            (string callbackError, object value) = GetOf<object>(space, null, property, info, parent);
             if (callbackError != "")
             {
                 return new TargetWorldPosInfo
@@ -2112,6 +2365,8 @@ namespace SaintsField.Editor.Utils
                         Error = "",
                         IsTransform = false,
                         WorldPos = go.transform.TransformPoint(v3Value),
+                        Space = go.transform,
+                        // WorldRot = go.transform.rotation,
                     };
                 case Component comp:
                     return new TargetWorldPosInfo
@@ -2119,6 +2374,8 @@ namespace SaintsField.Editor.Utils
                         Error = "",
                         IsTransform = false,
                         WorldPos = comp.transform.TransformPoint(v3Value),
+                        Space = comp.transform,
+                        // WorldRot = comp.transform.rotation,
                     };
                 default:
                     return new TargetWorldPosInfo
@@ -2260,6 +2517,210 @@ namespace SaintsField.Editor.Utils
 
                 yield return (enumValue, value, useLabel);
             }
+        }
+
+        public static string GetStepFormatter(float step)
+        {
+            string valueStr = step.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            int decimalPointIndex = valueStr.IndexOf(System.Globalization.CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator, StringComparison.Ordinal);
+
+            int decimalPlaces = 0;
+
+            if (decimalPointIndex >= 0)
+            {
+                decimalPlaces = valueStr.Length - decimalPointIndex - 1;
+            }
+
+            // string formatValue = curValue.ToString("F" + decimalPlaces);
+            // return curValue.ToString($"0.{new string('#', decimalPlaces)}");
+            return $"0.{new string('#', decimalPlaces)}";
+        }
+
+        public static string GetStepFormatter(double step)
+        {
+            string valueStr = step.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            int decimalPointIndex = valueStr.IndexOf(System.Globalization.CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator, StringComparison.Ordinal);
+
+            int decimalPlaces = 0;
+
+            if (decimalPointIndex >= 0)
+            {
+                decimalPlaces = valueStr.Length - decimalPointIndex - 1;
+            }
+
+            // string formatValue = curValue.ToString("F" + decimalPlaces);
+            // return curValue.ToString($"0.{new string('#', decimalPlaces)}");
+            return $"0.{new string('#', decimalPlaces)}";
+        }
+
+        public static IReadOnlyList<T> ShrinkListTo<T>(IList<T> lis, int count)
+        {
+            List<T> removed = new List<T>();
+            if (count >= lis.Count)
+            {
+                // Debug.Log($"processedIndex skip {lis.Count} -> {count} ");
+                return removed;
+            }
+
+            // Debug.Log($"processedIndex try {lis.Count} -> {count} ");
+
+            for (int toRemoveIndex = lis.Count - 1; toRemoveIndex >= count; toRemoveIndex--)
+            {
+                // Debug.Log($"processedIndex remove index {toRemoveIndex}");
+                T ele = lis[toRemoveIndex];
+                // ele.RemoveFromHierarchy();
+                removed.Add(ele);
+                lis.RemoveAt(toRemoveIndex);
+            }
+            return removed;
+        }
+
+        public static bool SearchObject(object childObject, string rawToken, HashSet<object> searchedObjects)
+        {
+            if (RuntimeUtil.IsNull(childObject))
+            {
+                return false;
+            }
+
+            if(!searchedObjects.Add(childObject))
+            {
+                return false;
+            }
+
+            string token = rawToken.ToLower();
+
+            Type childType = childObject.GetType();
+            // treat primitive-like types as leaf nodes: match against their string representation
+            if (childType.IsPrimitive || childObject is string || childType.IsEnum || childType == typeof(decimal))
+            {
+                // Debug.Log($"Looking for string {childObject} with {token}");
+                return childObject.ToString().ToLower().Contains(token);
+            }
+
+            if (childObject is UnityEngine.Object uObject)
+            {
+                if (uObject is GameObject go)
+                {
+                    return go.name.ToLower().Contains(token);
+                }
+                return SerializedUtils.SearchUnityObjectProp(uObject, rawToken, searchedObjects);
+            }
+
+            if (childObject is IEnumerable ie)
+            {
+                return ie.Cast<object>().Any(each => SearchObject(each, rawToken, searchedObjects));
+            }
+
+            const BindingFlags bindAttrNormal = BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+            FieldInfo[] fieldTargets = childType.GetFields(bindAttrNormal);
+            foreach (FieldInfo fieldInfo in fieldTargets)
+            {
+                if (AbsRenderer.SkipTypeDrawing(fieldInfo.FieldType))
+                {
+                    continue;
+                }
+
+                object fieldValue;
+                try
+                {
+                    fieldValue = fieldInfo.GetValue(childObject);
+                }
+                catch (Exception e)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning(e);
+#endif
+                    continue;
+                }
+
+                if (SearchObject(fieldValue, rawToken, searchedObjects))
+                {
+                    return true;
+                }
+            }
+            PropertyInfo[] propertyTargets = childType.GetProperties(bindAttrNormal);
+            foreach (PropertyInfo propertyInfo in propertyTargets)
+            {
+                if (AbsRenderer.SkipTypeDrawing(propertyInfo.PropertyType))
+                {
+                    continue;
+                }
+
+                object propertyValue;
+                try
+                {
+                    propertyValue = propertyInfo.GetValue(childObject);
+                }
+                catch (Exception e)
+                {
+#if SAINTSFIELD_DEBUG
+                    Debug.LogWarning(e);
+#endif
+                    continue;
+                }
+
+                if (SearchObject(propertyValue, rawToken, searchedObjects))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Note: This WILL contain -1 for the sake of async searching...
+        public static IEnumerable<int> SearchArrayObjects(IReadOnlyList<object> payloadRawValues, string searchFull)
+        {
+            IReadOnlyList<ListSearchToken> searchTokens = SerializedUtils.ParseSearch(searchFull).ToArray();
+            for (int arrayElementIndex = 0; arrayElementIndex < payloadRawValues.Count; arrayElementIndex++)
+            {
+                object childObject = payloadRawValues[arrayElementIndex];
+                bool all = true;
+                HashSet<object>[] searchedObjectsArray = Enumerable.Range(0, searchTokens.Count)
+                    .Select(_ => new HashSet<object>())
+                    .ToArray();
+                for (int tokenIndex = 0; tokenIndex < searchTokens.Count; tokenIndex++)
+                {
+                    ListSearchToken search = searchTokens[tokenIndex];
+                    HashSet<object> searchedObjects = searchedObjectsArray[tokenIndex];
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_SEARCH
+                    Debug.Log($"#Search# searching token@{tokenIndex}={search.Token} of property={property.name}@{arrayElementIndex} with seachedObjects={string.Join(",", searchedObjects)}");
+#endif
+                    if (!Util.SearchObject(childObject, search.Token, searchedObjects))
+                    {
+                        all = false;
+                        break;
+                    }
+                }
+
+                if (all)
+                {
+#if SAINTSFIELD_DEBUG && SAINTSFIELD_DEBUG_LIST_DRAWER_SETTINGS
+                    Debug.Log($"found: {childProperty.propertyPath}");
+#endif
+                    yield return arrayElementIndex;
+                }
+                else
+                {
+                    yield return -1;
+                }
+            }
+        }
+
+        public static bool SearchObjectWithTokens(object value, IReadOnlyList<ListSearchToken> searchTokens)
+        {
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (ListSearchToken search in searchTokens)
+            {
+                // ReSharper disable once InvertIf
+                if (!SearchObject(value, search.Token, new HashSet<object>()))
+                {
+                    // Debug.Log($"search failed {value} for {search.Token}");
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

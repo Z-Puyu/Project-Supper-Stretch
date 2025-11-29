@@ -1,30 +1,29 @@
 #if UNITY_2021_3_OR_NEWER
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
-using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
-using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
-namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
+namespace SaintsField.Editor.Drawers.AnimatorParamDrawer
 {
     public partial class AnimatorParamAttributeDrawer
     {
-        private static string NameDropdownField(SerializedProperty property) =>
-            $"{property.propertyPath}__AnimatorParam_DropdownField";
+        // private static string NameDropdownField(SerializedProperty property) =>
+        //     $"{property.propertyPath}__AnimatorParam_DropdownField";
 
         private static string NameHelpBox(SerializedProperty property) =>
             $"{property.propertyPath}__AnimatorParam_HelpBox";
 
-        private IReadOnlyList<AnimatorControllerParameter> _cachedAnimatorControllerParams = Array.Empty<AnimatorControllerParameter>();
-        private Animator _cachedAnimator = null;
+        // private IReadOnlyList<AnimatorControllerParameter> _cachedAnimatorControllerParams = Array.Empty<AnimatorControllerParameter>();
+        // private Animator _cachedAnimator = null;
 
         protected override VisualElement CreateFieldUIToolKit(SerializedProperty property,
             ISaintsAttribute saintsAttribute, IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container,
@@ -35,26 +34,33 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
             {
                 case SerializedPropertyType.String:
                 {
-                    AnimatorParamStringElement bindableElement = new AnimatorParamStringElement();
-                    // bindableElement.BindAnimatorParameters(metaInfo.AnimatorParameters);
-                    bindableElement.BindProperty(property);
-                    return new StringDropdownField(GetPreferredLabel(property), bindableElement)
+                    AnimatorParamStringElement bindableElement = new AnimatorParamStringElement
                     {
-                        name = NameDropdownField(property),
+                        bindingPath = property.propertyPath,
                     };
+                    AnimatorParamStringField field = new AnimatorParamStringField(GetPreferredLabel(property), bindableElement);
+                    field.AddToClassList(ClassAllowDisable);
+                    field.AddToClassList(AnimatorParamStringField.alignedFieldUssClassName);
+                    return field;
                 }
                 case SerializedPropertyType.Integer:
                 {
-                    AnimatorParamIntElement bindableElement = new AnimatorParamIntElement();
-                    // bindableElement.BindAnimatorParameters(metaInfo.AnimatorParameters);
-                    bindableElement.BindProperty(property);
-                    return new IntDropdownField(GetPreferredLabel(property), bindableElement)
+                    AnimatorParamIntElement bindableElement = new AnimatorParamIntElement
                     {
-                        name = NameDropdownField(property),
+                        bindingPath = property.propertyPath,
                     };
+                    AnimatorParamIntField field = new AnimatorParamIntField(GetPreferredLabel(property), bindableElement);
+                    field.AddToClassList(ClassAllowDisable);
+                    field.AddToClassList(AnimatorParamIntField.alignedFieldUssClassName);
+                    return field;
                 }
                 default:
-                    return new VisualElement();
+                {
+                    PropertyField fallback = PropertyFieldFallbackUIToolkit(property, GetPreferredLabel(property));
+                    fallback.AddToClassList(ClassFieldUIToolkit(property));
+                    fallback.AddToClassList(ClassAllowDisable);
+                    return fallback;
+                }
             }
         }
 
@@ -99,45 +105,64 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
             IReadOnlyList<PropertyAttribute> allAttributes,
             VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
-            VisualElement fieldElement;
-            Button dropdownButton;
+            HelpBox helpBox = container.Q<HelpBox>(NameHelpBox(property));
+            AnimatorParamAttribute animatorParamAttribute = (AnimatorParamAttribute)saintsAttribute;
+
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (property.propertyType)
             {
                 case SerializedPropertyType.String:
                 {
-                    fieldElement = container.Q<VisualElement>(NameDropdownField(property));
-                    dropdownButton = fieldElement.Q<AnimatorParamStringElement>().Button;
+                    AnimatorParamStringField field = container.Q<AnimatorParamStringField>();
+
+                    void Check()
+                    {
+                        MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
+                        UIToolkitUtils.SetHelpBox(helpBox, metaInfo.Error);
+                        if (metaInfo.Error == "")
+                        {
+                            field.AnimatorParamStringElement.BindAnimatorParameters(metaInfo.Animator, metaInfo.AnimatorParameters);
+                        }
+                    }
+
+                    Check();
+                    SaintsEditorApplicationChanged.OnAnyEvent.AddListener(Check);
+                    field.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(Check));
+                    field.TrackSerializedObjectValue(property.serializedObject, _ => Check());
+                    field.TrackPropertyValue(property, p => onValueChangedCallback(p.stringValue));
+
+                    AddContextualMenuManipulator(field, animatorParamAttribute, property, onValueChangedCallback, info, parent);
                 }
                     break;
                 case SerializedPropertyType.Integer:
                 {
-                    fieldElement = container.Q<VisualElement>(NameDropdownField(property));
-                    dropdownButton = fieldElement.Q<AnimatorParamIntElement>().Button;
+                    AnimatorParamIntField field = container.Q<AnimatorParamIntField>();
+
+                    void Check()
+                    {
+                        MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
+                        UIToolkitUtils.SetHelpBox(helpBox, metaInfo.Error);
+                        if (metaInfo.Error == "")
+                        {
+                            field.AnimatorParamIntElement.BindAnimatorParameters(metaInfo.Animator, metaInfo.AnimatorParameters);
+                        }
+                    }
+
+                    Check();
+                    SaintsEditorApplicationChanged.OnAnyEvent.AddListener(Check);
+                    field.RegisterCallback<DetachFromPanelEvent>(_ => SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(Check));
+                    field.TrackSerializedObjectValue(property.serializedObject, _ => Check());
+                    field.TrackPropertyValue(property, p => onValueChangedCallback(p.intValue));
+
+                    AddContextualMenuManipulator(field, animatorParamAttribute, property, onValueChangedCallback, info, parent);
                 }
                     break;
                 default:
                     return;
             }
-
-
-            // UIToolkitUtils.AddContextualMenuManipulator(bindableElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
-
-            RefreshDisplay();
-
-            AddContextualMenuManipulator(fieldElement, property, onValueChangedCallback, info, parent);
-            dropdownButton.clicked += () => ShowDropdown(fieldElement, property, info, parent, onValueChangedCallback);
-
-            SaintsEditorApplicationChanged.OnAnyEvent.AddListener(RefreshDisplay);
-            fieldElement.RegisterCallback<DetachFromPanelEvent>(_ =>
-                SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(RefreshDisplay));
-
-            return;
-
-            void RefreshDisplay() => CheckAnimatorChanges(container, property, saintsAttribute, info, parent);
         }
 
-        private void AddContextualMenuManipulator(VisualElement bindableElement, SerializedProperty property, Action<object> onValueChangedCallback, FieldInfo info, object parent)
+        private static void AddContextualMenuManipulator(VisualElement bindableElement, AnimatorParamAttribute animatorParamAttribute, SerializedProperty property, Action<object> onValueChangedCallback, FieldInfo info, object parent)
         {
             UIToolkitUtils.AddContextualMenuManipulator(bindableElement, property, () => Util.PropertyChangedCallback(property, info, onValueChangedCallback));
             bool isString = property.propertyType == SerializedPropertyType.String;
@@ -150,14 +175,15 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
                     return;
                 }
 
-                if (_cachedAnimatorControllerParams.Count == 0)
+                bool canBeInt = int.TryParse(clipboardText, out int clipboardInt);
+
+                MetaInfo metaInfo = GetMetaInfo(property, animatorParamAttribute, info, parent);
+                if (metaInfo.Error != "")
                 {
                     return;
                 }
 
-                bool canBeInt = int.TryParse(clipboardText, out int clipboardInt);
-
-                foreach (AnimatorControllerParameter animParam in _cachedAnimatorControllerParams)
+                foreach (AnimatorControllerParameter animParam in metaInfo.AnimatorParameters)
                 {
                     if (animParam.name == clipboardText
                         || (canBeInt && animParam.nameHash == clipboardInt))
@@ -184,139 +210,249 @@ namespace SaintsField.Editor.Drawers.AnimatorDrawers.AnimatorParamDrawer
                 }
             }));
         }
-
-        private void CheckAnimatorChanges(VisualElement container, SerializedProperty property,
-            ISaintsAttribute saintsAttribute, FieldInfo info, object parent)
+        
+        private static MetaInfo GetMetaInfoShowInInspector(AnimatorParamAttribute animatorParamAttribute, object parent)
         {
-            MetaInfo metaInfo = GetMetaInfo(property, saintsAttribute, info, parent);
-            UpdateHelpBox(container.Q<HelpBox>(NameHelpBox(property)), metaInfo.Error);
-
-            if (metaInfo.AnimatorParameters.SequenceEqual(_cachedAnimatorControllerParams))
+            Animator animator;
+            if (string.IsNullOrEmpty(animatorParamAttribute.AnimatorName))
             {
-                return;
+                if(parent is Object uObj)
+                {
+                    IReadOnlyList<Object> r = Util.GetTargetsTypeFromObj(uObj, typeof(Animator));
+                    if (r.Count == 0)
+                    {
+                        return new MetaInfo
+                        {
+                            Error = $"No animator found on {uObj}",
+                        };
+                    }
+
+                    animator = r[0] as Animator;
+                }
+                else
+                {
+                    return new MetaInfo
+                    {
+                        Error = $"{parent} is not a unity object",
+                    };
+                }
+            }
+            else
+            {
+                (string error, Animator value) = Util.GetOfNoParams<Animator>(parent, animatorParamAttribute.AnimatorName, null);
+                if (error != "")
+                {
+                    return new MetaInfo
+                    {
+                        Error = error,
+                    };
+                }
+
+                animator = value;
             }
 
-            _cachedAnimatorControllerParams = metaInfo.AnimatorParameters;
-            _cachedAnimator = metaInfo.Animator;
-
-            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-            switch (property.propertyType)
+            if (animator == null)
             {
-                case SerializedPropertyType.String:
+                return new MetaInfo
                 {
-                    AnimatorParamStringElement bindableElement = container.Q<AnimatorParamStringElement>();
-                    bindableElement.BindAnimatorParameters(metaInfo.AnimatorParameters);
-                }
-                    return;
-                case SerializedPropertyType.Integer:
+                    Error = $"No animator found in {parent}",
+                };
+            }
+
+            RuntimeAnimatorController runtimeController = animator.runtimeAnimatorController;
+
+            if (runtimeController == null)
+            {
+                return new MetaInfo
                 {
-                    AnimatorParamIntElement bindableElement = container.Q<AnimatorParamIntElement>();
-                    bindableElement.BindAnimatorParameters(metaInfo.AnimatorParameters);
+                    Error = $"RuntimeAnimatorController must not be null in {animator.name}",
+                    AnimatorParameters = Array.Empty<AnimatorControllerParameter>(),
+                };
+            }
+
+            string loadPath;
+            if(runtimeController is AnimatorOverrideController aoc)
+            {
+                loadPath = AssetDatabase.GetAssetPath(aoc.runtimeAnimatorController);
+            }
+            else
+            {
+                loadPath = AssetDatabase.GetAssetPath(runtimeController);
+            }
+
+            AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(loadPath);
+            // AnimatorOverrideController oc = (AnimatorOverrideController);
+            // if (runtimeController is AnimatorOverrideController aoc)
+            // {
+            //     Debug.Log(aoc.runtimeAnimatorController);
+            //     Debug.Log(AssetDatabase.GetAssetPath(aoc.runtimeAnimatorController));
+            // }
+            // AnimatorController controller = (AnimatorController)runtimeController;
+            // Debug.Log($"runtimeController={runtimeController}/controller={controller}/{AssetDatabase.GetAssetPath(runtimeController)}");
+            // for override controller, this hack won't work.
+            // TODO: if the target is inside a prefab which is not loaded yet, does it works?
+            if (controller == null)
+            {
+                // Debug.Log(runtimeController.GetType());
+                // controller = (AnimatorController)runtimeController;
+                return new MetaInfo
+                {
+                    Error = $"Can not obtain AnimatorController from {animator.name}: {runtimeController.GetType()}",
+                    AnimatorParameters = Array.Empty<AnimatorControllerParameter>(),
+                };
+            }
+
+            List<AnimatorControllerParameter> animatorParameters = new List<AnimatorControllerParameter>();
+
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (AnimatorControllerParameter parameter in controller.parameters)
+            {
+                if (animatorParamAttribute.AnimatorParamType == null ||
+                    parameter.type == animatorParamAttribute.AnimatorParamType)
+                {
+                    animatorParameters.Add(parameter);
                 }
-                    return;
-                default:
-                    return;
+            }
+
+            return new MetaInfo
+            {
+                Error = "",
+                Animator = animator,
+                AnimatorParameters = animatorParameters,
+            };
+        }
+
+
+        private class AnimatorParamStringHelpBox : VisualElement
+        {
+            public readonly AnimatorParamStringField Field;
+            public readonly HelpBox HelpBox;
+
+            public AnimatorParamStringHelpBox(AnimatorParamStringField field)
+            {
+                Add(Field = field);
+                Add(HelpBox = new HelpBox
+                {
+                    style =
+                    {
+                        flexGrow = 1,
+                        flexShrink = 1,
+                        display = DisplayStyle.None,
+                    },
+                });
             }
         }
 
-        private static void UpdateHelpBox(HelpBox helpBox, string error)
+        public static VisualElement UIToolkitValueEditString(VisualElement oldElement, AnimatorParamAttribute animatorParamAttribute, string label, string value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
         {
-            if (helpBox.text == error)
+            MetaInfo metaInfo = GetMetaInfoShowInInspector(
+                animatorParamAttribute,
+                targets[0]);
+
+            if (oldElement is AnimatorParamStringHelpBox oldContainer)
             {
-                return;
+                oldContainer.Field.SetValueWithoutNotify(value);
+                if (metaInfo.Error == "")
+                {
+                    oldContainer.Field.AnimatorParamStringElement.BindAnimatorParameters(metaInfo.Animator, metaInfo.AnimatorParameters);
+                }
+                UIToolkitUtils.SetHelpBox(oldContainer.HelpBox, metaInfo.Error);
+                return null;
             }
 
-            helpBox.style.display = string.IsNullOrEmpty(error) ? DisplayStyle.None : DisplayStyle.Flex;
-            helpBox.text = error;
+            AnimatorParamStringElement visualInput = new AnimatorParamStringElement()
+            {
+                value = value,
+            };
+            if (metaInfo.Error == "")
+            {
+                visualInput.BindAnimatorParameters(metaInfo.Animator, metaInfo.AnimatorParameters);
+            }
+            AnimatorParamStringField field =
+                new AnimatorParamStringField(label, visualInput)
+                {
+                    value = value,
+                };
+
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
+
+            if (setterOrNull != null)
+            {
+                visualInput.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return new AnimatorParamStringHelpBox(field);
         }
 
-        private string _brownColor;
-
-        private void ShowDropdown(VisualElement root, SerializedProperty property, FieldInfo info, object parent, Action<object> onValueChangedCallback)
+        private class AnimatorParamIntHelpBox : VisualElement
         {
-            if(_cachedAnimatorControllerParams.Count == 0 && _cachedAnimator == null)
+            public readonly AnimatorParamIntField Field;
+            public readonly HelpBox HelpBox;
+
+            public AnimatorParamIntHelpBox(AnimatorParamIntField field)
             {
-                return;
-            }
-
-            bool isString = property.propertyType == SerializedPropertyType.String;
-
-            _brownColor ??= $"#{ColorUtility.ToHtmlStringRGB(EColor.Brown.GetColor())}";
-
-            AnimatorControllerParameter selectedParam = null;
-
-            AdvancedDropdownList<AnimatorControllerParameter> lis =
-                new AdvancedDropdownList<AnimatorControllerParameter>();
-            foreach (AnimatorControllerParameter cachedAnimatorControllerParam in _cachedAnimatorControllerParams)
-            {
-                lis.Add(
-                    $"{cachedAnimatorControllerParam.name} <color={_brownColor}>{cachedAnimatorControllerParam.type}</color> <color=#808080>({cachedAnimatorControllerParam.nameHash})</color>",
-                    cachedAnimatorControllerParam);
-
-                if (isString && cachedAnimatorControllerParam.name == property.stringValue
-                    || !isString && cachedAnimatorControllerParam.nameHash == property.intValue)
+                Add(Field = field);
+                Add(HelpBox = new HelpBox
                 {
-                    selectedParam = cachedAnimatorControllerParam;
-                }
+                    style =
+                    {
+                        flexGrow = 1,
+                        flexShrink = 1,
+                        display = DisplayStyle.None,
+                    },
+                });
             }
+        }
+        
+        public static VisualElement UIToolkitValueEditInt(VisualElement oldElement, AnimatorParamAttribute animatorParamAttribute, string label, int value, Action<object> beforeSet, Action<object> setterOrNull, bool labelGrayColor, bool inHorizontalLayout, IReadOnlyList<Attribute> allAttributes, IReadOnlyList<object> targets)
+        {
+            MetaInfo metaInfo = GetMetaInfoShowInInspector(
+                animatorParamAttribute,
+                targets[0]);
 
-            if(_cachedAnimator != null)
+            if (oldElement is AnimatorParamIntHelpBox oldContainer)
             {
-                if (_cachedAnimatorControllerParams.Count > 0)
+                oldContainer.Field.SetValueWithoutNotify(value);
+                if (metaInfo.Error == "")
                 {
-                    lis.AddSeparator();
+                    oldContainer.Field.AnimatorParamIntElement.BindAnimatorParameters(metaInfo.Animator, metaInfo.AnimatorParameters);
                 }
-
-                lis.Add("Edit Animator...", null);
+                UIToolkitUtils.SetHelpBox(oldContainer.HelpBox, metaInfo.Error);
+                return null;
             }
 
-            AdvancedDropdownMetaInfo metaInfo = new AdvancedDropdownMetaInfo
+            AnimatorParamIntElement visualInput = new AnimatorParamIntElement
             {
-                CurValues = selectedParam is null ? Array.Empty<object>(): new object[] { selectedParam },
-                DropdownListValue = lis,
-                SelectStacks = Array.Empty<AdvancedDropdownAttributeDrawer.SelectStack>(),
+                value = value,
             };
 
-            (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(root.worldBound);
-
-            SaintsAdvancedDropdownUIToolkit sa = new SaintsAdvancedDropdownUIToolkit(
-                metaInfo,
-                root.worldBound.width,
-                maxHeight,
-                false,
-                (_, curItem) =>
+            if (metaInfo.Error == "")
+            {
+                visualInput.BindAnimatorParameters(metaInfo.Animator, metaInfo.AnimatorParameters);
+            }
+            AnimatorParamIntField field =
+                new AnimatorParamIntField(label, visualInput)
                 {
-                    AnimatorControllerParameter newV = (AnimatorControllerParameter)curItem;
-                    if (newV is null)
-                    {
-                        if(_cachedAnimator != null)
-                        {
-                            OpenAnimator(_cachedAnimator);
-                        }
+                    value = value,
+                };
 
-                        return;
-                    }
+            UIToolkitUtils.UIToolkitValueEditAfterProcess(field, setterOrNull,
+                labelGrayColor, inHorizontalLayout);
 
-                    object newValue;
-                    if (isString)
-                    {
-                        newValue = property.stringValue = newV.name;
-                    }
-                    else
-                    {
-                        newValue = property.intValue = newV.nameHash;
-                    }
-
-                    ReflectUtils.SetValue(property.propertyPath, property.serializedObject.targetObject, info, parent, newValue);
-                    property.serializedObject.ApplyModifiedProperties();
-                    onValueChangedCallback.Invoke(newValue);
-                }
-            );
-
-            UnityEditor.PopupWindow.Show(worldBound, sa);
+            if (setterOrNull != null)
+            {
+                visualInput.RegisterValueChangedCallback(evt =>
+                {
+                    beforeSet?.Invoke(value);
+                    setterOrNull(evt.newValue);
+                });
+            }
+            return new AnimatorParamIntHelpBox(field);
         }
-
-        private static string GetParameterLabel(AnimatorControllerParameter each) => $"{each.name} [{each.type}]";
     }
 }
 #endif

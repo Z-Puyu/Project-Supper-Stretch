@@ -14,9 +14,10 @@ namespace SaintsField
         [SerializeField, Obsolete]
         public List<T> value = new List<T>();
 
-        [SerializeField]
-        private List<SaintsWrap<T>> _saintsList = new List<SaintsWrap<T>>();
+        [SerializeField] private List<SaintsWrap<T>> _saintsList = new List<SaintsWrap<T>>();
         [SerializeField] private int _saintsSerializedVersion;
+        private const int SaintsSerializedVersionRuntime = 2;
+        [SerializeField] private WrapType _wrapType;
 
         private List<T> _list = new List<T>();
 
@@ -24,6 +25,13 @@ namespace SaintsField
 
         public void OnBeforeSerialize()
         {
+#if UNITY_EDITOR
+            if (_saintsSerializedVersion < 2)
+            {
+                _wrapType = RuntimeUtil.EditorWrapMigrateFrom1(_saintsList);
+            }
+#endif
+
 #if UNITY_EDITOR
             // ReSharper disable once InvertIf
             if (_saintsSerializedVersion == 0)
@@ -34,24 +42,25 @@ namespace SaintsField
                 foreach (T oldValue in value)
 #pragma warning restore CS0612 // Type or member is obsolete
                 {
-                    _saintsList.Add(new SaintsWrap<T>(oldValue));
+                    _saintsList.Add(new SaintsWrap<T>(_wrapType, oldValue));
                 }
 
+                _saintsSerializedVersion = SaintsSerializedVersionRuntime;
                 // ReSharper disable once RedundantJumpStatement
                 return;
             }
 #endif
 
-#if UNITY_EDITOR
-            // do nothing
-#else
-            _saintsList.Clear();
-            foreach (T v in _list)
-            {
-                _saintsList.Add(new SaintsWrap<T>(v));
-            }
-
-#endif
+// #if UNITY_EDITOR
+//             // do nothing
+// #else
+//             _saintsList.Clear();
+//             foreach (T v in _list)
+//             {
+//                 _saintsList.Add(new SaintsWrap<T>(_wrapType, v));
+//             }
+// #endif
+            _saintsSerializedVersion = SaintsSerializedVersionRuntime;
         }
 
 #if UNITY_EDITOR
@@ -62,7 +71,6 @@ namespace SaintsField
 #if UNITY_EDITOR
             if (_saintsSerializedVersion == 0)
             {
-                _saintsSerializedVersion = 1;
 #pragma warning disable CS0612 // Type or member is obsolete
                 _list = value;
 #pragma warning restore CS0612 // Type or member is obsolete
@@ -114,18 +122,20 @@ namespace SaintsField
 
         public SaintsList()
         {
+            _saintsSerializedVersion = SaintsSerializedVersionRuntime;
+            _wrapType = SaintsWrap<T>.GuessWrapType();
         }
-        public SaintsList(IEnumerable<T> ie)
+        public SaintsList(IEnumerable<T> ie): this()
         {
             _list = new List<T>(ie);
 #if UNITY_EDITOR
             foreach (T element in _list)
             {
-                _saintsList.Add(new SaintsWrap<T>(element));
+                _saintsList.Add(new SaintsWrap<T>(_wrapType, element));
             }
 #endif
         }
-        public SaintsList(int capacity)
+        public SaintsList(int capacity): this()
         {
             _list = new List<T>(capacity);
         }
@@ -137,7 +147,7 @@ namespace SaintsField
         }
 
         // Explicit conversion operator: Converts T[] to SaintsArray<T>
-        public static explicit operator SaintsList<T>(List<T> lis)
+        public static implicit operator SaintsList<T>(List<T> lis)
         {
             return new SaintsList<T>(lis);
         }
@@ -151,7 +161,7 @@ namespace SaintsField
         public void Add(T item)
         {
 #if UNITY_EDITOR
-            _saintsList.Add(new SaintsWrap<T>(item));
+            _saintsList.Add(new SaintsWrap<T>(_wrapType, item));
 #endif
             _list.Add(item);
         }
@@ -209,7 +219,7 @@ namespace SaintsField
         {
             _list.Insert(index, item);
 #if UNITY_EDITOR
-            _saintsList.Insert(index, new SaintsWrap<T>(item));
+            _saintsList.Insert(index, new SaintsWrap<T>(_wrapType, item));
 #endif
         }
 
@@ -228,7 +238,7 @@ namespace SaintsField
             {
                 _list[index] = value;
 #if UNITY_EDITOR
-                _saintsList[index] = new SaintsWrap<T>(value);
+                _saintsList[index] = new SaintsWrap<T>(_wrapType, value);
 #endif
             }
         }
@@ -241,7 +251,7 @@ namespace SaintsField
             foreach (T v in collection)
             {
                 _list.Add(v);
-                _saintsList.Add(new SaintsWrap<T>(v));
+                _saintsList.Add(new SaintsWrap<T>(_wrapType, v));
             }
 #else
             _list.AddRange(collection);
