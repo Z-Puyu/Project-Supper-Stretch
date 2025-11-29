@@ -1,0 +1,35 @@
+:root {
+}
+
+.title {
+    -unity-font-definition: url("project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=2230732570650464555&guid=4b7eafeb2fdeaf94c8ca39390ccee55c&type=3#NotInter-Regular");
+    -unity-font-style: bold;
+    font-size: 40px;
+    color: rgb(255, 255, 255);
+    -unity-text-align: middle-center;
+    align-self: center;
+    align-content: auto;
+}
+
+.button {
+    width: 300px;
+    align-items: stretch;
+    align-self: center;
+    background-color: rgba(0, 0, 0, 0);
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    font-size: 24px;
+    color: rgb(255, 255, 255);
+    -unity-text-align: middle-center;
+    transition-property: all;
+    transition-duration: 0s;
+    transition-timing-function: ease;
+    transition-delay: 0s;
+}
+
+.button:hover {
+    background-color: rgba(142, 50, 50, 0.5);
+    transition-duration: 0.2s;
+}
