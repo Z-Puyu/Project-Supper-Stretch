@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using CommonFrameworks.CommonUtilities;
 
 namespace CommonFrameworks.Iterators {
     public abstract class Iterator<T> : IIterator<T> {

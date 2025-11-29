@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using CommonFrameworks.CommonUtilities;
+using CommonFrameworks.Utilities;
 using GameplayAbilitiesSystem.Runtime.Attributes;
 using GameplayAbilitiesSystem.Runtime.Attributes.Evaluation;
 using GameplayAbilitiesSystem.Runtime.Modifiers;

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CommonFrameworks.CommonUtilities {
+namespace CommonFrameworks.Utilities {
     public struct Bitmask {
         public static Bitmask AllSet { get; } = new Bitmask(~0L);
         public static Bitmask NoneSet { get; } = new Bitmask(0L);

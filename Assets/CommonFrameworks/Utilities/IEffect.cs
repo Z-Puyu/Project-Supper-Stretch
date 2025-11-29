@@ -1,4 +1,4 @@
-namespace CommonFrameworks.CommonUtilities {
+namespace CommonFrameworks.Utilities {
     public interface IEffect<in T> {
         public void Apply(T target);
         public void Stop();

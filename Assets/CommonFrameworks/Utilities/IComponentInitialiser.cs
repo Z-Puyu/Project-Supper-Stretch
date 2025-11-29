@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CommonFrameworks.CommonUtilities {
+namespace CommonFrameworks.Utilities {
     public interface IComponentInitialiser<in T> where T : Component {
         public void Initialise(T component);
     }

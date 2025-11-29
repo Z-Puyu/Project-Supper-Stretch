@@ -1,5 +1,5 @@
 using System;
-using CommonFrameworks.CommonUtilities;
+using CommonFrameworks.Utilities;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
     internal abstract class Effect : IEffect<EffectTarget> {

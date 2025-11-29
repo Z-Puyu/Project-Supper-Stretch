@@ -1,4 +1,4 @@
-namespace CommonFrameworks.CommonUtilities {
+namespace CommonFrameworks.Utilities {
     public interface IPredicate {
         public bool Holds();
     }
