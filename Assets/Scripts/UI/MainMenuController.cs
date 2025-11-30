@@ -1,4 +1,6 @@
 ﻿using System;
+using CommonFrameworks.Utilities;
+using GameManagement;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -21,10 +23,12 @@ namespace UI {
 
         private void OnEnable() {
             this.QuitGameButton.clicked += Application.Quit;
+            this.NewGameButton.clicked += Singleton<GameInstance>.Instance.StartNewGame;
         }
 
         private void OnDisable() {
             this.QuitGameButton.clicked -= Application.Quit;
+            this.NewGameButton.clicked -= Singleton<GameInstance>.Instance.StartNewGame;
         }
 
         private void Update() {

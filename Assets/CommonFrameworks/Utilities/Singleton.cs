@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace CommonFrameworks.Utilities {
     [DisallowMultipleComponent]
@@ -9,11 +11,16 @@ namespace CommonFrameworks.Utilities {
         
         public static T Instance {
             get {
-                if (!Singleton<T>.instance) {
-                    Singleton<T>.instance = new GameObject($"{typeof(T).Name} (auto-generated)").AddComponent<T>();
-                }   
+                if (Singleton<T>.instance) {
+                    return Singleton<T>.instance;
+                }
+
+                Singleton<T>.instance = Object.FindAnyObjectByType<T>();
+                if (Singleton<T>.instance) {
+                    return Singleton<T>.instance;
+                }
                 
-                return Singleton<T>.instance;
+                return Singleton<T>.instance = new GameObject($"{typeof(T).Name} (auto-generated)").AddComponent<T>();
             }
 
             private set => Singleton<T>.instance = value;
@@ -22,13 +29,21 @@ namespace CommonFrameworks.Utilities {
         [field: SerializeField] private PersistenceLevel LevelOfPersistence { get; set; } = PersistenceLevel.Scene;
         
         protected virtual void Awake() {
-            if (Singleton<T>.Instance) {
+            if (!Application.isPlaying) {
+                return;
+            }
+            
+            if (Singleton<T>.instance) {
                 Object.Destroy(this.gameObject);
             } else {
                 Singleton<T>.Instance = this as T;
-                if (this.LevelOfPersistence == PersistenceLevel.Game) {
-                    Object.DontDestroyOnLoad(this.gameObject);
-                }
+            }
+        }
+
+        protected virtual void Start() {
+            if (this.LevelOfPersistence == PersistenceLevel.Game) {
+                this.transform.SetParent(null);
+                Object.DontDestroyOnLoad(this.gameObject);
             }
         }
     }
