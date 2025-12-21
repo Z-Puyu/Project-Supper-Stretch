@@ -20,17 +20,14 @@ namespace CommonFrameworks.ObjectCreation {
         }
 
         private static void Activate(Flyweight flyweight) {
-            flyweight.Activate();
             flyweight.gameObject.SetActive(true);
         }
         
         private static void Deactivate(Flyweight flyweight) {
-            flyweight.Deactivate();
             flyweight.gameObject.SetActive(false);
         }
         
         private static void Destroy(Flyweight flyweight) {
-            flyweight.Destroy();
             Object.Destroy(flyweight.gameObject);
         }
 
