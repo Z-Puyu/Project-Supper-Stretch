@@ -1,65 +1,71 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CommonFrameworks.Extensions;
+using SaintsField;
 using UnityEngine;
-using UnityEngine.Events;
+using UnityEngine.Pool;
 using Object = UnityEngine.Object;
 
 namespace CommonFrameworks.ObjectCreation {
-    [DisallowMultipleComponent]
-    public sealed class PoolableObject : MonoBehaviour {
-        private PoolableObject SourcePrefab { get; set; }
-        private Dictionary<Type, Component> Components { get; } = new Dictionary<Type, Component>();
-        private UnityEvent OnSpawned { get; } = new UnityEvent();
-        private UnityEvent OnDespawned { get; } = new UnityEvent();
-        private UnityEvent OnDestroyed { get; } = new UnityEvent();
-        internal event Action<PoolableObject> OnReturn = delegate { };
-        internal Guid Id { get; private set; } = Guid.NewGuid();
+    [CreateAssetMenu(fileName = "New Poolable Object", menuName = "Object Pooling/Poolable Object")]
+    public sealed class PoolableObject : ScriptableObject {
+        [field: SerializeField] private GameObject Prefab { get; set; }
+        [field: SerializeField, MinValue(10)] private int PoolSize { get; set; } = 10;
 
-        internal static PoolableObject CreateFrom(PoolableObject prefab) {
-            PoolableObject clone = Object.Instantiate(prefab);
-            clone.SourcePrefab = prefab;
-            clone.Id = prefab.Id;
-            foreach (Component component in clone.GetComponents<Component>()) {
-                if (component == clone || component == clone.transform) {
-                    continue;
-                }
-                
-                clone.Components.TryAdd(component.GetType(), component);
+        private Flyweight Create() {
+            GameObject obj = Object.Instantiate(this.Prefab);
+            obj.gameObject.SetActive(false);
+            obj.name = $"{this.Prefab.name}";
+            Flyweight flyweight = obj.GetOrAddComponent<Flyweight>();
+            flyweight.SourceObject = this;
+            return flyweight;
+        }
+
+        private static void Activate(Flyweight flyweight) {
+            flyweight.Activate();
+            flyweight.gameObject.SetActive(true);
+        }
+        
+        private static void Deactivate(Flyweight flyweight) {
+            flyweight.Deactivate();
+            flyweight.gameObject.SetActive(false);
+        }
+        
+        private static void Destroy(Flyweight flyweight) {
+            flyweight.Destroy();
+            Object.Destroy(flyweight.gameObject);
+        }
+
+        public void Return(Flyweight flyweight) {
+            if (flyweight.SourceObject == this) {
+                flyweight.ReturnToPool();
+            } else {
+#if DEBUG
+                Debug.LogError($"{this.name} cannot return a flyweight which it did not create.", this);
+#endif
             }
-            
-            return clone;
+        }
+
+        public void Return(GameObject obj) {
+            if (obj.TryGetComponent(out Flyweight flyweight)) {
+                this.Return(flyweight);
+            } else {
+#if DEBUG
+                Debug.LogError($"{this.name} cannot return a game object which is not a flyweight.", this);
+#endif  
+            }
+        }
+
+        public void Return<T>(T instance) where T : Component {
+            this.Return(instance.gameObject);
         }
         
-        internal T As<T>() where T : Component {
-            return this.Components.TryGetValue(typeof(T), out Component component) ? (T)component : null;
-        }
-
-        internal void Activate(Action<PoolableObject> onReturn) {
-            this.gameObject.SetActive(true);
-            this.OnReturn += onReturn;
-            this.OnSpawned.Invoke();
-        }
-
-        internal void Deactivate() {
-            this.OnDespawned.Invoke();
-            this.OnReturn = delegate { };
-            this.gameObject.SetActive(false);
-        }
-
-        internal void Destroy() {
-            this.OnDestroyed.Invoke();
-        }
-        
-        public GameObject Get() {
-            return ObjectPools.Pull(this.SourcePrefab ? this.SourcePrefab : this);
-        }
-
-        public T GetAs<T>() where T : Component {
-            return ObjectPools.Pull<T>(this.SourcePrefab ? this.SourcePrefab : this);
-        }
-        
-        public void ReturnToPool() {
-            this.OnReturn.Invoke(this);
+        internal IObjectPool<Flyweight> CreatePool() {
+            return new ObjectPool<Flyweight>(
+                createFunc: this.Create,
+                actionOnGet: PoolableObject.Activate,
+                actionOnRelease: PoolableObject.Deactivate,
+                actionOnDestroy: PoolableObject.Destroy,
+                defaultCapacity: this.PoolSize
+            );
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CommonFrameworks.Iterators {
     public sealed class DepthFirstWalker<T> : Walker<T> {
