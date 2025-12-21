@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using CommonFrameworks.Extensions;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace CommonFrameworks.ObjectCreation {
     [DisallowMultipleComponent]
