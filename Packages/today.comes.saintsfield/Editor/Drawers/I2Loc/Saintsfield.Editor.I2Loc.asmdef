@@ -1,0 +1,25 @@
+{
+    "name": "Saintsfield.Editor.I2Loc",
+    "rootNamespace": "",
+    "references": [
+        "Saintsfield.Runtime",
+        "Saintsfield.Editor",
+        "Saintsfield.Runtime.I2Loc",
+        "com.inter-illusion.i2"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "Sirenix.OdinInspector.Editor.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "SAINTSFIELD_I2_LOC"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
