@@ -7,7 +7,7 @@ namespace CommonFrameworks.Utilities;
 public abstract class Singleton<T> : MonoBehaviour where T : Singleton<T> {
     private enum PersistenceLevel { Scene, Game }
 
-    private static T instance;
+    private static T? instance;
         
     public static T Instance {
         get {
@@ -36,14 +36,16 @@ public abstract class Singleton<T> : MonoBehaviour where T : Singleton<T> {
         if (Singleton<T>.instance) {
             Object.Destroy(this.gameObject);
         } else {
-            Singleton<T>.Instance = this as T;
+            Singleton<T>.Instance = (this as T)!;
         }
     }
 
     protected virtual void Start() {
-        if (this.LevelOfPersistence == PersistenceLevel.Game) {
-            this.transform.SetParent(null);
-            Object.DontDestroyOnLoad(this.gameObject);
+        if (this.LevelOfPersistence != PersistenceLevel.Game) {
+            return;
         }
+
+        this.transform.SetParent(null);
+        Object.DontDestroyOnLoad(this.gameObject);
     }
 }

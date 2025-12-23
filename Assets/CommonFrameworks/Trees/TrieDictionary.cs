@@ -10,12 +10,12 @@ public sealed class TrieDictionary<K, T, V> : ITrie<KeyValuePair<K, V>, T>, IDic
         internal IDictionary<T, Entry> Children { get; } = new Dictionary<T, Entry>();
         internal bool IsEndOfKey { get; set; }
         internal int Size { get; set; }
-        internal K Key { get; set; }
-        internal V Value { get; set; }
+        internal K Key { get; set; } = default!;
+        internal V Value { get; set; } = default!;
     }
         
     private Entry Root { get; } = new Entry();
-    private T Separator { get; }
+    private T Separator { get; } = default!;
     private bool HasSeparator { get; }
         
     private Lazy<IEnumerable<KeyValuePair<K, V>>> CachedEntries { get; set; }
@@ -54,7 +54,7 @@ public sealed class TrieDictionary<K, T, V> : ITrie<KeyValuePair<K, V>, T>, IDic
     #region Dictionary Semantics
         
     public V this[K key] { 
-        get => this.TryGetValue(key, out V value) ? value : throw new KeyNotFoundException();
+        get => this.TryGetValue(key, out V value) && value is not null ? value : throw new KeyNotFoundException();
         set {
             if (!key.Any()) {
                 throw new ArgumentException("The key in a trie cannot be empty!", nameof(key));    
@@ -98,7 +98,7 @@ public sealed class TrieDictionary<K, T, V> : ITrie<KeyValuePair<K, V>, T>, IDic
         
     public bool Contains(KeyValuePair<K, V> item) {
         return this.HasPath(item.Key, out List<Entry> path) && path[^1].IsEndOfKey &&  
-               path[^1].Value.Equals(item);
+               EqualityComparer<V>.Default.Equals(path[^1].Value, item.Value);
     }
         
     public void CopyTo(KeyValuePair<K, V>[] array, int arrayIndex) {
@@ -106,7 +106,9 @@ public sealed class TrieDictionary<K, T, V> : ITrie<KeyValuePair<K, V>, T>, IDic
     }
         
     public bool Remove(KeyValuePair<K, V> item) {
-        return this.TryGetValue(item.Key, out V value) && value.Equals(item.Value) && this.Remove(item.Key);
+        return this.TryGetValue(item.Key, out V value) && 
+               EqualityComparer<V>.Default.Equals(value, item.Value) &&
+               this.Remove(item.Key);
     }
         
     public void Add(K key, V value) {
@@ -136,14 +138,14 @@ public sealed class TrieDictionary<K, T, V> : ITrie<KeyValuePair<K, V>, T>, IDic
     public bool Remove(K key) {
         return this.Remove(key.AsEnumerable());
     }
-        
+    
     public bool TryGetValue(K key, out V value) {
         if (this.HasPath(key, out List<Entry> path) && path[^1].IsEndOfKey) {
             value = path[^1].Value;
             return true;
         }
 
-        value = default;
+        value = default!;
         return false;
     }
         
@@ -167,12 +169,7 @@ public sealed class TrieDictionary<K, T, V> : ITrie<KeyValuePair<K, V>, T>, IDic
     }
         
     private bool HasPath(IEnumerable<T> prefix, out List<Entry> path) {
-        path = new List<Entry>();
-        if (prefix is null) {
-            return false;
-        }
-            
-        path.Add(this.Root);
+        path = new List<Entry> { this.Root };
         foreach (T element in prefix) {
             if (!path[^1].Children.TryGetValue(element, out Entry entry)) {
                 return false;
@@ -189,10 +186,6 @@ public sealed class TrieDictionary<K, T, V> : ITrie<KeyValuePair<K, V>, T>, IDic
     }
         
     public IEnumerable<KeyValuePair<K, V>> PrefixSearch(IEnumerable<T> prefix) {
-        if (prefix is null) {
-            return Enumerable.Empty<KeyValuePair<K, V>>();
-        }
-
         T[] prefixArray = prefix.ToArray();
         if (!this.HasPath(prefixArray, out List<Entry> path)) {
             return Enumerable.Empty<KeyValuePair<K, V>>();
@@ -225,10 +218,6 @@ public sealed class TrieDictionary<K, T, V> : ITrie<KeyValuePair<K, V>, T>, IDic
     }
         
     public bool RemoveAllWithPrefix(IEnumerable<T> prefix) {
-        if (prefix is null) {
-            return false;
-        }
-            
         T[] prefixArray = prefix.ToArray();
         if (!this.HasPath(prefixArray, out List<Entry> path)) {
             return false;
@@ -254,10 +243,6 @@ public sealed class TrieDictionary<K, T, V> : ITrie<KeyValuePair<K, V>, T>, IDic
     }
         
     public bool Remove(IEnumerable<T> key) {
-        if (key is null) {
-            return false;   
-        }
-            
         T[] prefix = key.ToArray();
         if (!this.HasPath(prefix, out List<Entry> path) || path.Count == 0) {
             return false;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CommonFrameworks.Extensions;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ namespace CommonFrameworks.ObjectCreation;
 
 [DisallowMultipleComponent]
 public sealed class Flyweight : MonoBehaviour {
-    internal PoolableObject SourceObject { get; set; }
+    [NotNull] internal PoolableObject? SourceObject { get; set; }
     private Dictionary<Type, Component> Components { get; } = new Dictionary<Type, Component>();
         
     internal T As<T>() where T : Component {

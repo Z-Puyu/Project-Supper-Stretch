@@ -1,4 +1,5 @@
-﻿using CommonFrameworks.Extensions;
+﻿using System.Diagnostics.CodeAnalysis;
+using CommonFrameworks.Extensions;
 using SaintsField;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -8,7 +9,10 @@ namespace CommonFrameworks.ObjectCreation;
 
 [CreateAssetMenu(fileName = "New Poolable Object", menuName = "Object Pooling/Poolable Object")]
 public sealed class PoolableObject : ScriptableObject {
-    [field: SerializeField] private GameObject Prefab { get; set; }
+    [NotNull] 
+    [field: SerializeField, Required] 
+    private GameObject? Prefab { get; set; }
+    
     [field: SerializeField, MinValue(10)] private int PoolSize { get; set; } = 10;
 
     private Flyweight Create() {

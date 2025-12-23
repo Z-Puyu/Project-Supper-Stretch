@@ -5,7 +5,7 @@ namespace CommonFrameworks.Processors;
 
 [Serializable]
 public abstract class Processor<T> : IProcessor<T> {
-    private Processor<T> Next { get; set; }
+    private Processor<T>? Next { get; set; }
 
     [field: SerializeField]
     private ProcessorChainingPolicy ChainingPolicy { get; set; } = ProcessorChainingPolicy.AlwaysContinue;

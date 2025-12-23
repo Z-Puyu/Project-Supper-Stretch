@@ -3,11 +3,11 @@
 namespace CommonFrameworks.Iterators;
 
 public abstract class Walker<T> : Iterator<T> {
-    private Action<T, T> OnMoveForward { get; }
-    private Action<T, T> OnBacktrack { get; }
+    private Action<T, T>? OnMoveForward { get; }
+    private Action<T, T>? OnBacktrack { get; }
 
     public Walker(
-        Action<T> onVisit = null, Action<T, T> onMoveForward = null, Action<T, T> onBacktrack = null
+        Action<T>? onVisit = null, Action<T, T>? onMoveForward = null, Action<T, T>? onBacktrack = null
     ) : base(onVisit) {
         this.OnMoveForward = onMoveForward;
         this.OnBacktrack = onBacktrack;

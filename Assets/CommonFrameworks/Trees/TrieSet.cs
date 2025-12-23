@@ -9,15 +9,14 @@ public sealed class TrieSet<K, T> : ITrie<K, T>, ISet<K> where K : IEnumerable<T
         internal IDictionary<T, Node> Children { get; } = new Dictionary<T, Node>();
         internal bool IsEndOfKey { get; set; }
         internal int Size { get; set; }
-        internal K Key { get; set; }
+        internal K Key { get; set; } = default!;
     }
 
     private Node Root { get; } = new Node();
-    private T Separator { get; }
+    private T Separator { get; } = default!;
     private bool HasSeparator { get; }
 
     public TrieSet() {
-        this.Separator = default;
         this.HasSeparator = false;
     }
 
@@ -40,9 +39,7 @@ public sealed class TrieSet<K, T> : ITrie<K, T>, ISet<K> where K : IEnumerable<T
     }
 
     void ICollection<K>.Add(K item) {
-        if (item is not null) {
-            this.Add(item);
-        }
+        this.Add(item);
     }
 
     public void Clear() {
@@ -51,7 +48,7 @@ public sealed class TrieSet<K, T> : ITrie<K, T>, ISet<K> where K : IEnumerable<T
     }
 
     public bool Contains(K item) {
-        return item is not null && this.HasPath(item, out List<Node> path) && path[^1].IsEndOfKey;
+        return this.HasPath(item, out List<Node> path) && path[^1].IsEndOfKey;
     }
 
     public void CopyTo(K[] array, int arrayIndex) {
@@ -59,7 +56,7 @@ public sealed class TrieSet<K, T> : ITrie<K, T>, ISet<K> where K : IEnumerable<T
     }
 
     public bool Remove(K item) {
-        return item is not null && this.Remove(item.AsEnumerable());
+        return this.Remove(item.AsEnumerable());
     }
 
     #endregion
@@ -153,12 +150,7 @@ public sealed class TrieSet<K, T> : ITrie<K, T>, ISet<K> where K : IEnumerable<T
     #endregion
 
     private bool HasPath(IEnumerable<T> prefix, out List<Node> path) {
-        path = new List<Node>();
-        if (prefix is null) {
-            return false;
-        }
-
-        path.Add(this.Root);
+        path = new List<Node> { this.Root };
         foreach (T element in prefix) {
             if (!path[^1].Children.TryGetValue(element, out Node node)) {
                 return false;
@@ -175,10 +167,6 @@ public sealed class TrieSet<K, T> : ITrie<K, T>, ISet<K> where K : IEnumerable<T
     }
 
     public IEnumerable<K> PrefixSearch(IEnumerable<T> prefix) {
-        if (prefix is null) {
-            return Enumerable.Empty<K>();
-        }
-
         T[] prefixArray = prefix.ToArray();
         if (!this.HasPath(prefixArray, out List<Node> path)) {
             return Enumerable.Empty<K>();
@@ -211,10 +199,6 @@ public sealed class TrieSet<K, T> : ITrie<K, T>, ISet<K> where K : IEnumerable<T
     }
 
     public bool RemoveAllWithPrefix(IEnumerable<T> prefix) {
-        if (prefix is null) {
-            return false;
-        }
-
         T[] prefixArray = prefix.ToArray();
         if (!this.HasPath(prefixArray, out List<Node> path)) {
             return false;
@@ -239,10 +223,6 @@ public sealed class TrieSet<K, T> : ITrie<K, T>, ISet<K> where K : IEnumerable<T
     }
 
     public bool Remove(IEnumerable<T> key) {
-        if (key is null) {
-            return false;
-        }
-
         T[] prefix = key.ToArray();
         if (!this.HasPath(prefix, out List<Node> path) || path.Count == 0) {
             return false;

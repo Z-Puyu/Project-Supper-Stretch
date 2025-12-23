@@ -5,7 +5,7 @@ namespace CommonFrameworks.Iterators;
 
 public sealed class DepthFirstWalker<T> : Walker<T> {
     public DepthFirstWalker(
-        Action<T> onVisit = null, Action<T, T> onMoveForward = null, Action<T, T> onBacktrack = null
+        Action<T>? onVisit = null, Action<T, T>? onMoveForward = null, Action<T, T>? onBacktrack = null
     ) : base(onVisit, onMoveForward, onBacktrack) { }
 
     protected override IEnumerable<Move> Traverse(ITraversable<T> map, T start) {

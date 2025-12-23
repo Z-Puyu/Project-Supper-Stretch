@@ -17,12 +17,12 @@ public abstract class Iterator<T> : IIterator<T> {
             this.MoveType = type;
         }
             
-        public Move(T to) : this(default, to, Type.Visit) { }
+        public Move(T to) : this(default!, to, Type.Visit) { }
     }
         
-    private Action<T> OnVisit { get; }
+    private Action<T>? OnVisit { get; }
         
-    public Iterator(Action<T> onVisit = null) {
+    public Iterator(Action<T>? onVisit = null) {
         this.OnVisit = onVisit;
     }
 
@@ -31,7 +31,7 @@ public abstract class Iterator<T> : IIterator<T> {
         steps += 1;
     }
 
-    private void Iterate(IEnumerator<Move> enumerator, Predicate<T> until = null, int count = -1) {
+    private void Iterate(IEnumerator<Move> enumerator, Predicate<T>? until = null, int count = -1) {
         int steps = 0;
         while (enumerator.MoveNext()) {
             Move move = enumerator.Current;
@@ -43,12 +43,12 @@ public abstract class Iterator<T> : IIterator<T> {
         }
     }
 
-    public void Iterate(ITraversable<T> map, Predicate<T> until = null, int count = -1) {
+    public void Iterate(ITraversable<T> map, Predicate<T>? until = null, int count = -1) {
         using IEnumerator<Move> enumerator = this.Traverse(map, map.Start).GetEnumerator();
         this.Iterate(enumerator, until, count);
     }
 
-    public void Iterate(ITraversable<T> map, T source, Predicate<T> until = null, int count = -1) {
+    public void Iterate(ITraversable<T> map, T source, Predicate<T>? until = null, int count = -1) {
         using IEnumerator<Move> enumerator = this.Traverse(map, source).GetEnumerator();
         this.Iterate(enumerator, until, count);
     }
