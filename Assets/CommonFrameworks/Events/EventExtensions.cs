@@ -3,31 +3,31 @@
 namespace CommonFrameworks.Events;
 
 public static class EventExtensions {
-    public static void Publish<S, E>(this E @event) where E : IEvent<S> where S : class {
-        MailBox<S, E>.Publish(@event);
+    public static void Publish<S, E>(this S sender, E @event) where S : class where E : IEvent {
+        MailBox<S, E>.Publish(sender, @event);
     }
         
-    public static void Whisper<S, E>(this E @event, object subscriber) where E : IEvent<S> where S : class {
-        MailBox<S, E>.PublishTo(subscriber, @event);
+    public static void Whisper<S, E>(this S sender, E @event, object subscriber) where E : IEvent where S : class {
+        MailBox<S, E>.PublishTo(subscriber, sender, @event);
     }
         
-    public static void Subscribe<S, E>(this object listener, Action<E> handler) where S : class where E : IEvent<S> {
+    public static void Subscribe<S, E>(this object listener, Action<Event<S, E>> handler) where S : class where E : IEvent {
         MailBox<S, E>.Register(listener, handler);
     }
         
-    public static void Unsubscribe<S, E>(this object listener, Action<E> handler) where S : class where E : IEvent<S> {
+    public static void Unsubscribe<S, E>(this object listener, Action<Event<S, E>> handler) where S : class where E : IEvent {
         MailBox<S, E>.Unregister(listener, handler);
     }
 
-    public static void Subscribe<S, E>(this object listener, Action handler) where S : class where E : IEvent<S> {
+    public static void Subscribe<S, E>(this object listener, Action handler) where S : class where E : IEvent {
         MailBox<S, E>.Register(listener, handler);
     }
         
-    public static void Unsubscribe<S, E>(this object listener, Action handler) where S : class where E : IEvent<S> {
+    public static void Unsubscribe<S, E>(this object listener, Action handler) where S : class where E : IEvent {
         MailBox<S, E>.Unregister(listener, handler);
     }
         
-    public static void UnsubscribeAll<S, E>(this object listener) where S : class where E : IEvent<S> {
+    public static void UnsubscribeAll<S, E>(this object listener) where S : class where E : IEvent {
         MailBox<S, E>.Unregister(listener);
     }
 }

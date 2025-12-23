@@ -4,27 +4,27 @@ using System.Linq;
 
 namespace CommonFrameworks.Events;
 
-public static class MailBox<S, E> where E : IEvent<S> where S : class {
-    private static Dictionary<object, Action<E>> Handlers { get; } = new Dictionary<object, Action<E>>();
+public static class MailBox<S, E> where E : IEvent where S : class {
+    private static Dictionary<object, Action<Event<S, E>>> Handlers { get; } = new Dictionary<object, Action<Event<S, E>>>();
         
     // ReSharper disable once StaticMemberInGenericType
     private static Dictionary<object, Action> Listeners { get; } = new Dictionary<object, Action>();
         
-    private static event Action<E> OnEvent = delegate { };
+    private static event Action<Event<S, E>> OnEvent = delegate { };
     private static event Action OnNotified = delegate { };
 
-    internal static void Publish(E @event) {
-        MailBox<S, E>.OnEvent.Invoke(@event);
+    internal static void Publish(S sender, E @event) {
+        MailBox<S, E>.OnEvent.Invoke(new Event<S, E>(sender, @event));
         MailBox<S, E>.OnNotified.Invoke();
     }
 
-    internal static void PublishTo(object subscriber, E @event) {
-        if (MailBox<S, E>.Handlers.TryGetValue(subscriber, out Action<E> handler)) {
-            handler.Invoke(@event);
+    internal static void PublishTo(object subscriber, S sender, E @event) {
+        if (MailBox<S, E>.Handlers.TryGetValue(subscriber, out Action<Event<S, E>> handler)) {
+            handler.Invoke(new Event<S, E>(sender, @event));
         }
     }
 
-    internal static void Register(object subscriber, Action<E> handler) {
+    internal static void Register(object subscriber, Action<Event<S, E>> handler) {
         MailBox<S, E>.OnEvent += handler;
         if (!MailBox<S, E>.Handlers.TryAdd(subscriber, handler)) {
             MailBox<S, E>.Handlers[subscriber] += handler;
@@ -38,8 +38,8 @@ public static class MailBox<S, E> where E : IEvent<S> where S : class {
         }
     }
         
-    internal static void Unregister(object subscriber, Action<E> handler) {
-        if (!MailBox<S, E>.Handlers.TryGetValue(subscriber, out Action<E> existing)) {
+    internal static void Unregister(object subscriber, Action<Event<S, E>> handler) {
+        if (!MailBox<S, E>.Handlers.TryGetValue(subscriber, out Action<Event<S, E>> existing)) {
             return;
         }
             
@@ -66,7 +66,7 @@ public static class MailBox<S, E> where E : IEvent<S> where S : class {
         }
     }
 
-    private static void UnregisterAll(Action<E> handler) {
+    private static void UnregisterAll(Action<Event<S, E>> handler) {
         if (handler is null) {
             return;
         }
@@ -75,7 +75,7 @@ public static class MailBox<S, E> where E : IEvent<S> where S : class {
         Delegate[] kept = MailBox<S, E>.OnEvent.GetInvocationList()
                                        .Where(@delegate => !toRemove.Contains(@delegate))
                                        .ToArray();
-        MailBox<S, E>.OnEvent = (Action<E>)Delegate.Combine(kept);
+        MailBox<S, E>.OnEvent = (Action<Event<S, E>>)Delegate.Combine(kept);
     }
 
     private static void UnregisterAll(Action handler) {
@@ -91,7 +91,7 @@ public static class MailBox<S, E> where E : IEvent<S> where S : class {
     }
         
     internal static void Unregister(object subscriber) {
-        if (MailBox<S, E>.Handlers.Remove(subscriber, out Action<E> handler)) {
+        if (MailBox<S, E>.Handlers.Remove(subscriber, out Action<Event<S, E>> handler)) {
             MailBox<S, E>.UnregisterAll(handler);
         }
 

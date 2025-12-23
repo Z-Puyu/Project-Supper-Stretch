@@ -1,5 +1,7 @@
 ﻿using Characters.Player;
+using CommonFrameworks.Events;
 using CommonFrameworks.Utilities;
+using GameManagement.Events;
 using SaintsField.Playa;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,7 +9,7 @@ using UnityEngine.InputSystem;
 namespace GameManagement;
 
 public sealed class PlayerInputInterpreter : Singleton<PlayerInputInterpreter> {
-    private PlayerControls PlayerControls { get; set; }
+    private PlayerControls? PlayerControls { get; set; }
         
     [field: ShowInInspector] public Vector2 MovementInput { get; private set; }
     [field: ShowInInspector] public bool IsDodging { get; private set; }
@@ -19,7 +21,7 @@ public sealed class PlayerInputInterpreter : Singleton<PlayerInputInterpreter> {
         
     protected override void Start() {
         base.Start();
-        this.PlayerControls.Movement.Movement.performed += parseMovement;
+        this.PlayerControls!.Movement.Movement.performed += parseMovement;
         this.PlayerControls.Actions.Dodge.performed += parseDodge;
         this.PlayerControls.Actions.Dodge.canceled += parseDodge;
         return;
@@ -30,7 +32,7 @@ public sealed class PlayerInputInterpreter : Singleton<PlayerInputInterpreter> {
 
         void parseDodge(InputAction.CallbackContext context) {
             this.IsDodging = context.ReadValueAsButton();
-                
+            this.Publish(new AttemptToDodgeEvent());
         }
     }
 }
