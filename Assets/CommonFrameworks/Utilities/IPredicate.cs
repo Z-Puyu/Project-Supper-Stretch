@@ -1,9 +1,9 @@
-namespace CommonFrameworks.Utilities {
-    public interface IPredicate {
-        public bool Holds();
-    }
+namespace CommonFrameworks.Utilities;
+
+public interface IPredicate {
+    public bool Holds();
+}
     
-    public interface IPredicate<in T> {
-        public bool Holds(T args);
-    }
+public interface IPredicate<in T> {
+    public bool Holds(T args);
 }

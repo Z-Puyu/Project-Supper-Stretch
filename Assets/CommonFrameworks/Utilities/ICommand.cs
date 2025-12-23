@@ -1,6 +1,6 @@
-namespace CommonFrameworks.Utilities {
-    public interface ICommand {
-        public void Execute();
-        public void Undo();
-    }
+namespace CommonFrameworks.Utilities;
+
+public interface ICommand {
+    public void Execute();
+    public void Undo();
 }
