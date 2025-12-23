@@ -97,7 +97,7 @@ public static class EnumExtensions {
                 );
     }
 
-    public static bool HasFlag<E>(this E e, E flags) where E : struct, Enum {
+    public static bool Contains<E>(this E e, E flags) where E : struct, Enum {
         return !EqualityComparer<E>.Default.Equals(e, default) && Helper<E>.HasFlag(e, flags);
     }
         

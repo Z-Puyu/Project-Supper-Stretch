@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace CommonFrameworks.Events;
 
-public static class MailBox<S, E> where E : IEvent where S : class {
+public static class MailBox<S, E> where E : IMessage where S : class {
     private static Dictionary<object, Action<Event<S, E>>> Handlers { get; } = new Dictionary<object, Action<Event<S, E>>>();
         
     // ReSharper disable once StaticMemberInGenericType

@@ -1,4 +1,5 @@
-﻿using SaintsField;
+﻿using System.Diagnostics.CodeAnalysis;
+using SaintsField;
 using SaintsField.Playa;
 using UnityEngine;
 
@@ -8,7 +9,9 @@ namespace GameCharacterBehaviours.Runtime.Movement;
 public abstract class Locomotion : MonoBehaviour {
     public enum Gesture { Walk, Run, Sprint }
         
-    [field: SerializeField, Required] protected Transform Root { get; private set; }
+    [NotNull] 
+    [field: SerializeField, Required] 
+    protected Transform? Root { get; private set; }
         
     public bool IsMoving { get; set; }
     [field: ShowInInspector] public Vector2 PlanarDirection { get; set; }

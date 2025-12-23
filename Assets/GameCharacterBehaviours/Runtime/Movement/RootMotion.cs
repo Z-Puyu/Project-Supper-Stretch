@@ -1,13 +1,16 @@
-﻿using System;
-using CommonFrameworks.Extensions;
+﻿using System.Diagnostics.CodeAnalysis;
+using SaintsField;
 using UnityEngine;
 
 namespace GameCharacterBehaviours.Runtime.Movement;
 
 [DisallowMultipleComponent, RequireComponent(typeof(Animator))]
 public sealed class RootMotion : MonoBehaviour {
-    [field: SerializeField] private Locomotion MovementController { get; set; }
-    private Animator Animator { get; set; }
+    [NotNull] 
+    [field: SerializeField, Required] 
+    private Locomotion? MovementController { get; set; }
+    
+    [NotNull] private Animator? Animator { get; set; }
 
     private void Awake() {
         this.Animator = this.GetComponent<Animator>();

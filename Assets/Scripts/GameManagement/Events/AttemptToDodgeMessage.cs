@@ -2,4 +2,4 @@
 
 namespace GameManagement.Events;
 
-public readonly record struct AttemptToDodgeEvent : IEvent;
+public readonly record struct AttemptToDodgeMessage : IMessage;

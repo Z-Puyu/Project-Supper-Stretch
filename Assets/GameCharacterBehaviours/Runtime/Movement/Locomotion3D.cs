@@ -1,12 +1,17 @@
-﻿using System;
+﻿using System.Diagnostics.CodeAnalysis;
+using SaintsField;
 using UnityEngine;
 
 namespace GameCharacterBehaviours.Runtime.Movement;
 
 public sealed class Locomotion3D : Locomotion {
-    [field: SerializeField] private CharacterController Controller { get; set; }
-    [field: SerializeField] private Transform CameraSpace { get; set; }
-    [field: SerializeField] private Animator Animator { get; set; }
+    [field: SerializeField] private CharacterController? Controller { get; set; }
+
+    [NotNull]
+    [field: SerializeField, Required] 
+    private Transform? CameraSpace { get; set; }
+
+    [field: SerializeField] private Animator? Animator { get; set; }
     public override bool UseRootMotion => true;
         
     private Vector3 PlanarDirection3D => new Vector3(this.PlanarDirection.x, 0, this.PlanarDirection.y).normalized;

@@ -32,7 +32,7 @@ public sealed class PlayerInputInterpreter : Singleton<PlayerInputInterpreter> {
 
         void parseDodge(InputAction.CallbackContext context) {
             this.IsDodging = context.ReadValueAsButton();
-            this.Publish(new AttemptToDodgeEvent());
+            this.Publish(new AttemptToDodgeMessage());
         }
     }
 }
