@@ -10,10 +10,10 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes;
 
 [CreateAssetMenu(fileName = "New Attribute Type", menuName = "Gameplay Abilities/Attribute Type")]
 public class AttributeType : ScriptableObject, IComparable<AttributeType>, IEquatable<AttributeType> {
-    [field: SerializeField, ReadOnly] public string Id { get; private set; }
-    [field: SerializeField, ReadOnly] private AttributeType Parent { get; set; }
-    [field: SerializeField] private string Name { get; set; }
-    [SerializeField] private string displayName;
+    [field: SerializeField, ReadOnly] public string Id { get; private set; } = string.Empty;
+    [field: SerializeField, ReadOnly] private AttributeType? Parent { get; set; }
+    [field: SerializeField] private string Name { get; set; } = string.Empty;
+    [SerializeField] private string displayName = string.Empty;
 
     [field: SerializeReference, ReferencePicker, ShowIf(nameof(this.IsLeaf))]
     public List<AttributeProcessor> Processors { get; private set; } = new List<AttributeProcessor>();
@@ -38,7 +38,7 @@ public class AttributeType : ScriptableObject, IComparable<AttributeType>, IEqua
 #if UNITY_EDITOR
     private void Rename() {
         LinkedList<string> names = new LinkedList<string>();
-        AttributeType curr = this;
+        AttributeType? curr = this;
         while (curr) {
             names.AddFirst(curr.Name);
             curr = curr.Parent;

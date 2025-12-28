@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using CommonFrameworks.Extensions;
@@ -24,18 +25,20 @@ public sealed class AttributeSet : MonoBehaviour, IAttributeReader, IModifiable 
     private TrieDictionary<AttributeKey, char, Node> Attributes { get; } =
         new TrieDictionary<AttributeKey, char, Node>('.');
 
-    [field: SerializeField] private AttributeTable DefaultBaseAttributes { get; set; }
-        
-    [field: SerializeField]
+    [field: SerializeField] private AttributeTable? DefaultBaseAttributes { get; set; }
+    
+    [field: SerializeField, Required]
     [field: InfoBox(
         "Attribute values are approximated by this after change." +
         "You can overwrite this in specific attribute types."
     )]
-    private AttributeApproximator Approximator { get; set; }
+    private AttributeApproximator Approximator { get; set; } = new AttributeApproximator();
 
-    [field: SerializeField, ReadOnly] private ModifierEnvironment ModifierEnvironment { get; set; }
+    [NotNull] 
+    [field: SerializeField, ReadOnly] 
+    private ModifierEnvironment? ModifierEnvironment { get; set; }
 
-    public event UnityAction<AttributeChange> OnAttributeUpdated;
+    public event UnityAction<AttributeChange>? OnAttributeUpdated;
 
     private void Awake() {
         this.RegisterModifierEnvironment(this.GetInParentOrAddComponent<ModifierEnvironment>());

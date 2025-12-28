@@ -19,7 +19,7 @@ public readonly struct AttributeKey : IComparable<AttributeKey>, IEquatable<Attr
         return string.Equals(this.Value, other.Value, StringComparison.OrdinalIgnoreCase);
     }
         
-    public override bool Equals(object obj) {
+    public override bool Equals(object? obj) {
         return obj is AttributeKey other && this.Equals(other);
     }
 

@@ -9,14 +9,14 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes.Processors;
 [Serializable]
 public class AttributeClamper : AttributeProcessor {
     [field: SerializeField] private bool HasMinValue { get; set; }
-        
-    [field: SerializeReference, ReferencePicker, ShowIf(nameof(this.HasMinValue))] 
-    private IAttributeMagnitude MinValue { get; set; }
+
+    [field: SerializeReference, ReferencePicker, ShowIf(nameof(this.HasMinValue))]
+    private IAttributeMagnitude MinValue { get; set; } = new Constant();
         
     [field: SerializeField] private bool HasMaxValue { get; set; }
         
     [field: SerializeReference, ReferencePicker, ShowIf(nameof(this.HasMaxValue))] 
-    private IAttributeMagnitude MaxValue { get; set; }
+    private IAttributeMagnitude MaxValue { get; set; } = new Constant();
         
     protected override bool TryProcess(Attribute data, out Attribute result) {
         double clampedValue = data.Value;
