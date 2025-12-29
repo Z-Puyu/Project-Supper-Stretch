@@ -72,6 +72,10 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: -0.000000007622733
       objectReference: {fileID: 0}
+    - target: {fileID: 8644232947531085645, guid: 10970dbb52c8c134cb629434ecf2ddf2, type: 3}
+      propertyPath: <CameraTransform>k__BackingField
+      value: 
+      objectReference: {fileID: 6013413687176798642}
     - target: {fileID: 8829115338478182532, guid: 10970dbb52c8c134cb629434ecf2ddf2, type: 3}
       propertyPath: m_Name
       value: Test Player
@@ -81,3 +85,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 10970dbb52c8c134cb629434ecf2ddf2, type: 3}
+--- !u!4 &6013413687176798642 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4264279494460778467, guid: 10970dbb52c8c134cb629434ecf2ddf2, type: 3}
+  m_PrefabInstance: {fileID: 7520497322702407249}
+  m_PrefabAsset: {fileID: 0}

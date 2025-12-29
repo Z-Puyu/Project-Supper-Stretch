@@ -47690,7 +47690,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1210495657512681727}
-  - component: {fileID: 3033155159852009027}
+  - component: {fileID: 8644232947531085645}
   m_Layer: 0
   m_Name: Camera System
   m_TagString: Untagged
@@ -47714,7 +47714,7 @@ Transform:
   - {fileID: 4264279494460778467}
   m_Father: {fileID: 3201459543287357664}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3033155159852009027
+--- !u!114 &8644232947531085645
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -47727,7 +47727,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Scripts.GameManagement::GameManagement.CameraSystem
   <LevelOfPersistence>k__BackingField: 0
-  <CameraTransform>k__BackingField: {fileID: 4264279494460778467}
+  <CameraTransform>k__BackingField: {fileID: 0}
 --- !u!1 &6356031882833635183
 GameObject:
   m_ObjectHideFlags: 0
@@ -74604,6 +74604,7 @@ MonoBehaviour:
   <Animator>k__BackingField: {fileID: 6388006269725896587}
   <LeftRightVelocityAnimatorParameter>k__BackingField: 2041851446
   <ForwardBackVelocityAnimatorParameter>k__BackingField: 72152147
+  <AnimationBlendTime>k__BackingField: 0.1
 --- !u!114 &2201749962735802151 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}

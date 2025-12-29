@@ -1,3 +1,3 @@
-﻿namespace CommonFrameworks.Events;
-
-public interface IMessage { }
+﻿namespace CommonFrameworks.Events {
+    public interface IMessage { }
+}

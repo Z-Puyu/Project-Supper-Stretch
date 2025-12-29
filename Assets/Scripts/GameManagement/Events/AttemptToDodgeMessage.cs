@@ -1,5 +1,5 @@
 ﻿using CommonFrameworks.Events;
 
-namespace GameManagement.Events;
-
-public readonly record struct AttemptToDodgeMessage : IMessage;
+namespace GameManagement.Events {
+    public readonly record struct AttemptToDodgeMessage : IMessage;
+}

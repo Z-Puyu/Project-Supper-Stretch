@@ -1,6 +1,6 @@
-﻿namespace UI;
-
-public interface IPage {
-    public void Open();
-    public void Close();
+﻿namespace UI {
+    public interface IPage {
+        public void Open();
+        public void Close();
+    }
 }

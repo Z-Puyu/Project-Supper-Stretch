@@ -2,45 +2,45 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace GameplayAbilitiesSystem.Runtime.Effects;
+namespace GameplayAbilitiesSystem.Runtime.Effects {
+    internal sealed class ContinuousEffect : TimedEffect {
+        public ContinuousEffect(
+            EffectData sourceEffect, EffectReceiverFacade target, Action onExecute, Action onStop, double duration
+        ) : base(sourceEffect, target, onExecute, onStop, duration) { }
 
-internal sealed class ContinuousEffect : TimedEffect {
-    public ContinuousEffect(
-        EffectData sourceEffect, EffectTarget target, Action onExecute, Action onStop, double duration
-    ) : base(sourceEffect, target, onExecute, onStop, duration) { }
+        public override void Apply(EffectReceiverFacade target) {
+            if (this.IsActive) {
+                return;
+            }
+            
+            this.IsActive = true;
+            if (this.Duration <= 0) {
+                base.Apply(target);
+            } else {
+                this.Coroutine = target.StartCoroutine(applyContinuously());
+            }
 
-    public override void Apply(EffectTarget target) {
-        if (this.IsActive) {
             return;
-        }
             
-        this.IsActive = true;
-        if (this.Duration <= 0) {
-            base.Apply(target);
-        } else {
-            this.Coroutine = target.StartCoroutine(applyContinuously());
+            IEnumerator applyContinuously() {
+                base.Apply(target);
+                yield return new WaitForSeconds((float)this.Duration);
+                this.Stop();
+            }
         }
 
-        return;
-            
-        IEnumerator applyContinuously() {
-            base.Apply(target);
-            yield return new WaitForSeconds((float)this.Duration);
-            this.Stop();
-        }
-    }
+        public override void Stop() {
+            if (!this.IsActive) {
+                return;
+            }
 
-    public override void Stop() {
-        if (!this.IsActive) {
-            return;
-        }
-
-        this.IsActive = false;
-        if (this.Coroutine is not null) {
-            this.Target.StopCoroutine(this.Coroutine);
-        }
+            this.IsActive = false;
+            if (this.Coroutine is not null) {
+                this.Target.StopCoroutine(this.Coroutine);
+            }
             
-        this.Coroutine = null;
-        base.Stop();
+            this.Coroutine = null;
+            base.Stop();
+        }
     }
 }

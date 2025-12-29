@@ -1,10 +1,10 @@
 using System;
 using CommonFrameworks.Utilities;
 
-namespace GameplayAbilitiesSystem.Runtime.Effects.CustomBehaviours;
-
-[Serializable]
-public abstract class EffectBehaviour : ConditionalExecution, IEffect<EffectTarget> {
-    public abstract void Apply(EffectTarget target);
-    public abstract void Stop();
+namespace GameplayAbilitiesSystem.Runtime.Effects.CustomBehaviours {
+    [Serializable]
+    public abstract class EffectBehaviour : ConditionalExecution, IEffect<EffectReceiverFacade> {
+        public abstract void Apply(EffectReceiverFacade target);
+        public abstract void Stop();
+    }
 }
