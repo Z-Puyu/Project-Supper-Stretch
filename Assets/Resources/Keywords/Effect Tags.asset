@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d058cfece1145a0bd9057c980a72f77, type: 3}
+  m_Name: Effect Tags
+  m_EditorClassIdentifier: GameplayKeywordsSystem.Runtime::GameplayKeywordsSystem.Runtime.KeywordSheet
+  <Keywords>k__BackingField:
+  - <Name>k__BackingField: Effects
+    <Path>k__BackingField: Effects
+    <Children>k__BackingField:
+    - <Name>k__BackingField: Combat
+      <Path>k__BackingField: Effects/Combat
+      <Children>k__BackingField:
+      - <Name>k__BackingField: iFrame
+        <Path>k__BackingField: Effects/Combat/iFrame
+        <Children>k__BackingField: []
