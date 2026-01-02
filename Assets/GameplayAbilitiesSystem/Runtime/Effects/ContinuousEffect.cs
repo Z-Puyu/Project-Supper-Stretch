@@ -1,46 +1,58 @@
-using System;
-using System.Collections;
-using UnityEngine;
+using System.Collections.Generic;
+using System.Threading;
+using GameplayKeywordsSystem.Runtime;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
-    internal sealed class ContinuousEffect : TimedEffect {
-        public ContinuousEffect(
-            EffectData sourceEffect, EffectReceiverFacade target, Action onExecute, Action onStop, double duration
-        ) : base(sourceEffect, target, onExecute, onStop, duration) { }
+    internal abstract class ContinuousEffect {
+        internal Effect? SourceEffect { get; set; }
+        private protected IEffectReceiverFacade? Target { get; private set; }
+        private ICollection<Keyword> RemovedKeywords { get; set; } = new List<Keyword>();
+        private ICollection<Keyword> AddedKeywords { get; set; } = new List<Keyword>();
+        private CancellationTokenSource? CancellationTokenSource { get; set; }
 
-        public override void Apply(EffectReceiverFacade target) {
-            if (this.IsActive) {
-                return;
-            }
-            
-            this.IsActive = true;
-            if (this.Duration <= 0) {
-                base.Apply(target);
-            } else {
-                this.Coroutine = target.StartCoroutine(applyContinuously());
+        private protected CancellationToken CancellationToken =>
+                this.CancellationTokenSource?.Token ?? CancellationToken.None;
+        
+        private protected bool IsAlive => !this.CancellationToken.IsCancellationRequested;
+
+        private protected void Apply(
+            IEffectReceiverFacade target, IEnumerable<string> addedKeywords, IEnumerable<string> removedKeywords
+        ) {
+            this.Target = target;
+            foreach (Keyword keyword in removedKeywords) {
+                this.RemovedKeywords.Add(keyword);
+                target.ReceiverKeywordContainer.Remove(keyword);
             }
 
-            return;
-            
-            IEnumerator applyContinuously() {
-                base.Apply(target);
-                yield return new WaitForSeconds((float)this.Duration);
-                this.Stop();
+            foreach (Keyword keyword in addedKeywords) {
+                this.AddedKeywords.Add(keyword);
+                target.ReceiverKeywordContainer.Add(keyword);
             }
         }
 
-        public override void Stop() {
-            if (!this.IsActive) {
-                return;
+        internal virtual void Stop() {
+            foreach (Keyword keyword in this.RemovedKeywords) {
+                this.Target.ReceiverKeywordContainer.Add(keyword);
             }
 
-            this.IsActive = false;
-            if (this.Coroutine is not null) {
-                this.Target.StopCoroutine(this.Coroutine);
+            foreach (Keyword keyword in this.AddedKeywords) {
+                this.Target.ReceiverKeywordContainer.Remove(keyword);
             }
             
-            this.Coroutine = null;
-            base.Stop();
+            this.CancellationTokenSource?.Cancel();
+        }
+
+        internal virtual void Reset() {
+            this.Target = null;
+            this.SourceEffect = null;
+            this.AddedKeywords.Clear();
+            this.RemovedKeywords.Clear();
+            if (this.CancellationTokenSource is null) {
+                this.CancellationTokenSource = new CancellationTokenSource();
+            } else if (this.CancellationTokenSource.IsCancellationRequested) {
+                this.CancellationTokenSource.Dispose();
+                this.CancellationTokenSource = new CancellationTokenSource();
+            }
         }
     }
 }

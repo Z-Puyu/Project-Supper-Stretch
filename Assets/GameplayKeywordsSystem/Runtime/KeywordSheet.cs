@@ -2,25 +2,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CommonFrameworks.Iterators;
-using CommonFrameworks.Trees;
+using CommonFrameworks.Utilities;
 using SaintsField;
 using UnityEngine;
 
 namespace GameplayKeywordsSystem.Runtime {
     [CreateAssetMenu(fileName = "New Keyword Sheet", menuName = "Gameplay Keywords/Keyword Sheet")]
     public sealed class KeywordSheet : ScriptableObject, ITraversable<KeywordSheetNode> {
-        [field: SerializeField, DefaultExpand, FieldDefaultExpand] 
+        [field: SerializeField, DefaultExpand, FieldDefaultExpand]
         private List<KeywordSheetNode> Keywords { get; set; } = new List<KeywordSheetNode>();
 
-        KeywordSheetNode ITraversable<KeywordSheetNode>.Start => this.Keywords.FirstOrDefault();
+        KeywordSheetNode? ITraversable<KeywordSheetNode>.Start => this.Keywords.FirstOrDefault();
 
-        bool ITraversable<KeywordSheetNode>.HasOutNeighbours(KeywordSheetNode vertex, out IEnumerable<KeywordSheetNode> children) {
+        private void OnDestroy() {
+            Database<KeywordSheet>.Reload();
+        }
+
+        bool ITraversable<KeywordSheetNode>.HasOutNeighbours(
+            KeywordSheetNode vertex, out IEnumerable<KeywordSheetNode> children
+        ) {
             children = vertex.Children;
             return vertex.Children.Count > 0;
         }
 
         private bool Contains(string keyword) {
-            string[] parts = keyword.Trim().ToLower().Split('.', StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = keyword.Trim().ToLower().Split('/', StringSplitOptions.RemoveEmptyEntries);
             KeywordSheetNode root = this.Keywords.Find(node => node.Name == parts[0]);
             if (root is null) {
                 return false;
@@ -32,23 +38,53 @@ namespace GameplayKeywordsSystem.Runtime {
                     return false;
                 }
             }
-            
+
             return true;
         }
 
-        internal IEnumerable<AdvancedDropdownList<string>> ToDropdownLists() {
-            return this.Keywords.Select(node => node.ToDropdownList());
+        internal IEnumerable<AdvancedDropdownList<string>> ToAdvancedDropdownLists(bool includeInternalNodes = false) {
+            List<AdvancedDropdownList<string>> list = new List<AdvancedDropdownList<string>>();
+            foreach (KeywordSheetNode child in this.Keywords) {
+                (AdvancedDropdownList<string>? self, AdvancedDropdownList<string> children) =
+                        child.ToAdvancedDropdownList(includeInternalNodes);
+                if (includeInternalNodes && self is not null) {
+                    list.Add(self);
+                }
+                
+                list.Add(children);
+            }
+
+            list.Sort((a, b) => string.Compare(a.displayName, b.displayName, StringComparison.OrdinalIgnoreCase));
+            return list;
+        }
+
+        internal IEnumerable<(string path, string name)> Collate() {
+            return this.Keywords.SelectMany(node => node.Collapse());
         }
 
         private void OnValidate() {
+            Debug.Log("Validating keyword sheet");
             Stack<string> path = new Stack<string>();
             DepthFirstWalker<KeywordSheetNode> walker = new DepthFirstWalker<KeywordSheetNode>(
-                onVisit: node => node.Path = string.Join('.', path.Reverse()),
-                onBacktrack: (_, _) => path.Pop(),
-                onMoveForward: (_, next) => path.Push(next.Name)
+                onVisit: node => {
+                    Debug.Log($"Visit {node.Name}");
+                    node.Path = string.Join('/', path.Reverse());
+                },
+                onBacktrack: (curr, prev) => {
+                    Debug.Log($"Backtrack {curr.Name} -> {prev.Name}");
+                    path.Pop();
+                },
+                onMoveForward: (curr, next) => {
+                    Debug.Log($"Move {curr.Name} -> {next.Name}");
+                    path.Push(next.Name);
+                }
             );
-            
+
             foreach (KeywordSheetNode node in this.Keywords) {
+                if (node is null) {
+                    continue;
+                }
+
                 path.Clear();
                 path.Push(node.Name);
                 walker.Iterate(this, node);

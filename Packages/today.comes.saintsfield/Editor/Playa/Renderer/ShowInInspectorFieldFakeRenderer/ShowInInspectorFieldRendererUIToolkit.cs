@@ -6,13 +6,14 @@ using System.Linq;
 using System.Reflection;
 using SaintsField;
 using SaintsField.Editor.Core;
-using Saintsfield.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using SaintsField.Utils;
+using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Saintsfield.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
+namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
 {
     public partial class ShowInInspectorFieldRenderer
     {
@@ -231,6 +232,8 @@ namespace Saintsfield.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer
                 // UIToolkitUtils.SetLabel(UIToolkitUtils.TryFindLabel(container), chunks, _richTextDrawer ??= new RichTextDrawer());
             }
 
+            // Debug.Log(FieldWithInfo.FieldInfo?.Name);
+            // Debug.Log(FieldWithInfo.PropertyInfo?.Name);
             (string error, object value) = GetValue(FieldWithInfo);
             // Debug.Log($"error={error}, value={value}");
 

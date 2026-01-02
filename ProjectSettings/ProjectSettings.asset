@@ -831,25 +831,25 @@ PlayerSettings:
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
   scriptingDefineSymbols:
-    Android: CROSS_PLATFORM_INPUT
-    EmbeddedLinux: 
-    GameCoreScarlett: 
-    GameCoreXboxOne: 
-    Kepler: 
-    LinuxHeadlessSimulation: 
-    Nintendo Switch: 
-    Nintendo Switch 2: 
-    PS4: 
-    PS5: 
-    QNX: 
+    Android: CROSS_PLATFORM_INPUT;SAINTSFIELD_SAINTS_EDITOR_APPLY
+    EmbeddedLinux: SAINTSFIELD_SAINTS_EDITOR_APPLY
+    GameCoreScarlett: SAINTSFIELD_SAINTS_EDITOR_APPLY
+    GameCoreXboxOne: SAINTSFIELD_SAINTS_EDITOR_APPLY
+    Kepler: SAINTSFIELD_SAINTS_EDITOR_APPLY
+    LinuxHeadlessSimulation: SAINTSFIELD_SAINTS_EDITOR_APPLY
+    Nintendo Switch: SAINTSFIELD_SAINTS_EDITOR_APPLY
+    Nintendo Switch 2: SAINTSFIELD_SAINTS_EDITOR_APPLY
+    PS4: SAINTSFIELD_SAINTS_EDITOR_APPLY
+    PS5: SAINTSFIELD_SAINTS_EDITOR_APPLY
+    QNX: SAINTSFIELD_SAINTS_EDITOR_APPLY
     ReservedCFE: SAINTSFIELD_SAINTS_EDITOR_APPLY
-    Standalone: CROSS_PLATFORM_INPUT
-    VisionOS: 
-    WebGL: CROSS_PLATFORM_INPUT
-    Windows Store Apps: 
-    XboxOne: 
-    iPhone: CROSS_PLATFORM_INPUT
-    tvOS: 
+    Standalone: CROSS_PLATFORM_INPUT;SAINTSFIELD_SAINTS_EDITOR_APPLY
+    VisionOS: SAINTSFIELD_SAINTS_EDITOR_APPLY
+    WebGL: CROSS_PLATFORM_INPUT;SAINTSFIELD_SAINTS_EDITOR_APPLY
+    Windows Store Apps: SAINTSFIELD_SAINTS_EDITOR_APPLY
+    XboxOne: SAINTSFIELD_SAINTS_EDITOR_APPLY
+    iPhone: CROSS_PLATFORM_INPUT;SAINTSFIELD_SAINTS_EDITOR_APPLY
+    tvOS: SAINTSFIELD_SAINTS_EDITOR_APPLY
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

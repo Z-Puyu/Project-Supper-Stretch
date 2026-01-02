@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
-using CommonFrameworks.Utilities;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using GameplayAbilitiesSystem.Runtime.Attributes;
 using GameplayAbilitiesSystem.Runtime.Attributes.Evaluation;
 using GameplayAbilitiesSystem.Runtime.Modifiers;
@@ -14,12 +14,13 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         private enum ValueSource { Target, Instigator }
         
         [field: SerializeField, TreeDropdown(nameof(this.GetAllAttributes))]
-        private string Target { get; set; }
+        private string Target { get; set; } = string.Empty;
         
         [field: SerializeField] private ModifierType Type { get; set; }
         
+        [NotNull] 
         [field: SerializeReference, ReferencePicker, TableColumn("Magnitude")] 
-        private IAttributeMagnitude Value { get; set; }
+        private IAttributeMagnitude? Value { get; set; }
 
         [field: SerializeField, TableColumn("Magnitude"), ShowIf(nameof(this.IsAttributeBased))]
         private ValueSource BackingAttributeSource { get; set; } = ValueSource.Instigator;
@@ -30,17 +31,19 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
             return AttributeUtils.GetDropdownList();
         }
 
-        internal Modifier CreateModifier(EffectEmitterFacade source, IAttributeReader target) {
-            IAttributeReader attributes = this.BackingAttributeSource switch {
-                ValueSource.Target => target,
-                ValueSource.Instigator => source.Instigator,
-                var _ => throw new ArgumentOutOfRangeException(nameof(this.BackingAttributeSource), this.BackingAttributeSource, "")
+        internal Modifier CreateModifier(
+            IEffectEmitterFacade source, IEffectReceiverFacade target,
+            IReadOnlyDictionary<string, double>? userData = null
+        ) {
+            IAttributeReader? attributes = this.BackingAttributeSource switch {
+                ValueSource.Target => target.AttributeReader,
+                ValueSource.Instigator => source.AttributeReader,
+                var _ => throw new ArgumentOutOfRangeException(
+                    nameof(this.BackingAttributeSource), this.BackingAttributeSource, ""
+                )
             };
 
-            return new Modifier(
-                this.Target, this.Type, this.Value.Evaluate(attributes, source.UserData),
-                m => this.TargetConditions.OfType<IPredicate<ModifierEnvironment>>().All(p => p.Holds(m))
-            );
+            return new Modifier(this.Target, this.Type, ModifierValue.Of(this.Value.Evaluate(attributes, userData)));
         }
     }
 }

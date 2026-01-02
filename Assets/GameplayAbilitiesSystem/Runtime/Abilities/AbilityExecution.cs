@@ -1,48 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameplayAbilitiesSystem.Runtime.Animations;
+using GameplayAbilitiesSystem.Runtime.Effects;
+using GameplayKeywordsSystem.Runtime;
 using SaintsField;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Abilities {
     [Serializable]
     public abstract class AbilityExecution {
-        [field: SerializeReference, ReferencePicker]
-        private List<AnimationEventHandler> AnimationEventHandlers { get; set; } = new List<AnimationEventHandler>();
+        [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))] 
+        private List<string> ReceivesKeywordsOnAbilityStart { get; set; } = new List<string>();
 
-        private IDictionary<AnimationNotifier, List<AnimationEventHandler>> CachedAnimationEventHandlers { get; } =
-            new Dictionary<AnimationNotifier, List<AnimationEventHandler>>();
-
-        public abstract void Start(AbilitySystem system);
-        public abstract void End(AbilitySystem system);
-
-        internal void RespondToAnimationEvent(AbilitySystem system, AnimationNotifier notifier) {
-            if (this.CachedAnimationEventHandlers.Count == 0) {
-                foreach (AnimationEventHandler? handler in this.AnimationEventHandlers) {
-                    if (!handler.HandledNotifier) {
-                        continue;
-                    }
-
-                    AnimationNotifier key = handler.HandledNotifier;
-                    if (this.CachedAnimationEventHandlers.TryGetValue(key, out List<AnimationEventHandler>? list)) {
-                        list.Add(handler);
-                    } else {
-                        this.CachedAnimationEventHandlers.Add(key, new List<AnimationEventHandler> { handler });
-                    }
-                }
+        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.GetTreeDropdownList();
+        
+        protected abstract void Start(AbilitySystem system);
+        protected abstract void End(AbilitySystem system);
+        
+        internal void StartExecution(AbilitySystem system) {
+            foreach (string keyword in this.ReceivesKeywordsOnAbilityStart) {
+                system.EmitterKeywordContainer.Add(keyword);
             }
-
-            if (notifier.InheritedNotifier && notifier.InheritedNotifier != notifier) {
-                this.RespondToAnimationEvent(system, notifier.InheritedNotifier);
+            
+            this.Start(system);
+        }
+        
+        internal void EndExecution(AbilitySystem system) {
+            foreach (string keyword in this.ReceivesKeywordsOnAbilityStart) {
+                system.EmitterKeywordContainer.Remove(keyword);
             }
-
-            if (!this.CachedAnimationEventHandlers.TryGetValue(notifier, out List<AnimationEventHandler>? handlers)) {
-                return;
-            }
-
-            foreach (AnimationEventHandler handler in handlers) {
-                handler.Handle(system, notifier);
-            }
+            
+            this.End(system);
         }
     }
 }

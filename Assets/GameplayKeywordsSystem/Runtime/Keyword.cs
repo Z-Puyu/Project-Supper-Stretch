@@ -3,23 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace GameplayKeywordsSystem.Runtime {
-    public readonly struct Keyword : IComparable<Keyword>, IEquatable<Keyword>, IEnumerable<char> {
-        private string Value { get; }
-        
-        public Keyword(string value) {
-            this.Value = value;
-        }
+    public readonly record struct Keyword(string Value) : IComparable<Keyword>, IEnumerable<char> {
+        public static readonly Keyword Empty = new Keyword(string.Empty);
 
+        public Keyword Chop(int length = 1) {
+            if (length <= 0) {
+                return new Keyword(this.Value);
+            }
+            
+            string[] parts = this.Value.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            return length >= parts.Length
+                    ? Keyword.Empty
+                    : new Keyword(string.Join("/", parts, 0, parts.Length - length));
+        }
+        
         public int CompareTo(Keyword other) {
             return string.Compare(this.Value, other.Value, StringComparison.OrdinalIgnoreCase);
-        }
-
-        public bool Equals(Keyword other) {
-            return string.Equals(this.Value, other.Value, StringComparison.OrdinalIgnoreCase);
-        }
-        
-        public override bool Equals(object obj) {
-            return obj is Keyword other && this.Equals(other);
         }
 
         public override int GetHashCode() {
@@ -52,14 +51,6 @@ namespace GameplayKeywordsSystem.Runtime {
 
         public static bool operator !=(Keyword keyword, string str) {
             return !string.Equals(keyword.Value, str, StringComparison.OrdinalIgnoreCase);
-        }
-        
-        public static bool operator ==(Keyword keyword, Keyword other) {
-            return string.Equals(keyword.Value, other.Value, StringComparison.OrdinalIgnoreCase);
-        }
-
-        public static bool operator !=(Keyword keyword, Keyword other) {
-            return !string.Equals(keyword.Value, other.Value, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

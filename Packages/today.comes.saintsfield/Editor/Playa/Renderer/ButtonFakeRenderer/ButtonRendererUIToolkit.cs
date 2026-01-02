@@ -6,10 +6,12 @@ using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
-using Saintsfield.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
+// ReSharper disable once RedundantUsingDirective
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -181,10 +183,80 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
             UIToolkitUtils.KeepRotate(buttonRotator);
             buttonRotator.schedule.Execute(() => UIToolkitUtils.TriggerRotate(buttonRotator)).StartingIn(200);
 
+            bool isStruct = ReflectUtils.TypeIsStruct(FieldWithInfo.Targets[0].GetType());
+
             _buttonElement = new Button(() =>
             {
                 SaintsContext.SerializedProperty = _serializedProperty;
-                object[] returnValues = FieldWithInfo.Targets.Select(t => methodInfo.Invoke(t, parameterValues)).ToArray();
+                object[] returnValues = FieldWithInfo.Targets.Select(eachTarget =>
+                {
+                    (object rawMemberValue, object useTarget) = GetRefreshedTarget(FieldWithInfo, eachTarget);
+
+                    object result = methodInfo.Invoke(useTarget, parameterValues);
+
+                    if (isStruct && FieldWithInfo.TargetParent != null && FieldWithInfo.TargetMemberInfo != null)
+                    {
+                        // Debug.Log($"write back {FieldWithInfo.TargetParent}:{FieldWithInfo.TargetMemberInfo.Name}");
+                        switch (FieldWithInfo.TargetMemberInfo)
+                        {
+                            case FieldInfo fieldInfo:
+                            {
+                                if (FieldWithInfo.TargetMemberIndex != -1)
+                                {
+                                    if(rawMemberValue != null)
+                                    {
+                                        Util.SetCollectionIndex(rawMemberValue, FieldWithInfo.TargetMemberIndex,
+                                            useTarget);
+                                    }
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        fieldInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
+                                    }
+                                    catch (Exception e)
+                                    {
+#if SAINTSFIELD_DEBUG
+                                        Debug.LogException(e);
+#endif
+                                    }
+                                }
+                            }
+                                break;
+                            case PropertyInfo propertyInfo:
+                            {
+                                if (propertyInfo.CanWrite)
+                                {
+                                    if (FieldWithInfo.TargetMemberIndex != -1)
+                                    {
+                                        if(rawMemberValue != null)
+                                        {
+                                            Util.SetCollectionIndex(rawMemberValue, FieldWithInfo.TargetMemberIndex,
+                                                useTarget);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        try
+                                        {
+                                            propertyInfo.SetValue(FieldWithInfo.TargetParent, useTarget);
+                                        }
+                                        catch (Exception e)
+                                        {
+#if SAINTSFIELD_DEBUG
+                                            Debug.LogException(e);
+#endif
+                                        }
+                                    }
+                                }
+                            }
+                                break;
+                        }
+                    }
+
+                    return result;
+                }).ToArray();
 
                 if (hasReturnValue)
                 {
@@ -381,6 +453,8 @@ namespace SaintsField.Editor.Playa.Renderer.ButtonFakeRenderer
                 }
             }
         }
+
+
 
         // private RichTextDrawer _richTextDrawer;
 

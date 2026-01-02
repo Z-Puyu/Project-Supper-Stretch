@@ -4,8 +4,8 @@ using GameplayKeywordsSystem.Runtime;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
     public interface IEffectReceiverFacade {
-        public AttributeSet AttributeSet { get; }
+        public IAttributeReader? AttributeReader { get; }
         public IModifiable ModifierConsumer { get; }
-        public ITaggable<Keyword> KeywordConsumer { get; }
+        public ITaggable<Keyword> ReceiverKeywordContainer { get; }
     }
 }

@@ -1,15 +1,17 @@
 using System.Collections.Generic;
-using CommonFrameworks.Utilities;
+using CommonFrameworks.Logic;
 using SaintsField;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
     public abstract class ConditionalExecution {
         [field: SerializeReference, ReferencePicker]
-        private List<IPredicate<EffectEmitterFacade>> SourceConditions { get; set; } = new List<IPredicate<EffectEmitterFacade>>();
+        private List<IPredicate<IEffectEmitterFacade>> SourceConditions { get; set; } =
+            new List<IPredicate<IEffectEmitterFacade>>();
 
         [field: SerializeReference, ReferencePicker]
-        protected List<IPredicate<EffectReceiverFacade>> TargetConditions { get; private set; } = new List<IPredicate<EffectReceiverFacade>>();
+        protected List<IPredicate<IEffectReceiverFacade>> TargetConditions { get; private set; } =
+            new List<IPredicate<IEffectReceiverFacade>>();
         
         protected virtual bool IsApplicable(IEffectReceiverFacade target) {
             return this.TargetConditions.Count == 0 ||
@@ -21,7 +23,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
                    this.SourceConditions.TrueForAll(condition => condition.Holds(source));
         }
 
-        public bool IsApplicable(EffectEmitterFacade source, EffectReceiverFacade target) {
+        public bool IsApplicable(IEffectEmitterFacade source, IEffectReceiverFacade target) {
             return this.IsApplicable(target) && this.IsApplicable(source);
         }
     }

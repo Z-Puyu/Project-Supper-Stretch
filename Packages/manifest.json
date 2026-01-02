@@ -1,4 +1,23 @@
 {
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "org.nuget.microsoft.codeanalysis.analyzers",
+        "org.nuget.microsoft.codeanalysis.common",
+        "org.nuget.microsoft.codeanalysis.csharp",
+        "org.nuget.system.buffers",
+        "org.nuget.system.collections.immutable",
+        "org.nuget.system.memory",
+        "org.nuget.system.numerics.vectors",
+        "org.nuget.system.reflection.metadata",
+        "org.nuget.system.runtime.compilerservices.unsafe",
+        "org.nuget.system.text.encoding.codepages",
+        "org.nuget.system.threading.tasks.extensions"
+      ]
+    }
+  ],
   "dependencies": {
     "com.kandreyc.unity-csharp-patch": "https://github.com/kandreyc/unity-csharp-patch.git#v1.5.0",
     "com.kyrylokuzyk.primetween": "file:../Assets/Plugins/PrimeTween/internal/com.kyrylokuzyk.primetween.tgz",
@@ -58,6 +77,7 @@
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
-    "com.unity.modules.xr": "1.0.0"
+    "com.unity.modules.xr": "1.0.0",
+    "org.nuget.microsoft.codeanalysis.csharp": "4.14.0"
   }
 }

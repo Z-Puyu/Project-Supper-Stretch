@@ -21,8 +21,6 @@ namespace CommonFrameworks.Iterators {
                 foreach (Move move in dfs(start, u)) {
                     yield return move;
                 }
-                
-                yield return new Move(u, start, Move.Type.Backward);
             }
             
             yield break;
@@ -34,6 +32,7 @@ namespace CommonFrameworks.Iterators {
                 
                 yield return new Move(parent, source, Move.Type.Forward);
                 if (!map.HasOutNeighbours(source, out IEnumerable<T> neighbourhood)) {
+                    yield return new Move(source, parent, Move.Type.Backward);
                     yield break;
                 }
                 

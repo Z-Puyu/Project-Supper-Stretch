@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CommonFrameworks.Collections;
 using CommonFrameworks.Processors;
-using CommonFrameworks.Trees;
 using GameplayAbilitiesSystem.Runtime.Attributes;
 using SaintsField;
 using SaintsField.Playa;
@@ -60,12 +60,12 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
         [field: SerializeField] private bool IsGlobalEnvironment { get; set; }
 
         [field: SerializeField, Required, HideIf(nameof(this.IsGlobalEnvironment))]
-        private ModifierEnvironment ParentEnvironment { get; set; }
+        private ModifierEnvironment? ParentEnvironment { get; set; }
 
         private TrieDictionary<AttributeKey, char, Node> Modifiers { get; } =
             new TrieDictionary<AttributeKey, char, Node>();
 
-        public event UnityAction<AttributeKey> OnModifierUpdated;
+        public event UnityAction<AttributeKey> OnModifierUpdated = delegate { };
 
         public void AddModifier(Modifier modifier) {
             if (modifier.Value == 0) {
@@ -83,7 +83,7 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
                 node.Modifiers[(int)modifier.Type] += modifier.Value;
             }
 
-            this.OnModifierUpdated?.Invoke(modifier.Target);
+            this.OnModifierUpdated.Invoke(modifier.Target);
         }
 
         private void CollectModifiers(AttributeKey attribute, ModifierValue[] modifiers) {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using SaintsField;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace GameplayKeywordsSystem.Runtime {
 
         [field: SerializeField, DefaultExpand, FieldDefaultExpand]
         internal List<KeywordSheetNode> Children { get; private set; } = new List<KeywordSheetNode>();
-        
+
         internal bool IsLeaf => this.Children.Count == 0;
 
         private bool HasSameName(string name) {
@@ -23,17 +24,43 @@ namespace GameplayKeywordsSystem.Runtime {
             return node is not null;
         }
 
-        internal AdvancedDropdownList<string> ToDropdownList() {
+        internal (AdvancedDropdownList<string>? self, AdvancedDropdownList<string> children) ToAdvancedDropdownList(
+            bool includeInternalNodes = false
+        ) {
             if (this.IsLeaf) {
-                return new AdvancedDropdownList<string>(this.Name, this.Path);
+                return (null, new AdvancedDropdownList<string>(this.Name, this.Path));
             }
-            
-            List<AdvancedDropdownList<string>> children = this.Children.ConvertAll(child => child.ToDropdownList());
-            children.Sort((a, b) => string.Compare(a.displayName, b.displayName, StringComparison.OrdinalIgnoreCase));
-            return new AdvancedDropdownList<string>(this.Name, children);
+
+            List<AdvancedDropdownList<string>> list = new List<AdvancedDropdownList<string>>();
+            foreach (KeywordSheetNode child in this.Children) {
+                (AdvancedDropdownList<string>? self, AdvancedDropdownList<string> children) =
+                        child.ToAdvancedDropdownList(includeInternalNodes);
+                if (includeInternalNodes && self is not null) {
+                    list.Add(self);
+                }
+
+                list.Add(children);
+            }
+
+            list.Sort((a, b) => string.Compare(a.displayName, b.displayName, StringComparison.OrdinalIgnoreCase));
+            return (new AdvancedDropdownList<string>(this.Name, this.Path),
+                new AdvancedDropdownList<string>(this.Name, list));
         }
 
-        public int CompareTo(KeywordSheetNode other) {
+        internal IEnumerable<(string path, string name)> Collapse() {
+            List<(string, string)> list = new List<(string, string)> { (this.Path, this.Name) };
+            Queue<KeywordSheetNode> queue = new Queue<KeywordSheetNode>(this.Children);
+            while (queue.TryDequeue(out KeywordSheetNode child)) {
+                list.Add((child.Path, child.Name));
+                foreach (KeywordSheetNode grandchild in child.Children) {
+                    queue.Enqueue(grandchild);
+                }
+            }
+
+            return list;
+        }
+
+        public int CompareTo(KeywordSheetNode? other) {
             if (object.ReferenceEquals(this, other)) {
                 return 0;
             }

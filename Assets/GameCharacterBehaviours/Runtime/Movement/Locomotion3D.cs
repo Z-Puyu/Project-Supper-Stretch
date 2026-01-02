@@ -22,12 +22,16 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             }
         }
 
-        protected override void Move(float deltaTime) {
+        protected override void MoveBy(Vector3 displacement) {
             if (this.Controller) {
-                this.Controller.Move(this.PlanarDirection3D * deltaTime);
+                this.Controller.Move(displacement);
             } else {
-                this.Root.position += this.PlanarDirection3D * deltaTime;
+                this.OwnerTransform.position += displacement;
             }
+        }
+
+        protected override void Move(float deltaTime) {
+            this.MoveBy(this.PlanarDirection3D * deltaTime);
         }
 
         protected override void Rotate() {
@@ -37,17 +41,17 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             
             Vector3 forward = this.CameraSpace.forward;
             Quaternion target = Quaternion.LookRotation(forward);
-            Quaternion rotation = this.Root.rotation;
-            float diff = Vector3.Angle(forward, this.Root.forward);
+            Quaternion rotation = this.OwnerTransform.rotation;
+            float diff = Vector3.Angle(forward, this.OwnerTransform.forward);
             if (diff < 1) {
                 return;
             }
             
             float duration = diff / this.RotationSpeed;
-            this.Root.rotation = Quaternion.Slerp(rotation, target, Mathf.Clamp01(Time.deltaTime / duration));
+            this.OwnerTransform.rotation = Quaternion.Slerp(rotation, target, Mathf.Clamp01(Time.deltaTime / duration));
 #if DEBUG
-            Vector3 position = this.Root.position;
-            Debug.DrawRay(position, this.Root.forward * 100, Color.red);
+            Vector3 position = this.OwnerTransform.position;
+            Debug.DrawRay(position, this.OwnerTransform.forward * 100, Color.red);
             Debug.DrawRay(position, forward * 100, Color.green);
 #endif
         }

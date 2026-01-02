@@ -1,5 +1,4 @@
-﻿using System;
-using CommonFrameworks.Utilities;
+﻿using CommonFrameworks.Utilities;
 using GameManagement;
 using UnityEngine;
 using UnityEngine.UIElements;

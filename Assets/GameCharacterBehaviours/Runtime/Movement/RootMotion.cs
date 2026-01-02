@@ -16,9 +16,7 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         }
 
         private void OnAnimatorMove() {
-            Vector3 delta = this.Animator.deltaPosition;
-            this.MovementController.PlanarDirection = new Vector2(delta.x / Time.deltaTime, delta.z / Time.deltaTime);
-            this.MovementController.MoveAndRotate(Time.deltaTime);
+            this.MovementController.MoveAndRotate(this.Animator.deltaPosition);
         }
     }
 }

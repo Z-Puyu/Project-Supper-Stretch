@@ -90,6 +90,12 @@ namespace CommonFrameworks.Extensions {
 
         #region Get-Or-Add Operations
 
+        public static void AddIfAbsent<T>(this GameObject obj) where T : Component {
+            if (!obj.TryGetComponent(out T _)) {
+                obj.AddComponent<T>();
+            }
+        }
+
         public static T GetOrAddComponent<T>(this GameObject obj) where T : Component {
             return obj.TryGetComponent(out T component) ? component : obj.AddComponent<T>();
         }

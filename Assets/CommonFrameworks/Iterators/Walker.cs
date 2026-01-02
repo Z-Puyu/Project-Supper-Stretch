@@ -5,7 +5,7 @@ namespace CommonFrameworks.Iterators {
         private Action<T, T>? OnMoveForward { get; }
         private Action<T, T>? OnBacktrack { get; }
 
-        public Walker(
+        protected Walker(
             Action<T>? onVisit = null, Action<T, T>? onMoveForward = null, Action<T, T>? onBacktrack = null
         ) : base(onVisit) {
             this.OnMoveForward = onMoveForward;

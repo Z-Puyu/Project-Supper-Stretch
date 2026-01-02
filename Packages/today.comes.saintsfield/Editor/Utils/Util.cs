@@ -1090,7 +1090,125 @@ namespace SaintsField.Editor.Utils
                 return (e.Message, defaultValue);
             }
 
+            if (property != null && target != null)
+            {
+                Type targetType = target.GetType();
+                // Debug.Log(targetType);
+                if (ReflectUtils.TypeIsStruct(targetType))
+                {
+                    // Debug.Log($"Type {targetType} Is Struct");
+
+                    string originPath = property.propertyPath;
+                    // target type will be the parent if it's a primitive array/list, so we need to check if
+                    // we're directly under an array/list, like string[]
+                    int propIndex = SerializedUtils.PropertyPathIndex(originPath);
+                    if (propIndex < 0)
+                    {
+                        string[] propPaths = originPath.Split(SerializedUtils.DotSplitSeparator);
+                        if(propPaths.Length >= 2)
+                        {
+                            string lastParentPart = propPaths[^2];
+                            int insideArrayIndex = -1;
+                            if (lastParentPart.StartsWith("data[") && lastParentPart.EndsWith("]"))
+                            {
+                                insideArrayIndex = int.Parse(lastParentPart.Substring("data[".Length,
+                                    lastParentPart.Length - "data[".Length - 1));
+                            }
+                            // Debug.Log(insideArrayIndex);
+                            (SerializedUtils.FieldOrProp targetFieldOrProp, object targetParent) = SerializedUtils.GetFieldInfoAndDirectParentByPathSegments(property, propPaths.SkipLast(1));
+                            if (targetParent != null)
+                            {
+                                // Debug.Log($"targetParent={targetParent}, {targetParent is Array}");
+                                if (targetFieldOrProp.IsField)
+                                {
+                                    if (insideArrayIndex >= 0)
+                                    {
+                                        object collectionInfo = targetFieldOrProp.FieldInfo.GetValue(targetParent);
+                                        SetCollectionIndex(collectionInfo, insideArrayIndex, target);
+                                    }
+                                    else
+                                    {
+                                        try
+                                        {
+                                            targetFieldOrProp.FieldInfo.SetValue(targetParent, target);
+                                        }
+                                        catch (Exception e)
+                                        {
+    #if SAINTSFIELD_DEBUG
+                                            Debug.LogException(e);
+    #endif
+                                        }
+                                    }
+                                }
+                                else if(targetFieldOrProp.PropertyInfo.CanWrite)
+                                {
+                                    // Debug.Log($"write back {targetFieldOrProp.PropertyInfo.Name} with {target}");
+                                    if (insideArrayIndex >= 0)
+                                    {
+                                        object collectionInfo = targetFieldOrProp.FieldInfo.GetValue(targetParent);
+                                        SetCollectionIndex(collectionInfo, insideArrayIndex, target);
+                                    }
+                                    else
+                                    {
+                                        try
+                                        {
+                                            targetFieldOrProp.PropertyInfo.SetValue(targetParent, target);
+                                        }
+                                        catch (Exception e)
+                                        {
+    #if SAINTSFIELD_DEBUG
+                                            Debug.LogException(e);
+    #endif
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             return ("", genResult);
+        }
+
+        public static void SetCollectionIndex(object collectionInfo, int insideArrayIndex, object target)
+        {
+            switch (collectionInfo)
+            {
+                case Array arr:
+                {
+                    try
+                    {
+                        arr.SetValue(target, insideArrayIndex);
+                    }
+                    catch (Exception e)
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogException(e);
+#endif
+                    }
+                }
+                    break;
+                case IList lis:
+                {
+                    try
+                    {
+                        lis[insideArrayIndex] = target;
+                    }
+                    catch (Exception e)
+                    {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogException(e);
+#endif
+                    }
+                }
+                    break;
+                default:
+#if SAINTSFIELD_DEBUG
+                    Debug.LogError($"{collectionInfo} is not a supported collection type: {collectionInfo?.GetType()}");
+#endif
+                    break;
+            }
         }
 
         private static Type FindTypeInAssmbly(Assembly assembly, IReadOnlyList<string> split)

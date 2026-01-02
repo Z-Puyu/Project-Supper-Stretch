@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
+using CommonFrameworks.Collections;
+using CommonFrameworks.Components;
 using CommonFrameworks.Extensions;
 using CommonFrameworks.Processors;
-using CommonFrameworks.Trees;
 using GameplayAbilitiesSystem.Runtime.Attributes.Processors;
 using GameplayAbilitiesSystem.Runtime.Modifiers;
 using SaintsField;
@@ -14,7 +15,7 @@ using UnityEngine.Events;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes {
     [DisallowMultipleComponent, RequireComponent(typeof(ModifierEnvironment))]
-    public sealed class AttributeSet : MonoBehaviour, IAttributeReader, IModifiable {
+    public sealed class AttributeSet : BehaviourComponent, IAttributeReader, IModifiable {
         private sealed class Node {
             internal double BaseValue { get; set; }
             internal double Value { get; set; }
@@ -22,7 +23,7 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         }
 
         private TrieDictionary<AttributeKey, char, Node> Attributes { get; } =
-            new TrieDictionary<AttributeKey, char, Node>('.');
+            new TrieDictionary<AttributeKey, char, Node>('/');
 
         [field: SerializeField] private AttributeTable? DefaultBaseAttributes { get; set; }
     
@@ -37,20 +38,13 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
 
         public event UnityAction<AttributeChange>? OnAttributeUpdated;
 
-        private void Awake() {
+        protected override void Awake() {
+            base.Awake();
             this.ModifierEnvironment = this.GetOrAddComponent<ModifierEnvironment>();
             this.ModifierEnvironment.OnModifierUpdated += this.UpdateAttribute;
-        }
-
-        private void OnEnable() {
             if (this.Attributes.Count == 0 && this.DefaultBaseAttributes) {
                 this.DefaultBaseAttributes.Initialise(this);
             }
-        }
-
-        private void RegisterModifierEnvironment(ModifierEnvironment environment) {
-            this.ModifierEnvironment = environment;
-            this.ModifierEnvironment.OnModifierUpdated += this.UpdateAttribute;
         }
 
         private void PostAttributeUpdate(Attribute attribute) {

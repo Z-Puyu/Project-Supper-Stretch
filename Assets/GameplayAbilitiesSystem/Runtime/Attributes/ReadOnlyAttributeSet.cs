@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using CommonFrameworks.Trees;
+using CommonFrameworks.Collections;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes {
     public sealed class ReadOnlyAttributeSet : IAttributeReader {

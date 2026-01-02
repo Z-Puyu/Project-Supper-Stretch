@@ -1,4 +1,5 @@
-﻿using CommonFrameworks.Utilities;
+﻿using Characters.Player;
+using CommonFrameworks.Utilities;
 using GameCharacterBehaviours.Runtime.Movement;
 using SaintsField;
 using SaintsField.Playa;

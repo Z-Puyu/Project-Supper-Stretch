@@ -12,12 +12,12 @@ namespace CommonFrameworks.Events {
         private static event Action<Event<S, E>> OnEvent = delegate { };
         private static event Action OnNotified = delegate { };
 
-        internal static void Publish(S sender, E @event) {
+        internal static void Send(S sender, E @event) {
             MailBox<S, E>.OnEvent.Invoke(new Event<S, E>(sender, @event));
             MailBox<S, E>.OnNotified.Invoke();
         }
 
-        internal static void PublishTo(object subscriber, S sender, E @event) {
+        internal static void SendTo(object subscriber, S sender, E @event) {
             if (MailBox<S, E>.Handlers.TryGetValue(subscriber, out Action<Event<S, E>> handler)) {
                 handler.Invoke(new Event<S, E>(sender, @event));
             }
