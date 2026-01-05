@@ -1,0 +1,91 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using GameplayAbilitiesSystem.Runtime.Animations;
+using SaintsField;
+using SaintsField.Playa;
+using UnityEngine;
+
+namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
+    [Serializable]
+    public sealed class PlayAnimation : AbilityExecutionStep {
+        [field: SerializeField, OnValueChanged(nameof(this.OnClipChanged))] 
+        private AnimationClip? Clip { get; set; }
+
+        [field: SerializeField, Table(true, true), ShowIf(nameof(this.HasAnyAnimationSignal))]
+        private List<AnimationSignal> AnimationSignals { get; set; } = new List<AnimationSignal>();
+        
+        [field: SerializeReference, ReferencePicker, HideIf(nameof(this.WillEndAbilityOnCompletion))] 
+        private AbilityExecutionStep? AnimationEnd { get; set; }
+
+        [field: SerializeReference, ReferencePicker]
+        private AbilityExecutionStep? AnimationInterrupt { get; set; } = new EndAbility();
+        
+        private CancellationTokenSource? Interrupter { get; set; }
+        
+        private bool HasAnyAnimationSignal => this.AnimationSignals.Count > 0;
+
+        protected override async Awaitable Execute(
+            AbilitySystem system, Ability ability, CancellationTokenSource interrupter
+        ) {
+            if (!this.Clip) {
+                return;
+            }
+
+            this.Interrupter = interrupter;
+            this.Animate(system, this.Clip, interrupter);
+            await new AwaitableCompletionSource().Awaitable;
+        }
+
+        private async void Animate(AbilitySystem system, AnimationClip clip, CancellationTokenSource interrupter) {
+            try {
+                await system.PlayAnimation(clip, interrupter.Token, onNotify);
+                if (this.OwnerSystem && this.OwnerAbility) {
+                    this.AnimationEnd?.Run(this.OwnerSystem, this.OwnerAbility, interrupter);
+                }
+
+                return;
+
+                void onNotify(AnimationNotifier notifier) {
+                    if (this.OwnerSystem && this.OwnerAbility) {
+                        this.AnimationSignals.FirstOrDefault(signal => signal.Name == notifier.Name)
+                            ?.OnSignal?.Run(this.OwnerSystem, this.OwnerAbility, interrupter);
+                    }
+                }
+            } catch (OperationCanceledException) {
+                if (this.OwnerSystem && this.OwnerAbility) {
+                    this.AnimationInterrupt?.Run(this.OwnerSystem, this.OwnerAbility, interrupter);
+                }
+            } catch (Exception e) {
+                Debug.LogException(e);
+            } finally {
+                this.Interrupter = null;
+            }
+        }
+        
+        private void OnClipChanged() {
+            if (!this.Clip) {
+                this.AnimationSignals.Clear();
+            } else {
+                List<AnimationNotifier> notifiers = this.Clip.events
+                                                        .Select(@event => @event.objectReferenceParameter)
+                                                        .OfType<AnimationNotifier>()
+                                                        .ToList();
+                this.AnimationSignals.RemoveAll(signal => notifiers.All(notifier => notifier.Name != signal.Name));
+                List<AnimationSignal> signals = new List<AnimationSignal>(notifiers.Count);
+                foreach (AnimationNotifier notifier in notifiers) {
+                    AnimationSignal? signal = this.AnimationSignals.FirstOrDefault(s => s.Name == notifier.Name);
+                    signals.Add(signal ?? new AnimationSignal(notifier.Name));
+                }
+                
+                this.AnimationSignals = signals;
+            }
+        }
+        
+        [Button]
+        private void RefreshAnimationSignals() {
+            this.OnClipChanged();
+        }
+    }
+}

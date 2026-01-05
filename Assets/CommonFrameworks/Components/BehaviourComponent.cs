@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using CommonFrameworks.Extensions;
 using UnityEngine;
 using Object = UnityEngine.Object;

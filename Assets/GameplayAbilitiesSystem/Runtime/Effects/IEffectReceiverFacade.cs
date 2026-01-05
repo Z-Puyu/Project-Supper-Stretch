@@ -1,4 +1,5 @@
-﻿using GameplayAbilitiesSystem.Runtime.Attributes;
+﻿using GameplayAbilitiesSystem.Runtime.Abilities;
+using GameplayAbilitiesSystem.Runtime.Attributes;
 using GameplayAbilitiesSystem.Runtime.Modifiers;
 using GameplayKeywordsSystem.Runtime;
 
@@ -7,5 +8,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         public IAttributeReader? AttributeReader { get; }
         public IModifiable ModifierConsumer { get; }
         public ITaggable<Keyword> ReceiverKeywordContainer { get; }
+        
+        public void StopEffects(Ability? ability = null, Effect? type = null, Keyword keyword = default);
     }
 }

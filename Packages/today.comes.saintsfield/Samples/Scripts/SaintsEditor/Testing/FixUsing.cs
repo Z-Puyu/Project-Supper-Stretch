@@ -1,4 +1,3 @@
-using System;
 using SaintsField.Playa;
 using SaintsField.Samples.Scripts.Interface;
 using UnityEngine;

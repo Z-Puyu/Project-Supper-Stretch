@@ -2,10 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SaintsField.Editor.Core;
 using SaintsField.Editor.UIToolkitElements;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.ColorPalette.UIToolkit

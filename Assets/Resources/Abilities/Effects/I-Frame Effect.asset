@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 572ceab3531345fdb52a8d7603dd9002, type: 3}
-  m_Name: Dodge i-Frame Effect
+  m_Name: I-Frame Effect
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Effects.Effect
-  <Tag>k__BackingField: 
+  <Tag>k__BackingField: Effects/Combat/iFrame
   <Periodicity>k__BackingField: 0
   <IsInfinite>k__BackingField: 0
   <Duration>k__BackingField: 0
@@ -22,9 +22,9 @@ MonoBehaviour:
   <Modifiers>k__BackingField: []
   <TargetReceivesKeywords>k__BackingField: []
   <TargetRemovesKeywords>k__BackingField: []
-  <SourceAddsKeywords>k__BackingField: []
+  <SourceReceivesKeywords>k__BackingField: []
   <SourceRemovesKeywords>k__BackingField: []
-  <CustomEffects>k__BackingField: []
+  <CustomSideEffects>k__BackingField: []
   references:
     version: 2
     RefIds: []

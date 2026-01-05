@@ -1,5 +1,3 @@
-using SaintsField.Samples.Scripts.SaintsEditor;
-
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
 {
     public class Issue278EnumByte : SaintsMonoBehaviour

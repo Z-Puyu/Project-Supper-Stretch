@@ -1,11 +1,9 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Characters.Events;
 using CommonFrameworks.Events;
 using GameplayAbilitiesSystem.Runtime.Abilities;
 using SaintsField;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Characters.Player {
     [DisallowMultipleComponent]
@@ -26,7 +24,7 @@ namespace Characters.Player {
                 return;
             }
             
-            this.AbilitySystem.PerformAbility(this.RollAbility);
+            this.AbilitySystem.Perform(this.RollAbility);
         }
     }
 }

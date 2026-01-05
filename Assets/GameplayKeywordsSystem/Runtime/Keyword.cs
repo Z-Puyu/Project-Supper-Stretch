@@ -16,6 +16,10 @@ namespace GameplayKeywordsSystem.Runtime {
                     ? Keyword.Empty
                     : new Keyword(string.Join("/", parts, 0, parts.Length - length));
         }
+
+        public bool StartsWith(Keyword prefix) {
+            return this.Value.StartsWith(prefix.Value, StringComparison.OrdinalIgnoreCase);
+        }
         
         public int CompareTo(Keyword other) {
             return string.Compare(this.Value, other.Value, StringComparison.OrdinalIgnoreCase);

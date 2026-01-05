@@ -1,5 +1,4 @@
 ﻿using System;
-using SaintsField.Samples.Scripts.Interface;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.ReferenceExamples

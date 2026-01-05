@@ -1,5 +1,4 @@
 using SaintsField.ComponentHeader;
-using SaintsField.Samples.Scripts.SaintsEditor;
 
 namespace SaintsField.Samples.Scripts.HeaderComponentExample
 {

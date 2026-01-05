@@ -1,8 +1,6 @@
 using SaintsField.Playa;
 using UnityEngine;
-using UnityEngine.Events;
 #if UNITY_EDITOR
-using UnityEditor;
 #endif
 
 // ReSharper disable once CheckNamespace

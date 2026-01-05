@@ -3,7 +3,6 @@ using System;
 using System.Reflection;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using UnityEditor;
-using UnityEngine.Events;
 
 namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 {

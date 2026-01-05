@@ -1,5 +1,4 @@
 using System;
-using SaintsField.Samples.Scripts.SaintsEditor;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {

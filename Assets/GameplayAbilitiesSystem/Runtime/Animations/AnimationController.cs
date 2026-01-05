@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Events;
@@ -6,25 +7,27 @@ using UnityEngine.Playables;
 
 namespace GameplayAbilitiesSystem.Runtime.Animations {
     public sealed class AnimationController {
+        private Animator Animator { get; set; }
+        private CancellationTokenSource InternalInterrupter { get; set; } = new CancellationTokenSource();
         private PlayableGraph PlayableGraph { get; } = PlayableGraph.Create("Animation Graph");
         private AnimationPlayableOutput Output { get; set; }
         private AnimationMixerPlayable FinalMixer { get; set; }
         private AnimatorControllerPlayable AnimatorController { get; set; }
         private AnimationClipPlayable ActionAnimationClip { get; set; }
-        internal event UnityAction<AnimationClip> OnClipPlayed = delegate { };
+        internal event UnityAction<AnimationClip, UnityAction<AnimationNotifier>> OnAnimationStarted = delegate { };
 
-        private AnimationController() {
+        private AnimationController(Animator animator) {
+            this.Animator = animator;
             this.FinalMixer = AnimationMixerPlayable.Create(this.PlayableGraph, 1);
+            this.Output = AnimationPlayableOutput.Create(this.PlayableGraph, "Output", animator);
+            this.AnimatorController = AnimatorControllerPlayable.Create(
+                this.PlayableGraph, animator.runtimeAnimatorController
+            );
         }
 
         internal static AnimationController Create(Animator animator) {
-            AnimationController controller = new AnimationController();
-            controller.Output = AnimationPlayableOutput.Create(controller.PlayableGraph, "Output", animator);
+            AnimationController controller = new AnimationController(animator);
             controller.Output.SetSourcePlayable(controller.FinalMixer);
-            controller.AnimatorController = AnimatorControllerPlayable.Create(
-                controller.PlayableGraph, animator.runtimeAnimatorController
-            );
-
             controller.FinalMixer.DisconnectInput(0);
             controller.FinalMixer.ConnectInput(0, controller.AnimatorController, 0);
             controller.FinalMixer.SetInputWeight(0, 1);
@@ -32,25 +35,47 @@ namespace GameplayAbilitiesSystem.Runtime.Animations {
             return controller;
         }
 
-        public IEnumerator? PlayActionAnimation(AnimationClip clip) {
-            if (this.ActionAnimationClip.IsValid() && this.ActionAnimationClip.GetAnimationClip() == clip) {
-                return null;
+        public async Awaitable PlayActionAnimation(
+            AnimationClip clip, UnityAction<AnimationNotifier> onNotify, Action? onInterrupt = null,
+            CancellationToken interrupter = default
+        ) {
+            this.InterruptCurrentAction();
+            createClip();
+            this.OnAnimationStarted.Invoke(clip, onNotify);
+            using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(
+                interrupter, this.InternalInterrupter.Token
+            );
+            
+            try {
+                await this.Crossfade(clip, cts.Token);
+            } finally {
+                this.ResetPlayableGraph();
             }
 
-            this.FinalMixer.SetInputCount(2);
-            this.InterruptCurrentAction();
+            return;
 
-            this.ActionAnimationClip = AnimationClipPlayable.Create(this.PlayableGraph, clip);
-            this.ActionAnimationClip.SetDuration(clip.length);
-            this.ActionAnimationClip.SetApplyFootIK(false);
-            this.ActionAnimationClip.SetPropagateSetTime(true);
-            this.ActionAnimationClip.SetTime(0);
-
-            this.FinalMixer.ConnectInput(1, this.ActionAnimationClip, 0);
-            return this.Crossfade(clip);
+            void createClip() {
+                this.FinalMixer.SetInputCount(2);
+                this.ActionAnimationClip = AnimationClipPlayable.Create(this.PlayableGraph, clip);
+                this.ActionAnimationClip.SetDuration(clip.length);
+                this.ActionAnimationClip.SetApplyFootIK(false);
+                this.ActionAnimationClip.SetPropagateSetTime(true);
+                this.ActionAnimationClip.SetTime(0);
+                this.FinalMixer.ConnectInput(1, this.ActionAnimationClip, 0);
+            }
         }
 
         public void InterruptCurrentAction() {
+            if (!this.ActionAnimationClip.IsValid()) {
+                return;
+            }
+
+            this.InternalInterrupter.Cancel();
+            this.InternalInterrupter.Dispose();
+            this.InternalInterrupter = new CancellationTokenSource();
+        }
+
+        private void ResetPlayableGraph() {
             this.FinalMixer.SetInputWeight(0, 1);
             this.FinalMixer.SetInputWeight(1, 0);
             if (!this.ActionAnimationClip.IsValid()) {
@@ -58,28 +83,34 @@ namespace GameplayAbilitiesSystem.Runtime.Animations {
             }
 
             this.FinalMixer.DisconnectInput(1);
-            this.PlayableGraph.DestroyPlayable(this.ActionAnimationClip);
+            this.ActionAnimationClip.Destroy();
         }
 
-        private IEnumerator Crossfade(
-            AnimationClip clip, float fadeRatio = 0.1f, float minFadeDurationInSeconds = 0.1f
+        private async Awaitable Crossfade(
+            AnimationClip anim, CancellationToken interrupter,
+            float fadeRatio = 0.1f, float minFadeDurationInSeconds = 0.1f
         ) {
-            float durationInSeconds = Mathf.Max(clip.length * fadeRatio, minFadeDurationInSeconds);
+            minFadeDurationInSeconds = Mathf.Min(minFadeDurationInSeconds, anim.length / 2);
+            float durationInSeconds = Mathf.Max(anim.length * fadeRatio, minFadeDurationInSeconds);
             float t = 0;
             while (t < durationInSeconds) {
                 t += Time.deltaTime;
                 float w = Mathf.SmoothStep(0, 1, t / durationInSeconds);
                 this.FinalMixer.SetInputWeight(1, w);
                 this.FinalMixer.SetInputWeight(0, 1 - w);
-                yield return null;
+                await Awaitable.NextFrameAsync(interrupter);
             }
 
-            this.OnClipPlayed(clip);
-            yield return new WaitUntil(() => this.ActionAnimationClip.IsDone());
-            this.FinalMixer.DisconnectInput(1);
-            this.FinalMixer.SetInputCount(1);
-            this.FinalMixer.SetInputWeight(0, 1);
-            this.ActionAnimationClip.Destroy();
+            await Awaitable.WaitForSecondsAsync(anim.length - durationInSeconds, interrupter);
+
+            t = 0;
+            while (!this.ActionAnimationClip.IsDone()) {
+                t += Time.deltaTime;
+                float w = Mathf.SmoothStep(1, 0, t / durationInSeconds);
+                this.FinalMixer.SetInputWeight(1, w);
+                this.FinalMixer.SetInputWeight(0, 1 - w);
+                await Awaitable.NextFrameAsync(interrupter);
+            }
         }
     }
 }

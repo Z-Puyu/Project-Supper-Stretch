@@ -1,5 +1,4 @@
 using SaintsField.Editor.Playa;
-using SaintsField.Editor.Playa.Renderer;
 using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;

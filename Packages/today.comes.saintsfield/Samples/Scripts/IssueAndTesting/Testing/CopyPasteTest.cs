@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using SaintsField.Playa;
-using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 #if UNITY_EDITOR

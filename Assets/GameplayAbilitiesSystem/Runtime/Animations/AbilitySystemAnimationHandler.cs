@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using GameplayAbilitiesSystem.Runtime.Abilities;
-using SaintsField;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
 namespace GameplayAbilitiesSystem.Runtime.Animations {
@@ -17,6 +12,7 @@ namespace GameplayAbilitiesSystem.Runtime.Animations {
             }
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local
         private void ConnectAnimationEvent(AnimationClip clip) {
             foreach (AnimationEvent @event in clip.events) {
                 // ReSharper disable once Unity.NoNullPatternMatching
@@ -27,12 +23,26 @@ namespace GameplayAbilitiesSystem.Runtime.Animations {
                 @event.functionName = nameof(this.SendNotification);
             }
         }
-
-        internal void ConnectToAnimationController(AnimationController controller) {
-            controller.OnClipPlayed += this.ConnectAnimationEvent;
+        
+        // ReSharper disable once MemberCanBeMadeStatic.Local
+        private void ConnectAnimationEvent(AnimationClip clip, UnityAction<AnimationNotifier> onNotify) {
+            foreach (AnimationEvent @event in clip.events) {
+                // ReSharper disable once Unity.NoNullPatternMatching
+                if (@event.objectReferenceParameter is not AnimationNotifier) {
+                    continue;
+                }
+                
+                this.OnNotified += onNotify;
+                @event.functionName = nameof(this.SendNotification);
+            }
         }
 
-        private void SendNotification(AnimationNotifier notifier) {
+        internal void ConnectToAnimationController(AnimationController controller) {
+            controller.OnAnimationStarted += this.ConnectAnimationEvent;
+        }
+
+        private void SendNotification(AnimationEvent @event) {
+            AnimationNotifier notifier = (AnimationNotifier)@event.objectReferenceParameter;
             this.OnNotified?.Invoke(notifier);
         }
     }

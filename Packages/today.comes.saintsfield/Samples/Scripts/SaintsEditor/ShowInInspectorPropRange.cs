@@ -1,4 +1,3 @@
-using SaintsField;
 using SaintsField.Playa;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor

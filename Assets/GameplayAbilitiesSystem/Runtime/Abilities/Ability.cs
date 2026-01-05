@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using CommonFrameworks.Collections;
 using CommonFrameworks.Logic;
+using GameplayAbilitiesSystem.Runtime.Abilities.Executions;
 using GameplayAbilitiesSystem.Runtime.Animations;
-using GameplayAbilitiesSystem.Runtime.Effects;
 using GameplayKeywordsSystem.Runtime;
 using SaintsField;
 using UnityEngine;
@@ -17,7 +18,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         private List<IPredicate<AbilitySystem>> Conditions { get; set; } = new List<IPredicate<AbilitySystem>>();
         
         [field: SerializeReference, ReferencePicker] 
-        private AbilityExecution Execution { get; set; }
+        private List<AbilityExecutionStep> ExecutionSteps { get; set; } = new List<AbilityExecutionStep>();
         
         [field: SerializeReference, ReferencePicker]
         private List<AnimationEventHandler> AnimationEventHandlers { get; set; } = new List<AnimationEventHandler>();
@@ -55,8 +56,28 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             return true;
         }
 
-        internal void Execute(AbilitySystem system) {
-            this.Execution.StartExecution(system);
+        internal async void Execute(AbilitySystem system, CancellationTokenSource interrupter) {
+            try {
+                CancellationToken death = system.destroyCancellationToken;
+                CancellationToken interrupt = interrupter.Token;
+                using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(interrupt, death);
+                AbilityExecutionStep? currentStep = null;
+                for (int i = 0; i < this.ExecutionSteps.Count; i += 1) {
+                    currentStep?.Complete();
+                    currentStep = this.ExecutionSteps[i];
+                    try {
+                        await currentStep.Run(system, this, cts);
+                    } catch (OperationCanceledException) {
+                        if (!cts.IsCancellationRequested) {
+                            system.Interrupt(this);
+                        }
+
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                Debug.LogException(e);
+            }
         }
 
         internal void RespondToAnimationEvent(AbilitySystem system, AnimationNotifier notifier) {

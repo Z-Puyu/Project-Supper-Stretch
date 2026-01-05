@@ -6,7 +6,7 @@ namespace GameplayAbilitiesSystem.Runtime.Animations {
     [CreateAssetMenu(fileName = "New Animation Notifier", menuName = "Gameplay Abilities/Animation Notifier")]
     public sealed class AnimationNotifier : ScriptableObject {
         [field: SerializeField, Required, TreeDropdown(nameof(this.AllKeywords))] 
-        internal string Name { get; private set; } = Keyword.Empty;
+        public string Name { get; private set; } = Keyword.Empty;
         
         private AdvancedDropdownList<string> AllKeywords => KeywordUtils.GetTreeDropdownList();
     }

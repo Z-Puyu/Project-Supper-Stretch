@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using CommonFrameworks.Utilities;
-using GameplayAbilitiesSystem.Runtime.Attributes;
+using GameplayAbilitiesSystem.Runtime.Abilities;
 using GameplayAbilitiesSystem.Runtime.Modifiers;
 using GameplayKeywordsSystem.Runtime;
 using SaintsField;
@@ -84,10 +84,12 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         /// <param name="source">The instigator of the effect</param>
         /// <param name="target">The target of the effect</param>
         /// <param name="continuousEffect">The running effect, if the effect should be active for a duration.</param>
+        /// <param name="sourceAbility">Optional ability that caused the effect.</param>
         /// <param name="userData">Optional user data for the effect.</param>
         internal void Apply(
             IEffectEmitterFacade source, IEffectReceiverFacade target, 
             out ContinuousEffect? continuousEffect,
+            Ability? sourceAbility = null,
             IReadOnlyDictionary<string, double>? userData = null
         ) {
             List<Modifier> modifiers = new List<Modifier>();
@@ -98,7 +100,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
                     break;
                 case Type.Periodic:
                     PeriodicEffect periodicEffect = Effect.PeriodicEffectPool.Get();
-                    periodicEffect.SourceEffect = this;
+                    periodicEffect.Descriptor = new EffectDescriptor(sourceAbility, this, this.Tag);
                     continuousEffect = periodicEffect;
                     periodicEffect.Apply(
                         new PeriodicEffect.Arguments(
@@ -109,7 +111,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
                     break;
                 case Type.Persistent:
                     PersistentEffect persistentEffect = Effect.PersistentEffectPool.Get();
-                    persistentEffect.SourceEffect = this;
+                    persistentEffect.Descriptor = new EffectDescriptor(sourceAbility, this, this.Tag);
                     continuousEffect = persistentEffect;
                     persistentEffect.Apply(
                         new PersistentEffect.Arguments(

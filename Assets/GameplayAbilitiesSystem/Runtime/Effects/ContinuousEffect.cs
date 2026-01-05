@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using GameplayKeywordsSystem.Runtime;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
     internal abstract class ContinuousEffect {
-        internal Effect? SourceEffect { get; set; }
-        private protected IEffectReceiverFacade? Target { get; private set; }
+        internal EffectDescriptor Descriptor { get; set; }
+        [NotNull] private protected IEffectReceiverFacade? Target { get; private set; }
         private ICollection<Keyword> RemovedKeywords { get; set; } = new List<Keyword>();
         private ICollection<Keyword> AddedKeywords { get; set; } = new List<Keyword>();
         private CancellationTokenSource? CancellationTokenSource { get; set; }
@@ -44,7 +45,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
 
         internal virtual void Reset() {
             this.Target = null;
-            this.SourceEffect = null;
+            this.Descriptor = EffectDescriptor.Empty;
             this.AddedKeywords.Clear();
             this.RemovedKeywords.Clear();
             if (this.CancellationTokenSource is null) {

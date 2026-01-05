@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using SaintsField.Interfaces;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
