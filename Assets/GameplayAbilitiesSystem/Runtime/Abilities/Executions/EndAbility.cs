@@ -4,10 +4,14 @@ using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
     [Serializable]
-    internal sealed class EndAbility : AbilityExecutionStep {
-        protected override async Awaitable Execute(AbilitySystem system, Ability ability, CancellationTokenSource interrupter) {
+    internal sealed class EndAbility : IAbilityExecutor {
+        public Awaitable Run(AbilitySystem system, Ability ability, CancellationTokenSource interrupter) {
             system.Stop(ability);
-            await new AwaitableCompletionSource().Awaitable;
+            return new AwaitableCompletionSource().Awaitable;
+        }
+
+        void IAbilityExecutor.Complete() {
+            throw new InvalidOperationException($"{nameof(EndAbility)} cannot be completed");
         }
     }
 }

@@ -18,7 +18,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         private List<IPredicate<AbilitySystem>> Conditions { get; set; } = new List<IPredicate<AbilitySystem>>();
         
         [field: SerializeReference, ReferencePicker] 
-        private List<AbilityExecutionStep> ExecutionSteps { get; set; } = new List<AbilityExecutionStep>();
+        private List<IAbilityExecutor> ExecutionSteps { get; set; } = new List<IAbilityExecutor>();
         
         [field: SerializeReference, ReferencePicker]
         private List<AnimationEventHandler> AnimationEventHandlers { get; set; } = new List<AnimationEventHandler>();
@@ -61,7 +61,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                 CancellationToken death = system.destroyCancellationToken;
                 CancellationToken interrupt = interrupter.Token;
                 using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(interrupt, death);
-                AbilityExecutionStep? currentStep = null;
+                IAbilityExecutor? currentStep = null;
                 for (int i = 0; i < this.ExecutionSteps.Count; i += 1) {
                     currentStep?.Complete();
                     currentStep = this.ExecutionSteps[i];

@@ -17,10 +17,10 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
         private List<AnimationSignal> AnimationSignals { get; set; } = new List<AnimationSignal>();
         
         [field: SerializeReference, ReferencePicker, HideIf(nameof(this.WillEndAbilityOnCompletion))] 
-        private AbilityExecutionStep? AnimationEnd { get; set; }
+        private IAbilityExecutor? AnimationEnd { get; set; }
 
         [field: SerializeReference, ReferencePicker]
-        private AbilityExecutionStep? AnimationInterrupt { get; set; } = new EndAbility();
+        private IAbilityExecutor? AnimationInterrupt { get; set; } = new EndAbility();
         
         private CancellationTokenSource? Interrupter { get; set; }
         

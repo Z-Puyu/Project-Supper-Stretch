@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
     [Serializable]
-    public abstract class AbilityExecutionStep {
+    public abstract class AbilityExecutionStep : IAbilityExecutor {
         protected AbilitySystem? OwnerSystem { get; private set; }
         protected Ability? OwnerAbility { get; private set; }
         internal bool IsComplete { get; private set; }
@@ -22,7 +22,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
 
         protected virtual void OnComplete(AbilitySystem system, Ability ability) { }
         
-        internal void Complete() {
+        void IAbilityExecutor.Complete() {
             if (!this.OwnerSystem || !this.OwnerAbility) {
                 Debug.LogWarning("Ability execution completes when it is not running");
                 return;
