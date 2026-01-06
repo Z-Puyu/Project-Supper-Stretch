@@ -13,6 +13,9 @@ namespace GameplayKeywordsSystem.Runtime {
         [field: SerializeField, TreeDropdown(nameof(this.AllKeywords)), DefaultExpand] 
         private List<string> PreexistingKeywords { get; set; } = new List<string>();
         
+        public event Action<Keyword> OnKeywordAdded = delegate { };
+        public event Action<Keyword> OnKeywordRemoved = delegate { };
+        
         public int Count => this.Keywords.Count;
         public bool IsReadOnly => this.Keywords.IsReadOnly;
         
@@ -25,7 +28,7 @@ namespace GameplayKeywordsSystem.Runtime {
         }
 
         void ICollection<Keyword>.Add(Keyword item) {
-            this.Keywords.Add(item);
+            this.Add(item);
         }
 
         public void Clear() {
@@ -41,11 +44,24 @@ namespace GameplayKeywordsSystem.Runtime {
         }
 
         public bool Add(Keyword label) {
-            return this.Keywords.Add(label);
+            if (!this.Keywords.Add(label)) {
+                return false;
+            }
+
+            this.OnKeywordAdded.Invoke(label);
+            return true;
         }
 
         public bool Remove(Keyword item) {
-            return this.Keywords.RemoveAllWithPrefix(item);
+            if (!this.Keywords.RemoveAllWithPrefix(item, out IEnumerable<Keyword> removed)) {
+                return false;
+            }
+
+            foreach (Keyword keyword in removed) {
+                this.OnKeywordRemoved.Invoke(keyword);
+            }
+                
+            return true;
         }
 
         public IEnumerator<Keyword> GetEnumerator() {

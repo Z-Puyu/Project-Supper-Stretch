@@ -19,16 +19,22 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         [field: SerializeField, MinValue(0), EndText("<color=gray>degrees / s")]
         protected float RotationSpeed { get; private set; } = 1;
 
-        public abstract bool UseRootMotion { get; }
+        public bool CanMove { protected get; set; } = true;
+        public bool CanRotate { protected get; set; } = true;
 
         protected override void Awake() {
             base.Awake();
             this.OwnerTransform = this.Owner.transform;
         }
 
-        public void MoveAndRotate(Vector3 displacement) {
-            this.MoveBy(displacement);
-            this.Rotate();
+        public void MoveAndRotate(Vector3 displacement, bool forced = true) {
+            if (forced || this.CanMove) {
+                this.MoveBy(displacement);
+            }
+
+            if (forced || this.CanRotate) {
+                this.Rotate();
+            }
         }
 
         protected abstract void MoveBy(Vector3 displacement);
@@ -38,8 +44,13 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         protected abstract void Rotate();
 
         protected virtual void Update() {
-            this.Move(Time.deltaTime);
-            this.Rotate();
+            if (this.CanMove) {
+                this.Move(Time.deltaTime);
+            }
+
+            if (this.CanRotate) {
+                this.Rotate();
+            }
         }
     }
 }

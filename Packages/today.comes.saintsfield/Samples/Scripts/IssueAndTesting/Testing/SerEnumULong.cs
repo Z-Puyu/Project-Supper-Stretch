@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using SaintsField.Playa;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Testing
 {

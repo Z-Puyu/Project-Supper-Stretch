@@ -25,6 +25,10 @@ namespace GameplayAbilitiesSystem.Runtime.Animations {
             );
         }
 
+        ~AnimationController() {
+            this.PlayableGraph.Destroy();
+        }
+
         internal static AnimationController Create(Animator animator) {
             AnimationController controller = new AnimationController(animator);
             controller.Output.SetSourcePlayable(controller.FinalMixer);

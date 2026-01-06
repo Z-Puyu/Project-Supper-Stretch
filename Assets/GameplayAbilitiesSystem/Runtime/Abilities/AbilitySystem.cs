@@ -23,8 +23,8 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         private TrieDictionary<Keyword, char, ICollection<Ability>> AbilitiesByTag { get; } =
             new TrieDictionary<Keyword, char, ICollection<Ability>>();
 
-        private IDictionary<Ability, CancellationTokenSource> RunningAbilities { get; } =
-            new Dictionary<Ability, CancellationTokenSource>();
+        private IDictionary<Ability, AbilityActivation> RunningAbilities { get; } =
+            new Dictionary<Ability, AbilityActivation>();
 
         private EffectRegistry EffectRegistry { get; } = new EffectRegistry();
 
@@ -42,7 +42,10 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
 
         protected override void Awake() {
             base.Awake();
-            this.DefaultAbilities.ForEach(this.AvailableAbilities.Add);
+            foreach (Ability ability in this.DefaultAbilities) {
+                this.Grant(ability);
+            }
+            
             if (!this.Animator) {
                 this.Animator = this.Owner.TryGetComponentInChildren(out Animator animator)
                         ? animator
@@ -89,13 +92,12 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                 return;
             }
             
-            if (!ability.TryCommit(this)) {
+            if (!ability.TryCommit(this, out AbilityActivation activation)) {
                 return;
             }
-
-            CancellationTokenSource interrupter = new CancellationTokenSource();
-            this.RunningAbilities[ability] = interrupter;
-            ability.Execute(this, interrupter.Token);
+            
+            this.RunningAbilities[ability] = activation;
+            ability.Execute(this, activation.Interrupter.Token);
         }
 
         /// <summary>
@@ -118,12 +120,11 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         /// </summary>
         /// <param name="ability">The ability to stop.</param>
         public void Stop(Ability ability) {
-            if (!this.RunningAbilities.Remove(ability, out CancellationTokenSource interrupter)) {
+            if (!this.RunningAbilities.Remove(ability, out AbilityActivation activation)) {
                 return;
             }
 
-            interrupter.Cancel();
-            interrupter.Dispose();
+            activation.Stop(this);
             this.AvailableAbilities.Add(ability);
         }
 

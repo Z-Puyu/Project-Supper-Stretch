@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.SeparatorDrawer;
 using SaintsField.Utils;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Playa.Renderer.PlayaSeparatorSemiRenderer

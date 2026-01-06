@@ -237,22 +237,46 @@ namespace CommonFrameworks.Collections {
             path[^1].Children.Clear();
             path[^1].IsEndOfKey = false;
             int size = path[^1].Size;
-            int idx = 1;
-            this.Root.Size -= size;
-            foreach (T element in prefixArray) {
-                path[idx].Size -= size;
-                if (path[idx].Size == 0) {
-                    path[idx - 1].Children.Remove(element);
-                    break;
+            for (int i = 1; i < prefixArray.Length; i += 1) {
+                path[i].Size -= size;
+                if (path[i].Size > 0) {
+                    continue;
                 }
                 
-                idx += 1;
+                path[i - 1].Children.Remove(prefixArray[i]);
+                break;
             }
             
+            this.Root.Size -= size;
             this.InvalidateCachedCollections();
             return true;
         }
-        
+
+        public bool RemoveAllWithPrefix(IEnumerable<T> prefix, out IEnumerable<KeyValuePair<K, V>> removed) {
+            T[] prefixArray = prefix.ToArray();
+            IList<KeyValuePair<K, V>> removedEntries = this.BreathFirstPrefixSearch(prefixArray);
+            removed = removedEntries;
+            if (removedEntries.Count == 0) {
+                return false;
+            }
+
+            if (this.HasPath(prefixArray, out List<Entry> path)) {
+                for (int i = 1; i < prefixArray.Length; i += 1) {
+                    path[i].Size -= removedEntries.Count;
+                    if (path[i].Size > 0) {
+                        continue;
+                    }
+                    
+                    path[i - 1].Children.Remove(prefixArray[i]);
+                    break;
+                }
+            }
+            
+            this.Root.Size -= removedEntries.Count;
+            this.InvalidateCachedCollections();
+            return true;
+        }
+
         public bool Remove(IEnumerable<T> key) {
             T[] prefix = key.ToArray();
             if (!this.HasPath(prefix, out List<Entry> path) || path.Count == 0) {

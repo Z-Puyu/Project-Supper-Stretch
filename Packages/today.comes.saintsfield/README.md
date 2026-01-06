@@ -8,7 +8,7 @@
 [![openupm](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=Downloads&query=%24.downloads&suffix=%2Fmonth&url=https%3A%2F%2Fpackage.openupm.com%2Fdownloads%2Fpoint%2Flast-month%2Ftoday.comes.saintsfield)](https://openupm.com/packages/today.comes.saintsfield/)
 [![repo-stars](https://img.shields.io/github/stars/TylerTemp/SaintsField)](https://github.com/TylerTemp/SaintsField/)
 
-`SaintsField` is a Unity Inspector extension tool focusing on script fields like [NaughtyAttributes](https://github.com/dbrizov/NaughtyAttributes) but different.
+`SaintsField` is a Unity extension tool for enhancing inspector and data serialization.
 
 Developed by: [TylerTemp](https://github.com/TylerTemp), [墨瞳](https://github.com/xc13308)
 
@@ -95,9 +95,9 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.7.6**
+**5.7.8**
 
-Fix: `ShowInInspector` inside `struct` can not read a real-time but cached value [#240](https://github.com/TylerTemp/SaintsField/issues/240)
+Fix: `ListView` & `ReferencePicker` property tracker clean-up so it does not give error now [#352](https://github.com/TylerTemp/SaintsField/issues/352)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -2892,7 +2892,7 @@ Automatically assign a sibling target.
 *   `bool includeInactive = true`
 
     Should inactive GameObject be included? `true` to include inactive GameObject.
- 
+
 *   `Type compType = null`
 
     The component type to assign. If null, it'll use the field type.

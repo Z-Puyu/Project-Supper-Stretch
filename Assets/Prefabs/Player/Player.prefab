@@ -58308,6 +58308,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameplayKeywordsSystem.Runtime::GameplayKeywordsSystem.Runtime.KeywordContainer
   <Label>k__BackingField:
     <PreexistingKeywords>k__BackingField: []
+  <OnKeywordAdded>k__BackingField:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 62607394211588175}
+        m_TargetAssemblyTypeName: Characters.KeywordEventHandler, Scripts.Characters
+        m_MethodName: HandleNewlyAddedKeyword
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  <OnKeywordRemoved>k__BackingField:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 62607394211588175}
+        m_TargetAssemblyTypeName: Characters.KeywordEventHandler, Scripts.Characters
+        m_MethodName: HandleRemovedKeyword
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &7450872485352935328
 GameObject:
   m_ObjectHideFlags: 0
@@ -71181,6 +71211,7 @@ GameObject:
   - component: {fileID: 6504065115825005498}
   - component: {fileID: 6265021832810256200}
   - component: {fileID: 3149564668375874624}
+  - component: {fileID: 62607394211588175}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -71281,6 +71312,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Scripts.Characters::Characters.Player.Actor
   <AbilitySystem>k__BackingField: {fileID: 6658280735558002848}
   <RollAbility>k__BackingField: {fileID: 11400000, guid: 46e1df1ad72d91d45828c65fa4dad265, type: 2}
+--- !u!114 &62607394211588175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8829115338478182532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64630a10c8844e93b2bd645eea6b1dcc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Scripts.Characters::Characters.KeywordEventHandler
+  <KeywordToBlockMovement>k__BackingField: Character Flags/Movement Blocked
+  <KeywordToBlockRotation>k__BackingField: Character Flags/Rotation Blocked
+  <LocomotionComponent>k__BackingField: {fileID: 2201749962735802151}
 --- !u!1 &8850985187954054067
 GameObject:
   m_ObjectHideFlags: 0

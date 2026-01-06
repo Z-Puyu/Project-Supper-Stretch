@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using CommonFrameworks.Extensions;
 using SaintsField;
 using UnityEngine;
 
@@ -11,7 +12,8 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         private Transform? CameraSpace { get; set; }
 
         [field: SerializeField] private Animator? Animator { get; set; }
-        public override bool UseRootMotion => true;
+        
+        private bool UseRootMotion { get; set; } = false;
         
         private Vector3 PlanarDirection3D => new Vector3(this.PlanarDirection.x, 0, this.PlanarDirection.y).normalized;
 
@@ -19,6 +21,10 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             base.Awake();
             if (!this.Controller) {
                 this.Controller = this.GetComponent<CharacterController>();
+            }
+
+            if (this.Animator && this.Animator.HasComponent<RootMotion>()) {
+                this.UseRootMotion = true;
             }
         }
 

@@ -13,6 +13,12 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))] 
         internal List<string> Tags { get; private set; } = new List<string>();
         
+        [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))] 
+        internal List<string> KeywordsToGrantWhileRunning { get; private set; } = new List<string>();
+        
+        [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))] 
+        internal List<string> KeywordsToRevokeWhileRunning { get; private set; } = new List<string>();
+        
         [field: SerializeReference, Tooltip("Conditions on the ability system for this ability to be usable")]
         [field: FieldLabelText(nameof(this.LabelCondition), true)]
         private List<IPredicate<AbilitySystem>> Conditions { get; set; } = new List<IPredicate<AbilitySystem>>();
@@ -26,13 +32,31 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             return condition.GetType().Name;
         }
 
-        internal bool TryCommit(AbilitySystem system) {
+        internal bool TryCommit(AbilitySystem system, out AbilityActivation activation) {
             foreach (IPredicate<AbilitySystem> condition in this.Conditions) {
-                if (!condition.Holds(system)) {
-                    return false;
+                if (condition.Holds(system)) {
+                    continue;
                 }
+
+                activation = default;
+                return false;
+            }
+
+            ICollection<Keyword> granted = new List<Keyword>();
+            ICollection<Keyword> revoked = new List<Keyword>();
+            foreach (Keyword keyword in this.KeywordsToRevokeWhileRunning) {
+                if (system.EmitterKeywordContainer.Remove(keyword)) {
+                    revoked.Add(keyword);
+                }   
             }
             
+            foreach (Keyword keyword in this.KeywordsToGrantWhileRunning) {
+                if (system.EmitterKeywordContainer.Add(keyword)) {
+                    granted.Add(keyword);
+                }    
+            }
+            
+            activation = new AbilityActivation(granted, revoked, new CancellationTokenSource());
             return true;
         }
 

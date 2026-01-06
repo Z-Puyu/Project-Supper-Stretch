@@ -218,18 +218,41 @@ namespace CommonFrameworks.Collections {
             path[^1].Children.Clear();
             path[^1].IsEndOfKey = false;
             int size = path[^1].Size;
-            int idx = 1;
-            this.Root.Size -= size;
-            foreach (T element in prefixArray) {
-                path[idx].Size -= size;
-                if (path[idx].Size == 0) {
-                    path[idx - 1].Children.Remove(element);
-                    break;
+            for (int i = 1; i < prefixArray.Length; i += 1) {
+                path[i].Size -= size;
+                if (path[i].Size > 0) {
+                    continue;
                 }
 
-                idx += 1;
+                path[i - 1].Children.Remove(prefixArray[i]);
+                break;
+            }
+            
+            this.Root.Size -= size;
+            return true;
+        }
+        
+        public bool RemoveAllWithPrefix(IEnumerable<T> prefix, out IEnumerable<K> removed) {
+            T[] prefixArray = prefix.ToArray();
+            IList<K> removedKeys = this.BreathFirstPrefixSearch(prefixArray);
+            removed = removedKeys;
+            if (removedKeys.Count == 0) {
+                return false;
             }
 
+            if (this.HasPath(prefixArray, out List<Node> path)) {
+                for (int i = 1; i < prefixArray.Length; i += 1) {
+                    path[i].Size -= removedKeys.Count;
+                    if (path[i].Size > 0) {
+                        continue;
+                    }
+
+                    path[i - 1].Children.Remove(prefixArray[i]);
+                    break;
+                }
+            }
+            
+            this.Root.Size -= removedKeys.Count;
             return true;
         }
 

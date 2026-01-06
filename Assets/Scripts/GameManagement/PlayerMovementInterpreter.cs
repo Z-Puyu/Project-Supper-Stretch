@@ -1,4 +1,5 @@
-﻿using Characters.Player;
+﻿using System.Diagnostics.CodeAnalysis;
+using Characters.Player;
 using CommonFrameworks.Utilities;
 using GameCharacterBehaviours.Runtime.Movement;
 using SaintsField;
@@ -8,8 +9,13 @@ using UnityEngine;
 namespace GameManagement {
     [DisallowMultipleComponent]
     public class PlayerMovementInterpreter : MonoBehaviour {
-        [field: SerializeField, Required] private Locomotion Locomotion { get; set; }
-        [field: SerializeField, Required] private Animator Animator { get; set; }
+        [NotNull] 
+        [field: SerializeField, Required] 
+        private Locomotion? Locomotion { get; set; }
+        
+        [NotNull] 
+        [field: SerializeField, Required] 
+        private Animator? Animator { get; set; }
         
         [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Float)]
         [field: ShowIf(nameof(this.Animator)), Required]
@@ -34,9 +40,7 @@ namespace GameManagement {
                 this.ForwardBackVelocityAnimatorParameter, input.y, this.AnimationBlendTime, Time.deltaTime
             );
             
-            if (!this.Locomotion.UseRootMotion) {
-                this.Locomotion.PlanarDirection = new Vector2(direction.x, direction.z).normalized;
-            }
+            this.Locomotion.PlanarDirection = new Vector2(direction.x, direction.z).normalized;
         }
     }
 }

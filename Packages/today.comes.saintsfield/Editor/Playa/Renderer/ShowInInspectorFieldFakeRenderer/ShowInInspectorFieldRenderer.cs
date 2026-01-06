@@ -3,6 +3,7 @@ using System.Linq;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Playa;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace SaintsField.Editor.Playa.Renderer.ShowInInspectorFieldFakeRenderer

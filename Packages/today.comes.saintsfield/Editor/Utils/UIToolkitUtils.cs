@@ -882,6 +882,7 @@ namespace SaintsField.Editor.Utils
                         //     toggle.m_Clickable.acceptClicksIfDisabled = true;
 
                         listView.BindProperty(property);
+                        listView.RegisterCallback<DetachFromPanelEvent>(_ => Unbind(listView));
 
                         return listViewNotExist ? listView : null;
 
@@ -2742,6 +2743,8 @@ namespace SaintsField.Editor.Utils
                     }
                 ));
             };
+
+            dropdownBtn.TrackPropertyValue(property, _ => dropdownBtn.ButtonLabelElement.text = GetReferencePropertyLabel(property));
 
             return dropdownBtn;
         }

@@ -13,7 +13,12 @@ MonoBehaviour:
   m_Name: Roll
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Abilities.Ability
   <Tags>k__BackingField:
-  - 
+  - Ability/Movement/Dodge
+  <KeywordsToGrantWhileRunning>k__BackingField:
+  - Character Flags/In Action
+  - Character Flags/Movement Blocked
+  - Character Flags/Rotation Blocked
+  <KeywordsToRevokeWhileRunning>k__BackingField: []
   <Conditions>k__BackingField:
   - rid: 1692151751057866752
   <ExecutionSteps>k__BackingField:
@@ -21,8 +26,6 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
     - rid: 1692151751057866752
       type: {class: ForbiddenKeywords, ns: GameplayAbilitiesSystem.Runtime.Abilities.Predicate, asm: GameplayAbilitiesSystem.Runtime}
       data:
@@ -31,13 +34,16 @@ MonoBehaviour:
     - rid: 1692151813856559430
       type: {class: PlayAnimation, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
       data:
-        <WillEndAbilityOnCompletion>k__BackingField: 1
+        <WillEndAbilityOnCompletion>k__BackingField: 0
         <Clip>k__BackingField: {fileID: -7510004476302381493, guid: 316244d2030138147995d0a5460b0f95, type: 3}
         <AnimationSignals>k__BackingField: []
         <AnimationEnd>k__BackingField:
-          rid: -2
+          rid: 1692151836468576363
         <AnimationInterrupt>k__BackingField:
           rid: 1692151813856559440
     - rid: 1692151813856559440
+      type: {class: EndAbility, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
+      data: 
+    - rid: 1692151836468576363
       type: {class: EndAbility, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
       data: 

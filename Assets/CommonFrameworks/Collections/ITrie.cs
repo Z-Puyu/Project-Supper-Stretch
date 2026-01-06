@@ -37,6 +37,15 @@ namespace CommonFrameworks.Collections {
         public bool RemoveAllWithPrefix(IEnumerable<T> prefix);
         
         /// <summary>
+        /// Removes all keys that start with the given prefix.
+        /// </summary>
+        /// <param name="prefix">The prefix.</param>
+        /// <param name="removed">The removed keys.</param>
+        /// <returns><c>true</c> if anything is removed,
+        /// <c>false</c> if no key starts with <paramref name="prefix"/>></returns>
+        public bool RemoveAllWithPrefix(IEnumerable<T> prefix, out IEnumerable<U> removed);
+        
+        /// <summary>
         /// Removes a key in the trie.
         /// </summary>
         /// <param name="key">The key to remove.</param>

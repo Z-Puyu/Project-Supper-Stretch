@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using CommonFrameworks.Components;
 using SaintsField;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace GameplayKeywordsSystem.Runtime {
     [DisallowMultipleComponent]
@@ -10,14 +12,24 @@ namespace GameplayKeywordsSystem.Runtime {
         [field: SerializeField, SaintsRow(inline: true)] 
         private KeywordLabel Label { get; set; } = new KeywordLabel();
         
+        [field: SerializeField] private UnityEvent<Keyword> OnKeywordAdded { get; set; } = new UnityEvent<Keyword>();
+        [field: SerializeField] private UnityEvent<Keyword> OnKeywordRemoved { get; set; } = new UnityEvent<Keyword>();
+        
         public int Count => this.Label.Count;
         public bool IsReadOnly => this.Label.IsReadOnly;
         
         protected override void Awake() {
             base.Awake();
             this.Label.Initialise();
+            this.Label.OnKeywordRemoved += this.OnKeywordRemoved.Invoke;
+            this.Label.OnKeywordAdded += this.OnKeywordAdded.Invoke;
         }
-        
+
+        private void OnDestroy() {
+            this.Label.OnKeywordRemoved -= this.OnKeywordRemoved.Invoke;
+            this.Label.OnKeywordAdded -= this.OnKeywordAdded.Invoke;
+        }
+
         public bool Add(Keyword label) {
             return this.Label.Add(label);
         }

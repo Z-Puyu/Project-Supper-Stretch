@@ -16,7 +16,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
         [field: SerializeField, Table(true, true), ShowIf(nameof(this.HasAnyAnimationSignal))]
         private List<AnimationSignal> AnimationSignals { get; set; } = new List<AnimationSignal>();
         
-        [field: SerializeReference, ReferencePicker, HideIf(nameof(this.WillEndAbilityOnCompletion))] 
+        [field: SerializeReference, ReferencePicker] 
         private IAbilityExecutor? AnimationEnd { get; set; }
 
         [field: SerializeReference, ReferencePicker]
