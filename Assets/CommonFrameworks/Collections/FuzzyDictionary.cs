@@ -2,6 +2,15 @@
 using System.Collections.Generic;
 
 namespace CommonFrameworks.Collections {
+    /// <summary>
+    /// A dictionary that supports some degree of fuzzy search.
+    /// The keys in this dictionary must be enumerable. When reading a value,
+    /// this dictionary will attempt to find the closest matching key that is a prefix of the provided key.
+    /// However, checking if a key exists in the dictionary still uses exact matching.
+    /// </summary>
+    /// <typeparam name="K">The key type.</typeparam>
+    /// <typeparam name="T">The element type of the key.</typeparam>
+    /// <typeparam name="V">The value type.</typeparam>
     public sealed class FuzzyDictionary<K, T, V> : IDictionary<K, V>, IReadOnlyDictionary<K, V>
             where K : IEnumerable<T> {
         private TrieDictionary<K, T, V> Dictionary { get; } = new TrieDictionary<K, T, V>();
@@ -65,7 +74,7 @@ namespace CommonFrameworks.Collections {
         bool IReadOnlyDictionary<K, V>.ContainsKey(K key) {
             return this.ContainsKey(key);
         }
-
+        
         public bool TryGetValue(K key, out V value) {
             if (this.Dictionary.TryGetValue(key, out value)) {
                 return true;
