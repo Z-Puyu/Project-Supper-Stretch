@@ -7,10 +7,10 @@ using SaintsField.Playa;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes {
-    [CreateAssetMenu(fileName = "New Attribute Type", menuName = "Gameplay Abilities/Attribute Type")]
-    public class AttributeType : ScriptableObject, IComparable<AttributeType>, IEquatable<AttributeType> {
+    [Serializable]
+    public sealed class AttributeType : IComparable<AttributeType>, IEquatable<AttributeType> {
         [field: SerializeField, ReadOnly] public string Id { get; private set; } = string.Empty;
-        [field: SerializeField, ReadOnly] private AttributeType? Parent { get; set; }
+        [field: SerializeReference, ReadOnly] private AttributeType? Parent { get; set; }
         [field: SerializeField] private string Name { get; set; } = string.Empty;
         [SerializeField] private string displayName = string.Empty;
 
@@ -22,41 +22,35 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         
         public string DisplayName => string.IsNullOrWhiteSpace(this.displayName) ? this.Name : this.displayName;
         public bool IsLeaf => this.SubTypes.Count == 0;
-        public bool IsRoot => !this.Parent;
+        public bool IsRoot => this.Parent is null;
 
         public bool Includes(string attribute) {
             return this.Id == attribute || this.SubTypes.Any(type => type.Includes(attribute));
         }
-
-        private void OnValidate() {
-            if (this.IsLeaf) {
-                this.Rename();
-            }
-        }
-
+        
 #if UNITY_EDITOR
-        private void Rename() {
+        internal void Validate() {
             LinkedList<string> names = new LinkedList<string>();
             AttributeType? curr = this;
-            while (curr) {
+            while (curr is not null) {
                 names.AddFirst(curr.Name);
                 curr = curr.Parent;
             }
             
-            this.Id = string.Join(".", names);
+            this.Id = string.Join("/", names);
             foreach (AttributeType def in this.SubTypes) {
-                if (!def) {
+                if (def is null) {
                     continue;
                 }
                 
                 def.Parent = this;
-                def.Rename();
+                def.Validate();
             }
         }
 #endif
 
-        public int CompareTo(AttributeType other) {
-            return other ? string.CompareOrdinal(this.Id, other.Id) : 1;
+        public int CompareTo(AttributeType? other) {
+            return other is not null ? string.CompareOrdinal(this.Id, other.Id) : 1;
         }
         
         public bool Equals(AttributeType other) {
@@ -73,9 +67,16 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
             children.Sort((a, b) => string.CompareOrdinal(a.displayName, b.displayName));
             return new AdvancedDropdownList<string>(this.DisplayName, children);
         }
+        
+        internal AdvancedDropdownList<AttributeType> ToObjectAdvancedDropdownList() {
+            if (this.IsLeaf) {
+                return new AdvancedDropdownList<AttributeType>(this.DisplayName, this);
+            }
 
-        public static IEnumerable<AttributeType> GetAllLeaves() {
-            return Resources.LoadAll<AttributeType>("").Where(a => a.IsLeaf).OrderBy(a => a.Id);
+            List<AdvancedDropdownList<AttributeType>> children =
+                    this.SubTypes.ConvertAll(child => child.ToObjectAdvancedDropdownList());
+            children.Sort((a, b) => string.CompareOrdinal(a.displayName, b.displayName));
+            return new AdvancedDropdownList<AttributeType>(this.DisplayName, children);
         }
     }
 }

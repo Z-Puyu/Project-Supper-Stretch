@@ -102,6 +102,15 @@ namespace Characters.Player
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Sprint"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""d11f56a2-9ed7-45e5-b085-791a51885733"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Hold"",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -159,6 +168,17 @@ namespace Characters.Player
                     ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ae0ab2ea-d9ea-4387-ac56-ec16cfe756ac"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Sprint"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -196,6 +216,7 @@ namespace Characters.Player
             // Movement
             m_Movement = asset.FindActionMap("Movement", throwIfNotFound: true);
             m_Movement_Movement = m_Movement.FindAction("Movement", throwIfNotFound: true);
+            m_Movement_Sprint = m_Movement.FindAction("Sprint", throwIfNotFound: true);
             // Actions
             m_Actions = asset.FindActionMap("Actions", throwIfNotFound: true);
             m_Actions_Dodge = m_Actions.FindAction("Dodge", throwIfNotFound: true);
@@ -281,6 +302,7 @@ namespace Characters.Player
         private readonly InputActionMap m_Movement;
         private List<IMovementActions> m_MovementActionsCallbackInterfaces = new List<IMovementActions>();
         private readonly InputAction m_Movement_Movement;
+        private readonly InputAction m_Movement_Sprint;
         /// <summary>
         /// Provides access to input actions defined in input action map "Movement".
         /// </summary>
@@ -296,6 +318,10 @@ namespace Characters.Player
             /// Provides access to the underlying input action "Movement/Movement".
             /// </summary>
             public InputAction @Movement => m_Wrapper.m_Movement_Movement;
+            /// <summary>
+            /// Provides access to the underlying input action "Movement/Sprint".
+            /// </summary>
+            public InputAction @Sprint => m_Wrapper.m_Movement_Sprint;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -325,6 +351,9 @@ namespace Characters.Player
                 @Movement.started += instance.OnMovement;
                 @Movement.performed += instance.OnMovement;
                 @Movement.canceled += instance.OnMovement;
+                @Sprint.started += instance.OnSprint;
+                @Sprint.performed += instance.OnSprint;
+                @Sprint.canceled += instance.OnSprint;
             }
 
             /// <summary>
@@ -339,6 +368,9 @@ namespace Characters.Player
                 @Movement.started -= instance.OnMovement;
                 @Movement.performed -= instance.OnMovement;
                 @Movement.canceled -= instance.OnMovement;
+                @Sprint.started -= instance.OnSprint;
+                @Sprint.performed -= instance.OnSprint;
+                @Sprint.canceled -= instance.OnSprint;
             }
 
             /// <summary>
@@ -482,6 +514,13 @@ namespace Characters.Player
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnMovement(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Sprint" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnSprint(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Actions" which allows adding and removing callbacks.

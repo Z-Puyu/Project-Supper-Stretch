@@ -26,7 +26,7 @@ namespace CommonFrameworks.Events {
             MailBox<S, E>.Unregister(listener, handler);
         }
         
-        public static void UnsubscribeAll<S, E>(this object listener) where S : class where E : IMessage {
+        public static void Unsubscribe<S, E>(this object listener) where S : class where E : IMessage {
             MailBox<S, E>.Unregister(listener);
         }
     }

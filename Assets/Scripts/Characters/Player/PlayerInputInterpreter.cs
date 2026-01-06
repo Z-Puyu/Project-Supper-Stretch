@@ -18,18 +18,13 @@ namespace Characters.Player {
         protected override void Start() {
             base.Start();
             this.PlayerControls!.Movement.Movement.performed += parseMovement;
-            this.PlayerControls.Actions.Dodge.performed += parseDodge;
-            this.PlayerControls.Actions.Dodge.canceled += parseDodge;
+            this.PlayerControls.Actions.Dodge.performed += _ => this.Send(new AttemptToDodgeMessage());
+            this.PlayerControls.Movement.Sprint.performed += _ => this.Send(new PerformSprintingMessage(true));
+            this.PlayerControls.Movement.Sprint.canceled += _ => this.Send(new PerformSprintingMessage(false));
             return;
             
             void parseMovement(InputAction.CallbackContext context) {
                 this.MovementInput = context.ReadValue<Vector2>();
-            }
-
-            void parseDodge(InputAction.CallbackContext context) {
-                if (context.performed) {
-                    this.Send(new AttemptToDodgeMessage());
-                }
             }
         }
     }

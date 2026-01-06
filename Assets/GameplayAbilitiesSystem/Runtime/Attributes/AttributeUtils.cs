@@ -4,17 +4,23 @@ using CommonFrameworks.Utilities;
 using SaintsField;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes {
-    public class AttributeUtils {
-        public static IEnumerable<string> GetAll() {
-            List<string> keywords = Database<AttributeType>.LoadedResources
-                                                           .Select(type => new string(type.Id)).ToList();
-            keywords.Sort();
-            return keywords;
+    public static class AttributeUtils {
+        public static AdvancedDropdownList<AttributeType> GetLeafTypes() {
+            AdvancedDropdownList<AttributeType> types = new AdvancedDropdownList<AttributeType>(
+                "Attributes",
+                Database<AttributeDefinitionSheet>.LoadedResources
+                                                  .SelectMany(sheet => sheet.GetDropdownLists())
+                                                  .OrderBy(type => type.displayName)
+            );
+            
+            return types;
         }
 
         public static AdvancedDropdownList<string> GetDropdownList() {
-            IEnumerable<AdvancedDropdownList<string>> lists =
-                    Database<AttributeType>.LoadedResources.Select(type => type.ToAdvancedDropdownList());
+            IEnumerable<AdvancedDropdownList<string>> lists = 
+                    Database<AttributeDefinitionSheet>.LoadedResources
+                                                      .SelectMany(type => type.GetKeyDropdownLists())
+                                                      .OrderBy(node => node.displayName);
             return new AdvancedDropdownList<string>("Attributes", lists);
         }
     }

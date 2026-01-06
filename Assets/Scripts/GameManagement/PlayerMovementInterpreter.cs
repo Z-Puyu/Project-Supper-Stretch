@@ -1,10 +1,14 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using Characters;
 using Characters.Player;
 using CommonFrameworks.Utilities;
 using GameCharacterBehaviours.Runtime.Movement;
+using GameplayAbilitiesSystem.Runtime.Attributes;
 using SaintsField;
 using SaintsField.Playa;
 using UnityEngine;
+using Attribute = Codice.Client.BaseCommands.Attribute;
 
 namespace GameManagement {
     [DisallowMultipleComponent]
@@ -17,6 +21,13 @@ namespace GameManagement {
         [field: SerializeField, Required] 
         private Animator? Animator { get; set; }
         
+        [NotNull] 
+        [field: SerializeField, Required]
+        private AttributeSet? AttributeSet { get; set; }
+        
+        [field: SerializeField, TreeDropdown(nameof(this.AllAttributes))] 
+        private string MovementSpeedAttribute { get; set; } = string.Empty;
+        
         [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Float)]
         [field: ShowIf(nameof(this.Animator)), Required]
         private int LeftRightVelocityAnimatorParameter { get; set; }
@@ -26,9 +37,22 @@ namespace GameManagement {
         private int ForwardBackVelocityAnimatorParameter { get; set; }
         
         [field: SerializeField, MinValue(0)] private float AnimationBlendTime { get; set; } = 0.1f;
+        private double Speed { get; set; } = 1;
+        
+        private AdvancedDropdownList<string> AllAttributes => AttributeUtils.GetDropdownList();
+
+        private void OnEnable() {
+            this.AttributeSet.OnAttributeUpdated += this.OnAttributeUpdated;
+        }
+
+        private void OnAttributeUpdated(AttributeChange change) {
+            if (change.Attribute == this.MovementSpeedAttribute) {
+                this.Speed = change.NewValue;
+            }
+        }
 
         private void Update() {
-            Vector2 input = Singleton<PlayerInputInterpreter>.Instance.MovementInput;
+            Vector2 input = Singleton<PlayerInputInterpreter>.Instance.MovementInput * (float)this.Speed;
             Vector3 direction = CameraSystem.PlanarForward * input.y + CameraSystem.PlanarRight * input.x;
             this.Locomotion.IsMoving = input.sqrMagnitude >= 0.0001;
             

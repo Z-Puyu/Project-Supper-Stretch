@@ -19,8 +19,21 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         [field: SerializeField, MinValue(0), EndText("<color=gray>degrees / s")]
         protected float RotationSpeed { get; private set; } = 1;
 
+        [field: SerializeField] public Gesture Mode { protected get; set; } = Gesture.Run;
+        [field: SerializeField, MinValue(0)] public float WalkingSpeed { get; set; } = 1;
+        [field: SerializeField, MinValue(0)] public float RunningSpeed { get; set; } = 2;
+        [field: SerializeField, MinValue(0)] public float SprintingSpeed { get; set; } = 3;
+        [field: SerializeField, MinValue(0)] public float SpeedMultiplier { get; set; } = 1;
+        
         public bool CanMove { protected get; set; } = true;
         public bool CanRotate { protected get; set; } = true;
+        
+        public float CurrentSpeed => this.Mode switch {
+            Gesture.Walk => this.WalkingSpeed,
+            Gesture.Run => this.RunningSpeed,
+            Gesture.Sprint => this.SprintingSpeed,
+            var _ => this.WalkingSpeed
+        } * this.SpeedMultiplier;
 
         protected override void Awake() {
             base.Awake();
@@ -29,7 +42,7 @@ namespace GameCharacterBehaviours.Runtime.Movement {
 
         public void MoveAndRotate(Vector3 displacement, bool forced = true) {
             if (forced || this.CanMove) {
-                this.MoveBy(displacement);
+                this.MoveBy(forced ? displacement : displacement * this.CurrentSpeed);
             }
 
             if (forced || this.CanRotate) {

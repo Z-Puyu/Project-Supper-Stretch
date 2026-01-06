@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20d5ec4efb9449748f918d09b91b4304, type: 3}
+  m_Name: Character Attributes
+  m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Attributes.AttributeDefinitionSheet
+  <AttributeTypes>k__BackingField:
+  - <Id>k__BackingField: Speed
+    <Name>k__BackingField: Speed
+    displayName: Speed
+    <SubTypes>k__BackingField: []
+  - <Id>k__BackingField: Attack
+    <Name>k__BackingField: Attack
+    displayName: Attack
+    <SubTypes>k__BackingField:
+    - <Id>k__BackingField: Attack/Physical
+      <Name>k__BackingField: Physical
+      displayName: Physical Attack
+      <SubTypes>k__BackingField:
+      - <Id>k__BackingField: Attack/Physical/Slash
+        <Name>k__BackingField: Slash
+        displayName: Slash Attack
+        <SubTypes>k__BackingField: []
+      - <Id>k__BackingField: Attack/Physical/Thrash
+        <Name>k__BackingField: Thrash
+        displayName: Thrash Attack
+        <SubTypes>k__BackingField: []
+      - <Id>k__BackingField: Attack/Physical/Smash
+        <Name>k__BackingField: Smash
+        displayName: Smash Attack
+        <SubTypes>k__BackingField: []
+    - <Id>k__BackingField: Attack/Magic
+      <Name>k__BackingField: Magic
+      displayName: Magic Attack
+      <SubTypes>k__BackingField: []
+    - <Id>k__BackingField: Attack/Elemental
+      <Name>k__BackingField: Elemental
+      displayName: Elemental Attack
+      <SubTypes>k__BackingField:
+      - <Id>k__BackingField: Attack/Elemental/Fire
+        <Name>k__BackingField: Fire
+        displayName: Fire Attack
+        <SubTypes>k__BackingField: []
+      - <Id>k__BackingField: Attack/Elemental/Lightning
+        <Name>k__BackingField: Lightning
+        displayName: Lightning Attack
+        <SubTypes>k__BackingField: []

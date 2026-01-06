@@ -125,7 +125,11 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         /// Stops the given ability from executing.
         /// </summary>
         /// <param name="ability">The ability to stop.</param>
-        public void Stop(Ability ability) {
+        public void Stop(Ability? ability) {
+            if (!ability) {
+                return;
+            }
+            
             if (!this.RunningAbilities.Remove(ability, out AbilityActivation activation)) {
                 return;
             }

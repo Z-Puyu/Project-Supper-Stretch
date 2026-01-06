@@ -37,7 +37,7 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         }
 
         protected override void Move(float deltaTime) {
-            this.MoveBy(this.PlanarDirection3D * deltaTime);
+            this.MoveBy(this.PlanarDirection3D * (deltaTime * this.CurrentSpeed));
         }
 
         protected override void Rotate() {

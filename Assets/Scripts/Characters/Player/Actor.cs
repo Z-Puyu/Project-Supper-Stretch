@@ -21,26 +21,40 @@ namespace Characters.Player {
         
         [field: SerializeField] private Ability? RollAbility { get; set; }
         [field: SerializeField] private Ability? BackstepAbility { get; set; }
+        [field: SerializeField] private Ability? SprintAbility { get; set; }
 
         private void Awake() {
             if (!this.ComponentRoot) {
-                this.ComponentRoot = this.GetComponentInChildren<ComponentManager>();
+                this.ComponentRoot = this.GetComponentInChildren<ComponentManager>(true);
             }
         }
 
         private void OnEnable() {
             this.Subscribe<PlayerInputInterpreter, AttemptToDodgeMessage>(this.HandleDodgeEvent);
+            this.Subscribe<PlayerInputInterpreter, PerformSprintingMessage>(this.HandleSprintEvent);
         }
-        
+
+        private void OnDisable() {
+            this.Unsubscribe<PlayerInputInterpreter, AttemptToDodgeMessage>();
+            this.Unsubscribe<PlayerInputInterpreter, PerformSprintingMessage>();
+        }
+
         private T GetActorComponent<T>() where T : BehaviourComponent {
             return this.ComponentRoot.GetOrAdd<T>();
         }
-
-
+        
         private void HandleDodgeEvent() {
             this.GetActorComponent<AbilitySystem>().Perform(
                 this.GetActorComponent<Locomotion>().IsMoving ? this.RollAbility : this.BackstepAbility
             );
+        }
+        
+        private void HandleSprintEvent(Event<PlayerInputInterpreter, PerformSprintingMessage> @event) {
+            if (@event.Message.IsSprinting) {
+                this.GetActorComponent<AbilitySystem>().Perform(this.SprintAbility);
+            } else {
+                this.GetActorComponent<AbilitySystem>().Stop(this.SprintAbility);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using CommonFrameworks.Components;
 using SaintsField;
 using UnityEngine;
@@ -7,12 +8,11 @@ using UnityEngine;
 namespace GameplayAbilitiesSystem.Runtime.Attributes {
     [CreateAssetMenu(fileName = "New Attribute Table", menuName = "Gameplay Abilities/Attribute Table")]
     public sealed class AttributeTable : ScriptableObject, IEnumerable<KeyValuePair<AttributeType, double>>, IComponentInitialiser<AttributeSet> {
-        [field: SerializeField, SaintsDictionary]
-        private SaintsDictionary<AttributeType, double> BaseValues { get; set; } =
-            new SaintsDictionary<AttributeType, double>(); 
+        [field: SerializeField, Table]
+        private List<AttributeTableRow> BaseValues { get; set; } = new List<AttributeTableRow>();
         
         public IEnumerator<KeyValuePair<AttributeType, double>> GetEnumerator() {
-            return this.BaseValues.GetEnumerator();
+            return this.BaseValues.Select(row => row.MakePair()).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() {

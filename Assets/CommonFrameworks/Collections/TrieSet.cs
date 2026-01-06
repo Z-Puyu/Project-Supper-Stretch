@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace CommonFrameworks.Collections {
@@ -47,15 +48,35 @@ namespace CommonFrameworks.Collections {
         }
 
         public bool Contains(K item) {
-            return this.HasPath(item, out List<Node> path) && path[^1].IsEndOfKey;
+            return this.HasPath(item, out List<(Node node, T element)> path) && path[^1].node.IsEndOfKey;
         }
 
         public void CopyTo(K[] array, int arrayIndex) {
             this.BreathFirstPrefixSearch(Enumerable.Empty<T>()).ToArray().CopyTo(array, arrayIndex);
         }
+        
+        public bool Remove(K key) {
+            if (!this.HasPath(key, out List<(Node node, T element)> path) || path.Count == 0) {
+                return false;
+            }
 
-        public bool Remove(K item) {
-            return this.Remove(item.AsEnumerable());
+            if (!path[^1].node.IsEndOfKey) {
+                return false;
+            }
+
+            path[^1].node.IsEndOfKey = false;
+            this.Root.Size -= 1;
+            for (int i = 1; i < path.Count; i += 1) {
+                path[i].node.Size -= 1;
+                if (path[i].node.Size > 0) {
+                    continue;
+                }
+                
+                path[i - 1].node.Children.Remove(path[i].element);
+                break;
+            }
+
+            return true;
         }
 
         #endregion
@@ -148,32 +169,67 @@ namespace CommonFrameworks.Collections {
 
         #endregion
 
-        private bool HasPath(IEnumerable<T> prefix, out List<Node> path) {
-            path = new List<Node> { this.Root };
+        private bool HasPath<P>(P prefix, out List<(Node node, T element)> path) where P : IEnumerable<T> {
+            path = new List<(Node node, T element)> { (this.Root, default!) };
             foreach (T element in prefix) {
-                if (!path[^1].Children.TryGetValue(element, out Node node)) {
+                if (!path[^1].node.Children.TryGetValue(element, out Node node)) {
                     return false;
                 }
-
-                path.Add(node);
+                
+                path.Add((node, element));
             }
 
-            return !this.HasSeparator || path[^1].Children.ContainsKey(this.Separator);
+            return !this.HasSeparator || path[^1].node.Children.ContainsKey(this.Separator);
         }
 
-        public bool ContainsPrefix(IEnumerable<T> prefix) {
-            return this.HasPath(prefix, out List<Node> _);
+        public bool ContainsPrefix<P>(P prefix) where P : IEnumerable<T> {
+            return this.HasPath(prefix, out List<(Node node, T element)> _);
         }
 
-        public IList<K> BreathFirstPrefixSearch(IEnumerable<T> prefix) {
-            T[] prefixArray = prefix.ToArray();
-            if (!this.HasPath(prefixArray, out List<Node> path)) {
+        public bool ContainsPrefixKey<S>(S sequence, [NotNullWhen(true)] out K? key) where S : IEnumerable<T> {
+            Node curr = this.Root;
+            foreach (T element in sequence) {
+                if (curr.IsEndOfKey) {
+                    key = curr.Key;
+                    return true;
+                }
+
+                if (curr.Children.TryGetValue(element, out curr)) {
+                    continue;
+                }
+
+                key = default;
+                return false;
+            }
+
+            key = default;
+            return false;
+        }
+
+        public bool FindLongestPrefixKey<S>(S sequence, [NotNullWhen(true)] out K? key) where S : IEnumerable<T> {
+            Node curr = this.Root;
+            bool found = false;
+            key = default;
+            foreach (T element in sequence) {
+                if (curr.IsEndOfKey) {
+                    found = true;
+                    key = curr.Key;
+                } else if (!curr.Children.TryGetValue(element, out curr)) {
+                    break;
+                }
+            }
+            
+            return found;
+        }
+
+        public IList<K> BreathFirstPrefixSearch<P>(P prefix) where P : IEnumerable<T> {
+            if (!this.HasPath(prefix, out List<(Node node, T element)> path)) {
                 return new List<K>();
             }
 
             List<K> keys = new List<K>();
             Queue<Node> queue = new Queue<Node>();
-            queue.Enqueue(path[^1]);
+            queue.Enqueue(path[^1].node);
             while (queue.TryDequeue(out Node curr)) {
                 if (curr.IsEndOfKey) {
                     keys.Add(curr.Key);
@@ -187,15 +243,14 @@ namespace CommonFrameworks.Collections {
             return keys;
         }
         
-        public IList<K> DepthFirstPrefixSearch(IEnumerable<T> prefix) {
-            T[] prefixArray = prefix.ToArray();
-            if (!this.HasPath(prefixArray, out List<Node> path)) {
+        public IList<K> DepthFirstPrefixSearch<P>(P prefix) where P : IEnumerable<T> {
+            if (!this.HasPath(prefix, out List<(Node node, T element)> path)) {
                 return new List<K>();
             }
 
             List<K> keys = new List<K>();
             Stack<Node> stack = new Stack<Node>(); 
-            stack.Push(path[^1]);
+            stack.Push(path[^1].node);
             while (stack.TryPop(out Node curr)) {
                 if (curr.IsEndOfKey) {
                     keys.Add(curr.Key);
@@ -209,22 +264,21 @@ namespace CommonFrameworks.Collections {
             return keys;
         }
 
-        public bool RemoveAllWithPrefix(IEnumerable<T> prefix) {
-            T[] prefixArray = prefix.ToArray();
-            if (!this.HasPath(prefixArray, out List<Node> path)) {
+        public bool RemoveAllWithPrefix<P>(P prefix) where P : IEnumerable<T> {
+            if (!this.HasPath(prefix, out List<(Node node, T element)> path)) {
                 return false;
             }
 
-            path[^1].Children.Clear();
-            path[^1].IsEndOfKey = false;
-            int size = path[^1].Size;
-            for (int i = 1; i < prefixArray.Length; i += 1) {
-                path[i].Size -= size;
-                if (path[i].Size > 0) {
+            path[^1].node.Children.Clear();
+            path[^1].node.IsEndOfKey = false;
+            int size = path[^1].node.Size;
+            for (int i = 1; i < path.Count; i += 1) {
+                path[i].node.Size -= size;
+                if (path[i].node.Size > 0) {
                     continue;
                 }
 
-                path[i - 1].Children.Remove(prefixArray[i]);
+                path[i - 1].node.Children.Remove(path[i].element);
                 break;
             }
             
@@ -232,53 +286,29 @@ namespace CommonFrameworks.Collections {
             return true;
         }
         
-        public bool RemoveAllWithPrefix(IEnumerable<T> prefix, out IEnumerable<K> removed) {
-            T[] prefixArray = prefix.ToArray();
-            IList<K> removedKeys = this.BreathFirstPrefixSearch(prefixArray);
+        public bool RemoveAllWithPrefix<P>(P prefix, out IEnumerable<K> removed) where P : IEnumerable<T> {
+            if (!this.HasPath(prefix, out List<(Node node, T element)> path)) {
+                removed = Enumerable.Empty<K>();
+                return false;
+            }
+            
+            IList<K> removedKeys = this.BreathFirstPrefixSearch(path.Select(p => p.element));
             removed = removedKeys;
             if (removedKeys.Count == 0) {
                 return false;
             }
-
-            if (this.HasPath(prefixArray, out List<Node> path)) {
-                for (int i = 1; i < prefixArray.Length; i += 1) {
-                    path[i].Size -= removedKeys.Count;
-                    if (path[i].Size > 0) {
-                        continue;
-                    }
-
-                    path[i - 1].Children.Remove(prefixArray[i]);
-                    break;
+            
+            for (int i = 1; i < path.Count; i += 1) {
+                path[i].node.Size -= removedKeys.Count;
+                if (path[i].node.Size > 0) {
+                    continue;
                 }
+
+                path[i - 1].node.Children.Remove(path[i].element);
+                break;
             }
             
             this.Root.Size -= removedKeys.Count;
-            return true;
-        }
-
-        public bool Remove(IEnumerable<T> key) {
-            T[] prefix = key.ToArray();
-            if (!this.HasPath(prefix, out List<Node> path) || path.Count == 0) {
-                return false;
-            }
-
-            if (!path[^1].IsEndOfKey) {
-                return false;
-            }
-
-            path[^1].IsEndOfKey = false;
-            this.Root.Size -= 1;
-            int idx = 1;
-            foreach (T element in prefix) {
-                path[idx].Size -= 1;
-                if (path[idx].Size == 0) {
-                    path[idx - 1].Children.Remove(element);
-                    break;
-                }
-
-                idx += 1;
-            }
-
             return true;
         }
     }

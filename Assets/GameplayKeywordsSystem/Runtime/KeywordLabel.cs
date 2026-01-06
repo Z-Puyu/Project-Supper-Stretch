@@ -35,8 +35,13 @@ namespace GameplayKeywordsSystem.Runtime {
             this.Keywords.Clear();
         }
 
-        public bool Contains(Keyword item) {
-            return this.Keywords.ContainsPrefix(item);
+        /// <summary>
+        /// Checks if the label contains the given keyword.
+        /// </summary>
+        /// <param name="keyword">The keyword to check for.</param>
+        /// <returns><c>true</c> if the keyword is a prefix of any keyword present in the label</returns>
+        public bool Contains(Keyword keyword) {
+            return this.Keywords.ContainsPrefix(keyword);
         }
 
         public void CopyTo(Keyword[] array, int arrayIndex) {
@@ -52,13 +57,21 @@ namespace GameplayKeywordsSystem.Runtime {
             return true;
         }
 
-        public bool Remove(Keyword item) {
-            if (!this.Keywords.RemoveAllWithPrefix(item, out IEnumerable<Keyword> removed)) {
+        /// <summary>
+        /// Removes the given keyword from the label.
+        /// </summary>
+        /// <param name="keyword">The keyword to remove</param>
+        /// <returns><c>true</c> if the keyword is removed, and <c>false</c> if the keyword is not present</returns>
+        /// <remarks>
+        /// This removes all keywords that start with the given keyword.
+        /// </remarks>
+        public bool Remove(Keyword keyword) {
+            if (!this.Keywords.RemoveAllWithPrefix(keyword, out IEnumerable<Keyword> removed)) {
                 return false;
             }
 
-            foreach (Keyword keyword in removed) {
-                this.OnKeywordRemoved.Invoke(keyword);
+            foreach (Keyword k in removed) {
+                this.OnKeywordRemoved.Invoke(k);
             }
                 
             return true;

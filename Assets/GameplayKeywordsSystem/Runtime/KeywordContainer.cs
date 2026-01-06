@@ -38,12 +38,25 @@ namespace GameplayKeywordsSystem.Runtime {
             this.Label.CopyTo(array, arrayIndex);
         }
 
-        public bool Remove(Keyword label) {
-            return this.Label.Remove(label);
+        /// <summary>
+        /// Removes the given keyword from the label.
+        /// </summary>
+        /// <param name="keyword">The keyword to remove</param>
+        /// <returns><c>true</c> if the keyword is removed, and <c>false</c> if the keyword is not present</returns>
+        /// <remarks>
+        /// This removes all keywords that start with the given keyword.
+        /// </remarks>
+        public bool Remove(Keyword keyword) {
+            return this.Label.Remove(keyword);
         }
 
-        public bool Contains(Keyword label) {
-            return this.Label.Contains(label);
+        /// <summary>
+        /// Checks if the label contains the given keyword.
+        /// </summary>
+        /// <param name="keyword">The keyword to check for.</param>
+        /// <returns><c>true</c> if the keyword is a prefix of any keyword present in the label</returns>
+        public bool Contains(Keyword keyword) {
+            return this.Label.Contains(keyword);
         }
 
         void ICollection<Keyword>.Add(Keyword item) {
