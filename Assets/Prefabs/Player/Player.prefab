@@ -54072,6 +54072,7 @@ MonoBehaviour:
   <AttributeSet>k__BackingField: {fileID: 6624264980163878195}
   <DefaultAbilities>k__BackingField:
   - {fileID: 11400000, guid: 46e1df1ad72d91d45828c65fa4dad265, type: 2}
+  - {fileID: 11400000, guid: d1b5f047207a9004b88750d8f1cecf3e, type: 2}
 --- !u!1 &6894017745684009813
 GameObject:
   m_ObjectHideFlags: 0
@@ -71311,7 +71312,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Scripts.Characters::Characters.Player.Actor
   <AbilitySystem>k__BackingField: {fileID: 6658280735558002848}
+  <ComponentRoot>k__BackingField: {fileID: 5972498177023485511}
   <RollAbility>k__BackingField: {fileID: 11400000, guid: 46e1df1ad72d91d45828c65fa4dad265, type: 2}
+  <BackstepAbility>k__BackingField: {fileID: 11400000, guid: d1b5f047207a9004b88750d8f1cecf3e, type: 2}
 --- !u!114 &62607394211588175
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -15,9 +15,12 @@ namespace CommonFrameworks.Components {
             }
             
             this.Root = manager;
-            if (!this.Root.RegisterComponent(this)) {
-                Object.Destroy(this);
+            if (this.Root.RegisterComponent(this)) {
+                return;
             }
+
+            Debug.LogError($"Component {this.GetType()} already registered! The duplicate will be removed.");
+            Object.Destroy(this);
         }
     }
 }

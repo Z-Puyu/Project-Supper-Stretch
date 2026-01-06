@@ -1,6 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Characters.Events;
+using CommonFrameworks.Components;
 using CommonFrameworks.Events;
+using GameCharacterBehaviours.Runtime.Movement;
 using GameplayAbilitiesSystem.Runtime.Abilities;
 using SaintsField;
 using UnityEngine;
@@ -12,19 +15,32 @@ namespace Characters.Player {
         [field: SerializeField, Required] 
         private AbilitySystem? AbilitySystem { get; set; }
         
+        [NotNull]
+        [field: SerializeField, Required] 
+        private ComponentManager? ComponentRoot { get; set; }
+        
         [field: SerializeField] private Ability? RollAbility { get; set; }
+        [field: SerializeField] private Ability? BackstepAbility { get; set; }
+
+        private void Awake() {
+            if (!this.ComponentRoot) {
+                this.ComponentRoot = this.GetComponentInChildren<ComponentManager>();
+            }
+        }
 
         private void OnEnable() {
             this.Subscribe<PlayerInputInterpreter, AttemptToDodgeMessage>(this.HandleDodgeEvent);
         }
+        
+        private T GetActorComponent<T>() where T : BehaviourComponent {
+            return this.ComponentRoot.GetOrAdd<T>();
+        }
 
 
         private void HandleDodgeEvent() {
-            if (!this.RollAbility) {
-                return;
-            }
-            
-            this.AbilitySystem.Perform(this.RollAbility);
+            this.GetActorComponent<AbilitySystem>().Perform(
+                this.GetActorComponent<Locomotion>().IsMoving ? this.RollAbility : this.BackstepAbility
+            );
         }
     }
 }

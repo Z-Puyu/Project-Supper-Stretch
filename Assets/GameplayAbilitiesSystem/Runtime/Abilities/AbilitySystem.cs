@@ -87,7 +87,11 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         /// the conditions for the ability to start are met.
         /// </summary>
         /// <param name="ability">The ability to perform.</param>
-        public void Perform(Ability ability) {
+        public void Perform(Ability? ability) {
+            if (!ability) {
+                return;
+            }
+            
             this.Interrupt(ability);
             this.Stop(ability);
             if (!this.AvailableAbilities.Remove(ability)) {

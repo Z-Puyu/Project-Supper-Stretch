@@ -14,6 +14,9 @@ namespace CommonFrameworks.Components {
         
         private Dictionary<Type, BehaviourComponent> Components { get; } = new Dictionary<Type, BehaviourComponent>();
 
+        private Dictionary<Type, BehaviourComponent> BaseComponents { get; } =
+            new Dictionary<Type, BehaviourComponent>();
+
         private void Awake() {
             if (!this.Owner) {
                 this.Owner = this.gameObject;
@@ -21,31 +24,55 @@ namespace CommonFrameworks.Components {
         }
 
         internal bool RegisterComponent(BehaviourComponent component) {
-            if (this.Components.TryAdd(component.GetType(), component)) {
-                return true;
+            Type type = component.GetType();
+            if (!this.Components.TryAdd(type, component)) {
+                return false;
             }
 
-            Debug.LogError($"Component {component.GetType()} already registered! The duplicate will be removed.");
-            return false;
+            Type? @base = type.BaseType;
+            while (@base is not null && @base != typeof(BehaviourComponent)) {
+                if (this.BaseComponents.TryAdd(@base, component)) {
+                    continue;
+                }
+
+                if (component.GetType().IsSubclassOf(this.BaseComponents[@base].GetType())) {
+                    this.BaseComponents[@base] = component;
+                }
+                    
+                @base = @base.BaseType;
+            }
+
+            foreach (Type @interface in type.GetInterfaces()) {
+                if (this.BaseComponents.TryAdd(@interface, component)) {
+                    continue;
+                }
+                    
+                if (component.GetType().IsSubclassOf(this.BaseComponents[@interface].GetType())) {
+                    this.BaseComponents[@interface] = component;
+                }
+            }
+                
+            return true;
         }
         
         public bool HasComponent<T>() where T : BehaviourComponent {
-            return this.Components.ContainsKey(typeof(T));
+            return this.Components.ContainsKey(typeof(T)) || this.BaseComponents.ContainsKey(typeof(T));
         }
         
         public bool HasComponent<T>([NotNullWhen(true)] out T? component) where T : BehaviourComponent {
-            if (this.Components.TryGetValue(typeof(T), out BehaviourComponent c)) {
+            if (this.Components.TryGetValue(typeof(T), out BehaviourComponent c) ||
+                this.BaseComponents.TryGetValue(typeof(T), out c)) {
                 component = (T)c;
                 return true;
             }
-            
+
             component = null;
             return false;
         }
 
         public T GetOrAdd<T>() where T : BehaviourComponent {
-            if (this.Components.TryGetValue(typeof(T), out BehaviourComponent component)) {
-                return (T)component;
+            if (this.HasComponent(out T? component)) {
+                return component;
             }
 
             T comp = this.AddSubobject<T>();
