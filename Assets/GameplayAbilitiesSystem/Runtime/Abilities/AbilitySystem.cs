@@ -88,6 +88,8 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         /// </summary>
         /// <param name="ability">The ability to perform.</param>
         public void Perform(Ability ability) {
+            this.Interrupt(ability);
+            this.Stop(ability);
             if (!this.AvailableAbilities.Remove(ability)) {
                 return;
             }
@@ -139,6 +141,14 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             foreach (Ability ability in abilities) {
                 this.Stop(ability);           
             }
+        }
+
+        private void Interrupt(Ability ability) {
+            if (!this.RunningAbilities.TryGetValue(ability, out AbilityActivation activation)) {
+                return;
+            }
+            
+            activation.Interrupt(this);
         }
 
         public async Awaitable PlayAnimation(

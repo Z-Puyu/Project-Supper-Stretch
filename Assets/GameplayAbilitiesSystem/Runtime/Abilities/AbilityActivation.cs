@@ -9,8 +9,6 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         CancellationTokenSource Interrupter
     ) {
         internal void Stop(AbilitySystem system) {
-            this.Interrupter.Cancel();
-            this.Interrupter.Dispose();
             foreach (Keyword keyword in this.GrantedKeywords) {
                 system.EmitterKeywordContainer.Remove(keyword);
             }
@@ -18,6 +16,11 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             foreach (Keyword keyword in this.RevokedKeywords) {
                 system.EmitterKeywordContainer.Add(keyword);
             }
+        }
+        
+        internal void Interrupt(AbilitySystem system) {
+            this.Interrupter.Cancel();
+            this.Interrupter.Dispose();
         }
     }
 }
