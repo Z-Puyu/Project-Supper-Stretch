@@ -25,7 +25,7 @@ namespace CommonFrameworks.Collections {
 
         public TrieDictionary() {
             this.CachedEntries =
-                    new Lazy<IEnumerable<KeyValuePair<K, V>>>(() => this.PrefixSearch(Enumerable.Empty<T>()));
+                    new Lazy<IEnumerable<KeyValuePair<K, V>>>(() => this.BreathFirstPrefixSearch(Enumerable.Empty<T>()));
             this.CachedKeys = new Lazy<ICollection<K>>(() => this.Entries.Select(entry => entry.Key).ToArray());
             this.CachedValues = new Lazy<ICollection<V>>(() => this.Entries.Select(entry => entry.Value).ToArray());
         }
@@ -38,7 +38,7 @@ namespace CommonFrameworks.Collections {
         private void InvalidateCachedCollections() {
             if (this.CachedEntries.IsValueCreated) {
                 this.CachedEntries =
-                        new Lazy<IEnumerable<KeyValuePair<K, V>>>(() => this.PrefixSearch(Enumerable.Empty<T>()));
+                        new Lazy<IEnumerable<KeyValuePair<K, V>>>(() => this.BreathFirstPrefixSearch(Enumerable.Empty<T>()));
             }
 
             if (this.CachedKeys.IsValueCreated) {
@@ -184,31 +184,43 @@ namespace CommonFrameworks.Collections {
             return this.HasPath(prefix, out List<Entry> _);
         }
         
-        public IEnumerable<KeyValuePair<K, V>> PrefixSearch(IEnumerable<T> prefix) {
+        public IList<KeyValuePair<K, V>> BreathFirstPrefixSearch(IEnumerable<T> prefix) {
             T[] prefixArray = prefix.ToArray();
             if (!this.HasPath(prefixArray, out List<Entry> path)) {
-                return Enumerable.Empty<KeyValuePair<K, V>>();
+                return new List<KeyValuePair<K, V>>();
             }
 
             List<KeyValuePair<K, V>> entries = new List<KeyValuePair<K, V>>();
-            Stack<(T element, Entry entry, int idx)> stack = new Stack<(T element, Entry entry, int idx)>();
-            List<T> elements = new List<T>(prefixArray);
-            foreach ((T element, Entry entry) in path[^1].Children) {
-                stack.Push((element, entry, elements.Count));
+            Queue<Entry> queue = new Queue<Entry>();
+            queue.Enqueue(path[^1]);
+            while (queue.TryDequeue(out Entry curr)) {
+                if (curr.IsEndOfKey) {
+                    entries.Add(new KeyValuePair<K, V>(curr.Key, curr.Value));
+                } else {
+                    foreach (Entry entry in curr.Children.Values) {
+                        queue.Enqueue(entry);
+                    }
+                }
             }
 
-            while (stack.TryPop(out (T element, Entry entry, int idx) curr)) {
-                if (elements.Count == curr.idx) {
-                    elements.Add(curr.element);
-                } else {
-                    elements[curr.idx] = curr.element;
-                }
+            return entries;
+        }
 
-                if (curr.entry.IsEndOfKey) {
-                    entries.Add(new KeyValuePair<K, V>(curr.entry.Key, curr.entry.Value));
+        public IList<KeyValuePair<K, V>> DepthFirstPrefixSearch(IEnumerable<T> prefix) {
+            T[] prefixArray = prefix.ToArray();
+            if (!this.HasPath(prefixArray, out List<Entry> path)) {
+                return new List<KeyValuePair<K, V>>();
+            }
+
+            List<KeyValuePair<K, V>> entries = new List<KeyValuePair<K, V>>();
+            Stack<Entry> stack = new Stack<Entry>();
+            stack.Push(path[^1]);
+            while (stack.TryPop(out Entry curr)) {
+                if (curr.IsEndOfKey) {
+                    entries.Add(new KeyValuePair<K, V>(curr.Key, curr.Value));
                 } else {
-                    foreach ((T element, Entry entry) in curr.entry.Children) {
-                        stack.Push((element, entry, curr.idx + 1));
+                    foreach (Entry entry in curr.Children.Values) {
+                        stack.Push(entry);
                     }
                 }
             }

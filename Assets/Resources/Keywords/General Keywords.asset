@@ -19,9 +19,15 @@ MonoBehaviour:
     - <Name>k__BackingField: Invincible
       <Path>k__BackingField: Status/Invincible
       <Children>k__BackingField: []
-  - <Name>k__BackingField: Flags
-    <Path>k__BackingField: Flags
+  - <Name>k__BackingField: Character Flags
+    <Path>k__BackingField: Character Flags
     <Children>k__BackingField:
-    - <Name>k__BackingField: Is Performing Action
-      <Path>k__BackingField: Flags/Is Performing Action
+    - <Name>k__BackingField: In Action
+      <Path>k__BackingField: Character Flags/In Action
+      <Children>k__BackingField: []
+    - <Name>k__BackingField: Rotation Blocked
+      <Path>k__BackingField: Character Flags/Rotation Blocked
+      <Children>k__BackingField: []
+    - <Name>k__BackingField: Movement Blocked
+      <Path>k__BackingField: Character Flags/Movement Blocked
       <Children>k__BackingField: []

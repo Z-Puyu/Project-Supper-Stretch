@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
+using CommonFrameworks.Collections;
 using CommonFrameworks.Components;
 using CommonFrameworks.Extensions;
 using GameplayAbilitiesSystem.Runtime.Animations;
@@ -17,6 +19,9 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
     public sealed class AbilitySystem : BehaviourComponent, IEffectEmitterFacade, IEffectReceiverFacade {
         private AnimationController? AnimationController { get; set; }
         private ICollection<Ability> AvailableAbilities { get; } = new HashSet<Ability>();
+
+        private TrieDictionary<Keyword, char, ICollection<Ability>> AbilitiesByTag { get; } =
+            new TrieDictionary<Keyword, char, ICollection<Ability>>();
 
         private IDictionary<Ability, CancellationTokenSource> RunningAbilities { get; } =
             new Dictionary<Ability, CancellationTokenSource>();
@@ -52,10 +57,33 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         }
 
         /// <summary>
+        /// Grants the given ability to the ability system.
+        /// </summary>
+        /// <param name="ability">The ability to grant.</param>
+        /// <returns>True if the ability was granted, false if it was already granted.</returns>
+        public bool Grant(Ability ability) {
+            if (this.AvailableAbilities.Contains(ability)) {
+                return false;
+            }
+            
+            this.AvailableAbilities.Add(ability);
+            foreach (Keyword keyword in ability.Tags) {
+                if (!this.AbilitiesByTag.TryGetValue(keyword, out ICollection<Ability> abilities)) {
+                    abilities = new List<Ability>();
+                    this.AbilitiesByTag.Add(keyword, abilities);
+                }
+                
+                abilities.Add(ability);
+            }
+            
+            return true;
+        }
+
+        /// <summary>
         /// Attempts to execute the given ability. This will check if the ability system has the ability and
         /// the conditions for the ability to start are met.
         /// </summary>
-        /// <param name="ability"></param>
+        /// <param name="ability">The ability to perform.</param>
         public void Perform(Ability ability) {
             if (!this.AvailableAbilities.Remove(ability)) {
                 return;
@@ -70,7 +98,26 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             ability.Execute(this, interrupter.Token);
         }
 
-        internal void Stop(Ability ability) {
+        /// <summary>
+        /// Attempts to execute the first ability with the given keyword tag.
+        /// </summary>
+        /// <param name="keyword">The keyword tag to search for.</param>
+        public void Perform(Keyword keyword) {
+            Ability? ability = this.AbilitiesByTag
+                                   .DepthFirstPrefixSearch(keyword.Value)
+                                   .FirstOrDefault().Value.FirstOrDefault();
+            if (!ability) {
+                return;
+            }
+            
+            this.Perform(ability);
+        }
+
+        /// <summary>
+        /// Stops the given ability from executing.
+        /// </summary>
+        /// <param name="ability">The ability to stop.</param>
+        public void Stop(Ability ability) {
             if (!this.RunningAbilities.Remove(ability, out CancellationTokenSource interrupter)) {
                 return;
             }
@@ -78,6 +125,19 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             interrupter.Cancel();
             interrupter.Dispose();
             this.AvailableAbilities.Add(ability);
+        }
+
+        /// <summary>
+        /// Stops all abilities that have the given keyword tag.
+        /// </summary>
+        /// <param name="keyword">The keyword tag to stop abilities with.</param>
+        public void Stop(Keyword keyword) {
+            IEnumerable<Ability> abilities = this.AbilitiesByTag
+                                                 .DepthFirstPrefixSearch(keyword.Value)
+                                                 .SelectMany(pair => pair.Value);
+            foreach (Ability ability in abilities) {
+                this.Stop(ability);           
+            }
         }
 
         public async Awaitable PlayAnimation(

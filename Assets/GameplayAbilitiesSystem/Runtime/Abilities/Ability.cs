@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using System.Threading;
 using CommonFrameworks.Logic;
 using GameplayAbilitiesSystem.Runtime.Abilities.Executions;
+using GameplayKeywordsSystem.Runtime;
 using SaintsField;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Abilities {
     [CreateAssetMenu(fileName = "New Ability", menuName = "Gameplay Abilities/Ability")]
     public sealed class Ability : ScriptableObject {
+        [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))] 
+        internal List<string> Tags { get; private set; } = new List<string>();
+        
         [field: SerializeReference, Tooltip("Conditions on the ability system for this ability to be usable")]
         [field: FieldLabelText(nameof(this.LabelCondition), true)]
         private List<IPredicate<AbilitySystem>> Conditions { get; set; } = new List<IPredicate<AbilitySystem>>();
         
         [field: SerializeReference, ReferencePicker] 
         private List<IAbilityExecutor> ExecutionSteps { get; set; } = new List<IAbilityExecutor>();
+        
+        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.GetTreeDropdownList(true);
         
         private string LabelCondition(object condition) {
             return condition.GetType().Name;

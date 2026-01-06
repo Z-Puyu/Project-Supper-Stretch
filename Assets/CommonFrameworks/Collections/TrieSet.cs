@@ -30,7 +30,7 @@ namespace CommonFrameworks.Collections {
         public bool IsReadOnly => false;
 
         public IEnumerator<K> GetEnumerator() {
-            return this.PrefixSearch(Enumerable.Empty<T>()).GetEnumerator();
+            return this.BreathFirstPrefixSearch(Enumerable.Empty<T>()).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() {
@@ -51,7 +51,7 @@ namespace CommonFrameworks.Collections {
         }
 
         public void CopyTo(K[] array, int arrayIndex) {
-            this.PrefixSearch(Enumerable.Empty<T>()).ToArray().CopyTo(array, arrayIndex);
+            this.BreathFirstPrefixSearch(Enumerable.Empty<T>()).ToArray().CopyTo(array, arrayIndex);
         }
 
         public bool Remove(K item) {
@@ -165,31 +165,43 @@ namespace CommonFrameworks.Collections {
             return this.HasPath(prefix, out List<Node> _);
         }
 
-        public IEnumerable<K> PrefixSearch(IEnumerable<T> prefix) {
+        public IList<K> BreathFirstPrefixSearch(IEnumerable<T> prefix) {
             T[] prefixArray = prefix.ToArray();
             if (!this.HasPath(prefixArray, out List<Node> path)) {
-                return Enumerable.Empty<K>();
+                return new List<K>();
             }
 
             List<K> keys = new List<K>();
-            Stack<(T element, Node node, int idx)> stack = new Stack<(T element, Node node, int idx)>();
-            List<T> elements = new List<T>(prefixArray);
-            foreach ((T element, Node node) in path[^1].Children) {
-                stack.Push((element, node, elements.Count));
+            Queue<Node> queue = new Queue<Node>();
+            queue.Enqueue(path[^1]);
+            while (queue.TryDequeue(out Node curr)) {
+                if (curr.IsEndOfKey) {
+                    keys.Add(curr.Key);
+                } else {
+                    foreach (Node node in curr.Children.Values) {
+                        queue.Enqueue(node);
+                    }
+                }
             }
 
-            while (stack.TryPop(out (T element, Node node, int idx) curr)) {
-                if (elements.Count == curr.idx) {
-                    elements.Add(curr.element);
-                } else {
-                    elements[curr.idx] = curr.element;
-                }
+            return keys;
+        }
+        
+        public IList<K> DepthFirstPrefixSearch(IEnumerable<T> prefix) {
+            T[] prefixArray = prefix.ToArray();
+            if (!this.HasPath(prefixArray, out List<Node> path)) {
+                return new List<K>();
+            }
 
-                if (curr.node.IsEndOfKey) {
-                    keys.Add(curr.node.Key);
+            List<K> keys = new List<K>();
+            Stack<Node> stack = new Stack<Node>(); 
+            stack.Push(path[^1]);
+            while (stack.TryPop(out Node curr)) {
+                if (curr.IsEndOfKey) {
+                    keys.Add(curr.Key);
                 } else {
-                    foreach ((T element, Node node) in curr.node.Children) {
-                        stack.Push((element, node, curr.idx + 1));
+                    foreach (Node node in curr.Children.Values) {
+                        stack.Push(node);
                     }
                 }
             }

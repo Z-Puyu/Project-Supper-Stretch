@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 955fa20d01bb40b3a53dd2d24209eca9, type: 3}
   m_Name: Roll
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Abilities.Ability
+  <Tags>k__BackingField:
+  - 
   <Conditions>k__BackingField:
   - rid: 1692151751057866752
   <ExecutionSteps>k__BackingField:
   - rid: 1692151813856559430
-  <AnimationEventHandlers>k__BackingField:
-  - rid: 1692151751057866864
   references:
     version: 2
     RefIds:
@@ -28,12 +28,6 @@ MonoBehaviour:
       data:
         <Keywords>k__BackingField:
         - Flags/Is Performing Action
-    - rid: 1692151751057866864
-      type: {class: ApplyEffectsToSelfOnAnimation, ns: GameplayAbilitiesSystem.Runtime.Animations, asm: GameplayAbilitiesSystem.Runtime}
-      data:
-        <EventName>k__BackingField: Events/Combat/Dodge/Roll
-        <Effects>k__BackingField:
-        - {fileID: 11400000, guid: 95464a4a295bf5246b5250478771ac9c, type: 2}
     - rid: 1692151813856559430
       type: {class: PlayAnimation, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
       data:
