@@ -10,7 +10,7 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         /// </summary>
         /// <param name="key">The key of the attribute.</param>
         /// <returns>The current value of the attribute.</returns>
-        public double GetCurrent(AttributeKey key);
+        public double Query(AttributeKey key);
 
         /// <summary>
         /// Checks if the owner has sufficient amount of attribute for a given key.
@@ -18,6 +18,6 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         /// <param name="threshold">The threshold to check against.</param>
         /// <param name="key">The key of the attribute.</param>
         /// <returns><c>true</c> if the owner has sufficient amount of attribute for the given key.</returns>
-        public bool Has(double threshold, AttributeKey key);
+        public bool HasAtLeast(double threshold, AttributeKey key);
     }
 }

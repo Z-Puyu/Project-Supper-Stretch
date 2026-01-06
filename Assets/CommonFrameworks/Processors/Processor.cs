@@ -9,12 +9,14 @@ namespace CommonFrameworks.Processors {
         [field: SerializeField]
         private ProcessorChainingPolicy ChainingPolicy { get; set; } = ProcessorChainingPolicy.AlwaysContinue;
 
-        public T Process(T data) {
-            bool isSuccessful = this.TryProcess(data, out T result);
+        public void Process(ref T data) {
+            bool isSuccessful = this.TryProcess(ref data);
             bool shouldContinue = this.ChainingPolicy == ProcessorChainingPolicy.AlwaysContinue ||
                                   (this.ChainingPolicy == ProcessorChainingPolicy.BreakOnlyOnFailure && isSuccessful) ||
                                   (this.ChainingPolicy == ProcessorChainingPolicy.BreakOnlyOnSuccess && !isSuccessful);
-            return shouldContinue && this.Next is not null ? this.Next.Process(result) : result;
+            if (shouldContinue) {
+                this.Next?.Process(ref data);
+            } 
         }
 
         public Processor<T> Then(Processor<T> processor) {
@@ -22,6 +24,11 @@ namespace CommonFrameworks.Processors {
             return processor;
         }
         
-        protected abstract bool TryProcess(T data, out T result);
+        /// <summary>
+        /// Attempts to process the given data.
+        /// </summary>
+        /// <param name="data">The input data to process.</param>
+        /// <returns>True if the processing was successful, false otherwise.</returns>
+        protected abstract bool TryProcess(ref T data);
     }
 }

@@ -16,12 +16,6 @@ using UnityEngine.Events;
 namespace GameplayAbilitiesSystem.Runtime.Attributes {
     [DisallowMultipleComponent, RequireComponent(typeof(ModifierEnvironment))]
     public sealed class AttributeSet : BehaviourComponent, IAttributeReader, IModifiable {
-        private sealed class Node {
-            internal double BaseValue { get; set; }
-            internal double Value { get; set; }
-            internal List<IProcessor<Attribute>> Processors { get; } = new List<IProcessor<Attribute>>();
-        }
-
         private TrieDictionary<AttributeKey, char, Node> Attributes { get; } =
             new TrieDictionary<AttributeKey, char, Node>('/');
 
@@ -48,38 +42,42 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         }
 
         private void PostAttributeUpdate(Attribute attribute) {
-            this.Attributes[attribute.Id].Value = !attribute.IsValueApproximated
-                    ? this.Approximator.Process(attribute).Value
-                    : attribute.Value;
+            if (!attribute.HasBeenApproximated) {
+                this.Approximator.Process(ref attribute);
+            }
+            
+            this.Attributes[attribute.Id].Value = attribute.Value;
         }
 
         private void UpdateAttribute(AttributeKey key) {
             if (!this.Attributes.TryGetValue(key, out Node node)) {
-                node = new Node();
+                node = new Node(0);
                 this.Attributes.Add(key, node);
             }
 
             double oldValue = node.Value;
-            AttributeQuery query = new AttributeQuery(this.gameObject, this, key, node.BaseValue, false);
+            AttributeQuery query = new AttributeQuery(this.Owner, this, key, node.BaseValue);
             this.PostAttributeUpdate(this.ModifierEnvironment.Query(ref query, node.Processors));
             this.OnAttributeUpdated?.Invoke(new AttributeChange(key, oldValue, node.Value));
         }
 
-        public double GetCurrent(AttributeKey key) {
+        public double Query(AttributeKey key) {
             return this.Attributes.TryGetValue(key, out Node node) ? node.Value : 0;
         }
 
-        public bool Has(double threshold, AttributeKey key) {
+        public bool HasAtLeast(double threshold, AttributeKey key) {
             return this.Attributes.TryGetValue(key, out Node node) && node.Value >= threshold;
         }
 
-        public void SetBase(AttributeKey key, double value) {
-            try {
-                this.Attributes[key].BaseValue = value;
-                this.UpdateAttribute(key);
-            } catch (KeyNotFoundException e) {
-                Debug.LogException(e, this);
+        private void SetBase(AttributeKey key, double value) {
+            if (!this.Attributes.TryGetValue(key, out Node node)) {
+                node = new Node(value);
+                this.Attributes.Add(key, node);
+            } else {
+                node.BaseValue = value;
             }
+            
+            this.UpdateAttribute(key);
         }
 
         public void Clear() {
@@ -87,10 +85,13 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         }
 
         internal void Initialise(AttributeType attributeType, double value) {
-            Node node = new Node();
-            node.Processors.AddRange(attributeType.Processors);
-            this.Attributes.Add(attributeType.Id, node);
-            this.SetBase(attributeType.Id, value);
+            if (this.Attributes.ContainsKey(attributeType.Id)) {
+                Debug.LogError($"Attribute {attributeType.Id} is already initialised", this.Owner);
+            } else {
+                Node node = new Node(value, attributeType.Processors);
+                this.Attributes.Add(attributeType.Id, node);
+                this.UpdateAttribute(attributeType.Id);
+            }
         }
 
         public IEnumerator<Attribute> GetEnumerator() {
@@ -111,8 +112,25 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
             return this.GetEnumerator();
         }
 
-        public void AddModifier(Modifier modifier) {
-            this.ModifierEnvironment.AddModifier(modifier);
+        void IModifiable.AddModifier(Modifier modifier) {
+            if (modifier.Type == ModifierType.SetBase) {
+                this.SetBase(modifier.Target, modifier.Value);
+            } else {
+                this.ModifierEnvironment.AddModifier(modifier);
+            }
+        }
+        
+        private sealed class Node {
+            internal double BaseValue { get; set; }
+            internal double Value { get; set; }
+            internal List<IProcessor<Attribute>> Processors { get; } = new List<IProcessor<Attribute>>();
+
+            internal Node(double initialValue, IEnumerable<IProcessor<Attribute>>? processors = null) {
+                this.BaseValue = initialValue;
+                if (processors is not null) {
+                    this.Processors.AddRange(processors);
+                }
+            }
         }
     }
 }

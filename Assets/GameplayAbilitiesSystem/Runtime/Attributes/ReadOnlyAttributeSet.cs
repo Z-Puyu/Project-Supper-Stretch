@@ -14,11 +14,11 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
             }
         }
         
-        public double GetCurrent(AttributeKey key) {
+        public double Query(AttributeKey key) {
             return this.Attributes.TryGetValue(key, out double value) ? value : 0;
         }
         
-        public bool Has(double threshold, AttributeKey key) {
+        public bool HasAtLeast(double threshold, AttributeKey key) {
             return this.Attributes.TryGetValue(key, out double value) && value >= threshold;
         }
 

@@ -17,17 +17,15 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes.Processors {
         [field: SerializeReference, ReferencePicker, ShowIf(nameof(this.HasMaxValue))] 
         private IAttributeMagnitude MaxValue { get; set; } = new Constant();
         
-        protected override bool TryProcess(Attribute data, out Attribute result) {
-            double clampedValue = data.Value;
+        protected override bool TryProcess(ref Attribute data) {
             if (this.HasMinValue) {
-                clampedValue = Math.Max(this.MinValue.Evaluate(data.Source, null), clampedValue);
+                data.Value = Math.Max(this.MinValue.Evaluate(data.Source), data.Value);
             }
 
             if (this.HasMaxValue) {
-                clampedValue = Math.Min(this.MaxValue.Evaluate(data.Source, null), clampedValue);
+                data.Value = Math.Min(this.MaxValue.Evaluate(data.Source), data.Value);
             }
             
-            result = new Attribute(data.Source, data.Id, clampedValue, false);
             return true;
         }
     }

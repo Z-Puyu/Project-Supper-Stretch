@@ -1,5 +1,5 @@
 namespace CommonFrameworks.Processors {
     public interface IProcessor<T> {
-        public T Process(T data);
+        public void Process(ref T data);
     }
 }

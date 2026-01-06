@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using SaintsField;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes {
     [Serializable]
     internal class AttributeTableRow {
+        [NotNull]
         [field: SerializeField, TreeDropdown(nameof(this.AllAttributeTypes))]
-        internal AttributeType Attribute { get; set; }
+        internal AttributeType? Attribute { get; set; }
 
         [field: SerializeField] internal double Value { get; set; }
 

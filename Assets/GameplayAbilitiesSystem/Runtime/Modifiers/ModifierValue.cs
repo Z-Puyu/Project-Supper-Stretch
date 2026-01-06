@@ -6,6 +6,8 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
     /// Supports different types of operations (Shift, Multiply, Offset) and can be combined using arithmetic operators.
     /// </summary>
     public readonly record struct ModifierValue(double Magnitude) {
+        public static ModifierValue Zero { get; } = new ModifierValue(0);
+        
         internal static ModifierValue Of(double magnitude) {
             return new ModifierValue(Math.Round(magnitude, 3));
         }
@@ -20,7 +22,6 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
             return operation switch {
                 ModifierType.Shift or ModifierType.Offset => value + this.Magnitude,
                 ModifierType.Multiplier => value * Math.Max(100 + this.Magnitude, 0) / 100.0f,
-                ModifierType.Override => this.Magnitude,
                 var _ => value
             };
         }

@@ -3,27 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes {
-    public readonly struct AttributeKey : IComparable<AttributeKey>, IEquatable<AttributeKey>, IEnumerable<char> {
-        private string Value { get; }
-        
-        public AttributeKey(string value) {
-            this.Value = value;
-        }
-
+    public readonly record struct AttributeKey(string Value) : IComparable<AttributeKey>, IEnumerable<char> {
         public int CompareTo(AttributeKey other) {
             return string.Compare(this.Value, other.Value, StringComparison.OrdinalIgnoreCase);
-        }
-
-        public bool Equals(AttributeKey other) {
-            return string.Equals(this.Value, other.Value, StringComparison.OrdinalIgnoreCase);
-        }
-        
-        public override bool Equals(object? obj) {
-            return obj is AttributeKey other && this.Equals(other);
-        }
-
-        public override int GetHashCode() {
-            return this.Value?.GetHashCode() ?? 0;
         }
 
         public IEnumerator<char> GetEnumerator() {
@@ -52,14 +34,6 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
 
         public static bool operator !=(AttributeKey key, string id) {
             return !string.Equals(key.Value, id, StringComparison.OrdinalIgnoreCase);
-        }
-        
-        public static bool operator ==(AttributeKey key, AttributeKey other) {
-            return string.Equals(key.Value, other.Value, StringComparison.OrdinalIgnoreCase);
-        }
-
-        public static bool operator !=(AttributeKey key, AttributeKey other) {
-            return !string.Equals(key.Value, other.Value, StringComparison.OrdinalIgnoreCase);
         }
     }
 }
