@@ -9,7 +9,7 @@ namespace GameplayAbilitiesSystem.Runtime.Animations {
         [field: SerializeField, ReadOnly] internal string Name { get; private set; }
         
         [field: SerializeReference, ReferencePicker] 
-        internal AbilityExecutionStep? OnSignal { get; set; }
+        internal IAbilityExecutor? OnSignal { get; set; }
         
         public AnimationSignal(string name) {
             this.Name = name;

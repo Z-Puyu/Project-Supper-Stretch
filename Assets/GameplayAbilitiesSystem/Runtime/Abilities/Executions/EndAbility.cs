@@ -5,7 +5,7 @@ using UnityEngine;
 namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
     [Serializable]
     internal sealed class EndAbility : IAbilityExecutor {
-        public Awaitable Run(AbilitySystem system, Ability ability, CancellationTokenSource interrupter) {
+        Awaitable IAbilityExecutor.Run(AbilitySystem system, Ability ability, CancellationToken interrupt) {
             system.Stop(ability);
             return new AwaitableCompletionSource().Awaitable;
         }

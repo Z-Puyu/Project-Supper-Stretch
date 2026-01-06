@@ -14,13 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Abilities.Ability
   <Conditions>k__BackingField:
   - rid: 1692151751057866752
-  <Execution>k__BackingField:
-    rid: 1692151751057866867
+  <ExecutionSteps>k__BackingField:
+  - rid: 1692151813856559430
   <AnimationEventHandlers>k__BackingField:
   - rid: 1692151751057866864
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 1692151751057866752
       type: {class: ForbiddenKeywords, ns: GameplayAbilitiesSystem.Runtime.Abilities.Predicate, asm: GameplayAbilitiesSystem.Runtime}
       data:
@@ -32,9 +34,16 @@ MonoBehaviour:
         <EventName>k__BackingField: Events/Combat/Dodge/Roll
         <Effects>k__BackingField:
         - {fileID: 11400000, guid: 95464a4a295bf5246b5250478771ac9c, type: 2}
-    - rid: 1692151751057866867
-      type: {class: DodgeAbilityExecution, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
+    - rid: 1692151813856559430
+      type: {class: PlayAnimation, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
       data:
-        <ReceivesKeywordsOnAbilityStart>k__BackingField:
-        - Flags/Is Performing Action
-        <DodgeAnimationClip>k__BackingField: {fileID: -7510004476302381493, guid: 316244d2030138147995d0a5460b0f95, type: 3}
+        <WillEndAbilityOnCompletion>k__BackingField: 1
+        <Clip>k__BackingField: {fileID: -7510004476302381493, guid: 316244d2030138147995d0a5460b0f95, type: 3}
+        <AnimationSignals>k__BackingField: []
+        <AnimationEnd>k__BackingField:
+          rid: -2
+        <AnimationInterrupt>k__BackingField:
+          rid: 1692151813856559440
+    - rid: 1692151813856559440
+      type: {class: EndAbility, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
+      data: 

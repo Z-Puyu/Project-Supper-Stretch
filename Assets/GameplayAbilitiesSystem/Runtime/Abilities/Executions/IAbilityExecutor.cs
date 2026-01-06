@@ -2,8 +2,8 @@
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
-    public interface IAbilityExecutor {
-        public Awaitable Run(AbilitySystem system, Ability ability, CancellationTokenSource interrupter);
+    internal interface IAbilityExecutor {
+        internal Awaitable Run(AbilitySystem system, Ability ability, CancellationToken interrupt);
         internal void Complete();
     }
 }

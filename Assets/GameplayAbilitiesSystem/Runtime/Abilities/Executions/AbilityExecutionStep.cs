@@ -7,19 +7,30 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
     public abstract class AbilityExecutionStep : IAbilityExecutor {
         protected AbilitySystem? OwnerSystem { get; private set; }
         protected Ability? OwnerAbility { get; private set; }
-        internal bool IsComplete { get; private set; }
         [field: SerializeField] protected bool WillEndAbilityOnCompletion { get; private set; }
 
-        public async Awaitable Run(AbilitySystem system, Ability ability, CancellationTokenSource interrupter) {
+        async Awaitable IAbilityExecutor.Run(AbilitySystem system, Ability ability, CancellationToken interrupt) {
             this.OwnerSystem = system;
             this.OwnerAbility = ability;
-            await this.Execute(system, ability, interrupter);
+            await this.Execute(system, ability, interrupt);
         }
 
+        /// <summary>
+        /// Executes the ability step.
+        /// </summary>
+        /// <param name="system">The ability system that initiated the ability</param>
+        /// <param name="ability">The ability that is being executed</param>
+        /// <param name="interrupt">The cancellation token for interrupting the ability externally</param>
+        /// <returns></returns>
         protected abstract Awaitable Execute(
-            AbilitySystem system, Ability ability, CancellationTokenSource interrupter
+            AbilitySystem system, Ability ability, CancellationToken interrupt
         );
 
+        /// <summary>
+        /// CLeans up the ability step when it completes.
+        /// </summary>
+        /// <param name="system">The ability system that initiated the ability</param>
+        /// <param name="ability">The ability that is being executed</param>
         protected virtual void OnComplete(AbilitySystem system, Ability ability) { }
         
         void IAbilityExecutor.Complete() {
@@ -29,7 +40,6 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
             }
             
             this.OnComplete(this.OwnerSystem, this.OwnerAbility);
-            this.IsComplete = true;
             if (this.WillEndAbilityOnCompletion) {
                 this.OwnerSystem.Stop(this.OwnerAbility);
             }

@@ -22,27 +22,22 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
         [field: SerializeReference, ReferencePicker]
         private IAbilityExecutor? AnimationInterrupt { get; set; } = new EndAbility();
         
-        private CancellationTokenSource? Interrupter { get; set; }
-        
         private bool HasAnyAnimationSignal => this.AnimationSignals.Count > 0;
 
-        protected override async Awaitable Execute(
-            AbilitySystem system, Ability ability, CancellationTokenSource interrupter
-        ) {
+        protected override async Awaitable Execute(AbilitySystem system, Ability ability, CancellationToken interrupt) {
             if (!this.Clip) {
                 return;
             }
-
-            this.Interrupter = interrupter;
-            this.Animate(system, this.Clip, interrupter);
+            
+            this.Animate(system, this.Clip, interrupt);
             await new AwaitableCompletionSource().Awaitable;
         }
 
-        private async void Animate(AbilitySystem system, AnimationClip clip, CancellationTokenSource interrupter) {
+        private async void Animate(AbilitySystem system, AnimationClip clip, CancellationToken interrupt) {
             try {
-                await system.PlayAnimation(clip, interrupter.Token, onNotify);
+                await system.PlayAnimation(clip, interrupt, onNotify);
                 if (this.OwnerSystem && this.OwnerAbility) {
-                    this.AnimationEnd?.Run(this.OwnerSystem, this.OwnerAbility, interrupter);
+                    this.AnimationEnd?.Run(this.OwnerSystem, this.OwnerAbility, interrupt);
                 }
 
                 return;
@@ -50,18 +45,16 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
                 void onNotify(AnimationNotifier notifier) {
                     if (this.OwnerSystem && this.OwnerAbility) {
                         this.AnimationSignals.FirstOrDefault(signal => signal.Name == notifier.Name)
-                            ?.OnSignal?.Run(this.OwnerSystem, this.OwnerAbility, interrupter);
+                            ?.OnSignal?.Run(this.OwnerSystem, this.OwnerAbility, interrupt);
                     }
                 }
             } catch (OperationCanceledException) {
                 if (this.OwnerSystem && this.OwnerAbility) {
-                    this.AnimationInterrupt?.Run(this.OwnerSystem, this.OwnerAbility, interrupter);
+                    this.AnimationInterrupt?.Run(this.OwnerSystem, this.OwnerAbility, interrupt);
                 }
             } catch (Exception e) {
                 Debug.LogException(e);
-            } finally {
-                this.Interrupter = null;
-            }
+            } 
         }
         
         private void OnClipChanged() {

@@ -67,17 +67,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
 
             CancellationTokenSource interrupter = new CancellationTokenSource();
             this.RunningAbilities[ability] = interrupter;
-            ability.Execute(this, interrupter);
-        }
-
-        internal void Interrupt(Ability ability) {
-            if (!this.RunningAbilities.Remove(ability, out CancellationTokenSource interrupter)) {
-                return;
-            }
-            
-            interrupter.Cancel();
-            interrupter.Dispose();
-            this.AvailableAbilities.Add(ability);
+            ability.Execute(this, interrupter.Token);
         }
 
         internal void Stop(Ability ability) {
@@ -85,6 +75,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                 return;
             }
 
+            interrupter.Cancel();
             interrupter.Dispose();
             this.AvailableAbilities.Add(ability);
         }
