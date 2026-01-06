@@ -56,17 +56,37 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
             }
 
             double oldValue = node.Value;
-            AttributeQuery query = new AttributeQuery(this.Owner, this, key, node.BaseValue);
-            this.PostAttributeUpdate(this.ModifierEnvironment.Query(ref query, node.Processors));
+            this.PostAttributeUpdate(this.Query(key, node.BaseValue, node.Processors));
             this.OnAttributeUpdated?.Invoke(new AttributeChange(key, oldValue, node.Value));
+        }
+
+        private Attribute Query(AttributeKey key, double @base, IEnumerable<IProcessor<Attribute>> processors) {
+            AttributeQuery query = new AttributeQuery(this.Owner, this, key, @base);
+            return this.ModifierEnvironment.Query(ref query, processors);
         }
 
         public double Query(AttributeKey key) {
             return this.Attributes.TryGetValue(key, out Node node) ? node.Value : 0;
         }
 
+        public double QueryMax(AttributeKey key) {
+            return this.Attributes.TryGetValue(key, out Node node)
+                    ? this.Query(key, int.MaxValue, node.Processors).Value
+                    : int.MaxValue;
+        }
+
+        public double QueryMin(AttributeKey key) {
+            return this.Attributes.TryGetValue(key, out Node node)
+                    ? this.Query(key, int.MinValue, node.Processors).Value
+                    : int.MinValue;
+        }
+
         public bool HasAtLeast(double threshold, AttributeKey key) {
             return this.Attributes.TryGetValue(key, out Node node) && node.Value >= threshold;
+        }
+        
+        public bool HasAtMost(double cap, AttributeKey key) {
+            return this.Attributes.TryGetValue(key, out Node node) && node.Value <= cap;
         }
 
         private void SetBase(AttributeKey key, double value) {

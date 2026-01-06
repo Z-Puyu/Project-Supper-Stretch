@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using CommonFrameworks.Logic;
 using GameplayAbilitiesSystem.Runtime.Abilities.Executions;
@@ -18,6 +19,8 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         
         [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))] 
         internal List<string> KeywordsToRevokeWhileRunning { get; private set; } = new List<string>();
+        
+        [field: SerializeField] private List<Cost> Costs { get; set; } = new List<Cost>();
         
         [field: SerializeReference, Tooltip("Conditions on the ability system for this ability to be usable")]
         [field: FieldLabelText(nameof(this.LabelCondition), true)]
@@ -40,6 +43,15 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
 
                 activation = default;
                 return false;
+            }
+
+            if (this.Costs.Exists(cost => !cost.IsAffordable(system.AttributeSet))) {
+                activation = default;
+                return false;
+            }
+
+            foreach (Cost cost in this.Costs) {
+                cost.Spend(system.AttributeSet, system.AttributeSet);
             }
 
             ICollection<Keyword> granted = new List<Keyword>();

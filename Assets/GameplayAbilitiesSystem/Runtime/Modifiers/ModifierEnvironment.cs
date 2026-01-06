@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -75,9 +76,9 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
             return new Attribute(query.Source, query.Id, query.Value, query.IsValueApproximated);
         }
 
-        internal Attribute Query(ref AttributeQuery query, in IEnumerable<IProcessor<Attribute>> processors) {
+        internal Attribute Query(ref AttributeQuery query, in IEnumerable<IProcessor<Attribute>>? processors = null) {
             ModifierValue[] modifiers = { ModifierValue.Zero, ModifierValue.Zero, ModifierValue.Zero };
-            return this.Query(ref query, modifiers, processors.ToArray());
+            return this.Query(ref query, modifiers, processors?.ToArray() ?? Array.Empty<IProcessor<Attribute>>());
         }
 
         public override string ToString() {

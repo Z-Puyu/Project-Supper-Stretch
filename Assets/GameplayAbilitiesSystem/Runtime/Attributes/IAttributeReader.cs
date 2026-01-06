@@ -11,6 +11,10 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         /// <param name="key">The key of the attribute.</param>
         /// <returns>The current value of the attribute.</returns>
         public double Query(AttributeKey key);
+        
+        public double QueryMax(AttributeKey key);
+        
+        public double QueryMin(AttributeKey key);
 
         /// <summary>
         /// Checks if the owner has sufficient amount of attribute for a given key.
@@ -19,5 +23,13 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         /// <param name="key">The key of the attribute.</param>
         /// <returns><c>true</c> if the owner has sufficient amount of attribute for the given key.</returns>
         public bool HasAtLeast(double threshold, AttributeKey key);
+        
+        /// <summary>
+        /// Checks if the owner has at most the specified amount of attribute for a given key.
+        /// </summary>
+        /// <param name="cap">The maximum allowed amount of attribute for the given key.</param>
+        /// <param name="key">The key of the attribute.</param>
+        /// <returns><c>true</c> if the owner has at most the specified amount of attribute for the given key.</returns>
+        public bool HasAtMost(double cap, AttributeKey key);
     }
 }
