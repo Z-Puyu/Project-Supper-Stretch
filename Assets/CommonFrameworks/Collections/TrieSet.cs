@@ -54,7 +54,7 @@ namespace CommonFrameworks.Collections {
         public void CopyTo(K[] array, int arrayIndex) {
             this.BreathFirstPrefixSearch(Enumerable.Empty<T>()).ToArray().CopyTo(array, arrayIndex);
         }
-        
+
         public bool Remove(K key) {
             if (!this.HasPath(key, out List<(Node node, T element)> path) || path.Count == 0) {
                 return false;
@@ -71,7 +71,7 @@ namespace CommonFrameworks.Collections {
                 if (path[i].node.Size > 0) {
                     continue;
                 }
-                
+
                 path[i - 1].node.Children.Remove(path[i].element);
                 break;
             }
@@ -155,7 +155,7 @@ namespace CommonFrameworks.Collections {
             foreach (K key in this.Where(key => set.Contains(key))) {
                 this.Remove(key);
             }
-            
+
             foreach (K key in set.Where(key => !this.Contains(key))) {
                 this.Add(key);
             }
@@ -175,7 +175,7 @@ namespace CommonFrameworks.Collections {
                 if (!path[^1].node.Children.TryGetValue(element, out Node node)) {
                     return false;
                 }
-                
+
                 path.Add((node, element));
             }
 
@@ -218,7 +218,7 @@ namespace CommonFrameworks.Collections {
                     break;
                 }
             }
-            
+
             return found;
         }
 
@@ -242,14 +242,14 @@ namespace CommonFrameworks.Collections {
 
             return keys;
         }
-        
+
         public IList<K> DepthFirstPrefixSearch<P>(P prefix) where P : IEnumerable<T> {
             if (!this.HasPath(prefix, out List<(Node node, T element)> path)) {
                 return new List<K>();
             }
 
             List<K> keys = new List<K>();
-            Stack<Node> stack = new Stack<Node>(); 
+            Stack<Node> stack = new Stack<Node>();
             stack.Push(path[^1].node);
             while (stack.TryPop(out Node curr)) {
                 if (curr.IsEndOfKey) {
@@ -281,23 +281,23 @@ namespace CommonFrameworks.Collections {
                 path[i - 1].node.Children.Remove(path[i].element);
                 break;
             }
-            
+
             this.Root.Size -= size;
             return true;
         }
-        
+
         public bool RemoveAllWithPrefix<P>(P prefix, out IEnumerable<K> removed) where P : IEnumerable<T> {
             if (!this.HasPath(prefix, out List<(Node node, T element)> path)) {
                 removed = Enumerable.Empty<K>();
                 return false;
             }
-            
+
             IList<K> removedKeys = this.BreathFirstPrefixSearch(path.Select(p => p.element));
             removed = removedKeys;
             if (removedKeys.Count == 0) {
                 return false;
             }
-            
+
             for (int i = 1; i < path.Count; i += 1) {
                 path[i].node.Size -= removedKeys.Count;
                 if (path[i].node.Size > 0) {
@@ -307,7 +307,7 @@ namespace CommonFrameworks.Collections {
                 path[i - 1].node.Children.Remove(path[i].element);
                 break;
             }
-            
+
             this.Root.Size -= removedKeys.Count;
             return true;
         }

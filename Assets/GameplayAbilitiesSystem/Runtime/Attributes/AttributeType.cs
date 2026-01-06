@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GameplayAbilitiesSystem.Runtime.Attributes.Processors;
+using CommonFrameworks.Processors;
 using SaintsField;
 using SaintsField.Playa;
 using UnityEngine;
@@ -10,41 +10,23 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
     [Serializable]
     public sealed class AttributeType : IComparable<AttributeType>, IEquatable<AttributeType> {
         [field: SerializeField, ReadOnly] public string Id { get; private set; } = string.Empty;
-        [field: SerializeReference, ReadOnly] private AttributeType? Parent { get; set; }
         [field: SerializeField] private string Name { get; set; } = string.Empty;
         [SerializeField] private string displayName = string.Empty;
 
         [field: SerializeReference, ReferencePicker, ShowIf(nameof(this.IsLeaf))]
-        public List<AttributeProcessor> Processors { get; private set; } = new List<AttributeProcessor>();
+        public List<IProcessor<Attribute>> Processors { get; private set; } = new List<IProcessor<Attribute>>();
         
         [field: SerializeField]
         public List<AttributeType> SubTypes { get; private set; } = new List<AttributeType>();
         
         public string DisplayName => string.IsNullOrWhiteSpace(this.displayName) ? this.Name : this.displayName;
-        public bool IsLeaf => this.SubTypes.Count == 0;
-        public bool IsRoot => this.Parent is null;
-
-        public bool Includes(string attribute) {
-            return this.Id == attribute || this.SubTypes.Any(type => type.Includes(attribute));
-        }
+        private bool IsLeaf => this.SubTypes.Count == 0;
         
 #if UNITY_EDITOR
-        internal void Validate() {
-            LinkedList<string> names = new LinkedList<string>();
-            AttributeType? curr = this;
-            while (curr is not null) {
-                names.AddFirst(curr.Name);
-                curr = curr.Parent;
-            }
-            
-            this.Id = string.Join("/", names);
+        internal void Validate(string parent = "") {
+            this.Id = string.IsNullOrEmpty(parent) ? this.Name : $"{parent}/{this.Name}";
             foreach (AttributeType def in this.SubTypes) {
-                if (def is null) {
-                    continue;
-                }
-                
-                def.Parent = this;
-                def.Validate();
+                def?.Validate(this.Id);
             }
         }
 #endif

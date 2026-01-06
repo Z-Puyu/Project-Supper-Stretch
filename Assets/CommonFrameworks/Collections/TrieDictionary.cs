@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace CommonFrameworks.Collections {
-    public sealed class TrieDictionary<K, T, V> : ITrie<KeyValuePair<K, V>, T>, IDictionary<K, V> where K : IEnumerable<T> {
+    public sealed class TrieDictionary<K, T, V> : ITrie<KeyValuePair<K, V>, T>,
+                                                  IDictionary<K, V>,
+                                                  IReadOnlyDictionary<K, V> where K : IEnumerable<T> {
         private sealed class Entry {
             internal IDictionary<T, Entry> Children { get; } = new Dictionary<T, Entry>();
             internal bool IsEndOfKey { get; set; }
@@ -12,20 +14,21 @@ namespace CommonFrameworks.Collections {
             internal K Key { get; set; } = default!;
             internal V Value { get; set; } = default!;
         }
-        
+
         private Entry Root { get; } = new Entry();
         private T Separator { get; } = default!;
         private bool HasSeparator { get; }
-        
+
         private Lazy<IEnumerable<KeyValuePair<K, V>>> CachedEntries { get; set; }
         private Lazy<ICollection<K>> CachedKeys { get; set; }
         private Lazy<ICollection<V>> CachedValues { get; set; }
-        
+
         private IEnumerable<KeyValuePair<K, V>> Entries => this.CachedEntries.Value;
 
         public TrieDictionary() {
             this.CachedEntries =
-                    new Lazy<IEnumerable<KeyValuePair<K, V>>>(() => this.BreathFirstPrefixSearch(Enumerable.Empty<T>()));
+                    new Lazy<IEnumerable<KeyValuePair<K, V>>>(() => this.BreathFirstPrefixSearch(Enumerable.Empty<T>())
+                    );
             this.CachedKeys = new Lazy<ICollection<K>>(() => this.Entries.Select(entry => entry.Key).ToArray());
             this.CachedValues = new Lazy<ICollection<V>>(() => this.Entries.Select(entry => entry.Value).ToArray());
         }
@@ -38,7 +41,9 @@ namespace CommonFrameworks.Collections {
         private void InvalidateCachedCollections() {
             if (this.CachedEntries.IsValueCreated) {
                 this.CachedEntries =
-                        new Lazy<IEnumerable<KeyValuePair<K, V>>>(() => this.BreathFirstPrefixSearch(Enumerable.Empty<T>()));
+                        new Lazy<IEnumerable<KeyValuePair<K, V>>>(() =>
+                                this.BreathFirstPrefixSearch(Enumerable.Empty<T>())
+                        );
             }
 
             if (this.CachedKeys.IsValueCreated) {
@@ -49,16 +54,16 @@ namespace CommonFrameworks.Collections {
                 this.CachedValues = new Lazy<ICollection<V>>(() => this.Entries.Select(entry => entry.Value).ToArray());
             }
         }
-        
+
         #region Dictionary Semantics
-        
-        public V this[K key] { 
+
+        public V this[K key] {
             get => this.TryGetValue(key, out V value) && value is not null ? value : throw new KeyNotFoundException();
             set {
                 if (!key.Any()) {
-                    throw new ArgumentException("The key in a trie cannot be empty!", nameof(key));    
+                    throw new ArgumentException("The key in a trie cannot be empty!", nameof(key));
                 }
-                
+
                 List<Entry> path = this.Trace(key);
                 path[^1].Value = value;
                 if (!path[^1].IsEndOfKey) {
@@ -67,16 +72,18 @@ namespace CommonFrameworks.Collections {
                         entry.Size += 1;
                     }
                 }
-                
+
                 this.InvalidateCachedCollections();
             }
         }
-        
+
         public ICollection<K> Keys => this.CachedKeys.Value;
         public ICollection<V> Values => this.CachedValues.Value;
+        IEnumerable<K> IReadOnlyDictionary<K, V>.Keys => this.Keys;
+        IEnumerable<V> IReadOnlyDictionary<K, V>.Values => this.Values;
         public int Count => this.Root.Size;
         public bool IsReadOnly => false;
-        
+
         public IEnumerator<KeyValuePair<K, V>> GetEnumerator() {
             return this.Entries.GetEnumerator();
         }
@@ -84,56 +91,56 @@ namespace CommonFrameworks.Collections {
         IEnumerator IEnumerable.GetEnumerator() {
             return this.GetEnumerator();
         }
-        
+
         public void Add(KeyValuePair<K, V> item) {
             this.Add(item.Key, item.Value);
         }
-        
+
         public void Clear() {
             this.Root.Children.Clear();
             this.Root.Size = 0;
             this.InvalidateCachedCollections();
         }
-        
+
         public bool Contains(KeyValuePair<K, V> item) {
-            return this.HasPath(item.Key, out List<(Entry entry, T element)> path) && path[^1].entry.IsEndOfKey &&  
+            return this.HasPath(item.Key, out List<(Entry entry, T element)> path) && path[^1].entry.IsEndOfKey &&
                    EqualityComparer<V>.Default.Equals(path[^1].entry.Value, item.Value);
         }
-        
+
         public void CopyTo(KeyValuePair<K, V>[] array, int arrayIndex) {
             this.Entries.ToArray().CopyTo(array, arrayIndex);
         }
-        
+
         public bool Remove(KeyValuePair<K, V> item) {
-            return this.TryGetValue(item.Key, out V value) && 
+            return this.TryGetValue(item.Key, out V value) &&
                    EqualityComparer<V>.Default.Equals(value, item.Value) &&
                    this.Remove(item.Key);
         }
-        
+
         public void Add(K key, V value) {
             if (!key.Any()) {
-                throw new ArgumentException("The key in a trie cannot be empty!", nameof(key));    
+                throw new ArgumentException("The key in a trie cannot be empty!", nameof(key));
             }
-            
+
             List<Entry> path = this.Trace(key);
             if (path[^1].IsEndOfKey) {
                 throw new ArgumentException($"An element with key {key} already exists!");
             }
-            
+
             path[^1].IsEndOfKey = true;
             path[^1].Key = key;
             path[^1].Value = value;
             foreach (Entry entry in path) {
                 entry.Size += 1;
             }
-            
+
             this.InvalidateCachedCollections();
         }
-        
+
         public bool ContainsKey(K key) {
             return this.HasPath(key, out List<(Entry entry, T element)> path) && path[^1].entry.IsEndOfKey;
         }
-        
+
         public bool Remove(K key) {
             if (!this.HasPath(key, out List<(Entry entry, T element)> path) || path.Count == 0) {
                 return false;
@@ -142,23 +149,23 @@ namespace CommonFrameworks.Collections {
             if (!path[^1].entry.IsEndOfKey) {
                 return false;
             }
-            
+
             path[^1].entry.IsEndOfKey = false;
             for (int i = 1; i < path.Count; i += 1) {
                 path[i].entry.Size -= 1;
                 if (path[i].entry.Size > 0) {
                     continue;
                 }
-                
+
                 path[i - 1].entry.Children.Remove(path[i].element);
                 break;
             }
 
             this.Root.Size -= 1;
             this.InvalidateCachedCollections();
-            return true;   
+            return true;
         }
-    
+
         public bool TryGetValue(K key, out V value) {
             if (this.HasPath(key, out List<(Entry entry, T element)> path) && path[^1].entry.IsEndOfKey) {
                 value = path[^1].entry.Value;
@@ -168,7 +175,7 @@ namespace CommonFrameworks.Collections {
             value = default!;
             return false;
         }
-        
+
         #endregion
 
         private List<Entry> Trace(K sequence) {
@@ -187,20 +194,20 @@ namespace CommonFrameworks.Collections {
 
             return path;
         }
-        
+
         private bool HasPath<P>(P prefix, out List<(Entry entry, T element)> path) where P : IEnumerable<T> {
             path = new List<(Entry entry, T element)> { (this.Root, default!) };
             foreach (T element in prefix) {
                 if (!path[^1].entry.Children.TryGetValue(element, out Entry entry)) {
                     return false;
                 }
-                
+
                 path.Add((entry, element));
             }
 
             return !this.HasSeparator || path[^1].entry.Children.ContainsKey(this.Separator);
         }
-        
+
         public bool ContainsPrefix<P>(P prefix) where P : IEnumerable<T> {
             return this.HasPath(prefix, out List<(Entry entry, T element)> _);
         }
@@ -220,7 +227,7 @@ namespace CommonFrameworks.Collections {
                 key = default;
                 return false;
             }
-            
+
             key = default;
             return false;
         }
@@ -237,7 +244,7 @@ namespace CommonFrameworks.Collections {
                     break;
                 }
             }
-            
+
             return found;
         }
 
@@ -282,12 +289,12 @@ namespace CommonFrameworks.Collections {
 
             return entries;
         }
-        
+
         public bool RemoveAllWithPrefix<P>(P prefix) where P : IEnumerable<T> {
             if (!this.HasPath(prefix, out List<(Entry entry, T element)> path)) {
                 return false;
             }
-            
+
             path[^1].entry.Children.Clear();
             path[^1].entry.IsEndOfKey = false;
             int size = path[^1].entry.Size;
@@ -296,17 +303,18 @@ namespace CommonFrameworks.Collections {
                 if (path[i].entry.Size > 0) {
                     continue;
                 }
-                
+
                 path[i - 1].entry.Children.Remove(path[i].element);
                 break;
             }
-            
+
             this.Root.Size -= size;
             this.InvalidateCachedCollections();
             return true;
         }
 
-        public bool RemoveAllWithPrefix<P>(P prefix, out IEnumerable<KeyValuePair<K, V>> removed) where P : IEnumerable<T> {
+        public bool RemoveAllWithPrefix<P>(P prefix, out IEnumerable<KeyValuePair<K, V>> removed)
+                where P : IEnumerable<T> {
             if (!this.HasPath(prefix, out List<(Entry entry, T element)> path)) {
                 removed = Enumerable.Empty<KeyValuePair<K, V>>();
                 return false;
@@ -317,17 +325,17 @@ namespace CommonFrameworks.Collections {
             if (removedEntries.Count == 0) {
                 return false;
             }
-            
+
             for (int i = 1; i < path.Count; i += 1) {
                 path[i].entry.Size -= removedEntries.Count;
                 if (path[i].entry.Size > 0) {
                     continue;
                 }
-                    
+
                 path[i - 1].entry.Children.Remove(path[i].element);
                 break;
             }
-            
+
             this.Root.Size -= removedEntries.Count;
             this.InvalidateCachedCollections();
             return true;
