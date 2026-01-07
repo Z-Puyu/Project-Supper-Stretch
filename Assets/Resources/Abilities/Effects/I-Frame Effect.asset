@@ -13,18 +13,32 @@ MonoBehaviour:
   m_Name: I-Frame Effect
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Effects.Effect
   <Tag>k__BackingField: Effects/Combat/iFrame
-  <Periodicity>k__BackingField: 0
-  <IsInfinite>k__BackingField: 0
-  <Duration>k__BackingField: 0
+  <Periodicity>k__BackingField: 2
+  <IsInfinite>k__BackingField: 1
+  <Duration>k__BackingField: -1
   <PeriodCount>k__BackingField: 1
   <Interval>k__BackingField: 0
   <ShouldExecuteBeforeFirstInterval>k__BackingField: 0
-  <Modifiers>k__BackingField: []
-  <TargetReceivesKeywords>k__BackingField: []
-  <TargetRemovesKeywords>k__BackingField: []
-  <SourceReceivesKeywords>k__BackingField: []
-  <SourceRemovesKeywords>k__BackingField: []
-  <CustomSideEffects>k__BackingField: []
+  <KeywordPreset>k__BackingField:
+    <TargetReceivesKeywords>k__BackingField:
+    - Status/Invincible
+    <TargetRemovesKeywords>k__BackingField: []
+    <SourceReceivesKeywords>k__BackingField: []
+    <SourceRemovesKeywords>k__BackingField: []
+  <ModifierPreset>k__BackingField:
+    <Modifiers>k__BackingField:
+    - <Target>k__BackingField: 
+      <Type>k__BackingField: 0
+      <Value>k__BackingField:
+        rid: 1692151863182360906
+      <BackingAttributeSource>k__BackingField: 0
+      <Condition>k__BackingField:
+        <SourceConditions>k__BackingField: []
+        <TargetConditions>k__BackingField: []
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 1692151863182360906
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 0

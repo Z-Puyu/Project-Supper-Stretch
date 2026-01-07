@@ -1,6 +1,5 @@
 ﻿#if UNITY_2021_3_OR_NEWER //&& !SAINTSFIELD_UI_TOOLKIT_DISABLE
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.Editor.Core;
@@ -95,6 +94,13 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
             if(targetNeedUpdate || hasAnyChildren)
             {
+                root.Add(_helpBox = new HelpBox("", HelpBoxMessageType.Error)
+                {
+                    style =
+                    {
+                        display = DisplayStyle.None,
+                    },
+                });
                 return _rootElement = root;
             }
 
@@ -102,42 +108,6 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         }
 
         protected abstract (VisualElement target, bool needUpdate) CreateTargetUIToolkit(VisualElement container);
-
-        private static void MergeIntoGroup(Dictionary<string, VisualElement> groupElements, string groupBy, VisualElement root, VisualElement child)
-        {
-            if (string.IsNullOrEmpty(groupBy))
-            {
-                root.Add(child);
-                return;
-            }
-
-            bool exists = groupElements.TryGetValue(groupBy, out VisualElement groupElement);
-            if (!exists)
-            {
-                groupElement = new VisualElement
-                {
-                    style =
-                    {
-                        flexDirection = FlexDirection.Row,
-                    }
-                };
-                groupElement.AddToClassList($"{ClassSaintsFieldPlaya}-group-{groupBy}");
-                groupElements.Add(groupBy, groupElement);
-                root.Add(groupElement);
-            }
-
-            groupElement.Add(child);
-        }
-
-        private class InfoBoxUserData
-        {
-            public string XmlContent;
-            public EMessageType MessageType;
-
-            public InfoBoxAttribute InfoBoxAttribute;
-            public SaintsFieldWithInfo FieldWithInfo;
-            public RichTextDrawer RichTextDrawer;
-        }
 
 
         protected virtual PreCheckResult OnUpdateUIToolKit(VisualElement root)
@@ -156,6 +126,7 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
         // }
 
         private Color _preColor;
+        private HelpBox _helpBox;
 
         private PreCheckResult UpdatePreCheckUIToolkitInternal(SaintsFieldWithInfo fieldWithInfo, VisualElement result)
         {
@@ -178,6 +149,8 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
             }
 
             ApplyGuiColor(result);
+
+            UIToolkitUtils.SetHelpBox(_helpBox, preCheckResult.Error);
 
             return preCheckResult;
         }
@@ -354,38 +327,43 @@ namespace SaintsField.Editor.Playa.Renderer.BaseRenderer
                         return "";
                     }
 
-                    bool hasError = false;
+                    // string error = "";
 
                     (string error, int index, object value) result = Util.GetValue(FieldWithInfo.SerializedProperty, FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0]);
-                    (string error, int index, object value) accResult = result;
-                    if (tagName == "field")
+                    // (string error, int index, object value) accResult = result;
+                    if (result.error != "")
                     {
-                        if (result.error != "")
-                        {
-                            hasError = true;
-                        }
+                        // error = result.error;
                     }
                     else
                     {
-                        string revName = tagName["field.".Length..];
+                        if (tagName == "field")
+                        {
+                        }
+                        else
+                        {
+                            string revName = tagName["field.".Length..];
 
-                        // string[] subFields = revName.Split(SerializedUtils.DotSplitSeparator);
-                        // object accParent = FieldWithInfo.Targets[0];
+                            (string error, object result) getOfValue = Util.GetOf<object>(revName, null,
+                                FieldWithInfo.SerializedProperty,
+                                FieldWithInfo.FieldInfo, result.value, null);
 
-                        (string error, object result) getOfValue = Util.GetOf<object>(revName, null, FieldWithInfo.SerializedProperty,
-                            FieldWithInfo.FieldInfo, FieldWithInfo.Targets[0], null);
-
-                        hasError = getOfValue.error != "";
-                        accResult = (getOfValue.error, accResult.index, getOfValue.result);
+                            // hasError = getOfValue.error != "";
+                            // error = getOfValue.error;
+                            result = (getOfValue.error, result.index, getOfValue.result);
+                        }
                     }
 
-                    // ReSharper disable once ConvertIfStatementToReturnStatement
-                    if (hasError)
+                    // ReSharper disable once InvertIf
+                    if (result.error != "")
                     {
+#if SAINTSFIELD_DEBUG
+                        Debug.LogWarning(result.error);
+#endif
                         return rawContent;
                     }
 
-                    return RichTextDrawer.TagStringFormatter(accResult.value, tagValue);
+                    return RichTextDrawer.TagStringFormatter(result.value, tagValue);
                 }
                 case SaintsRenderType.NonSerializedField:
                 case SaintsRenderType.Method:

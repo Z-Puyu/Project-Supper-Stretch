@@ -122,6 +122,7 @@ namespace HierarchyDesigner
             public UpdateMode LayerUpdateMode = UpdateMode.Dynamic;
             public bool EnableDynamicBackgroundForGameObjectMainIcon = true;
             public bool EnablePreciseRectForDynamicBackgroundForGameObjectMainIcon = true;
+            public bool EnableProjectTexturesInMainIconOverrideWindow = false;
             public bool EnableCustomizationForGameObjectComponentIcons = true;
             public bool EnableTooltipOnComponentIconHovered = true;
             public bool EnableActiveStateEffectForComponentIcons = true;
@@ -1401,6 +1402,18 @@ namespace HierarchyDesigner
             }
         }
 
+        public static bool EnableProjectTexturesInMainIconOverrideWindow
+        {
+            get => advancedSettings.EnableProjectTexturesInMainIconOverrideWindow;
+            set
+            {
+                if (advancedSettings.EnableProjectTexturesInMainIconOverrideWindow != value)
+                {
+                    advancedSettings.EnableProjectTexturesInMainIconOverrideWindow = value;
+                }
+            }
+        }
+
         public static bool EnableCustomizationForGameObjectComponentIcons
         {
             get => advancedSettings.EnableCustomizationForGameObjectComponentIcons;
@@ -1734,6 +1747,7 @@ namespace HierarchyDesigner
                 LayerUpdateMode = UpdateMode.Dynamic,
                 EnableDynamicBackgroundForGameObjectMainIcon = true,
                 EnablePreciseRectForDynamicBackgroundForGameObjectMainIcon = true,
+                EnableProjectTexturesInMainIconOverrideWindow = false,
                 EnableCustomizationForGameObjectComponentIcons = true,
                 EnableTooltipOnComponentIconHovered = true,
                 EnableActiveStateEffectForComponentIcons = true,

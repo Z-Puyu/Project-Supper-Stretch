@@ -41,7 +41,9 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         private bool ShouldExecuteBeforeFirstInterval { get; set; }
 
         [field: SerializeField] private EffectKeywordPreset KeywordPreset { get; set; } = new EffectKeywordPreset();
-        [field: SerializeField] private EffectModifierPreset ModifierPreset { get; set; } = new EffectModifierPreset();
+        
+        [field: SerializeField, SaintsRow(true)] 
+        private EffectModifierPreset ModifierPreset { get; set; } = new EffectModifierPreset();
         
         private bool IsFinite => !this.IsInfinite;
         private bool IsInstant => this.Periodicity == Type.Instant;
