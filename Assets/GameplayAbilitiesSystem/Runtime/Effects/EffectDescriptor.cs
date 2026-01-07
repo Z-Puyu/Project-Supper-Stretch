@@ -9,10 +9,10 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
     ) {
         public static EffectDescriptor Empty { get; } = new EffectDescriptor();
         
-        internal bool IsOnePossibleCaseOf(EffectDescriptor other) {
-            bool haveDifferentSourceAbility = !other.SourceAbility || other.SourceAbility == this.SourceAbility;
-            bool haveDifferentSourceEffect = !other.SourceEffect || other.SourceEffect == this.SourceEffect;
-            bool haveDifferentTag = this.Tag.StartsWith(other.Tag);
+        internal bool IsOnePossibleCaseOf(Ability? ability = null, Effect? effect = null, Keyword keyword = default) {
+            bool haveDifferentSourceAbility = !ability || ability == this.SourceAbility;
+            bool haveDifferentSourceEffect = !effect || effect == this.SourceEffect;
+            bool haveDifferentTag = this.Tag.StartsWith(keyword);
             return !haveDifferentSourceAbility && !haveDifferentSourceEffect && !haveDifferentTag;
         }
     }

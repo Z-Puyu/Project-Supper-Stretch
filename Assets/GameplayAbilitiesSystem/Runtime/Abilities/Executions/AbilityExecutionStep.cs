@@ -21,7 +21,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
         /// <param name="system">The ability system that initiated the ability</param>
         /// <param name="ability">The ability that is being executed</param>
         /// <param name="interrupt">The cancellation token for interrupting the ability externally</param>
-        /// <returns></returns>
+        /// <returns>An awaitable that completes when the execution is finished</returns>
         protected abstract Awaitable Execute(
             AbilitySystem system, Ability ability, CancellationToken interrupt
         );

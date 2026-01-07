@@ -29,15 +29,15 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         private EffectRegistry EffectRegistry { get; } = new EffectRegistry();
 
         [NotNull] [field: SerializeField] private Animator? Animator { get; set; }
-        [NotNull] [field: SerializeField] private KeywordContainer? KeywordContainer { get; set; }
-        [NotNull] [field: SerializeField] public AttributeSet? AttributeSet { get; private set; }
+        [NotNull] private KeywordContainer? KeywordContainer { get; set; }
+        [NotNull] private AttributeSet? AttributeSet { get; set; }
         [NotNull] private AbilitySystemAnimationHandler? AnimationHandler { get; set; }
         [field: SerializeField] private List<Ability> DefaultAbilities { get; set; } = new List<Ability>();
 
-        IAttributeReader IEffectEmitterFacade.AttributeReader => this.AttributeSet;
+        public IAttributeReader AttributeReader => this.AttributeSet;
         public ITaggable<Keyword> EmitterKeywordContainer => this.KeywordContainer;
         IAttributeReader IEffectReceiverFacade.AttributeReader => this.AttributeSet;
-        IModifiable IEffectReceiverFacade.ModifierConsumer => this.AttributeSet;
+        public IModifiable ModifierConsumer => this.AttributeSet;
         ITaggable<Keyword> IEffectReceiverFacade.ReceiverKeywordContainer => this.KeywordContainer;
 
         protected override void Awake() {
@@ -87,7 +87,8 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         /// the conditions for the ability to start are met.
         /// </summary>
         /// <param name="ability">The ability to perform.</param>
-        public void Perform(Ability? ability) {
+        /// <param name="userData">Optional user data for the ability.</param>
+        public void Perform(Ability? ability, IReadOnlyDictionary<string, double>? userData = null) {
             if (!ability) {
                 return;
             }
@@ -103,14 +104,15 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             }
             
             this.RunningAbilities[ability] = activation;
-            ability.Execute(this, activation.Interrupter.Token);
+            _ = ability.Execute(this, userData, activation.Interrupter.Token);
         }
 
         /// <summary>
         /// Attempts to execute the first ability with the given keyword tag.
         /// </summary>
         /// <param name="keyword">The keyword tag to search for.</param>
-        public void Perform(Keyword keyword) {
+        /// <param name="userData">Optional user data for the ability.</param>
+        public void Perform(Keyword keyword, IReadOnlyDictionary<string, double>? userData = null) {
             Ability? ability = this.AbilitiesByTag
                                    .DepthFirstPrefixSearch(keyword.Value)
                                    .FirstOrDefault().Value.FirstOrDefault();
@@ -169,13 +171,13 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             
             await this.AnimationController.PlayActionAnimation(anim, onNotify, onInterrupt, interrupter);
         }
-
-        internal void RegisterRunningEffect(ContinuousEffect effect, Ability sourceAbility) {
-            this.EffectRegistry.RegisterEffect(effect);
+        
+        CancellationTokenSource IEffectReceiverFacade.Register(EffectDescriptor effect, CancellationToken interrupt) {
+            return this.EffectRegistry.Register(effect, interrupt);
         }
-
-        public void StopEffects(Ability? ability = null, Effect? type = null, Keyword keyword = default) {
-            this.EffectRegistry.StopEffects(ability, type, keyword);
+        
+        void IEffectReceiverFacade.StopEffects(Ability? ability, Effect? type, Keyword keyword) {
+            this.EffectRegistry.Stop(ability, type, keyword);
         }
     }
 }

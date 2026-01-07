@@ -25,36 +25,29 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
         private bool HasAnyAnimationSignal => this.AnimationSignals.Count > 0;
 
         protected override async Awaitable Execute(AbilitySystem system, Ability ability, CancellationToken interrupt) {
-            if (!this.Clip) {
-                return;
+            try {
+                _ = animate();
+            } catch (OperationCanceledException) {
+                this.AnimationInterrupt?.Run(system, ability, interrupt);
             }
             
-            this.Animate(system, this.Clip, interrupt);
             await new AwaitableCompletionSource().Awaitable;
-        }
+            return;
 
-        private async void Animate(AbilitySystem system, AnimationClip clip, CancellationToken interrupt) {
-            try {
-                await system.PlayAnimation(clip, interrupt, onNotify);
-                if (this.OwnerSystem && this.OwnerAbility) {
-                    this.AnimationEnd?.Run(this.OwnerSystem, this.OwnerAbility, interrupt);
+            async Awaitable animate() {
+                if (!this.Clip) {
+                    return;
                 }
 
-                return;
-
-                void onNotify(AnimationNotifier notifier) {
-                    if (this.OwnerSystem && this.OwnerAbility) {
-                        this.AnimationSignals.FirstOrDefault(signal => signal.Name == notifier.Name)
-                            ?.OnSignal?.Run(this.OwnerSystem, this.OwnerAbility, interrupt);
+                await system.PlayAnimation(
+                    this.Clip, interrupt, notifier => {
+                        this.AnimationSignals.FirstOrDefault(signal => signal.Name == notifier.Name)?.OnSignal
+                            ?.Run(system, ability, interrupt);
                     }
-                }
-            } catch (OperationCanceledException) {
-                if (this.OwnerSystem && this.OwnerAbility) {
-                    this.AnimationInterrupt?.Run(this.OwnerSystem, this.OwnerAbility, interrupt);
-                }
-            } catch (Exception e) {
-                Debug.LogException(e);
-            } 
+                );
+                
+                this.AnimationEnd?.Run(system, ability, interrupt);
+            }
         }
         
         private void OnClipChanged() {

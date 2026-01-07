@@ -10,31 +10,40 @@ using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
     [Serializable]
-    public class EffectModifier : ConditionalExecution {
+    internal struct ModifierConfig {
         private enum ValueSource { Target, Instigator }
         
         [field: SerializeField, TreeDropdown(nameof(this.GetAllAttributes))]
         private string Target { get; set; } = string.Empty;
         
-        [field: SerializeField] private ModifierType Type { get; set; }
+        [field: SerializeField] private ModifierType Type { get; set; } = ModifierType.Shift;
         
         [NotNull] 
         [field: SerializeReference, ReferencePicker, TableColumn("Magnitude")] 
-        private IAttributeMagnitude? Value { get; set; }
+        private IAttributeMagnitude? Value { get; set; } = new Constant();
 
         [field: SerializeField, TableColumn("Magnitude"), ShowIf(nameof(this.IsAttributeBased))]
         private ValueSource BackingAttributeSource { get; set; } = ValueSource.Instigator;
+
+        [field: SerializeField] private EffectConditionPreset? Condition { get; set; } = null;
         
         private bool IsAttributeBased => this.Value is AttributeBasedValue;
+
+        public ModifierConfig() { }
 
         private AdvancedDropdownList<string> GetAllAttributes() {
             return AttributeUtils.GetDropdownList();
         }
 
-        internal Modifier CreateModifier(
-            IEffectEmitterFacade source, IEffectReceiverFacade target,
-            IReadOnlyDictionary<string, double>? userData = null
+        internal bool IsApplicable(
+            IEffectEmitterFacade source, IEffectReceiverFacade target, IReadOnlyDictionary<string, double>? userData,
+            out Modifier modifier
         ) {
+            if (this.Condition is not null && !this.Condition.IsApplicable(source, target)) {
+                modifier = default;
+                return false;
+            }
+            
             IAttributeReader? attributes = this.BackingAttributeSource switch {
                 ValueSource.Target => target.AttributeReader,
                 ValueSource.Instigator => source.AttributeReader,
@@ -43,7 +52,11 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
                 )
             };
 
-            return new Modifier(this.Target, this.Type, ModifierValue.Of(this.Value.Evaluate(attributes, userData)));
+            modifier = new Modifier(
+                this.Target, this.Type, ModifierValue.Of(this.Value.Evaluate(attributes, userData))
+            );
+            
+            return true;
         }
     }
 }

@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using CommonFrameworks.Utilities;
 using GameplayAbilitiesSystem.Runtime.Abilities;
 using GameplayAbilitiesSystem.Runtime.Modifiers;
@@ -7,29 +10,13 @@ using SaintsField;
 using SaintsField.Playa;
 using UnityEngine;
 using UnityEngine.Pool;
+using UnityEngine.Serialization;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
     [CreateAssetMenu(fileName = "New Effect", menuName = "Gameplay Abilities/Effect")]
     public sealed class Effect : ScriptableObject {
         internal enum Type { Instant, Periodic, Persistent }
         
-        private static IObjectPool<PeriodicEffect> PeriodicEffectPool { get; } = new ObjectPool<PeriodicEffect>(
-            createFunc: () => new PeriodicEffect(), 
-            actionOnGet: effect => effect.Reset(),
-            actionOnRelease: effect => effect.Stop(), 
-            actionOnDestroy: effect => effect.Stop(),
-            defaultCapacity: 100
-        );
-
-        private static IObjectPool<PersistentEffect> PersistentEffectPool { get; } = new ObjectPool<PersistentEffect>(
-            createFunc: () => new PersistentEffect(),
-            actionOnGet: effect => effect.Reset(),
-            actionOnRelease: effect => effect.Stop(), 
-            actionOnDestroy: effect => effect.Stop(),
-            defaultCapacity: 100
-        );
-
-        [field: LayoutStart("Effect Info", ELayout.Foldout)]
         [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))]
         internal string Tag { get; private set; } = string.Empty;
 
@@ -53,71 +40,73 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         [field: SerializeField, ShowIf(nameof(this.IsPeriodic))]
         private bool ShouldExecuteBeforeFirstInterval { get; set; }
 
-        [field: SerializeField, Table, LayoutEnd("Effect Info"), LayoutStart("Effect Behaviours", ELayout.Foldout)]
-        private List<EffectModifier> Modifiers { get; set; } = new List<EffectModifier>();
-        
-        [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))]
-        private List<string> TargetReceivesKeywords { get; set; } = new List<string>();
-        
-        [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))]
-        private List<string> TargetRemovesKeywords { get; set; } = new List<string>();
-        
-        [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))]
-        private List<string> SourceReceivesKeywords { get; set; } = new List<string>();
-        
-        [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))]
-        private List<string> SourceRemovesKeywords { get; set; } = new List<string>();
-
-        [field: SerializeReference, ReferencePicker]
-        private List<IEffect<IEffectEmitterFacade>> CustomSideEffects { get; set; } =
-            new List<IEffect<IEffectEmitterFacade>>();
+        [field: SerializeField] private EffectKeywordPreset KeywordPreset { get; set; } = new EffectKeywordPreset();
+        [field: SerializeField] private EffectModifierPreset ModifierPreset { get; set; } = new EffectModifierPreset();
         
         private bool IsFinite => !this.IsInfinite;
         private bool IsInstant => this.Periodicity == Type.Instant;
         private bool IsPeriodic => this.Periodicity == Type.Periodic;
         private bool IsContinuous => this.Periodicity == Type.Persistent;
-        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.GetTreeDropdownList();
+        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.GetTreeDropdownList(true);
 
         /// <summary>
         /// Applies the effect.
         /// </summary>
         /// <param name="source">The instigator of the effect</param>
         /// <param name="target">The target of the effect</param>
-        /// <param name="continuousEffect">The running effect, if the effect should be active for a duration.</param>
         /// <param name="sourceAbility">Optional ability that caused the effect.</param>
         /// <param name="userData">Optional user data for the effect.</param>
-        internal void Apply(
-            IEffectEmitterFacade source, IEffectReceiverFacade target, 
-            out ContinuousEffect? continuousEffect,
-            Ability? sourceAbility = null,
-            IReadOnlyDictionary<string, double>? userData = null
+        /// <param name="interrupt">The cancellation token for interrupting the effect externally.</param>
+        public async void Apply(
+            IEffectEmitterFacade source, IEffectReceiverFacade target,
+            IReadOnlyDictionary<string, double>? userData = null,
+            Ability? sourceAbility = null, CancellationToken interrupt = default
         ) {
-            List<Modifier> modifiers = new List<Modifier>();
-            continuousEffect = null;
+            try {
+                Modifier[] modifiers = this.ModifierPreset.Apply(source, target, userData).ToArray();
+                this.KeywordPreset.Apply(source, target);
+                if (this.Periodicity != Type.Periodic || this.ShouldExecuteBeforeFirstInterval) {
+                    foreach (Modifier modifier in modifiers) {
+                        target.ModifierConsumer.AddModifier(modifier);
+                    }
+                } else {
+                    using CancellationTokenSource interrupter = target.Register(
+                        new EffectDescriptor(sourceAbility, this, this.Tag), interrupt
+                    );
+
+                    try {
+                        await this.RunAsynchronously(target, modifiers, interrupter.Token);
+                    } catch (OperationCanceledException) {
+                        this.KeywordPreset.Revoke(source, target);
+                    }
+                }
+            } catch (Exception e) {
+                Debug.LogException(e);
+            }
+        }
+
+        private async Awaitable RunAsynchronously(
+            IEffectReceiverFacade target, Modifier[] modifiers, CancellationToken interrupt
+        ) {
             switch (this.Periodicity) {
-                case Type.Instant:
-                    new InstantEffect(target, null).Apply();
+                case Type.Persistent:
+                    try {
+                        await Awaitable.WaitForSecondsAsync(this.Duration, interrupt);
+                    } finally {
+                        foreach (Modifier modifier in modifiers) {
+                            target.ModifierConsumer.AddModifier(-modifier);
+                        }
+                    }
+                    
                     break;
                 case Type.Periodic:
-                    PeriodicEffect periodicEffect = Effect.PeriodicEffectPool.Get();
-                    periodicEffect.Descriptor = new EffectDescriptor(sourceAbility, this, this.Tag);
-                    continuousEffect = periodicEffect;
-                    periodicEffect.Apply(
-                        new PeriodicEffect.Arguments(
-                            target, this.Interval, this.PeriodCount, this.ShouldExecuteBeforeFirstInterval,
-                            modifiers, this.TargetReceivesKeywords, this.TargetRemovesKeywords
-                        )
-                    );
-                    break;
-                case Type.Persistent:
-                    PersistentEffect persistentEffect = Effect.PersistentEffectPool.Get();
-                    persistentEffect.Descriptor = new EffectDescriptor(sourceAbility, this, this.Tag);
-                    continuousEffect = persistentEffect;
-                    persistentEffect.Apply(
-                        new PersistentEffect.Arguments(
-                            target, this.Duration, modifiers, this.TargetReceivesKeywords, this.TargetRemovesKeywords
-                        )
-                    );
+                    for (int i = 0; i < this.PeriodCount; i += 1) {
+                        await Awaitable.WaitForSecondsAsync(this.Interval, interrupt);
+                        foreach (Modifier modifier in modifiers) {
+                            target.ModifierConsumer.AddModifier(modifier);
+                        }
+                    }
+                    
                     break;
             }
         }
