@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
+using CommonFrameworks.Extensions;
 using CommonFrameworks.Logic;
 using GameplayAbilitiesSystem.Runtime.Abilities.Executions;
 using GameplayAbilitiesSystem.Runtime.Effects;
@@ -14,12 +14,6 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
     public sealed class Ability : ScriptableObject {
         [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))]
         internal List<string> Tags { get; private set; } = new List<string>();
-
-        [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))]
-        internal List<string> KeywordsToGrantWhileRunning { get; private set; } = new List<string>();
-
-        [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))]
-        internal List<string> KeywordsToRevokeWhileRunning { get; private set; } = new List<string>();
 
         [field: SerializeField] private List<Cost> Costs { get; set; } = new List<Cost>();
 
@@ -57,21 +51,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                 cost.Spend(system.AttributeReader, system.ModifierConsumer);
             }
 
-            ICollection<Keyword> granted = new List<Keyword>();
-            ICollection<Keyword> revoked = new List<Keyword>();
-            foreach (Keyword keyword in this.KeywordsToRevokeWhileRunning) {
-                if (system.EmitterKeywordContainer.Remove(keyword)) {
-                    revoked.Add(keyword);
-                }
-            }
-
-            foreach (Keyword keyword in this.KeywordsToGrantWhileRunning) {
-                if (system.EmitterKeywordContainer.Add(keyword)) {
-                    granted.Add(keyword);
-                }
-            }
-
-            activation = new AbilityActivation(granted, revoked, new CancellationTokenSource());
+            activation = new AbilityActivation(new CancellationTokenSource());
             return true;
         }
 
@@ -86,12 +66,13 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                     await this.ExecutionSteps[i].Run(system, this, cts.Token);
                     this.ExecutionSteps[i].Complete();
                 } catch (OperationCanceledException) {
+                    system.Stop(this);
                     break;
                 }
             }
 
+            await AwaitableExtensions.WaitUntilAsync(() => !system.IsRunningAbility(this));
             this.SideEffect?.Stop(system);
-            system.Stop(this);
         }
     }
 }

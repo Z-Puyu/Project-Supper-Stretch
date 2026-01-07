@@ -1,10 +1,9 @@
 ﻿using System;
 using CommonFrameworks.Logic;
-using GameplayAbilitiesSystem.Runtime.Effects;
 using SaintsField;
 using UnityEngine;
 
-namespace GameplayAbilitiesSystem.Runtime.Predicate.Receiver {
+namespace GameplayAbilitiesSystem.Runtime.Effects.Predicate.Receiver {
     [Serializable]
     internal struct Not : IPredicate<IEffectReceiverFacade> {
         [field: SerializeReference, ReferencePicker]

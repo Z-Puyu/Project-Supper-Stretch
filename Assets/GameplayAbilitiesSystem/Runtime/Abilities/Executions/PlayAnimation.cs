@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using CommonFrameworks.Extensions;
 using GameplayAbilitiesSystem.Runtime.Animations;
 using SaintsField;
 using SaintsField.Playa;
@@ -17,21 +18,30 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
         private List<AnimationSignal> AnimationSignals { get; set; } = new List<AnimationSignal>();
         
         [field: SerializeReference, ReferencePicker] 
-        private IAbilityExecutor? AnimationEnd { get; set; }
+        private List<IAbilityExecutor> AnimationEnd { get; set; } = new List<IAbilityExecutor>();
 
         [field: SerializeReference, ReferencePicker]
-        private IAbilityExecutor? AnimationInterrupt { get; set; } = new EndAbility();
+        private List<IAbilityExecutor> AnimationInterrupt { get; set; } = new List<IAbilityExecutor> {
+            new EndAbility()
+        };
         
         private bool HasAnyAnimationSignal => this.AnimationSignals.Count > 0;
 
         protected override async Awaitable Execute(AbilitySystem system, Ability ability, CancellationToken interrupt) {
             try {
                 _ = animate();
-            } catch (OperationCanceledException) {
-                this.AnimationInterrupt?.Run(system, ability, interrupt);
+            } catch (OperationCanceledException) when (system.IsRunningAbility(ability)) {
+                foreach (IAbilityExecutor step in this.AnimationInterrupt) {
+                    try {
+                        await step.Run(system, ability, interrupt);
+                        step.Complete();
+                    } catch (OperationCanceledException) {
+                        break;
+                    }
+                }
             }
             
-            await new AwaitableCompletionSource().Awaitable;
+            await AwaitableExtensions.CompletedTask;
             return;
 
             async Awaitable animate() {
@@ -45,8 +55,15 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
                             ?.Run(system, ability, interrupt);
                     }
                 );
-                
-                this.AnimationEnd?.Run(system, ability, interrupt);
+
+                foreach (IAbilityExecutor step in this.AnimationEnd) {
+                    try {
+                        await step.Run(system, ability, interrupt);
+                        step.Complete();
+                    } catch (OperationCanceledException) {
+                        break;
+                    }
+                }
             }
         }
         

@@ -11,19 +11,14 @@ using UnityEngine;
 using Attribute = Codice.Client.BaseCommands.Attribute;
 
 namespace GameManagement {
-    [DisallowMultipleComponent]
+    [DisallowMultipleComponent, RequireComponent(typeof(Locomotion))]
     public class PlayerMovementInterpreter : MonoBehaviour {
-        [NotNull] 
-        [field: SerializeField, Required] 
-        private Locomotion? Locomotion { get; set; }
+        [NotNull] private Locomotion? Locomotion { get; set; }
+        [NotNull] private AttributeSet? AttributeSet { get; set; }
         
         [NotNull] 
         [field: SerializeField, Required] 
         private Animator? Animator { get; set; }
-        
-        [NotNull] 
-        [field: SerializeField, Required]
-        private AttributeSet? AttributeSet { get; set; }
         
         [field: SerializeField, TreeDropdown(nameof(this.AllAttributes))] 
         private string MovementSpeedAttribute { get; set; } = string.Empty;
@@ -41,7 +36,12 @@ namespace GameManagement {
         
         private AdvancedDropdownList<string> AllAttributes => AttributeUtils.GetDropdownList();
 
+        private void Awake() {
+            this.Locomotion = this.GetComponent<Locomotion>();
+        }
+
         private void OnEnable() {
+            this.AttributeSet = this.Locomotion.Root.GetOrAdd<AttributeSet>();
             this.AttributeSet.OnAttributeUpdated += this.OnAttributeUpdated;
         }
 

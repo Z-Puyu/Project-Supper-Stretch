@@ -10,5 +10,9 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes.Evaluation {
         public double Evaluate(IAttributeReader? attributes, IReadOnlyDictionary<string, double>? userData = null) {
             return this.Value;
         }
+
+        public override string ToString() {
+            return $"{this.Value}";
+        }
     }
 }

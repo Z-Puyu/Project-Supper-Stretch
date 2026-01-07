@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -16,7 +17,7 @@ using UnityEngine.Events;
 
 namespace GameplayAbilitiesSystem.Runtime.Abilities {
     [DisallowMultipleComponent]
-    public sealed class AbilitySystem : BehaviourComponent, IEffectEmitterFacade, IEffectReceiverFacade {
+    public sealed class AbilitySystem : BehaviourComponent, IEffectEmitterFacade, IEffectReceiverFacade, IEnumerable<Ability> {
         private AnimationController? AnimationController { get; set; }
         private ICollection<Ability> AvailableAbilities { get; } = new HashSet<Ability>();
 
@@ -39,6 +40,11 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         IAttributeReader IEffectReceiverFacade.AttributeReader => this.AttributeSet;
         public IModifiable ModifierConsumer => this.AttributeSet;
         ITaggable<Keyword> IEffectReceiverFacade.ReceiverKeywordContainer => this.KeywordContainer;
+        
+        public event UnityAction<Ability> OnAbilityStarted = delegate { };
+        public event UnityAction<Ability> OnAbilityStopped = delegate { };
+        public event UnityAction<Ability> OnAbilityGranted = delegate { }; 
+        public event UnityAction<Ability> OnAbilityRevoked = delegate { };
 
         protected override void Awake() {
             base.Awake();
@@ -57,6 +63,10 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             this.AnimationController = AnimationController.Create(this.Animator);
             this.AnimationHandler = this.Animator.GetOrAddComponent<AbilitySystemAnimationHandler>();
             this.AnimationHandler.ConnectToAnimationController(this.AnimationController);
+        }
+
+        private void OnDestroy() {
+            this.AnimationController?.Destroy();
         }
 
         /// <summary>
@@ -79,7 +89,20 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                 abilities.Add(ability);
             }
             
+            this.OnAbilityGranted.Invoke(ability);
             return true;
+        }
+        
+        public void Revoke(Ability ability) {
+            if (!this.AvailableAbilities.Remove(ability)) {
+                return;
+            }
+            
+            foreach (Keyword keyword in ability.Tags) {
+                this.AbilitiesByTag[keyword].Remove(ability);
+            }
+            
+            this.OnAbilityRevoked.Invoke(ability);
         }
 
         /// <summary>
@@ -92,8 +115,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             if (!ability) {
                 return;
             }
-            
-            this.Interrupt(ability);
+
             this.Stop(ability);
             if (!this.AvailableAbilities.Remove(ability)) {
                 return;
@@ -105,6 +127,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             
             this.RunningAbilities[ability] = activation;
             _ = ability.Execute(this, userData, activation.Interrupter.Token);
+            this.OnAbilityStarted.Invoke(ability);
         }
 
         /// <summary>
@@ -136,8 +159,9 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                 return;
             }
 
-            activation.Stop(this);
+            activation.Interrupt();
             this.AvailableAbilities.Add(ability);
+            this.OnAbilityStopped.Invoke(ability);
         }
 
         /// <summary>
@@ -153,16 +177,12 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             }
         }
 
-        private void Interrupt(Ability ability) {
-            if (!this.RunningAbilities.TryGetValue(ability, out AbilityActivation activation)) {
-                return;
-            }
-            
-            activation.Interrupt(this);
+        public bool IsRunningAbility(Ability ability) {
+            return this.RunningAbilities.ContainsKey(ability);
         }
 
         public async Awaitable PlayAnimation(
-            AnimationClip anim, CancellationToken interrupter, 
+            AnimationClip anim, CancellationToken interrupter,
             UnityAction<AnimationNotifier> onNotify, Action? onInterrupt = null
         ) {
             if (this.AnimationController is null) {
@@ -176,8 +196,22 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             return this.EffectRegistry.Register(effect, interrupt);
         }
         
-        void IEffectReceiverFacade.StopEffects(Ability? ability, Effect? type, Keyword keyword) {
+        public void StopEffects(Ability? ability, Effect? type, Keyword keyword) {
             this.EffectRegistry.Stop(ability, type, keyword);
+        }
+
+        public IEnumerator<Ability> GetEnumerator() {
+            foreach (Ability ability in this.AvailableAbilities) {
+                yield return ability;
+            }
+
+            foreach (Ability ability in this.RunningAbilities.Keys) {
+                yield return ability;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() {
+            return this.GetEnumerator();
         }
     }
 }

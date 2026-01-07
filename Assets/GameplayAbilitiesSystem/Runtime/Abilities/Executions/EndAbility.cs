@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using CommonFrameworks.Extensions;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
@@ -7,11 +8,9 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
     internal sealed class EndAbility : IAbilityExecutor {
         Awaitable IAbilityExecutor.Run(AbilitySystem system, Ability ability, CancellationToken interrupt) {
             system.Stop(ability);
-            return new AwaitableCompletionSource().Awaitable;
+            return AwaitableExtensions.CompletedTask;
         }
 
-        void IAbilityExecutor.Complete() {
-            throw new InvalidOperationException($"{nameof(EndAbility)} cannot be completed");
-        }
+        void IAbilityExecutor.Complete() { }
     }
 }

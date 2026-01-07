@@ -7,8 +7,12 @@ using UnityEngine;
 namespace GameplayAbilitiesSystem.Runtime.Effects {
     [Serializable]
     internal sealed class EffectModifierPreset {
-        [field: SerializeField, Table]
+        [field: SerializeField, FieldLabelText(nameof(this.LabelModifier), true)]
         private List<ModifierConfig> Modifiers { get; set; } = new List<ModifierConfig>();
+
+        private string LabelModifier(ModifierConfig config) {
+            return $"<b>{config}</b>";
+        }
 
         internal IEnumerable<Modifier> Apply(
             IEffectEmitterFacade source, IEffectReceiverFacade target, IReadOnlyDictionary<string, double>? userData

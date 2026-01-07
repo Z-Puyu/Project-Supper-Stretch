@@ -63,19 +63,15 @@ namespace GameplayKeywordsSystem.Runtime {
         }
 
         private void OnValidate() {
-            Debug.Log("Validating keyword sheet");
             Stack<string> path = new Stack<string>();
             DepthFirstWalker<KeywordSheetNode> walker = new DepthFirstWalker<KeywordSheetNode>(
                 onVisit: node => {
-                    Debug.Log($"Visit {node.Name}");
                     node.Path = string.Join('/', path.Reverse());
                 },
                 onBacktrack: (curr, prev) => {
-                    Debug.Log($"Backtrack {curr.Name} -> {prev.Name}");
                     path.Pop();
                 },
                 onMoveForward: (curr, next) => {
-                    Debug.Log($"Move {curr.Name} -> {next.Name}");
                     path.Push(next.Name);
                 }
             );

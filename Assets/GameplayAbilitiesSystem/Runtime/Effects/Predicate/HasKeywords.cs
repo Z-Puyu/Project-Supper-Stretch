@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommonFrameworks.Logic;
-using GameplayAbilitiesSystem.Runtime.Effects;
 using GameplayKeywordsSystem.Runtime;
 using SaintsField;
 using UnityEngine;
 
-namespace GameplayAbilitiesSystem.Runtime.Predicate {
+namespace GameplayAbilitiesSystem.Runtime.Effects.Predicate {
     [Serializable]
     public struct HasKeywords : IPredicate<IEffectEmitterFacade>, IPredicate<IEffectReceiverFacade> {
         private enum PredicateType {

@@ -32,6 +32,10 @@ namespace GameplayKeywordsSystem.Runtime {
         }
 
         public void Clear() {
+            foreach (Keyword keyword in this.Keywords) {
+                this.OnKeywordRemoved.Invoke(keyword);
+            }
+            
             this.Keywords.Clear();
         }
 

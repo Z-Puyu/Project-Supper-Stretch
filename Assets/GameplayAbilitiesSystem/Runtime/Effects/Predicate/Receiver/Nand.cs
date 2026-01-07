@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommonFrameworks.Logic;
-using GameplayAbilitiesSystem.Runtime.Effects;
 using SaintsField;
 using UnityEngine;
 
-namespace GameplayAbilitiesSystem.Runtime.Predicate.Receiver {
+namespace GameplayAbilitiesSystem.Runtime.Effects.Predicate.Receiver {
     [Serializable]
     internal struct Nand : IPredicate<IEffectReceiverFacade> {
         [field: SerializeReference, ReferencePicker]

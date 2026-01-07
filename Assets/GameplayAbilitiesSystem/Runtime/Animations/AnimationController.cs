@@ -25,10 +25,6 @@ namespace GameplayAbilitiesSystem.Runtime.Animations {
             );
         }
 
-        ~AnimationController() {
-            this.PlayableGraph.Destroy();
-        }
-
         internal static AnimationController Create(Animator animator) {
             AnimationController controller = new AnimationController(animator);
             controller.Output.SetSourcePlayable(controller.FinalMixer);
@@ -37,6 +33,10 @@ namespace GameplayAbilitiesSystem.Runtime.Animations {
             controller.FinalMixer.SetInputWeight(0, 1);
             controller.PlayableGraph.Play();
             return controller;
+        }
+
+        internal void Destroy() {
+            this.PlayableGraph.Destroy();
         }
 
         public async Awaitable PlayActionAnimation(

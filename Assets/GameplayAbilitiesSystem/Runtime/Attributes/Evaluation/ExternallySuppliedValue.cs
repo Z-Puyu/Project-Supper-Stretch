@@ -16,5 +16,9 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes.Evaluation {
         public double Evaluate(IAttributeReader? attributes, IReadOnlyDictionary<string, double>? userData = null) {
             return userData?.GetValueOrDefault(this.ValueKey, 0) ?? 0;
         }
+        
+        public override string ToString() {
+            return this.ValueKey;
+        }
     }
 }

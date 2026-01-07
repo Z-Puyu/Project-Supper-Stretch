@@ -1,24 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using GameplayKeywordsSystem.Runtime;
+﻿using System.Threading;
 
 namespace GameplayAbilitiesSystem.Runtime.Abilities {
     internal readonly record struct AbilityActivation(
-        ICollection<Keyword> GrantedKeywords,
-        ICollection<Keyword> RevokedKeywords,
         CancellationTokenSource Interrupter
     ) {
-        internal void Stop(AbilitySystem system) {
-            foreach (Keyword keyword in this.GrantedKeywords) {
-                system.EmitterKeywordContainer.Remove(keyword);
-            }
-            
-            foreach (Keyword keyword in this.RevokedKeywords) {
-                system.EmitterKeywordContainer.Add(keyword);
-            }
-        }
-        
-        internal void Interrupt(AbilitySystem system) {
+        internal void Interrupt() {
             this.Interrupter.Cancel();
             this.Interrupter.Dispose();
         }

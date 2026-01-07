@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommonFrameworks.Logic;
-using GameplayAbilitiesSystem.Runtime.Effects;
 using SaintsField;
 using UnityEngine;
 
-namespace GameplayAbilitiesSystem.Runtime.Predicate.Emitter {
+namespace GameplayAbilitiesSystem.Runtime.Effects.Predicate.Emitter {
     [Serializable]
-    internal struct And : IPredicate<IEffectEmitterFacade> {
+    internal struct None : IPredicate<IEffectEmitterFacade> {
         [field: SerializeReference, ReferencePicker]
         private List<IPredicate<IEffectEmitterFacade>> Predicates { get; set; }
 
         private List<Predicate<IEffectEmitterFacade>> CompiledPredicates { get; }
 
-        public And() {
+        public None() {
             this.Predicates = new List<IPredicate<IEffectEmitterFacade>>();
             this.CompiledPredicates = new List<Predicate<IEffectEmitterFacade>>();
         }
@@ -25,7 +24,7 @@ namespace GameplayAbilitiesSystem.Runtime.Predicate.Emitter {
                 }
             }
 
-            return this.CompiledPredicates.All(source);
+            return this.CompiledPredicates.None(source);
         }
     }
 }

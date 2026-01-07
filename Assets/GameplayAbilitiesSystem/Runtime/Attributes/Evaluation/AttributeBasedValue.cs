@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using SaintsField;
 using UnityEngine;
 
@@ -18,6 +19,25 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes.Evaluation {
         public double Evaluate(IAttributeReader? attributes, IReadOnlyDictionary<string, double>? userData = null) {
             double attributesValue = attributes?.Query(this.BackingAttribute) ?? 0;
             return this.Coefficient * (attributesValue + this.PreMultiplicationOffset) + this.PostMultiplicationOffset;
+        }
+
+        public override string ToString() {
+            StringBuilder sb = new StringBuilder();
+            if (Math.Abs(this.Coefficient - 1) > 0.001) {
+                sb.Append($"{this.Coefficient} × ");
+            }
+            
+            if (this.PreMultiplicationOffset != 0) {
+                sb.Append($"({this.PreMultiplicationOffset} + {this.BackingAttribute})");
+            } else {
+                sb.Append($"{this.BackingAttribute}");
+            }
+            
+            if (this.PostMultiplicationOffset != 0) {
+                sb.Append($" + {this.PostMultiplicationOffset}");
+            }
+            
+            return sb.ToString();
         }
     }
 }

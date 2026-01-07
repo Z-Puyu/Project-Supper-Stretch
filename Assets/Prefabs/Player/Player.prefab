@@ -54068,8 +54068,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem
   <Animator>k__BackingField: {fileID: 6388006269725896587}
-  <KeywordContainer>k__BackingField: {fileID: 5167578558040235596}
-  <AttributeSet>k__BackingField: {fileID: 6624264980163878195}
   <DefaultAbilities>k__BackingField:
   - {fileID: 11400000, guid: 46e1df1ad72d91d45828c65fa4dad265, type: 2}
   - {fileID: 11400000, guid: d1b5f047207a9004b88750d8f1cecf3e, type: 2}
@@ -71315,6 +71313,7 @@ MonoBehaviour:
   <ComponentRoot>k__BackingField: {fileID: 5972498177023485511}
   <RollAbility>k__BackingField: {fileID: 11400000, guid: 46e1df1ad72d91d45828c65fa4dad265, type: 2}
   <BackstepAbility>k__BackingField: {fileID: 11400000, guid: d1b5f047207a9004b88750d8f1cecf3e, type: 2}
+  <SprintAbility>k__BackingField: {fileID: 0}
 --- !u!114 &62607394211588175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74872,8 +74871,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a02db2079934f5c9a267550c8fd1232, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Scripts.GameManagement::GameManagement.PlayerMovementInterpreter
-  <Locomotion>k__BackingField: {fileID: 2201749962735802151}
   <Animator>k__BackingField: {fileID: 6388006269725896587}
+  <MovementSpeedAttribute>k__BackingField: Speed
   <LeftRightVelocityAnimatorParameter>k__BackingField: 2041851446
   <ForwardBackVelocityAnimatorParameter>k__BackingField: 72152147
   <AnimationBlendTime>k__BackingField: 0.1

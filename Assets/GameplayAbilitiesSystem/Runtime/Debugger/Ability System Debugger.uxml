@@ -1,0 +1,17 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 0; -unity-text-outline-color: rgba(0, 0, 0, 0); background-color: rgba(0, 0, 0, 0.75); min-width: auto; width: 33%; height: 100%; padding-left: 10px; padding-right: 10px;">
+        <ui:Label text="Ability System" name="SystemNameLabel" style="color: rgb(255, 255, 255); font-size: 32px; -unity-font-style: bold;"/>
+        <ui:Label text="Active Abilities" name="ActiveAbilitiesLabel" style="color: rgb(255, 255, 255); font-size: 28px; -unity-font-style: italic;"/>
+        <ui:VisualElement style="flex-grow: 0; margin-left: 25px;">
+            <ui:Label text="" name="ListOfActiveAbilities" parse-escape-sequences="true" style="color: rgb(255, 255, 255); font-size: 24px;"/>
+        </ui:VisualElement>
+        <ui:Label text="Usable Abilities" name="UsableAbilitiesLabel" style="color: rgb(255, 255, 255); font-size: 28px; -unity-font-style: italic;"/>
+        <ui:VisualElement style="flex-grow: 0; margin-left: 25px;">
+            <ui:Label text="Label" name="ListOfUsableAbilities" parse-escape-sequences="true" style="color: rgb(255, 255, 255); font-size: 24px;"/>
+        </ui:VisualElement>
+        <ui:Label text="Owned Keywords" name="KeywordsLabel" style="color: rgb(255, 255, 255); font-size: 28px; -unity-font-style: italic;"/>
+        <ui:VisualElement style="flex-grow: 0; margin-left: 25px;">
+            <ui:Label text="Label" name="ListOfKeywords" parse-escape-sequences="true" style="color: rgb(255, 255, 255); font-size: 24px;"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

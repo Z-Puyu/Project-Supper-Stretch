@@ -19,10 +19,19 @@ MonoBehaviour:
   - Character Flags/Movement Blocked
   - Character Flags/Rotation Blocked
   <KeywordsToRevokeWhileRunning>k__BackingField: []
+  <Costs>k__BackingField: []
   <Conditions>k__BackingField:
   - rid: 1692151751057866752
   <ExecutionSteps>k__BackingField:
   - rid: 1692151813856559430
+  <SideEffect>k__BackingField:
+    <KeywordPreset>k__BackingField:
+      <TargetReceivesKeywords>k__BackingField: []
+      <TargetRemovesKeywords>k__BackingField: []
+      <SourceReceivesKeywords>k__BackingField: []
+      <SourceRemovesKeywords>k__BackingField: []
+    <ModifierPreset>k__BackingField:
+      <Modifiers>k__BackingField: []
   references:
     version: 2
     RefIds:
@@ -38,12 +47,20 @@ MonoBehaviour:
         <Clip>k__BackingField: {fileID: -7510004476302381493, guid: 316244d2030138147995d0a5460b0f95, type: 3}
         <AnimationSignals>k__BackingField: []
         <AnimationEnd>k__BackingField:
-          rid: 1692151836468576363
+        - rid: 1692151863182360960
         <AnimationInterrupt>k__BackingField:
-          rid: 1692151813856559440
-    - rid: 1692151813856559440
-      type: {class: EndAbility, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
-      data: 
-    - rid: 1692151836468576363
-      type: {class: EndAbility, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
-      data: 
+        - rid: 1692151863182360965
+    - rid: 1692151863182360960
+      type: {class: EndEffects, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <WillEndAbilityOnCompletion>k__BackingField: 1
+        <SourceAbility>k__BackingField: {fileID: 0}
+        <EffectType>k__BackingField: {fileID: 11400000, guid: 95464a4a295bf5246b5250478771ac9c, type: 2}
+        <EffectTag>k__BackingField: 
+    - rid: 1692151863182360965
+      type: {class: EndEffects, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <WillEndAbilityOnCompletion>k__BackingField: 1
+        <SourceAbility>k__BackingField: {fileID: 0}
+        <EffectType>k__BackingField: {fileID: 11400000, guid: 95464a4a295bf5246b5250478771ac9c, type: 2}
+        <EffectTag>k__BackingField: 

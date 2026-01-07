@@ -19,10 +19,10 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         [field: SerializeField] private ModifierType Type { get; set; } = ModifierType.Shift;
         
         [NotNull] 
-        [field: SerializeReference, ReferencePicker, TableColumn("Magnitude")] 
+        [field: SerializeReference, ReferencePicker, DefaultExpand] 
         private IAttributeMagnitude? Value { get; set; } = new Constant();
 
-        [field: SerializeField, TableColumn("Magnitude"), ShowIf(nameof(this.IsAttributeBased))]
+        [field: SerializeField, ShowIf(nameof(this.IsAttributeBased))]
         private ValueSource BackingAttributeSource { get; set; } = ValueSource.Instigator;
 
         [field: SerializeField] private EffectConditionPreset? Condition { get; set; } = null;
@@ -57,6 +57,12 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
             );
             
             return true;
+        }
+
+        public override string ToString() {
+            return string.IsNullOrWhiteSpace(this.Target)
+                    ? "Undefined"
+                    : $"{this.Target} {this.Type}: {this.Value}";
         }
     }
 }
