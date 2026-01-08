@@ -4,13 +4,14 @@ using System.Linq;
 
 namespace CommonFrameworks.Events {
     public static class Mailbox<S, E> where S : class where E : IMessage {
-        private static HashSet<Action<Event<S, E>>> Listeners { get; } = new HashSet<Action<Event<S, E>>>();
+        private static readonly IDictionary<object, ISet<Action<Event<S, E>>>> RegisteredHandlers =
+                new Dictionary<object, ISet<Action<Event<S, E>>>>();
+        
+        private static readonly IDictionary<object, Action<Event<S, E>>> Handlers =
+                new Dictionary<object, Action<Event<S, E>>>();
 
-        private static Dictionary<object, Action<Event<S, E>>> Handlers { get; } =
-            new Dictionary<object, Action<Event<S, E>>>();
-
-        private static Dictionary<Action, Action<Event<S, E>>> ParameterlessHandlers { get; } =
-            new Dictionary<Action, Action<Event<S, E>>>();
+        private static readonly IDictionary<Action, Action<Event<S, E>>> ParameterlessHandlers =
+                new Dictionary<Action, Action<Event<S, E>>>();
 
         private static event Action<Event<S, E>> OnEvent = delegate { };
 
@@ -25,10 +26,14 @@ namespace CommonFrameworks.Events {
         }
 
         internal static bool Register(object subscriber, Action<Event<S, E>> handler) {
-            if (!Mailbox<S, E>.Listeners.Add(handler)) {
-                return false;
+            if (Mailbox<S, E>.RegisteredHandlers.TryGetValue(subscriber, out ISet<Action<Event<S, E>>> existing)) {
+                if (!existing.Add(handler)) {
+                    return false;
+                }
+            } else {
+                Mailbox<S, E>.RegisteredHandlers.Add(subscriber, new HashSet<Action<Event<S, E>>> { handler });
             }
-
+            
             Mailbox<S, E>.OnEvent += handler;
             if (!Mailbox<S, E>.Handlers.TryAdd(subscriber, handler)) {
                 Mailbox<S, E>.Handlers[subscriber] += handler;
