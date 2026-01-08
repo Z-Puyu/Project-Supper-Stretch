@@ -49,7 +49,6 @@ namespace CommonFrameworks.Events {
 
         public static void Subscribe<S, E>(this object listener, Action<Event<S, E>> handler)
                 where S : class where E : IMessage {
-            EventExtensions.RegisterSubscription<S, E>(listener);
             Mailbox<S, E>.AddSubscription(listener, handler);
         }
 
@@ -59,7 +58,6 @@ namespace CommonFrameworks.Events {
         }
 
         public static void Subscribe<S, E>(this object listener, Action handler) where S : class where E : IMessage {
-            EventExtensions.RegisterSubscription<S, E>(listener);
             Mailbox<S, E>.AddSubscription(listener, handler);
         }
 
