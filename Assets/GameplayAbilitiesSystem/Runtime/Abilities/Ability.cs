@@ -26,7 +26,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         
         [field: SerializeField] private AbilityEffect? SideEffect { get; set; }
 
-        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.GetTreeDropdownList(true);
+        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.Fetch<AbilityTagSheet>();
 
         private string LabelCondition(object condition) {
             return condition.GetType().Name;

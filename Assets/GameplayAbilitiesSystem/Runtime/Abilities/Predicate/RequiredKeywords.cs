@@ -11,7 +11,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Predicate {
         [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))] 
         private List<string> Keywords { get; set; } 
         
-        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.GetTreeDropdownList();
+        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.Fetch<KeywordSheet>();
         
         public bool Holds(AbilitySystem system) {
             foreach (string keyword in this.Keywords) {

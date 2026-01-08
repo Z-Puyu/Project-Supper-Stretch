@@ -16,8 +16,8 @@ namespace Characters {
         [NotNull] 
         [field: SerializeField, Required] 
         private Locomotion? LocomotionComponent { get; set; }
-        
-        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.GetTreeDropdownList();
+
+        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.Fetch<KeywordSheet>();
         
         public void HandleNewlyAddedKeyword(Keyword keyword) {
             if (keyword == this.KeywordToBlockMovement) {

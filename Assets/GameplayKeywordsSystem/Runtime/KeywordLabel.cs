@@ -19,7 +19,7 @@ namespace GameplayKeywordsSystem.Runtime {
         public int Count => this.Keywords.Count;
         public bool IsReadOnly => this.Keywords.IsReadOnly;
         
-        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.GetTreeDropdownList();
+        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.Fetch<KeywordSheet>();
         
         internal void Initialise() {
             foreach (string keyword in this.PreexistingKeywords) {

@@ -8,6 +8,6 @@ namespace GameplayAbilitiesSystem.Runtime.Animations {
         [field: SerializeField, Required, TreeDropdown(nameof(this.AllKeywords))] 
         public string Name { get; private set; } = Keyword.Empty;
         
-        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.GetTreeDropdownList();
+        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.Fetch<KeywordSheet>();
     }
 }

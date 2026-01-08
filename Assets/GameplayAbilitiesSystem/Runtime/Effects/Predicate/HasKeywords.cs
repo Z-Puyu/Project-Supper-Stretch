@@ -21,7 +21,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects.Predicate {
 
         [field: SerializeField] private PredicateType Predicate { get; set; } = PredicateType.All;
         
-        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.GetTreeDropdownList();
+        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.Fetch<KeywordSheet>();
         
         public HasKeywords() { }
         

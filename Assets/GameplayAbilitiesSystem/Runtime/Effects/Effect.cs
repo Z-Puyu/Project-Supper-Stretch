@@ -49,7 +49,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         private bool IsInstant => this.Periodicity == Type.Instant;
         private bool IsPeriodic => this.Periodicity == Type.Periodic;
         private bool IsContinuous => this.Periodicity == Type.Persistent;
-        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.GetTreeDropdownList(true);
+        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.Fetch<EffectTagSheet>();
 
         /// <summary>
         /// Applies the effect.

@@ -15,7 +15,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
         [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))] 
         private string EffectTag { get; set; } = string.Empty;
         
-        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.GetTreeDropdownList(true);
+        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.Fetch<EffectTagSheet>();
 
         protected override Awaitable Execute(AbilitySystem system, Ability ability, CancellationToken interrupt) {
             system.StopEffects(this.SourceAbility, this.EffectType, this.EffectTag);

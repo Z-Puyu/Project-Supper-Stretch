@@ -19,7 +19,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))]
         private List<string> SourceRemovesKeywords { get; set; } = new List<string>();
         
-        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.GetTreeDropdownList(true);
+        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.Fetch<KeywordSheet>();
         
         internal void Apply(IEffectEmitterFacade source, IEffectReceiverFacade target) {
             foreach (string keyword in this.SourceRemovesKeywords) {

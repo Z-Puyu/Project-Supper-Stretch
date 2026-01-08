@@ -23,18 +23,15 @@ namespace GameplayKeywordsSystem.Runtime {
             return node is not null;
         }
 
-        internal (AdvancedDropdownList<string>? self, AdvancedDropdownList<string> children) ToAdvancedDropdownList(
-            bool includeInternalNodes = false
-        ) {
+        internal (AdvancedDropdownList<string>?, AdvancedDropdownList<string>) Collapse(bool all = false) {
             if (this.IsLeaf) {
                 return (null, new AdvancedDropdownList<string>(this.Name, this.Path));
             }
 
             List<AdvancedDropdownList<string>> list = new List<AdvancedDropdownList<string>>();
             foreach (KeywordSheetNode child in this.Children) {
-                (AdvancedDropdownList<string>? self, AdvancedDropdownList<string> children) =
-                        child.ToAdvancedDropdownList(includeInternalNodes);
-                if (includeInternalNodes && self is not null) {
+                (AdvancedDropdownList<string>? self, AdvancedDropdownList<string> children) = child.Collapse(all);
+                if (all && self is not null) {
                     list.Add(self);
                 }
 
@@ -44,19 +41,6 @@ namespace GameplayKeywordsSystem.Runtime {
             list.Sort((a, b) => string.Compare(a.displayName, b.displayName, StringComparison.OrdinalIgnoreCase));
             return (new AdvancedDropdownList<string>(this.Name, this.Path),
                 new AdvancedDropdownList<string>(this.Name, list));
-        }
-
-        internal IEnumerable<(string path, string name)> Collapse() {
-            List<(string, string)> list = new List<(string, string)> { (this.Path, this.Name) };
-            Queue<KeywordSheetNode> queue = new Queue<KeywordSheetNode>(this.Children);
-            while (queue.TryDequeue(out KeywordSheetNode child)) {
-                list.Add((child.Path, child.Name));
-                foreach (KeywordSheetNode grandchild in child.Children) {
-                    queue.Enqueue(grandchild);
-                }
-            }
-
-            return list;
         }
 
         public int CompareTo(KeywordSheetNode? other) {
