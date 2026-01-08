@@ -81,10 +81,8 @@ namespace CommonFrameworks.Events {
             if (!Mailbox<S, E>.Handlers.Remove(subscriber, out Action<Event<S, E>> handler)) {
                 return;
             }
-
-            HashSet<Delegate> invalid = handler.GetInvocationList().ToHashSet();
-            IEnumerable<Delegate> kept = Mailbox<S, E>.OnEvent.GetInvocationList()
-                                                      .Where(del => !invalid.Contains(del));
+            
+            IEnumerable<Delegate> kept = Mailbox<S, E>.OnEvent.GetInvocationList().Except(handler.GetInvocationList());
             Mailbox<S, E>.OnEvent = (Action<Event<S, E>>)Delegate.Combine(kept.ToArray());
         }
     }
