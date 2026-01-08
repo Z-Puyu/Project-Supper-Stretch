@@ -19,52 +19,54 @@ namespace CommonFrameworks.Events {
             } else {
                 set.Add(subscription);
             }
-            
+
             SubscriptionDescriptor publisher = new SubscriptionDescriptor(PublisherType: typeof(S));
             SubscriptionDescriptor @event = new SubscriptionDescriptor(EventType: typeof(E));
             if (!EventExtensions.ClearActions.ContainsKey(publisher)) {
-                EventExtensions.ClearActions.Add(publisher, Mailbox<S, E>.Unregister);
+                EventExtensions.ClearActions.Add(publisher, Mailbox<S, E>.ClearSubscriptions);
             } else if (!EventExtensions.ClearActions.ContainsKey(subscription)) {
-                EventExtensions.ClearActions[publisher] += Mailbox<S, E>.Unregister;
+                EventExtensions.ClearActions[publisher] += Mailbox<S, E>.ClearSubscriptions;
             }
-            
+
             if (!EventExtensions.ClearActions.ContainsKey(@event)) {
-                EventExtensions.ClearActions.Add(@event, Mailbox<S, E>.Unregister);
+                EventExtensions.ClearActions.Add(@event, Mailbox<S, E>.ClearSubscriptions);
             } else if (!EventExtensions.ClearActions.ContainsKey(subscription)) {
-                EventExtensions.ClearActions[@event] += Mailbox<S, E>.Unregister;
+                EventExtensions.ClearActions[@event] += Mailbox<S, E>.ClearSubscriptions;
             }
-            
+
             if (!EventExtensions.ClearActions.ContainsKey(subscription)) {
-                EventExtensions.ClearActions.Add(subscription, Mailbox<S, E>.Unregister);
+                EventExtensions.ClearActions.Add(subscription, Mailbox<S, E>.ClearSubscriptions);
             }
         }
-        
+
         public static void Send<S, E>(this S sender, E @event) where S : class where E : IMessage {
-            Mailbox<S, E>.Send(sender, @event);
+            Mailbox<S, E>.Publish(sender, @event);
         }
-        
+
         public static void SendTo<S, E>(this S sender, object subscriber, E @event) where E : IMessage where S : class {
-            Mailbox<S, E>.SendTo(subscriber, sender, @event);
+            Mailbox<S, E>.PublishTo(subscriber, sender, @event);
         }
-        
-        public static void Subscribe<S, E>(this object listener, Action<Event<S, E>> handler) where S : class where E : IMessage {
+
+        public static void Subscribe<S, E>(this object listener, Action<Event<S, E>> handler)
+                where S : class where E : IMessage {
             EventExtensions.RegisterSubscription<S, E>(listener);
-            Mailbox<S, E>.Register(listener, handler);
+            Mailbox<S, E>.AddSubscription(listener, handler);
         }
-        
-        public static void Unsubscribe<S, E>(this object listener, Action<Event<S, E>> handler) where S : class where E : IMessage {
-            Mailbox<S, E>.Unregister(listener, handler);
+
+        public static void Unsubscribe<S, E>(this object listener, Action<Event<S, E>> handler)
+                where S : class where E : IMessage {
+            Mailbox<S, E>.RemoveSubscription(listener, handler);
         }
 
         public static void Subscribe<S, E>(this object listener, Action handler) where S : class where E : IMessage {
             EventExtensions.RegisterSubscription<S, E>(listener);
-            Mailbox<S, E>.Register(listener, handler);
+            Mailbox<S, E>.AddSubscription(listener, handler);
         }
-        
+
         public static void Unsubscribe<S, E>(this object listener, Action handler) where S : class where E : IMessage {
-            Mailbox<S, E>.Unregister(listener, handler);
+            Mailbox<S, E>.RemoveSubscription(listener, handler);
         }
-        
+
         public static void Mute<S, E>(this object listener) where S : class where E : IMessage {
             SubscriptionDescriptor subscription = new SubscriptionDescriptor(typeof(S), typeof(E));
             if (EventExtensions.ClearActions.TryGetValue(subscription, out Action<object> action)) {
@@ -90,7 +92,7 @@ namespace CommonFrameworks.Events {
             if (!EventExtensions.Subscriptions.TryGetValue(listener, out ISet<SubscriptionDescriptor> subscriptions)) {
                 return;
             }
-            
+
             foreach (SubscriptionDescriptor subscription in subscriptions) {
                 if (EventExtensions.ClearActions.TryGetValue(subscription, out Action<object> action)) {
                     action.Invoke(listener);

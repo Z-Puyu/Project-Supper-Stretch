@@ -15,17 +15,17 @@ namespace CommonFrameworks.Events {
 
         private static event Action<Event<S, E>> OnEvent = delegate { };
 
-        internal static void Send(S sender, E @event) {
+        public static void Publish(S sender, E @event) {
             Mailbox<S, E>.OnEvent.Invoke(new Event<S, E>(sender, @event));
         }
 
-        internal static void SendTo(object subscriber, S sender, E @event) {
+        public static void PublishTo(object subscriber, S sender, E @event) {
             if (Mailbox<S, E>.Handlers.TryGetValue(subscriber, out Action<Event<S, E>> handler)) {
                 handler.Invoke(new Event<S, E>(sender, @event));
             }
         }
 
-        internal static bool Register(object subscriber, Action<Event<S, E>> handler) {
+        public static bool AddSubscription(object subscriber, Action<Event<S, E>> handler) {
             if (Mailbox<S, E>.RegisteredHandlers.TryGetValue(subscriber, out ISet<Action<Event<S, E>>> existing)) {
                 if (!existing.Add(handler)) {
                     return false;
@@ -42,20 +42,20 @@ namespace CommonFrameworks.Events {
             return true;
         }
 
-        internal static void Register(object subscriber, Action handler) {
+        public static void AddSubscription(object subscriber, Action handler) {
             if (Mailbox<S, E>.ParameterlessHandlers.ContainsKey(handler)) {
                 return;
             }
 
             Action<Event<S, E>> action = _ => handler.Invoke();
-            if (!Mailbox<S, E>.Register(subscriber, action)) {
+            if (!Mailbox<S, E>.AddSubscription(subscriber, action)) {
                 return;
             }
 
             Mailbox<S, E>.ParameterlessHandlers[handler] = action;
         }
 
-        internal static void Unregister(object subscriber, Action<Event<S, E>> handler) {
+        public static void RemoveSubscription(object subscriber, Action<Event<S, E>> handler) {
             if (!Mailbox<S, E>.Handlers.TryGetValue(subscriber, out Action<Event<S, E>>? existing)) {
                 return;
             }
@@ -69,15 +69,15 @@ namespace CommonFrameworks.Events {
             }
         }
 
-        internal static void Unregister(object subscriber, Action handler) {
+        public static void RemoveSubscription(object subscriber, Action handler) {
             if (!Mailbox<S, E>.ParameterlessHandlers.Remove(handler, out Action<Event<S, E>> existing)) {
                 return;
             }
 
-            Mailbox<S, E>.Unregister(subscriber, existing);
+            Mailbox<S, E>.RemoveSubscription(subscriber, existing);
         }
 
-        internal static void Unregister(object subscriber) {
+        public static void ClearSubscriptions(object subscriber) {
             if (!Mailbox<S, E>.Handlers.Remove(subscriber, out Action<Event<S, E>> handler)) {
                 return;
             }
