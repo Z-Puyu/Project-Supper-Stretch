@@ -19,7 +19,7 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         [field: SerializeField, MinValue(0), EndText("<color=gray>degrees / s")]
         protected float RotationSpeed { get; private set; } = 1;
 
-        [field: SerializeField] public Gesture Mode { protected get; set; } = Gesture.Run;
+        [field: SerializeField] public Gesture Mode { get; set; } = Gesture.Run;
         [field: SerializeField, MinValue(0)] public float WalkingSpeed { get; set; } = 1;
         [field: SerializeField, MinValue(0)] public float RunningSpeed { get; set; } = 2;
         [field: SerializeField, MinValue(0)] public float SprintingSpeed { get; set; } = 3;

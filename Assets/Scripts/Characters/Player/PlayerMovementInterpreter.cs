@@ -42,7 +42,11 @@ namespace Characters.Player {
         }
         
         private void HandleSprintEvent(Event<PlayerInputInterpreter, PerformSprintingMessage> @event) {
-            this.Locomotion.Mode = @event.Message.IsSprinting ? Locomotion.Gesture.Sprint : Locomotion.Gesture.Run;
+            this.Locomotion.Mode = this.Locomotion.Mode switch {
+                Locomotion.Gesture.Run when @event.Message.IsSprinting => Locomotion.Gesture.Sprint,
+                Locomotion.Gesture.Sprint when !@event.Message.IsSprinting => Locomotion.Gesture.Run,
+                var _ => this.Locomotion.Mode
+            };
         }
 
         private void Update() {
