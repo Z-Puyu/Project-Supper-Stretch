@@ -39,6 +39,7 @@ namespace CommonFrameworks.Events {
                 Mailbox<S, E>.Handlers[subscriber] += handler;
             }
 
+            EventExtensions.RegisterSubscription<S, E>(subscriber);
             return true;
         }
 
@@ -51,7 +52,7 @@ namespace CommonFrameworks.Events {
             if (!Mailbox<S, E>.AddSubscription(subscriber, action)) {
                 return;
             }
-
+            
             Mailbox<S, E>.ParameterlessHandlers[handler] = action;
         }
 
