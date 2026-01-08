@@ -35,8 +35,7 @@ namespace Characters.Player {
         }
 
         private void OnDisable() {
-            this.Unsubscribe<PlayerInputInterpreter, AttemptToDodgeMessage>();
-            this.Unsubscribe<PlayerInputInterpreter, PerformSprintingMessage>();
+            this.Mute();
         }
 
         private T GetActorComponent<T>() where T : BehaviourComponent {

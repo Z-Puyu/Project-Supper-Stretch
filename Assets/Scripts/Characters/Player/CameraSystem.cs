@@ -4,7 +4,7 @@ using CommonFrameworks.Utilities;
 using SaintsField;
 using UnityEngine;
 
-namespace GameManagement {
+namespace Characters.Player {
     public class CameraSystem : Singleton<CameraSystem> {
         [NotNull] 
         [field: SerializeField, Required] 
