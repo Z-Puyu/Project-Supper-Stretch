@@ -34,19 +34,25 @@ namespace Characters.Player {
         }
 
         private void OnEnable() {
-            this.Subscribe<PlayerInputInterpreter, PerformSprintingMessage>(this.HandleSprintEvent);
+            Singleton<PlayerInputInterpreter>.Instance.OnSprint += this.BeginSprint;
+            Singleton<PlayerInputInterpreter>.Instance.OnCancelSprint += this.StopSprint;
         }
         
         private void OnDisable() {
-            this.Mute();
+            Singleton<PlayerInputInterpreter>.Instance.OnSprint -= this.BeginSprint;
+            Singleton<PlayerInputInterpreter>.Instance.OnCancelSprint -= this.StopSprint;
         }
         
-        private void HandleSprintEvent(Event<PlayerInputInterpreter, PerformSprintingMessage> @event) {
-            this.Locomotion.Mode = this.Locomotion.Mode switch {
-                Locomotion.Gesture.Run when @event.Message.IsSprinting => Locomotion.Gesture.Sprint,
-                Locomotion.Gesture.Sprint when !@event.Message.IsSprinting => Locomotion.Gesture.Run,
-                var _ => this.Locomotion.Mode
-            };
+        private void BeginSprint() {
+            if (this.Locomotion.Mode == Locomotion.Gesture.Run) {
+                this.Locomotion.Mode = Locomotion.Gesture.Sprint;
+            }
+        }
+
+        private void StopSprint() {
+            if (this.Locomotion.Mode == Locomotion.Gesture.Sprint) {
+                this.Locomotion.Mode = Locomotion.Gesture.Run;
+            }
         }
 
         private void Update() {
