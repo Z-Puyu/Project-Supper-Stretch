@@ -1,0 +1,84 @@
+:root {
+}
+
+.health-bar {
+    color: rgb(255, 255, 255);
+    background-color: rgb(0, 0, 0);
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+    opacity: 1;
+}
+
+.unity-progress-bar__background {
+    background-color: rgb(18, 16, 22);
+    opacity: 1;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+}
+
+.unity-progress-bar__title-container {
+    display: flex;
+    visibility: hidden;
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+}
+
+.unity-progress-bar__container {
+    background-color: rgba(0, 0, 0, 0);
+    display: flex;
+    visibility: visible;
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+}
+
+.health-bar .unity-progress-bar__progress {
+    background-color: rgb(142, 50, 50);
+}
+
+.stamina-bar {
+    color: rgb(255, 255, 255);
+    background-color: rgb(0, 0, 0);
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+    opacity: 1;
+}
+
+.stamina-bar .unity-progress-bar__progress {
+    background-color: rgb(75, 101, 67);
+}
