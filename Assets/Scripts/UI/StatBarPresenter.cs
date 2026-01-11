@@ -20,9 +20,12 @@ namespace UI {
             base.Bind(model, view);
             if (!this.Model) {
                 this.Model = model.GetClosestComponentInChildren<AttributeSet>();
+                if (!this.Model) {
+                    return;
+                }
             }
             
-            this.ViewRoot.lowValue = (float)this.Model!.QueryMin(this.TrackedAttribute);
+            this.ViewRoot.lowValue = (float)this.Model.QueryMin(this.TrackedAttribute);
             float max = (float)this.Model.QueryMax(this.TrackedAttribute);
             float current = (float)this.Model.Query(this.TrackedAttribute);
             this.Present((current, max));
