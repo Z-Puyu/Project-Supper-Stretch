@@ -39,7 +39,10 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
 
         [field: SerializeField, ShowIf(nameof(this.IsPeriodic))]
         private bool ShouldExecuteBeforeFirstInterval { get; set; }
-
+        
+        [field: SerializeField, ShowIf(nameof(this.IsPeriodic))]
+        private bool ShouldInterpolateBetweenTicks { get; set; }
+        
         [field: SerializeField] private EffectKeywordPreset KeywordPreset { get; set; } = new EffectKeywordPreset();
         
         [field: SerializeField, SaintsRow(true)] 
@@ -103,9 +106,21 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
                     break;
                 case Type.Periodic:
                     for (int i = 0; i < this.PeriodCount; i += 1) {
-                        await Awaitable.WaitForSecondsAsync(this.Interval, interrupt);
-                        foreach (Modifier modifier in modifiers) {
-                            target.ModifierConsumer.AddModifier(modifier);
+                        if (this.ShouldInterpolateBetweenTicks) {
+                            float progress = 0;
+                            while (progress < this.Interval) {
+                                await Awaitable.NextFrameAsync(interrupt);
+                                float delta = Mathf.Min(Time.deltaTime, this.Interval - progress);
+                                progress += Time.deltaTime;
+                                foreach (Modifier modifier in modifiers) {
+                                    target.ModifierConsumer.AddModifier(modifier * (delta / this.Interval));
+                                }
+                            }
+                        } else {
+                            await Awaitable.WaitForSecondsAsync(this.Interval, interrupt);
+                            foreach (Modifier modifier in modifiers) {
+                                target.ModifierConsumer.AddModifier(modifier);
+                            }
                         }
                     }
                     

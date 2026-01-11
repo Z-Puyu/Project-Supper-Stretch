@@ -7,5 +7,11 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
         ModifierValue Value
     ) {
         public static Modifier operator -(Modifier modifier) => modifier with { Value = -modifier.Value };
-    };
+
+        public static Modifier operator *(Modifier modifier, double multiplier) =>
+                modifier with { Value = modifier.Value * multiplier };
+
+        public static Modifier operator *(double multiplier, Modifier modifier) =>
+                modifier with { Value = modifier.Value * multiplier };
+    }
 }
