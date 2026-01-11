@@ -19102,6 +19102,38 @@ SkinnedMeshRenderer:
     m_Center: {x: -15.679912, y: -0.27777767, z: 0}
     m_Extent: {x: 20.23898, y: 15.40277, z: 13.306496}
   m_DirtyAABB: 0
+--- !u!1 &2337335256139320391
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 506932036770994415}
+  m_Layer: 0
+  m_Name: UI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &506932036770994415
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2337335256139320391}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3123894382537340082}
+  m_Father: {fileID: 3201459543287357664}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2337356166339032087
 GameObject:
   m_ObjectHideFlags: 0
@@ -32274,6 +32306,95 @@ Transform:
   - {fileID: 5540663922439560044}
   m_Father: {fileID: 290277334299679}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4253594664648656994
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3123894382537340082}
+  - component: {fileID: 6045959259392366400}
+  - component: {fileID: 7143448285222287953}
+  m_Layer: 0
+  m_Name: HUD
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3123894382537340082
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4253594664648656994}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 506932036770994415}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6045959259392366400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4253594664648656994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
+  m_PanelSettings: {fileID: 11400000, guid: 293af9233e5b1054aa08b1a9b70bbb49, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: 346f437c032c581458007e553f5c3ff9, type: 3}
+  m_SortingOrder: 0
+  m_Position: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+  m_PivotReferenceSize: 0
+  m_Pivot: 0
+  m_WorldSpaceCollider: {fileID: 0}
+--- !u!114 &7143448285222287953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4253594664648656994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0f942199c1042f2ad0bdc5af0c82df5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Scripts.UI::UI.Hud
+  <Presenters>k__BackingField:
+  - rid: 1692151951056961708
+  - rid: 1692151951056961709
+  <Owner>k__BackingField: {fileID: 8829115338478182532}
+  references:
+    version: 2
+    RefIds:
+    - rid: 1692151951056961708
+      type: {class: StatBarPresenter, ns: UI, asm: Scripts.UI}
+      data:
+        <Model>k__BackingField: {fileID: 6624264980163878195}
+        <View>k__BackingField: HealthBar (.health-bar)
+        <TrackedAttribute>k__BackingField: Health
+        <TrackedMaxAttribute>k__BackingField: Max Health
+    - rid: 1692151951056961709
+      type: {class: StatBarPresenter, ns: UI, asm: Scripts.UI}
+      data:
+        <Model>k__BackingField: {fileID: 6624264980163878195}
+        <View>k__BackingField: StaminaBar (.stamina-bar)
+        <TrackedAttribute>k__BackingField: Stamina
+        <TrackedMaxAttribute>k__BackingField: Max Stamina
 --- !u!1 &4256974226788895607
 GameObject:
   m_ObjectHideFlags: 0
@@ -57156,8 +57277,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7234192289941891906}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.25340134, y: 0.000000029099832, z: -0.000000007622733, w: 0.9673613}
-  m_LocalPosition: {x: 0, y: 2.25, z: -4}
+  m_LocalRotation: {x: -0.00000004234981, y: -0.00000006330537, z: -2.6809705e-15, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -71235,6 +71356,7 @@ Transform:
   - {fileID: 3384988132001304614}
   - {fileID: 3724551884916873635}
   - {fileID: 6576315276943627755}
+  - {fileID: 506932036770994415}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &6388006269725896587
@@ -71313,7 +71435,6 @@ MonoBehaviour:
   <ComponentRoot>k__BackingField: {fileID: 5972498177023485511}
   <RollAbility>k__BackingField: {fileID: 11400000, guid: 46e1df1ad72d91d45828c65fa4dad265, type: 2}
   <BackstepAbility>k__BackingField: {fileID: 11400000, guid: d1b5f047207a9004b88750d8f1cecf3e, type: 2}
-  <SprintAbility>k__BackingField: {fileID: 0}
 --- !u!114 &62607394211588175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74872,7 +74993,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Scripts.GameManagement::GameManagement.PlayerMovementInterpreter
   <Animator>k__BackingField: {fileID: 6388006269725896587}
-  <MovementSpeedAttribute>k__BackingField: Speed
   <LeftRightVelocityAnimatorParameter>k__BackingField: 2041851446
   <ForwardBackVelocityAnimatorParameter>k__BackingField: 72152147
   <AnimationBlendTime>k__BackingField: 0.1

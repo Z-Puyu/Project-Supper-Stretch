@@ -1,16 +1,17 @@
 using SaintsField;
+using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes.Evaluation {
     public enum ApproximationPolicy {
         Truncate,
         
-        [LabelText("Round to nearest")]
+        [InspectorName("Round to nearest")]
         RoundToNearest,
         
-        [LabelText("Round up")]
+        [InspectorName("Round up")]
         RoundUp,
         
-        [LabelText("Round down")]
+        [InspectorName("Round down")]
         RoundDown,
     }
 }

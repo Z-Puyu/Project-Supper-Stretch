@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CommonFrameworks.Collections;
+using CommonFrameworks.Maths;
 using CommonFrameworks.Processors;
 using GameplayAbilitiesSystem.Runtime.Attributes;
+using GameplayAbilitiesSystem.Runtime.Attributes.Evaluation;
 using SaintsField;
 using SaintsField.Playa;
 using UnityEngine;
@@ -55,20 +57,26 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
         }
 
         private Attribute Query(
-            ref AttributeQuery query, ModifierValue[] modifiers, in IProcessor<Attribute>[] processors
+            ref AttributeQuery query, ModifierValue[] modifiers, in IEvaluable<IAttributeReader>? max,
+            in IEvaluable<IAttributeReader>? min, in AttributeApproximator? approximator
         ) {
             this.CollectModifiers(query.Id, modifiers);
             if (!this.IsGlobalEnvironment && this.ParentEnvironment) {
-                return this.ParentEnvironment.Query(ref query, modifiers, processors);
+                return this.ParentEnvironment.Query(ref query, modifiers, max, min, approximator);
             }
 
             for (ModifierType op = ModifierType.Shift; op < ModifierType.Offset; op += 1) {
                 double value = modifiers[(int)op].ApplyTo(query.Value, op);
-                Attribute attribute = new Attribute(query.Source, query.Id, value, query.IsValueApproximated);
-                foreach (IProcessor<Attribute> processor in processors) {
-                    processor.Process(ref attribute);
+                if (max is not null) {
+                    value = Math.Min(max.Evaluate(query.Source), value);
                 }
-                
+
+                if (min is not null) {
+                    value = Math.Max(min.Evaluate(query.Source), value);
+                }
+
+                Attribute attribute = new Attribute(query.Source, query.Id, value, query.IsValueApproximated);
+                approximator?.Approximate(ref attribute);
                 query.Value = attribute.Value;
                 query.IsValueApproximated = attribute.HasBeenApproximated;
             }
@@ -76,9 +84,12 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
             return new Attribute(query.Source, query.Id, query.Value, query.IsValueApproximated);
         }
 
-        internal Attribute Query(ref AttributeQuery query, in IEnumerable<IProcessor<Attribute>>? processors = null) {
+        internal Attribute Query(
+            ref AttributeQuery query, in IEvaluable<IAttributeReader>? max, in IEvaluable<IAttributeReader>? min,
+            in AttributeApproximator? approximator
+        ) {
             ModifierValue[] modifiers = { ModifierValue.Zero, ModifierValue.Zero, ModifierValue.Zero };
-            return this.Query(ref query, modifiers, processors?.ToArray() ?? Array.Empty<IProcessor<Attribute>>());
+            return this.Query(ref query, modifiers, max, min, approximator);
         }
 
         public override string ToString() {

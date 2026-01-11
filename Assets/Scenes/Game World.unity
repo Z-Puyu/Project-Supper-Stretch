@@ -136,7 +136,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &447855964
 Transform:
   m_ObjectHideFlags: 0
@@ -381,6 +381,10 @@ PrefabInstance:
       propertyPath: <LocalSpace>k__BackingField
       value: 
       objectReference: {fileID: 1214551265}
+    - target: {fileID: 827690526734564352, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
+      propertyPath: 'managedReferences[-2]'
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 1358255194173204181, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: m_Name
       value: Test Player

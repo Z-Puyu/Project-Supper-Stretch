@@ -13,43 +13,288 @@ MonoBehaviour:
   m_Name: Character Attributes
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Attributes.AttributeDefinitionSheet
   <AttributeTypes>k__BackingField:
-  - <Id>k__BackingField: Speed
-    <Name>k__BackingField: Speed
-    displayName: Speed
-    <SubTypes>k__BackingField: []
   - <Id>k__BackingField: Attack
     <Name>k__BackingField: Attack
     displayName: Attack
+    <MinValue>k__BackingField:
+      rid: 1692151951056961748
+    <MaxValue>k__BackingField:
+      rid: -2
+    <ApproximatorOverride>k__BackingField:
+      rid: -2
+    <Derivation>k__BackingField:
+      <Seed>k__BackingField:
+        rid: 1692151951056961749
+      <CalculationSteps>k__BackingField: []
     <SubTypes>k__BackingField:
     - <Id>k__BackingField: Attack/Physical
       <Name>k__BackingField: Physical
       displayName: Physical Attack
+      <MinValue>k__BackingField:
+        rid: 1692151951056961750
+      <MaxValue>k__BackingField:
+        rid: -2
+      <ApproximatorOverride>k__BackingField:
+        rid: -2
+      <Derivation>k__BackingField:
+        <Seed>k__BackingField:
+          rid: 1692151951056961751
+        <CalculationSteps>k__BackingField: []
       <SubTypes>k__BackingField:
       - <Id>k__BackingField: Attack/Physical/Slash
         <Name>k__BackingField: Slash
         displayName: Slash Attack
+        <MinValue>k__BackingField:
+          rid: 1692151951056961752
+        <MaxValue>k__BackingField:
+          rid: -2
+        <ApproximatorOverride>k__BackingField:
+          rid: -2
+        <Derivation>k__BackingField:
+          <Seed>k__BackingField:
+            rid: -2
+          <CalculationSteps>k__BackingField: []
         <SubTypes>k__BackingField: []
       - <Id>k__BackingField: Attack/Physical/Thrash
         <Name>k__BackingField: Thrash
         displayName: Thrash Attack
+        <MinValue>k__BackingField:
+          rid: 1692151951056961754
+        <MaxValue>k__BackingField:
+          rid: -2
+        <ApproximatorOverride>k__BackingField:
+          rid: -2
+        <Derivation>k__BackingField:
+          <Seed>k__BackingField:
+            rid: -2
+          <CalculationSteps>k__BackingField: []
         <SubTypes>k__BackingField: []
       - <Id>k__BackingField: Attack/Physical/Smash
         <Name>k__BackingField: Smash
         displayName: Smash Attack
+        <MinValue>k__BackingField:
+          rid: 1692151951056961756
+        <MaxValue>k__BackingField:
+          rid: -2
+        <ApproximatorOverride>k__BackingField:
+          rid: -2
+        <Derivation>k__BackingField:
+          <Seed>k__BackingField:
+            rid: -2
+          <CalculationSteps>k__BackingField: []
         <SubTypes>k__BackingField: []
     - <Id>k__BackingField: Attack/Magic
       <Name>k__BackingField: Magic
       displayName: Magic Attack
+      <MinValue>k__BackingField:
+        rid: 1692151951056961758
+      <MaxValue>k__BackingField:
+        rid: -2
+      <ApproximatorOverride>k__BackingField:
+        rid: -2
+      <Derivation>k__BackingField:
+        <Seed>k__BackingField:
+          rid: -2
+        <CalculationSteps>k__BackingField: []
       <SubTypes>k__BackingField: []
     - <Id>k__BackingField: Attack/Elemental
       <Name>k__BackingField: Elemental
       displayName: Elemental Attack
+      <MinValue>k__BackingField:
+        rid: 1692151951056961760
+      <MaxValue>k__BackingField:
+        rid: -2
+      <ApproximatorOverride>k__BackingField:
+        rid: -2
+      <Derivation>k__BackingField:
+        <Seed>k__BackingField:
+          rid: 1692151951056961761
+        <CalculationSteps>k__BackingField: []
       <SubTypes>k__BackingField:
       - <Id>k__BackingField: Attack/Elemental/Fire
         <Name>k__BackingField: Fire
         displayName: Fire Attack
+        <MinValue>k__BackingField:
+          rid: 1692151951056961762
+        <MaxValue>k__BackingField:
+          rid: -2
+        <ApproximatorOverride>k__BackingField:
+          rid: -2
+        <Derivation>k__BackingField:
+          <Seed>k__BackingField:
+            rid: -2
+          <CalculationSteps>k__BackingField: []
         <SubTypes>k__BackingField: []
       - <Id>k__BackingField: Attack/Elemental/Lightning
         <Name>k__BackingField: Lightning
         displayName: Lightning Attack
+        <MinValue>k__BackingField:
+          rid: 1692151951056961764
+        <MaxValue>k__BackingField:
+          rid: -2
+        <ApproximatorOverride>k__BackingField:
+          rid: -2
+        <Derivation>k__BackingField:
+          <Seed>k__BackingField:
+            rid: -2
+          <CalculationSteps>k__BackingField: []
         <SubTypes>k__BackingField: []
+  - <Id>k__BackingField: Health
+    <Name>k__BackingField: Health
+    displayName: Health
+    <MinValue>k__BackingField:
+      rid: 1692151951056961766
+    <MaxValue>k__BackingField:
+      rid: -2
+    <ApproximatorOverride>k__BackingField:
+      rid: -2
+    <Derivation>k__BackingField:
+      <Seed>k__BackingField:
+        rid: -2
+      <CalculationSteps>k__BackingField: []
+    <SubTypes>k__BackingField: []
+  - <Id>k__BackingField: Max Health
+    <Name>k__BackingField: Max Health
+    displayName: Max Health
+    <MinValue>k__BackingField:
+      rid: 1692151951056961768
+    <MaxValue>k__BackingField:
+      rid: -2
+    <ApproximatorOverride>k__BackingField:
+      rid: -2
+    <Derivation>k__BackingField:
+      <Seed>k__BackingField:
+        rid: -2
+      <CalculationSteps>k__BackingField: []
+    <SubTypes>k__BackingField: []
+  - <Id>k__BackingField: Stamina
+    <Name>k__BackingField: Stamina
+    displayName: Stamina
+    <MinValue>k__BackingField:
+      rid: 1692151951056961770
+    <MaxValue>k__BackingField:
+      rid: -2
+    <ApproximatorOverride>k__BackingField:
+      rid: -2
+    <Derivation>k__BackingField:
+      <Seed>k__BackingField:
+        rid: -2
+      <CalculationSteps>k__BackingField: []
+    <SubTypes>k__BackingField: []
+  - <Id>k__BackingField: Max Stamina
+    <Name>k__BackingField: Max Stamina
+    displayName: Max Stamina
+    <MinValue>k__BackingField:
+      rid: 1692151951056961772
+    <MaxValue>k__BackingField:
+      rid: -2
+    <ApproximatorOverride>k__BackingField:
+      rid: -2
+    <Derivation>k__BackingField:
+      <Seed>k__BackingField:
+        rid: 1692151951056961773
+      <CalculationSteps>k__BackingField: []
+    <SubTypes>k__BackingField: []
+  - <Id>k__BackingField: Endurance
+    <Name>k__BackingField: Endurance
+    displayName: Endurance
+    <MinValue>k__BackingField:
+      rid: 1692151951056961774
+    <MaxValue>k__BackingField:
+      rid: -2
+    <ApproximatorOverride>k__BackingField:
+      rid: -2
+    <Derivation>k__BackingField:
+      <Seed>k__BackingField:
+        rid: -2
+      <CalculationSteps>k__BackingField: []
+    <SubTypes>k__BackingField: []
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 1692151951056961748
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 0
+    - rid: 1692151951056961749
+      type: {class: AttributeBasedValue, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <BackingAttribute>k__BackingField: 
+        <PreMultiplicationOffset>k__BackingField: 0
+        <Coefficient>k__BackingField: 1
+        <PostMultiplicationOffset>k__BackingField: 0
+    - rid: 1692151951056961750
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 0
+    - rid: 1692151951056961751
+      type: {class: AttributeBasedValue, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <BackingAttribute>k__BackingField: 
+        <PreMultiplicationOffset>k__BackingField: 0
+        <Coefficient>k__BackingField: 1
+        <PostMultiplicationOffset>k__BackingField: 0
+    - rid: 1692151951056961752
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 0
+    - rid: 1692151951056961754
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 0
+    - rid: 1692151951056961756
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 0
+    - rid: 1692151951056961758
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 0
+    - rid: 1692151951056961760
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 0
+    - rid: 1692151951056961761
+      type: {class: AttributeBasedValue, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <BackingAttribute>k__BackingField: 
+        <PreMultiplicationOffset>k__BackingField: 0
+        <Coefficient>k__BackingField: 1
+        <PostMultiplicationOffset>k__BackingField: 0
+    - rid: 1692151951056961762
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 0
+    - rid: 1692151951056961764
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 0
+    - rid: 1692151951056961766
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 0
+    - rid: 1692151951056961768
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 0
+    - rid: 1692151951056961770
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 0
+    - rid: 1692151951056961772
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 0
+    - rid: 1692151951056961773
+      type: {class: AttributeBasedValue, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <BackingAttribute>k__BackingField: Endurance
+        <PreMultiplicationOffset>k__BackingField: 0
+        <Coefficient>k__BackingField: 5
+        <PostMultiplicationOffset>k__BackingField: 0
+    - rid: 1692151951056961774
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 0

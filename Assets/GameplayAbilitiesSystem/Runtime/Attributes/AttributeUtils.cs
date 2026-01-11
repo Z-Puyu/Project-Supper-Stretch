@@ -5,18 +5,7 @@ using SaintsField;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes {
     public static class AttributeUtils {
-        public static AdvancedDropdownList<AttributeType> GetLeafTypes() {
-            AdvancedDropdownList<AttributeType> types = new AdvancedDropdownList<AttributeType>(
-                "Attributes",
-                Database<AttributeDefinitionSheet>.LoadedResources
-                                                  .SelectMany(sheet => sheet.GetDropdownLists())
-                                                  .OrderBy(type => type.displayName)
-            );
-            
-            return types;
-        }
-
-        public static AdvancedDropdownList<string> GetDropdownList() {
+        public static AdvancedDropdownList<string> GetLeafAttributes() {
             IEnumerable<AdvancedDropdownList<string>> lists = 
                     Database<AttributeDefinitionSheet>.LoadedResources
                                                       .SelectMany(type => type.GetKeyDropdownLists())

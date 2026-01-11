@@ -1,42 +1,79 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using CommonFrameworks.Processors;
+using CommonFrameworks.Maths;
+using GameplayAbilitiesSystem.Runtime.Attributes.Evaluation;
 using SaintsField;
 using SaintsField.Playa;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes {
     [Serializable]
-    public sealed class AttributeType : IComparable<AttributeType>, IEquatable<AttributeType> {
+    internal sealed class AttributeType : IComparable<AttributeType>, IEquatable<AttributeType> {
         [field: SerializeField, ReadOnly] public string Id { get; private set; } = string.Empty;
         [field: SerializeField] private string Name { get; set; } = string.Empty;
         [SerializeField] private string displayName = string.Empty;
-
-        [field: SerializeReference, ReferencePicker, ShowIf(nameof(this.IsLeaf))]
-        public List<IProcessor<Attribute>> Processors { get; private set; } = new List<IProcessor<Attribute>>();
         
-        [field: SerializeField]
-        public List<AttributeType> SubTypes { get; private set; } = new List<AttributeType>();
+        [field: SerializeReference, ReferencePicker, ShowIf(nameof(this.IsLeaf))]
+        internal IEvaluable<IAttributeReader>? MinValue { get; private set; } = new Constant();
+        
+        [field: SerializeReference, ReferencePicker, ShowIf(nameof(this.IsLeaf))]
+        internal IEvaluable<IAttributeReader>? MaxValue { get; private set; }
+        
+        [field: SerializeReference, ReferencePicker, ShowIf(nameof(this.IsLeaf))]
+        internal AttributeApproximator? ApproximatorOverride { get; private set; }
+        
+        [field: SerializeField, ShowIf(nameof(this.IsLeaf))]
+        internal AttributeCalculator? Derivation { get; private set; }
+        
+        [field: SerializeField] public List<AttributeType> SubTypes { get; private set; } = new List<AttributeType>();
         
         public string DisplayName => string.IsNullOrWhiteSpace(this.displayName) ? this.Name : this.displayName;
         private bool IsLeaf => this.SubTypes.Count == 0;
         
-#if UNITY_EDITOR
-        internal void Validate(string parent = "") {
-            this.Id = string.IsNullOrEmpty(parent) ? this.Name : $"{parent}/{this.Name}";
-            foreach (AttributeType def in this.SubTypes) {
-                def?.Validate(this.Id);
-            }
-        }
-#endif
-
         public int CompareTo(AttributeType? other) {
-            return other is not null ? string.CompareOrdinal(this.Id, other.Id) : 1;
+            if (other is null) {
+                return 1;
+            }
+            
+            IEnumerable<object> dependencies = Enumerable.Empty<object>();
+            if (this.MinValue is not null) {
+                dependencies = dependencies.Concat(this.MinValue.DependentParameters);
+            }
+            
+            if (this.MaxValue is not null) {
+                dependencies = dependencies.Concat(this.MaxValue.DependentParameters);
+            }
+            
+            if (this.Derivation is not null) {
+                dependencies = dependencies.Concat(this.Derivation.DependentParameters);
+            }
+            
+            HashSet<object> set = dependencies.ToHashSet();
+            return set.Contains(other) ? 1 : string.CompareOrdinal(this.Id, other.Id);
         }
         
         public bool Equals(AttributeType other) {
             return this.CompareTo(other) == 0;
+        }
+
+        internal bool HasChild(string id, [NotNullWhen(true)] out AttributeType? child) {
+            if (id == this.Id) {
+                child = this;
+                return true;
+            }
+            
+            if (id.StartsWith(this.Id)) {
+                foreach (AttributeType type in this.SubTypes) {
+                    if (type.HasChild(id, out child)) {
+                        return true;
+                    }
+                }    
+            }
+            
+            child = null;
+            return false;
         }
 
         internal AdvancedDropdownList<string> ToAdvancedDropdownList() {
@@ -50,15 +87,13 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
             return new AdvancedDropdownList<string>(this.DisplayName, children);
         }
         
-        internal AdvancedDropdownList<AttributeType> ToObjectAdvancedDropdownList() {
-            if (this.IsLeaf) {
-                return new AdvancedDropdownList<AttributeType>(this.DisplayName, this);
+#if UNITY_EDITOR
+        internal void Validate(string parent = "") {
+            this.Id = string.IsNullOrEmpty(parent) ? this.Name : $"{parent}/{this.Name}";
+            foreach (AttributeType def in this.SubTypes) {
+                def?.Validate(this.Id);
             }
-
-            List<AdvancedDropdownList<AttributeType>> children =
-                    this.SubTypes.ConvertAll(child => child.ToObjectAdvancedDropdownList());
-            children.Sort((a, b) => string.CompareOrdinal(a.displayName, b.displayName));
-            return new AdvancedDropdownList<AttributeType>(this.DisplayName, children);
         }
+#endif
     }
 }

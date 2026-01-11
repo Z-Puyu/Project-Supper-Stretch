@@ -25,7 +25,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         [field: SerializeField, TreeDropdown(nameof(this.AllAttributes))] 
         private string CostAttribute { get; set; } = string.Empty;
 
-        private AdvancedDropdownList<string> AllAttributes => AttributeUtils.GetDropdownList();
+        private AdvancedDropdownList<string> AllAttributes => AttributeUtils.GetLeafAttributes();
         
         internal bool IsAffordable(IAttributeReader consumer) {
             double cost = this.Amount?.Evaluate(consumer) ?? 0;

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes {
     public readonly record struct AttributeKey(string Value) : IComparable<AttributeKey>, IEnumerable<char> {
+        public static readonly AttributeKey Empty = new AttributeKey(string.Empty);
+        
         public int CompareTo(AttributeKey other) {
             return string.Compare(this.Value, other.Value, StringComparison.OrdinalIgnoreCase);
         }

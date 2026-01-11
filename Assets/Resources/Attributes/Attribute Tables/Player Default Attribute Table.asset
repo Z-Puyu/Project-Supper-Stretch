@@ -13,15 +13,13 @@ MonoBehaviour:
   m_Name: Player Default Attribute Table
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Attributes.AttributeTable
   <BaseValues>k__BackingField:
-  - <Attribute>k__BackingField:
-      <Id>k__BackingField: Attack/Elemental/Fire
-      <Name>k__BackingField: Fire
-      displayName: Fire Attack
-      <SubTypes>k__BackingField: []
-    <Value>k__BackingField: 2
-  - <Attribute>k__BackingField:
-      <Id>k__BackingField: Speed
-      <Name>k__BackingField: Speed
-      displayName: Speed
-      <SubTypes>k__BackingField: []
-    <Value>k__BackingField: 0
+  - <Attribute>k__BackingField: Max Health
+    <Value>k__BackingField: 100
+  - <Attribute>k__BackingField: Max Stamina
+    <Value>k__BackingField: 100
+  - <Attribute>k__BackingField: Health
+    <Value>k__BackingField: 100
+  - <Attribute>k__BackingField: Stamina
+    <Value>k__BackingField: 100
+  - <Attribute>k__BackingField: Endurance
+    <Value>k__BackingField: 10

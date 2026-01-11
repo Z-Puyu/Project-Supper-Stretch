@@ -1,0 +1,16 @@
+﻿using System.Diagnostics.CodeAnalysis;
+using SaintsField;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+namespace UI {
+    internal sealed class Hud : UiPage {
+        [NotNull] 
+        [field: SerializeField, Required] 
+        public GameObject? Owner { get; private set; }
+
+        public override void Open() { }
+
+        public override void Close() { }
+    }
+}

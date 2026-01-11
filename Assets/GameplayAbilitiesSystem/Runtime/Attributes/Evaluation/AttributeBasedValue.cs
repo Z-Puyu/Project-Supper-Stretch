@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using CommonFrameworks.Maths;
+using CommonFrameworks.Utilities;
 using SaintsField;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes.Evaluation {
     [Serializable]
-    internal sealed class AttributeBasedValue : IAttributeMagnitude {
+    internal sealed class AttributeBasedValue : IAttributeMagnitude, IEvaluable<IAttributeReader> {
         [field: SerializeField, TreeDropdown(nameof(this.AllAttributes))] 
         private string BackingAttribute { get; set; } = string.Empty;
         
@@ -14,12 +16,21 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes.Evaluation {
         [field: SerializeField] private double Coefficient { get; set; } = 1;
         [field: SerializeField] private double PostMultiplicationOffset { get; set; }
         
-        private AdvancedDropdownList<string> AllAttributes => AttributeUtils.GetDropdownList();
+        private AdvancedDropdownList<string> AllAttributes => AttributeUtils.GetLeafAttributes();
         
         public double Evaluate(IAttributeReader? attributes, IReadOnlyDictionary<string, double>? userData = null) {
             double attributesValue = attributes?.Query(this.BackingAttribute) ?? 0;
             return this.Coefficient * (attributesValue + this.PreMultiplicationOffset) + this.PostMultiplicationOffset;
         }
+
+        double IEvaluable<IAttributeReader>.Evaluate(IAttributeReader context) {
+            return this.Evaluate(context);
+        }
+
+        ICollection<object> IEvaluable<IAttributeReader>.DependentParameters =>
+                string.IsNullOrWhiteSpace(this.BackingAttribute)
+                        ? Array.Empty<object>()
+                        : new[] { this.BackingAttribute };
 
         public override string ToString() {
             StringBuilder sb = new StringBuilder();

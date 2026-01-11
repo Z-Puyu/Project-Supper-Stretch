@@ -1,14 +1,15 @@
-﻿using CommonFrameworks.Utilities;
+﻿using System.Diagnostics.CodeAnalysis;
+using CommonFrameworks.Utilities;
 using GameManagement;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace UI {
-    public sealed class MainMenuController : UiController {
-        private Button StartButton { set; get; }
-        private VisualElement OtherButtons { set; get; }
-        private Button NewGameButton { set; get; }
-        private Button QuitGameButton { set; get; }
+    public sealed class MainMenuPresenter : UiPresenter {
+        [NotNull] private Button? StartButton { set; get; }
+        [NotNull] private VisualElement? OtherButtons { set; get; }
+        [NotNull] private Button? NewGameButton { set; get; }
+        [NotNull] private Button? QuitGameButton { set; get; }
         
         private bool IsGameStarted { get; set; }
 

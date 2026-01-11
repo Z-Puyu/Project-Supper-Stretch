@@ -32,7 +32,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         public ModifierConfig() { }
 
         private AdvancedDropdownList<string> GetAllAttributes() {
-            return AttributeUtils.GetDropdownList();
+            return AttributeUtils.GetLeafAttributes();
         }
 
         internal bool IsApplicable(

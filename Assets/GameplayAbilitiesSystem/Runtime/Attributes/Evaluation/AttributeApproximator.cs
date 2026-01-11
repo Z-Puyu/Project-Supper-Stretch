@@ -1,10 +1,9 @@
 using System;
-using GameplayAbilitiesSystem.Runtime.Attributes.Evaluation;
 using UnityEngine;
 
-namespace GameplayAbilitiesSystem.Runtime.Attributes.Processors {
+namespace GameplayAbilitiesSystem.Runtime.Attributes.Evaluation {
     [Serializable]
-    public class AttributeApproximator : AttributeProcessor {
+    internal sealed class AttributeApproximator {
         private static readonly double[] Factors = { 1, 10, 100, 1000 };
         
         [field: SerializeField] private Precision PrecisionLevel { get; set; } = Precision.Integer;
@@ -12,7 +11,7 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes.Processors {
         [field: SerializeField]
         private ApproximationPolicy ApproximationPolicy { get; set; } = ApproximationPolicy.RoundToNearest;
         
-        protected override bool TryProcess(ref Attribute data) {
+        internal bool Approximate(ref Attribute data) {
             if (data.HasBeenApproximated) {
                 return false;
             }
