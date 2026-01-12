@@ -1,5 +1,4 @@
 using SaintsField.Playa;
-using SaintsField.Samples.Scripts.SaintsEditor;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
 {

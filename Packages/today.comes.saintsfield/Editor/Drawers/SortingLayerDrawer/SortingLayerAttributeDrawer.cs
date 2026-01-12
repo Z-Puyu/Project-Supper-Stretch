@@ -1,9 +1,5 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using SaintsField.Editor.Core;
+﻿using SaintsField.Editor.Core;
 using UnityEditor;
-using UnityEngine;
 
 namespace SaintsField.Editor.Drawers.SortingLayerDrawer
 {

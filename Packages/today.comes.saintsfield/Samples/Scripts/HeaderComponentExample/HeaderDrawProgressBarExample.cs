@@ -1,5 +1,4 @@
 using SaintsField.ComponentHeader;
-using SaintsField.Samples.Scripts.SaintsEditor;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif

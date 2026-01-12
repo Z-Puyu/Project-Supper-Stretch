@@ -1,4 +1,3 @@
-using System;
 using SaintsField.Playa;
 using UnityEngine;
 using UnityEngine.Events;

@@ -1,4 +1,3 @@
-using SaintsField;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor

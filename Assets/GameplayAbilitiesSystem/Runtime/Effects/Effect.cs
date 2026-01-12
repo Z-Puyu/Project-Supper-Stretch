@@ -2,15 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using CommonFrameworks.Utilities;
 using GameplayAbilitiesSystem.Runtime.Abilities;
 using GameplayAbilitiesSystem.Runtime.Modifiers;
 using GameplayKeywordsSystem.Runtime;
 using SaintsField;
 using SaintsField.Playa;
 using UnityEngine;
-using UnityEngine.Pool;
-using UnityEngine.Serialization;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
     [CreateAssetMenu(fileName = "New Effect", menuName = "Gameplay Abilities/Effect")]

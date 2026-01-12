@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Linq;
-using SaintsField.Playa;
 
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {

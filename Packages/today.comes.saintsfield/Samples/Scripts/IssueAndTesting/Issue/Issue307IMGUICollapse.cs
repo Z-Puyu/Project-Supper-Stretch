@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using SaintsField.Playa;
 using SaintsField.Samples.Scripts.IssueAndTesting.Issue46;
-using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue
 {

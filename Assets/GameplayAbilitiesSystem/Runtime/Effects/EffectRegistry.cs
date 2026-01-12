@@ -1,9 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using GameplayAbilitiesSystem.Runtime.Abilities;
-using GameplayKeywordsSystem.Runtime;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
     internal sealed class EffectRegistry {

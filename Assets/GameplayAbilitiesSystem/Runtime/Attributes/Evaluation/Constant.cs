@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using CommonFrameworks.Maths;
-using CommonFrameworks.Utilities;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes.Evaluation {

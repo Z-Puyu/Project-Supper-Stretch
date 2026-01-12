@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using SaintsField.Utils;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue

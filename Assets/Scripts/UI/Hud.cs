@@ -1,8 +1,6 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using SaintsField;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace UI {
     internal sealed class Hud : UiPage {

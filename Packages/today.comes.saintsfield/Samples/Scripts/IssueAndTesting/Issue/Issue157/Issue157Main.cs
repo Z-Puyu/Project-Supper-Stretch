@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using SaintsField.Samples.Scripts.SaintsEditor;
 
 namespace SaintsField.Samples.Scripts.IssueAndTesting.Issue.Issue157
 {

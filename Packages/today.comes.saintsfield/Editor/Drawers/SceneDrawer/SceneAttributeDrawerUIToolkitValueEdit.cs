@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using SaintsField.Editor.Utils;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.SceneDrawer
