@@ -179,7 +179,8 @@ namespace CommonFrameworks.Collections {
                 path.Add((node, element));
             }
 
-            return !this.HasSeparator || path[^1].node.Children.ContainsKey(this.Separator);
+            Node last = path[^1].node;
+            return last.IsEndOfKey || !this.HasSeparator || last.Children.ContainsKey(this.Separator);
         }
 
         public bool ContainsPrefix<P>(P prefix) where P : IEnumerable<T> {

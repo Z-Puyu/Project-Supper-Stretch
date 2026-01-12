@@ -1,15 +1,19 @@
 using System;
+using SaintsField;
 using UnityEngine;
 
-namespace Timers.Runtime {
-    public class CountdownTimer : Timer {
+namespace CommonFrameworks.Timers {
+    [Serializable]
+    public sealed class CountdownTimer : Timer {
         private double RemainingTime { get; set; }
-        private double Duration { get; set; }
-        private bool IsOneShot { get; set; }
+        [field: SerializeField, MinValue(0)] private double Duration { get; set; }
+        [field: SerializeField] private bool IsOneShot { get; set; }
         
-        public event Action OnTimeOut;
+        public event Action OnTimeOut = delegate { };
         
         public override double Progress => 1 - this.RemainingTime / this.Duration;
+        
+        private CountdownTimer() { }
 
         public CountdownTimer(double duration, bool isOneShot = false) {
             this.Duration = duration;
@@ -22,7 +26,7 @@ namespace Timers.Runtime {
                 return;
             }
 
-            this.OnTimeOut?.Invoke();
+            this.OnTimeOut.Invoke();
             if (this.IsOneShot) {
                 this.Stop();
             } else {
@@ -32,7 +36,7 @@ namespace Timers.Runtime {
 
         public override Timer Reset() {
             this.RemainingTime = this.Duration;
-            return this;
+            return base.Reset();
         }
         
         public CountdownTimer Reset(double duration) {

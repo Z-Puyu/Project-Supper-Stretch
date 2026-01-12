@@ -32,9 +32,9 @@ namespace CommonFrameworks.Utilities {
                 return;
             }
             
-            if (Singleton<T>.instance) {
+            if (Singleton<T>.instance && !object.ReferenceEquals(Singleton<T>.instance, this)) {
                 Object.Destroy(this.gameObject);
-            } else {
+            } else if (!Singleton<T>.instance) {
                 Singleton<T>.Instance = (this as T)!;
             }
         }

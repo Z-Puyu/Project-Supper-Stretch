@@ -51,7 +51,13 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
             }
             
             HashSet<object> set = dependencies.ToHashSet();
-            return set.Contains(other) ? 1 : string.CompareOrdinal(this.Id, other.Id);
+            return dependsOn(other) ? 1 : string.CompareOrdinal(this.Id, other.Id);
+
+            bool dependsOn(AttributeType type) {
+                return set.Contains(other) ||
+                       set.Any(item => item is string id && id == type.Id) ||
+                       set.Any(item => item is AttributeKey key && key == type.Id);
+            }
         }
         
         public bool Equals(AttributeType other) {

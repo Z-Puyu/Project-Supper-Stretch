@@ -118,11 +118,11 @@ namespace CommonFrameworks.Collections {
         }
 
         public void Add(K key, V value) {
-            if (!key.Any()) {
-                throw new ArgumentException("The key in a trie cannot be empty!", nameof(key));
-            }
-
             List<Entry> path = this.Trace(key);
+            if (path.Count <= 1) {
+                throw new ArgumentException("The key in a trie cannot be empty!", nameof(key));    
+            }
+            
             if (path[^1].IsEndOfKey) {
                 throw new ArgumentException($"An element with key {key} already exists!");
             }
@@ -178,7 +178,7 @@ namespace CommonFrameworks.Collections {
 
         #endregion
 
-        private List<Entry> Trace(K sequence) {
+        private List<Entry> Trace<S>(S sequence) where S : IEnumerable<T> {
             List<Entry> path = new List<Entry>();
             Entry curr = this.Root;
             path.Add(curr);
@@ -205,7 +205,8 @@ namespace CommonFrameworks.Collections {
                 path.Add((entry, element));
             }
 
-            return !this.HasSeparator || path[^1].entry.Children.ContainsKey(this.Separator);
+            Entry last = path[^1].entry;
+            return last.IsEndOfKey || !this.HasSeparator || last.Children.ContainsKey(this.Separator);
         }
 
         public bool ContainsPrefix<P>(P prefix) where P : IEnumerable<T> {

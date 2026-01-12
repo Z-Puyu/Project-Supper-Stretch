@@ -1,10 +1,10 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Template name="Health Bar" src="project://database/Assets/UI/Player/Health%20Bar.uxml?fileID=9197481963319205126&amp;guid=34b13dfd16661f74ebcb2a50b141f159&amp;type=3#Health Bar"/>
-    <Style src="project://database/Assets/UI/Style%20Sheets/Game%20Style%20Sheet.uss?fileID=7433441132597879392&amp;guid=084c62a9d0463724f95da32f318b0b94&amp;type=3"/>
+    <ui:Template name="Stat Bar" src="project://database/Assets/UI/Player/Stat%20Bar.uxml?fileID=9197481963319205126&amp;guid=34b13dfd16661f74ebcb2a50b141f159&amp;type=3#Stat Bar"/>
+    <Style src="project://database/Assets/UI/Style%20Sheets/Game%20Style%20Sheet.uss?fileID=7433441132597879392&amp;guid=084c62a9d0463724f95da32f318b0b94&amp;type=3#Game Style Sheet"/>
     <ui:VisualElement style="flex-grow: 1;">
         <ui:VisualElement name="Vitals" style="flex-grow: 1; bottom: auto; top: auto; width: auto; margin-top: 20px; margin-right: 20px; margin-bottom: 20px; margin-left: 20px;">
-            <ui:Instance template="Health Bar" name="HealthBar" class="health-bar" style="width: 500px; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px;"/>
-            <ui:Instance template="Health Bar" name="StaminaBar" class="stamina-bar" style="width: 500px; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px;"/>
+            <ui:Instance template="Stat Bar" name="HealthBar" class="health-bar" style="width: 300px;"/>
+            <ui:Instance template="Stat Bar" name="StaminaBar" class="stamina-bar" style="width: 300px;"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

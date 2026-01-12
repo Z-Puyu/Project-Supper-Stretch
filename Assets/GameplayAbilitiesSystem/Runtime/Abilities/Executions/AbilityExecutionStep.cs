@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
@@ -9,10 +10,13 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
         protected Ability? OwnerAbility { get; private set; }
         [field: SerializeField] protected bool WillEndAbilityOnCompletion { get; private set; }
 
-        async Awaitable IAbilityExecutor.Run(AbilitySystem system, Ability ability, CancellationToken interrupt) {
+        async Awaitable IAbilityExecutor.Run(
+            AbilitySystem system, Ability ability, CancellationToken interrupt,
+            IReadOnlyDictionary<string, double>? userData
+        ) {
             this.OwnerSystem = system;
             this.OwnerAbility = ability;
-            await this.Execute(system, ability, interrupt);
+            await this.Execute(system, ability, interrupt, userData);
         }
 
         /// <summary>
@@ -21,9 +25,11 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
         /// <param name="system">The ability system that initiated the ability</param>
         /// <param name="ability">The ability that is being executed</param>
         /// <param name="interrupt">The cancellation token for interrupting the ability externally</param>
+        /// <param name="userData">Optional user data for the ability</param>
         /// <returns>An awaitable that completes when the execution is finished</returns>
         protected abstract Awaitable Execute(
-            AbilitySystem system, Ability ability, CancellationToken interrupt
+            AbilitySystem system, Ability ability, CancellationToken interrupt,
+            IReadOnlyDictionary<string, double>? userData = null
         );
 
         /// <summary>

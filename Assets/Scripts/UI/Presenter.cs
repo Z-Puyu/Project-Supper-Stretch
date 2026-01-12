@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using CommonFrameworks.Extensions;
 using SaintsField;
 using UnityEngine;
@@ -18,7 +19,7 @@ namespace UI {
         string IPresenter.Name => this.View.Split(' ')[0];
         
         protected DropdownList<string> UniqueElements => this.Owner
-                ? this.Owner.FetchUniqueElements()
+                ? this.Owner.FetchUniqueElements<V>()
                 : new DropdownList<string>();
 
         void IPresenter.Bind(UiPage page) {
@@ -27,7 +28,9 @@ namespace UI {
 
         public virtual void Bind(GameObject model, VisualElement view) {
             VisualElementIdentifier identifier = VisualElementIdentifier.Parse(this.View);
-            this.ViewRoot = view.Q<V>(identifier.Name, identifier.Classes);
+            this.ViewRoot = identifier.Name.Split('/')
+                                      .Aggregate(view, (current, part) => current.Q(part))
+                                      .Q<V>(classes: identifier.Classes);
         }
         
         public abstract void Present(T data);

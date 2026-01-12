@@ -1,8 +1,5 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using Characters.Events;
+﻿using System.Diagnostics.CodeAnalysis;
 using CommonFrameworks.Components;
-using CommonFrameworks.Events;
 using CommonFrameworks.Utilities;
 using GameCharacterBehaviours.Runtime.Movement;
 using GameplayAbilitiesSystem.Runtime.Abilities;

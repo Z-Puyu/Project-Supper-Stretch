@@ -37,6 +37,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
 
         public IAttributeReader AttributeReader => this.AttributeSet;
         public ITaggable<Keyword> EmitterKeywordContainer => this.KeywordContainer;
+        
         IAttributeReader IEffectReceiverFacade.AttributeReader => this.AttributeSet;
         public IModifiable ModifierConsumer => this.AttributeSet;
         ITaggable<Keyword> IEffectReceiverFacade.ReceiverKeywordContainer => this.KeywordContainer;
@@ -196,8 +197,12 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             return this.EffectRegistry.Register(effect, interrupt);
         }
         
-        public void StopEffects(Ability? ability, Effect? type, Keyword keyword) {
-            this.EffectRegistry.Stop(ability, type, keyword);
+        void IEffectReceiverFacade.StopEffects(EffectDescriptor effect) {
+            this.EffectRegistry.Stop(effect);
+        }
+        
+        void IEffectEmitterFacade.Apply(Effect effect, IEffectReceiverFacade target) {
+            effect.Apply(this, target);
         }
 
         public IEnumerator<Ability> GetEnumerator() {

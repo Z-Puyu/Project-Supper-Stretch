@@ -145,7 +145,7 @@ MonoBehaviour:
     <MinValue>k__BackingField:
       rid: 1692151951056961766
     <MaxValue>k__BackingField:
-      rid: -2
+      rid: 1692151978318364827
     <ApproximatorOverride>k__BackingField:
       rid: -2
     <Derivation>k__BackingField:
@@ -173,7 +173,7 @@ MonoBehaviour:
     <MinValue>k__BackingField:
       rid: 1692151951056961770
     <MaxValue>k__BackingField:
-      rid: -2
+      rid: 1692151978318364826
     <ApproximatorOverride>k__BackingField:
       rid: -2
     <Derivation>k__BackingField:
@@ -298,3 +298,17 @@ MonoBehaviour:
       type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
       data:
         <Value>k__BackingField: 0
+    - rid: 1692151978318364826
+      type: {class: AttributeBasedValue, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <BackingAttribute>k__BackingField: Max Stamina
+        <PreMultiplicationOffset>k__BackingField: 0
+        <Coefficient>k__BackingField: 1
+        <PostMultiplicationOffset>k__BackingField: 0
+    - rid: 1692151978318364827
+      type: {class: AttributeBasedValue, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <BackingAttribute>k__BackingField: Max Health
+        <PreMultiplicationOffset>k__BackingField: 0
+        <Coefficient>k__BackingField: 1
+        <PostMultiplicationOffset>k__BackingField: 0

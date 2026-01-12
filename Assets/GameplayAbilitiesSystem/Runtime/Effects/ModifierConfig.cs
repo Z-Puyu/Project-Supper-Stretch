@@ -24,8 +24,6 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
 
         [field: SerializeField, ShowIf(nameof(this.IsAttributeBased))]
         private ValueSource BackingAttributeSource { get; set; } = ValueSource.Instigator;
-
-        [field: SerializeField] private EffectConditionPreset? Condition { get; set; } = null;
         
         private bool IsAttributeBased => this.Value is AttributeBasedValue;
 
@@ -35,15 +33,9 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
             return AttributeUtils.GetLeafAttributes();
         }
 
-        internal bool IsApplicable(
-            IEffectEmitterFacade source, IEffectReceiverFacade target, IReadOnlyDictionary<string, double>? userData,
-            out Modifier modifier
+        internal Modifier Instantiate(
+            IEffectEmitterFacade source, IEffectReceiverFacade target, IReadOnlyDictionary<string, double>? userData
         ) {
-            if (this.Condition is not null && !this.Condition.IsApplicable(source, target)) {
-                modifier = default;
-                return false;
-            }
-            
             IAttributeReader? attributes = this.BackingAttributeSource switch {
                 ValueSource.Target => target.AttributeReader,
                 ValueSource.Instigator => source.AttributeReader,
@@ -52,11 +44,9 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
                 )
             };
 
-            modifier = new Modifier(
+            return new Modifier(
                 this.Target, this.Type, ModifierValue.Of(this.Value.Evaluate(attributes, userData))
             );
-            
-            return true;
         }
 
         public override string ToString() {

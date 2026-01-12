@@ -10,29 +10,29 @@ namespace UI {
     [DisallowMultipleComponent, RequireComponent(typeof(UIDocument))]
     public abstract class UiPage : MonoBehaviour, IPage {
         [NotNull] private UIDocument? Document { get; set; }
-        private VisualElement Root => this.Document.rootVisualElement;
+        private protected VisualElement Root => this.Document.rootVisualElement;
 
         [field: SerializeReference, ReferencePicker, FieldLabelText(nameof(this.LabelPresenter), true)]
-        private List<IPresenter> Presenters { get; set; } = new List<IPresenter>();
+        private protected List<IPresenter> Presenters { get; private set; } = new List<IPresenter>();
 
         private void Awake() {
             this.Document = this.GetComponent<UIDocument>();
         }
-        
+
         private string LabelPresenter(IPresenter presenter, int index) {
             return $"[{index}] {presenter.Name}";
         }
         
-        internal DropdownList<string> FetchUniqueElements() {
+        internal DropdownList<string> FetchUniqueElements<V>() where V : VisualElement {
             VisualElement root = this.Document ? this.Root : this.GetComponent<UIDocument>().rootVisualElement;
-            IEnumerable<(string, string)> identifiers =
-                    root.FetchNamedChildren<VisualElement>().OrderBy(element => element.name).Select(selector);
-            
+            IEnumerable<(string, string)> identifiers = root.FetchNamedChildren<V>()
+                                                            .OrderBy(element => element.name)
+                                                            .Select(selector);
             return new DropdownList<string>(identifiers);
 
-            static (string, string) selector(VisualElement element) {
-                VisualElementIdentifier id = new VisualElementIdentifier(element);
-                return (id.ToString(), id.ToString());
+            (string, string) selector(V element) {
+                VisualElementIdentifier id = new VisualElementIdentifier(element, root);
+                return string.IsNullOrWhiteSpace(id.Name) ? ("root", id.ToString()) : (id.ToString(), id.ToString());
             }
         }
 

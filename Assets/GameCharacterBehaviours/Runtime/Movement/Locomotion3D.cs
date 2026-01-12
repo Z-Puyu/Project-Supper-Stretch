@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using CommonFrameworks.Extensions;
 using SaintsField;
 using UnityEngine;
@@ -12,6 +13,10 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         private Transform? CameraSpace { get; set; }
 
         [field: SerializeField] private Animator? Animator { get; set; }
+        [field: SerializeField] private bool AllowRotationWhenNotMoving { get; set; }
+
+        [field: SerializeReference, Required, ReferencePicker]
+        private IRotator? Rotator { get; set; } = new SmoothDampRotator();
         
         private bool UseRootMotion { get; set; } = false;
         
@@ -40,21 +45,36 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             this.MoveBy(this.PlanarDirection3D * (deltaTime * this.CurrentSpeed));
         }
 
-        protected override void Rotate() {
-            if (!this.IsMoving) {
+        protected override void Rotate(float deltaTime) {
+            if (!this.AllowRotationWhenNotMoving && !this.IsMoving) {
                 return;
             }
             
             Vector3 forward = this.CameraSpace.forward;
-            Quaternion target = Quaternion.LookRotation(forward);
-            Quaternion rotation = this.OwnerTransform.rotation;
-            float diff = Vector3.Angle(forward, this.OwnerTransform.forward);
-            if (diff < 1) {
-                return;
-            }
+            this.Rotator?.RotateTowards(this.OwnerTransform, forward, deltaTime);
+            // float yaw = Mathf.Atan2(forward.x, forward.z) * Mathf.Rad2Deg;
+            // this.SmoothedYaw = Mathf.MoveTowardsAngle(this.SmoothedYaw, yaw, 720 * Time.deltaTime);
+            // // Quaternion target = Quaternion.LookRotation(forward);
+            // Quaternion target = Quaternion.Euler(0f, this.SmoothedYaw, 0f);
+            // if (Quaternion.Angle(this.OwnerTransform.rotation, target) <= 1) {
+            //     this.OwnerTransform.rotation = target;
+            //     return;
+            // }
+            //
+            // // Quaternion rotation = this.OwnerTransform.rotation;
+            // // float diff = Vector3.Angle(forward, this.OwnerTransform.forward);
+            // // if (diff < 0.001) {
+            // //     return;
+            // // }
+            //
+            // this.OwnerTransform.rotation = Quaternion.RotateTowards(
+            //     this.OwnerTransform.rotation,
+            //     target,
+            //     this.RotationSpeed * Time.deltaTime
+            // );
             
-            float duration = diff / this.RotationSpeed;
-            this.OwnerTransform.rotation = Quaternion.Slerp(rotation, target, Mathf.Clamp01(Time.deltaTime / duration));
+            // float duration = diff / this.RotationSpeed;
+            // this.OwnerTransform.rotation = Quaternion.Slerp(rotation, target, Mathf.Clamp01(Time.deltaTime / duration));
 #if DEBUG
             Vector3 position = this.OwnerTransform.position;
             Debug.DrawRay(position, this.OwnerTransform.forward * 100, Color.red);

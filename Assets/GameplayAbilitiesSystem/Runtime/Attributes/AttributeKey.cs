@@ -15,7 +15,7 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         }
 
         public override string ToString() {
-            return this.Value.Trim().ToLower();
+            return this.Value.Trim();
         }
 
         IEnumerator IEnumerable.GetEnumerator() {

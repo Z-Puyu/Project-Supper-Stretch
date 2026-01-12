@@ -1,14 +1,9 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using Characters.Events;
-using CommonFrameworks.Events;
+﻿using System.Diagnostics.CodeAnalysis;
 using CommonFrameworks.Utilities;
 using GameCharacterBehaviours.Runtime.Movement;
-using GameplayAbilitiesSystem.Runtime.Attributes;
 using SaintsField;
 using SaintsField.Playa;
 using UnityEngine;
-using UnityEngine.Animations;
 
 namespace Characters.Player {
     [DisallowMultipleComponent, RequireComponent(typeof(Locomotion))]

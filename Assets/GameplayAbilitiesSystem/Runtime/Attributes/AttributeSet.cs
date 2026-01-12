@@ -54,7 +54,6 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
             }
 
             this.Attributes[updated.Id].Value = updated.Value;
-            this.OnAnyAttributeUpdated?.Invoke(key, new AttributeChange(oldValue, node.Value));
         }
 
         private Attribute Query(
@@ -119,7 +118,6 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         private Node AddNode(AttributeKey key, double value, AttributeType? type = null) {
             Node node = new Node(this, key, value, type);
             node.OnValueChanged += this.OnAnyAttributeUpdated.Invoke;
-            this.Attributes.Add(key, node);
             return node;
         }
 
@@ -184,7 +182,7 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
             internal event Action<AttributeKey, AttributeChange> OnValueChanged = delegate { };
 
             private void Reevaluate() {
-                if (this.Derivation is not null) {
+                if (this.Derivation is not null && this.Derivation.Exists) {
                     this.Owner.SetBase(this.Key, this.Derivation.Evaluate(this.Owner));
                 } else {
                     this.Owner.Evaluate(this.Key);
@@ -230,6 +228,7 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
                     }
                 }
 
+                owner.Attributes.Add(key, this);
                 this.Reevaluate();
             }
         }

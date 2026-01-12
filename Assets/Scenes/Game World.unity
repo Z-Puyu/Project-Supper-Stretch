@@ -385,6 +385,14 @@ PrefabInstance:
       propertyPath: 'managedReferences[-2]'
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 827690526734564352, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
+      propertyPath: managedReferences[1692151951056961708].<View>k__BackingField
+      value: Vitals/HealthBar/StatBar (.unity-progress-bar)
+      objectReference: {fileID: 0}
+    - target: {fileID: 827690526734564352, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
+      propertyPath: managedReferences[1692151951056961709].<View>k__BackingField
+      value: Vitals/StaminaBar/StatBar (.unity-progress-bar)
+      objectReference: {fileID: 0}
     - target: {fileID: 1358255194173204181, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: m_Name
       value: Test Player
@@ -435,32 +443,40 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6013413687176798642, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 2.25
       objectReference: {fileID: 0}
     - target: {fileID: 6013413687176798642, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -10
+      value: -4
       objectReference: {fileID: 0}
     - target: {fileID: 6013413687176798642, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.9673613
       objectReference: {fileID: 0}
     - target: {fileID: 6013413687176798642, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.00000004234981
+      value: 0.25340134
       objectReference: {fileID: 0}
     - target: {fileID: 6013413687176798642, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.00000006330537
+      value: 0.000000029099832
       objectReference: {fileID: 0}
     - target: {fileID: 6013413687176798642, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -2.6809705e-15
+      value: -0.000000007622733
       objectReference: {fileID: 0}
     - target: {fileID: 7903798642183644050, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: <LocalSpace>k__BackingField
       value: 
       objectReference: {fileID: 1214551265}
+    - target: {fileID: 8561346829058101622, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
+      propertyPath: <RotationSpeed>k__BackingField
+      value: 360
+      objectReference: {fileID: 0}
+    - target: {fileID: 8561346829058101622, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
+      propertyPath: managedReferences[1000].<SmoothTime>k__BackingField
+      value: 0.12
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 0}
     m_RemovedGameObjects: []

@@ -17,15 +17,12 @@ MonoBehaviour:
   <Costs>k__BackingField: []
   <Conditions>k__BackingField:
   - rid: 1692151863182360969
-  - rid: 1692151863182360970
-  <ExecutionSteps>k__BackingField: []
+  <ExecutionSteps>k__BackingField:
+  - rid: 1692151973348376681
   <SideEffect>k__BackingField:
     <KeywordPreset>k__BackingField:
-      <TargetReceivesKeywords>k__BackingField:
-      - Status/Sprinting
-      <TargetRemovesKeywords>k__BackingField:
-      - Status/Running
-      - Status/Walking
+      <TargetReceivesKeywords>k__BackingField: []
+      <TargetRemovesKeywords>k__BackingField: []
       <SourceReceivesKeywords>k__BackingField: []
       <SourceRemovesKeywords>k__BackingField: []
     <ModifierPreset>k__BackingField:
@@ -38,10 +35,9 @@ MonoBehaviour:
       data:
         <Keywords>k__BackingField:
         - Character Flags/Movement Blocked
-        - Status/Sprinting
-        - Status/Walking
-    - rid: 1692151863182360970
-      type: {class: RequiredKeywords, ns: GameplayAbilitiesSystem.Runtime.Abilities.Predicate, asm: GameplayAbilitiesSystem.Runtime}
+    - rid: 1692151973348376681
+      type: {class: ApplyEffectsOnSelf, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
       data:
-        <Keywords>k__BackingField:
-        - Status/Running
+        <WillEndAbilityOnCompletion>k__BackingField: 1
+        <Effects>k__BackingField:
+        - {fileID: 11400000, guid: 87a347297b1e3b345b8b5c6e5e39b356, type: 2}

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Timers.Runtime {
+namespace CommonFrameworks.Timers {
     public static class TimerSubsystem {
         private static readonly HashSet<Timer> Timers = new HashSet<Timer>();
         private static readonly List<Timer> Sweep = new List<Timer>();
@@ -21,6 +21,10 @@ namespace Timers.Runtime {
             TimerSubsystem.Sweep.Clear();
             TimerSubsystem.Sweep.AddRange(TimerSubsystem.Timers);
             foreach (Timer timer in TimerSubsystem.Sweep) {
+                if (!timer.IsRunning) {
+                    continue;
+                }
+                
                 timer.Tick();
             }
         }

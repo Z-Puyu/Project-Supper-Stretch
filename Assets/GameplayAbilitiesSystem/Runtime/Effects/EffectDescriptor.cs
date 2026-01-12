@@ -1,18 +1,35 @@
-﻿using GameplayAbilitiesSystem.Runtime.Abilities;
+﻿using System;
+using GameplayAbilitiesSystem.Runtime.Abilities;
 using GameplayKeywordsSystem.Runtime;
+using SaintsField;
+using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
-    internal readonly record struct EffectDescriptor(
-        Ability? SourceAbility = null,
-        Effect? SourceEffect = null,
-        Keyword Tag = default
-    ) {
-        public static EffectDescriptor Empty { get; } = new EffectDescriptor();
+    [Serializable]
+    internal record struct EffectDescriptor {
+        [field: SerializeField] private Ability? SourceAbility { get; set; }
+        [field: SerializeField] private Effect? SourceEffect { get; set; } = null;
         
-        internal bool IsOnePossibleCaseOf(Ability? ability = null, Effect? effect = null, Keyword keyword = default) {
-            bool haveDifferentSourceAbility = !ability || ability == this.SourceAbility;
-            bool haveDifferentSourceEffect = !effect || effect == this.SourceEffect;
-            bool haveDifferentTag = this.Tag.StartsWith(keyword);
+        [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))] 
+        private string Tag { get; set; }
+        
+        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.Fetch<EffectTagSheet>();
+
+        internal EffectDescriptor(Effect? effect, Ability? ability = null) {
+            this.SourceAbility = ability;
+            this.SourceEffect = effect;
+            this.Tag = effect ? effect.Tag : string.Empty;
+        }
+        
+        internal EffectDescriptor(string tag, Ability? ability = null) {
+            this.SourceAbility = ability;
+            this.Tag = tag;
+        }
+        
+        internal bool IsOnePossibleCaseOf(in EffectDescriptor descriptor) {
+            bool haveDifferentSourceAbility = !descriptor.SourceAbility || descriptor.SourceAbility == this.SourceAbility;
+            bool haveDifferentSourceEffect = !descriptor.SourceEffect || descriptor.SourceEffect == this.SourceEffect;
+            bool haveDifferentTag = this.Tag.StartsWith(descriptor.Tag);
             return !haveDifferentSourceAbility && !haveDifferentSourceEffect && !haveDifferentTag;
         }
     }

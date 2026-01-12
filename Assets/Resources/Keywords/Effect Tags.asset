@@ -37,3 +37,9 @@ MonoBehaviour:
       - <Name>k__BackingField: Jump
         <Path>k__BackingField: Effects/Locomotion/Jump
         <Children>k__BackingField: []
+    - <Name>k__BackingField: Regen
+      <Path>k__BackingField: Effects/Regen
+      <Children>k__BackingField:
+      - <Name>k__BackingField: Stamina
+        <Path>k__BackingField: Effects/Regen/Stamina
+        <Children>k__BackingField: []

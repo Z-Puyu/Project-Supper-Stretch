@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UIElements;
 
@@ -8,8 +9,18 @@ namespace UI {
         internal string Name { get; private set; }
         internal string[] Classes { get; private set; }
         
-        internal VisualElementIdentifier(VisualElement element) {
-            this.Name = element.name;
+        internal VisualElementIdentifier(VisualElement element, VisualElement? root = null) {
+            ICollection<string> path = new List<string>();
+            VisualElement? curr = element;
+            while (curr != root && curr is not null) {
+                if (!string.IsNullOrWhiteSpace(curr.name)) {
+                    path.Add(curr.name);
+                }
+                
+                curr = curr.parent;
+            }
+            
+            this.Name = string.Join('/', path.Reverse());
             this.Classes = element.GetClasses().ToArray();
         }
 
@@ -17,7 +28,7 @@ namespace UI {
             string[] tokens = id.Split(' ');
             return new VisualElementIdentifier {
                 Name = tokens[0],
-                Classes = tokens[1][1..^2].Split(' ').Select(@class => @class[1..]).ToArray()
+                Classes = tokens[1][1..^1].Split(' ').Select(@class => @class[1..]).ToArray()
             };
         }
 

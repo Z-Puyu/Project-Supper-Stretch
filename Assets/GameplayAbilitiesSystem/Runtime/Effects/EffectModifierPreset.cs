@@ -17,10 +17,8 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         internal IEnumerable<Modifier> Apply(
             IEffectEmitterFacade source, IEffectReceiverFacade target, IReadOnlyDictionary<string, double>? userData
         ) {
-            foreach (ModifierConfig modifierConfig in this.Modifiers) {
-                if (modifierConfig.IsApplicable(source, target, userData, out Modifier modifier)) {
-                    yield return modifier;
-                }
+            foreach (ModifierConfig config in this.Modifiers) {
+                yield return config.Instantiate(source, target, userData);
             }
         }
     }

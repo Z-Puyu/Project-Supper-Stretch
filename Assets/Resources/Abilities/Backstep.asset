@@ -14,11 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Abilities.Ability
   <Tags>k__BackingField:
   - Ability/Movement/Dodge
-  <KeywordsToGrantWhileRunning>k__BackingField:
-  - Character Flags/In Action
-  - Character Flags/Movement Blocked
-  - Character Flags/Rotation Blocked
-  <KeywordsToRevokeWhileRunning>k__BackingField: []
   <Costs>k__BackingField: []
   <Conditions>k__BackingField:
   - rid: 1692151751057866752
@@ -47,20 +42,12 @@ MonoBehaviour:
         <Clip>k__BackingField: {fileID: -5558953238165532788, guid: e55ef2f4572af804f9745df51162dfe7, type: 3}
         <AnimationSignals>k__BackingField: []
         <AnimationEnd>k__BackingField:
-        - rid: 1692151863182360961
+        - rid: 1692151973348376702
         <AnimationInterrupt>k__BackingField:
-        - rid: 1692151863182360963
-    - rid: 1692151863182360961
-      type: {class: EndEffects, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
-      data:
-        <WillEndAbilityOnCompletion>k__BackingField: 1
-        <SourceAbility>k__BackingField: {fileID: 0}
-        <EffectType>k__BackingField: {fileID: 11400000, guid: 95464a4a295bf5246b5250478771ac9c, type: 2}
-        <EffectTag>k__BackingField: 
-    - rid: 1692151863182360963
-      type: {class: EndEffects, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
-      data:
-        <WillEndAbilityOnCompletion>k__BackingField: 1
-        <SourceAbility>k__BackingField: {fileID: 0}
-        <EffectType>k__BackingField: {fileID: 11400000, guid: 95464a4a295bf5246b5250478771ac9c, type: 2}
-        <EffectTag>k__BackingField: 
+        - rid: 1692151973348376703
+    - rid: 1692151973348376702
+      type: {class: EndAbility, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
+      data: 
+    - rid: 1692151973348376703
+      type: {class: EndAbility, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
+      data: 

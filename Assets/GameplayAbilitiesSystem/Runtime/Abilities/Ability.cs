@@ -26,7 +26,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         
         [field: SerializeField] private AbilityEffect? SideEffect { get; set; }
 
-        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.Fetch<AbilityTagSheet>();
+        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.FetchLeaves<AbilityTagSheet>();
 
         private string LabelCondition(object condition) {
             return condition.GetType().Name;
@@ -41,8 +41,12 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                 activation = default;
                 return false;
             }
+            
+            foreach (Cost cost in this.Costs) {
+                if (cost.IsAffordable(system.AttributeReader)) {
+                    continue;
+                }
 
-            if (this.Costs.Exists(cost => !cost.IsAffordable(system.AttributeReader))) {
                 activation = default;
                 return false;
             }
@@ -63,7 +67,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(interrupt, death);
             for (int i = 0; i < this.ExecutionSteps.Count; i += 1) {
                 try {
-                    await this.ExecutionSteps[i].Run(system, this, cts.Token);
+                    await this.ExecutionSteps[i].Run(system, this, cts.Token, userData);
                     this.ExecutionSteps[i].Complete();
                 } catch (OperationCanceledException) {
                     system.Stop(this);
@@ -71,7 +75,11 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                 }
             }
 
-            await AwaitableExtensions.WaitUntilAsync(() => !system.IsRunningAbility(this));
+            await AwaitableTask.WaitUntilAsync(
+                (system, this),
+                ((AbilitySystem system, Ability ability) args) => !args.system.IsRunningAbility(args.ability)
+            );
+            
             this.SideEffect?.Stop(system);
         }
     }

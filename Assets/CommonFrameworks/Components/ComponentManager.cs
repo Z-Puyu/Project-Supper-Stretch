@@ -55,19 +55,20 @@ namespace CommonFrameworks.Components {
             return true;
         }
         
-        public bool HasComponent<T>() where T : BehaviourComponent {
-            return this.Components.ContainsKey(typeof(T)) || this.BaseComponents.ContainsKey(typeof(T));
+        public bool HasComponent<T>() where T : class {
+            return this.Components.ContainsKey(typeof(T)) || this.BaseComponents.ContainsKey(typeof(T)) ||
+                   this.GetClosestComponentInProperChildren<T>() != null;
         }
         
-        public bool HasComponent<T>([NotNullWhen(true)] out T? component) where T : BehaviourComponent {
+        public bool HasComponent<T>([NotNullWhen(true)] out T? component) where T : class {
             if (this.Components.TryGetValue(typeof(T), out BehaviourComponent c) ||
                 this.BaseComponents.TryGetValue(typeof(T), out c)) {
-                component = (T)c;
-                return true;
+                component = c as T;
+                return component != null;
             }
-
-            component = null;
-            return false;
+            
+            component = this.GetClosestComponentInProperChildren<T>();
+            return component != null;
         }
 
         public T GetOrAdd<T>() where T : BehaviourComponent {
@@ -75,6 +76,11 @@ namespace CommonFrameworks.Components {
                 return component;
             }
 
+            component = this.GetClosestComponentInProperChildren<T>();
+            return component ? component : this.Add<T>();
+        }
+        
+        public T Add<T>() where T : BehaviourComponent {
             T comp = this.AddSubobject<T>();
             this.RegisterComponent(comp);
             return comp;

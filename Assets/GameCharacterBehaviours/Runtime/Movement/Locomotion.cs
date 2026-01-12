@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using CommonFrameworks.Components;
 using SaintsField;
 using SaintsField.Playa;
@@ -16,8 +17,8 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         [field: SerializeField, MinValue(0)] private float RunSpeedCoefficient { get; set; } = 2;
         [field: SerializeField, MinValue(0)] private float SprintSpeedCoefficient { get; set; } = 3;
 
-        [field: SerializeField, MinValue(0), EndText("<color=gray>degrees / s")]
-        protected float RotationSpeed { get; private set; } = 1;
+        // [field: SerializeField, MinValue(0), EndText("<color=gray>degrees / s")]
+        // protected float RotationSpeed { get; private set; } = 1;
 
         [field: SerializeField] public Gesture Mode { get; set; } = Gesture.Run;
         [field: SerializeField, MinValue(0)] public float WalkingSpeed { get; set; } = 1;
@@ -40,29 +41,31 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             this.OwnerTransform = this.Owner.transform;
         }
 
-        public void MoveAndRotate(Vector3 displacement, bool forced = true) {
+        public void MoveAndRotate(Vector3 displacement, float deltaTime, bool forced = true) {
             if (forced || this.CanMove) {
                 this.MoveBy(forced ? displacement : displacement * this.CurrentSpeed);
             }
 
-            if (forced || this.CanRotate) {
-                this.Rotate();
-            }
+            // if (forced || this.CanRotate) {
+            //     this.Rotate(Time.deltaTime);
+            // }
         }
 
         protected abstract void MoveBy(Vector3 displacement);
 
         protected abstract void Move(float deltaTime);
 
-        protected abstract void Rotate();
+        protected abstract void Rotate(float deltaTime);
 
         protected virtual void Update() {
             if (this.CanMove) {
                 this.Move(Time.deltaTime);
             }
+        }
 
+        private void LateUpdate() {
             if (this.CanRotate) {
-                this.Rotate();
+                this.Rotate(Time.deltaTime);
             }
         }
     }

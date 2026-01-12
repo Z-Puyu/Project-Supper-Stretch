@@ -23,7 +23,8 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
 
         public void Initialise(AttributeSet component) {
             component.Clear();
-            foreach (KeyValuePair<AttributeType, double> entry in this.OrderBy(row => row.Key)) {
+            List<KeyValuePair<AttributeType, double>> entries = this.OrderBy(row => row.Key).ToList();
+            foreach (KeyValuePair<AttributeType, double> entry in entries) {
                 component.Initialise(entry.Key, entry.Value);
             }
         }

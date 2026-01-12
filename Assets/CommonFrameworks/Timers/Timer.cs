@@ -1,6 +1,6 @@
 using System;
 
-namespace Timers.Runtime {
+namespace CommonFrameworks.Timers {
     public abstract class Timer : IDisposable {
         private bool disposed;
         public bool IsRunning { get; private set; }
@@ -41,7 +41,11 @@ namespace Timers.Runtime {
             this.IsRunning = false;
         }
 
-        public abstract Timer Reset();
+        public virtual Timer Reset() {
+            this.IsFinished = false;
+            this.IsRunning = false;
+            return this;
+        }
 
         ~Timer() {
             this.Dispose(false);

@@ -37,11 +37,16 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
             return CancellationTokenSource.CreateLinkedTokenSource(interrupt, @internal.Token);
         }
 
-        internal void Stop(Ability? ability = null, Effect? type = null, Keyword keyword = default) {
+        internal void Stop(EffectDescriptor effect) {
             this.mutex.EnterWriteLock();
             try {
-                IEnumerable<EffectDescriptor> matches =
-                        this.ActiveEffects.Keys.Where(effect => effect.IsOnePossibleCaseOf(ability, type, keyword));
+                List<EffectDescriptor> matches = new List<EffectDescriptor>();
+                foreach (EffectDescriptor e in this.ActiveEffects.Keys) {
+                    if (e.IsOnePossibleCaseOf(effect)) {
+                        matches.Add(e);
+                    }
+                }
+
                 foreach (EffectDescriptor match in matches) {
                     if (!this.ActiveEffects.TryRemove(match, out List<CancellationTokenSource> interrupters)) {
                         continue;

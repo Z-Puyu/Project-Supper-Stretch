@@ -6433,6 +6433,54 @@ SkinnedMeshRenderer:
     m_Center: {x: 20.95787, y: -7.0907507, z: -0.0000009536743}
     m_Extent: {x: 30.816559, y: 16.874638, z: 23.6259}
   m_DirtyAABB: 0
+--- !u!1 &813272573716228858
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3729644039689476738}
+  - component: {fileID: 988052917139052487}
+  m_Layer: 0
+  m_Name: Vital Statistics Component
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3729644039689476738
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 813272573716228858}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6576315276943627755}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &988052917139052487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 813272573716228858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afcff56d37a14f8baaac329b04f0fef6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Stats.VitalStatistics
+  <Stats>k__BackingField:
+  - <TrackedAttribute>k__BackingField: Stamina
+    <RegenerationEffect>k__BackingField: {fileID: 11400000, guid: ce0b259a5ffa8cd448302955c60f78f1, type: 2}
+    <RegenerationDelay>k__BackingField: 1
 --- !u!1 &818759242803364532
 GameObject:
   m_ObjectHideFlags: 0
@@ -28796,10 +28844,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6019539295ff40da8efaeee6d6c947ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Attributes.AttributeSet
-  <DefaultBaseAttributes>k__BackingField: {fileID: 0}
+  <DefaultBaseAttributes>k__BackingField: {fileID: 11400000, guid: 527565972748b7b47a3e5efc9af7dd4e, type: 2}
   <Approximator>k__BackingField:
-    <ChainingPolicy>k__BackingField: 2
-    <PrecisionLevel>k__BackingField: 2
+    <PrecisionLevel>k__BackingField: 1
     <ApproximationPolicy>k__BackingField: 1
 --- !u!1 &3716163991651005176
 GameObject:
@@ -32387,14 +32434,14 @@ MonoBehaviour:
         <Model>k__BackingField: {fileID: 6624264980163878195}
         <View>k__BackingField: HealthBar (.health-bar)
         <TrackedAttribute>k__BackingField: Health
-        <TrackedMaxAttribute>k__BackingField: Max Health
+        <UnitLength>k__BackingField: 0
     - rid: 1692151951056961709
       type: {class: StatBarPresenter, ns: UI, asm: Scripts.UI}
       data:
         <Model>k__BackingField: {fileID: 6624264980163878195}
         <View>k__BackingField: StaminaBar (.stamina-bar)
         <TrackedAttribute>k__BackingField: Stamina
-        <TrackedMaxAttribute>k__BackingField: Max Stamina
+        <UnitLength>k__BackingField: 0
 --- !u!1 &4256974226788895607
 GameObject:
   m_ObjectHideFlags: 0
@@ -34510,6 +34557,7 @@ Transform:
   - {fileID: 7176089104183811268}
   - {fileID: 4946659537481911072}
   - {fileID: 622304388507415446}
+  - {fileID: 3729644039689476738}
   m_Father: {fileID: 3201459543287357664}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5972498177023485511

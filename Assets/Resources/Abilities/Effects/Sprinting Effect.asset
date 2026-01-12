@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 572ceab3531345fdb52a8d7603dd9002, type: 3}
+  m_Name: Sprinting Effect
+  m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Effects.Effect
+  <Tag>k__BackingField: Effects/Locomotion/Sprint
+  <Periodicity>k__BackingField: 1
+  <IsInfinite>k__BackingField: 1
+  <Duration>k__BackingField: -1
+  <PeriodCount>k__BackingField: -1
+  <Interval>k__BackingField: 1
+  <ShouldExecuteBeforeFirstInterval>k__BackingField: 0
+  <KeywordPreset>k__BackingField:
+    <TargetReceivesKeywords>k__BackingField:
+    - Status/Sprinting
+    <TargetRemovesKeywords>k__BackingField:
+    - Status/Running
+    - Status/Walking
+    <SourceReceivesKeywords>k__BackingField: []
+    <SourceRemovesKeywords>k__BackingField: []
+  <ModifierPreset>k__BackingField:
+    <Modifiers>k__BackingField:
+    - <Target>k__BackingField: Stamina
+      <Type>k__BackingField: 2
+      <Value>k__BackingField:
+        rid: 1692151973348376677
+      <BackingAttributeSource>k__BackingField: 0
+  <TargetRemovesEffects>k__BackingField: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 1692151973348376677
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 1

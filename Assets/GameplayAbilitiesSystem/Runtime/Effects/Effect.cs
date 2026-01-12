@@ -35,24 +35,25 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         private int PeriodCount { get; set; } = 1;
 
         [field: SerializeField, MinValue(0), EndText("seconds"), ShowIf(nameof(this.IsPeriodic))]
+        [field: Tooltip("If 0, the effect applies once per frame and modifiers are interpreted as per-second values")]
         private float Interval { get; set; }
 
         [field: SerializeField, ShowIf(nameof(this.IsPeriodic))]
         private bool ShouldExecuteBeforeFirstInterval { get; set; }
-        
-        [field: SerializeField, ShowIf(nameof(this.IsPeriodic))]
-        private bool ShouldInterpolateBetweenTicks { get; set; }
         
         [field: SerializeField] private EffectKeywordPreset KeywordPreset { get; set; } = new EffectKeywordPreset();
         
         [field: SerializeField, SaintsRow(true)] 
         private EffectModifierPreset ModifierPreset { get; set; } = new EffectModifierPreset();
         
+        [field: SerializeField, Table]
+        private List<EffectDescriptor> TargetRemovesEffects { get; set; } = new List<EffectDescriptor>();
+        
         private bool IsFinite => !this.IsInfinite;
         private bool IsInstant => this.Periodicity == Type.Instant;
         private bool IsPeriodic => this.Periodicity == Type.Periodic;
         private bool IsContinuous => this.Periodicity == Type.Persistent;
-        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.Fetch<EffectTagSheet>();
+        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.FetchLeaves<EffectTagSheet>();
 
         /// <summary>
         /// Applies the effect.
@@ -68,6 +69,10 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
             Ability? sourceAbility = null, CancellationToken interrupt = default
         ) {
             try {
+                foreach (EffectDescriptor descriptor in this.TargetRemovesEffects) {
+                    target.StopEffects(descriptor);    
+                }
+                
                 Modifier[] modifiers = this.ModifierPreset.Apply(source, target, userData).ToArray();
                 this.KeywordPreset.Apply(source, target);
                 if (this.Periodicity != Type.Periodic || this.ShouldExecuteBeforeFirstInterval) {
@@ -76,7 +81,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
                     }
                 } else {
                     using CancellationTokenSource interrupter = target.Register(
-                        new EffectDescriptor(sourceAbility, this, this.Tag), interrupt
+                        new EffectDescriptor(this, sourceAbility), interrupt
                     );
 
                     try {
@@ -106,7 +111,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
                     break;
                 case Type.Periodic:
                     for (int i = 0; i < this.PeriodCount; i += 1) {
-                        if (this.ShouldInterpolateBetweenTicks) {
+                        if (this.Interval <= 0) {
                             float progress = 0;
                             while (progress < this.Interval) {
                                 await Awaitable.NextFrameAsync(interrupt);

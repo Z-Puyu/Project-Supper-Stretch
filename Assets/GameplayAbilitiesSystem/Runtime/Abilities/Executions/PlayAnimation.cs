@@ -11,23 +11,26 @@ using UnityEngine;
 namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
     [Serializable]
     public sealed class PlayAnimation : AbilityExecutionStep {
-        [field: SerializeField, OnValueChanged(nameof(this.OnClipChanged))] 
+        [field: SerializeField, OnValueChanged(nameof(this.OnClipChanged))]
         private AnimationClip? Clip { get; set; }
 
         [field: SerializeField, Table(true, true), ShowIf(nameof(this.HasAnyAnimationSignal))]
         private List<AnimationSignal> AnimationSignals { get; set; } = new List<AnimationSignal>();
-        
-        [field: SerializeReference, ReferencePicker] 
+
+        [field: SerializeReference, ReferencePicker]
         private List<IAbilityExecutor> AnimationEnd { get; set; } = new List<IAbilityExecutor>();
 
         [field: SerializeReference, ReferencePicker]
         private List<IAbilityExecutor> AnimationInterrupt { get; set; } = new List<IAbilityExecutor> {
             new EndAbility()
         };
-        
+
         private bool HasAnyAnimationSignal => this.AnimationSignals.Count > 0;
 
-        protected override async Awaitable Execute(AbilitySystem system, Ability ability, CancellationToken interrupt) {
+        protected override async Awaitable Execute(
+            AbilitySystem system, Ability ability, CancellationToken interrupt,
+            IReadOnlyDictionary<string, double>? userData = null
+        ) {
             try {
                 _ = animate();
             } catch (OperationCanceledException) when (system.IsRunningAbility(ability)) {
@@ -40,8 +43,8 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
                     }
                 }
             }
-            
-            await AwaitableExtensions.CompletedTask;
+
+            await AwaitableTask.CompletedTask;
             return;
 
             async Awaitable animate() {
@@ -66,7 +69,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
                 }
             }
         }
-        
+
         private void OnClipChanged() {
             if (!this.Clip) {
                 this.AnimationSignals.Clear();
@@ -81,11 +84,11 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
                     AnimationSignal? signal = this.AnimationSignals.FirstOrDefault(s => s.Name == notifier.Name);
                     signals.Add(signal ?? new AnimationSignal(notifier.Name));
                 }
-                
+
                 this.AnimationSignals = signals;
             }
         }
-        
+
         [Button]
         private void RefreshAnimationSignals() {
             this.OnClipChanged();
