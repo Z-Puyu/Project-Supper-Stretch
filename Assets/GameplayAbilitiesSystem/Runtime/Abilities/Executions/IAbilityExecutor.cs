@@ -4,11 +4,12 @@ using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
     internal interface IAbilityExecutor {
-        internal Awaitable Run(
-            AbilitySystem system, Ability ability, CancellationToken interrupt,
-            IReadOnlyDictionary<string, double>? userData = null
-        );
-        
-        internal void Complete();
+        /// <summary>
+        /// Runs the ability execution step.
+        /// </summary>
+        /// <param name="context">The ability execution context.</param>
+        /// <param name="interrupt">The cancellation token for interrupting the execution.</param>
+        /// <returns>True if the execution is successful.</returns>
+        Awaitable<bool> Run(Ability.Context context, CancellationToken interrupt);
     }
 }

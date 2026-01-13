@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using CommonFrameworks.Async;
 using CommonFrameworks.Extensions;
 using CommonFrameworks.Logic;
 using GameplayAbilitiesSystem.Runtime.Abilities.Executions;
@@ -23,7 +24,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
 
         [field: SerializeReference, ReferencePicker]
         private List<IAbilityExecutor> ExecutionSteps { get; set; } = new List<IAbilityExecutor>();
-        
+
         [field: SerializeField] private AbilityEffect? SideEffect { get; set; }
 
         private AdvancedDropdownList<string> AllKeywords => KeywordUtils.FetchLeaves<AbilityTagSheet>();
@@ -32,22 +33,24 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             return condition.GetType().Name;
         }
 
-        internal bool TryCommit(AbilitySystem system, out AbilityActivation activation) {
+        internal bool TryCommit(
+            AbilitySystem system, IReadOnlyDictionary<string, double>? userData, out Context context
+        ) {
             foreach (IPredicate<AbilitySystem> condition in this.Conditions) {
                 if (condition.Holds(system)) {
                     continue;
                 }
 
-                activation = default;
+                context = default;
                 return false;
             }
-            
+
             foreach (Cost cost in this.Costs) {
                 if (cost.IsAffordable(system.AttributeReader)) {
                     continue;
                 }
 
-                activation = default;
+                context = default;
                 return false;
             }
 
@@ -55,32 +58,41 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                 cost.Spend(system.AttributeReader, system.ModifierConsumer);
             }
 
-            activation = new AbilityActivation(new CancellationTokenSource());
+            context = new Context(system, this, userData);
             return true;
         }
 
-        internal async Awaitable Execute(
-            AbilitySystem system, IReadOnlyDictionary<string, double>? userData, CancellationToken interrupt
-        ) {
-            this.SideEffect?.Apply(system, userData);
-            CancellationToken death = system.destroyCancellationToken;
-            using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(interrupt, death);
+        internal async Awaitable Execute(Context context) {
+            this.SideEffect?.Apply(context.Source, context.UserData);
+            using CancellationTokenSource linked = CancellationTokenSource.CreateLinkedTokenSource(
+                context.Source.destroyCancellationToken
+            );
+            
+            _ = this.ExecuteSteps(context, linked.Token);
+            try {
+                await context.MainProcess;
+            } catch (OperationCanceledException) {
+                linked.Cancel();
+            } finally {
+                this.SideEffect?.Stop(context.Source);
+            }
+        }
+
+        private async Awaitable ExecuteSteps(Context context, CancellationToken interrupt) {
             for (int i = 0; i < this.ExecutionSteps.Count; i += 1) {
-                try {
-                    await this.ExecutionSteps[i].Run(system, this, cts.Token, userData);
-                    this.ExecutionSteps[i].Complete();
-                } catch (OperationCanceledException) {
-                    system.Stop(this);
+                if (!await this.ExecutionSteps[i].Run(context, interrupt)) {
                     break;
                 }
             }
+        }
 
-            await AwaitableTask.WaitUntilAsync(
-                (system, this),
-                ((AbilitySystem system, Ability ability) args) => !args.system.IsRunningAbility(args.ability)
-            );
-            
-            this.SideEffect?.Stop(system);
+        public readonly record struct Context(
+            AbilitySystem Source,
+            Ability Ability,
+            IReadOnlyDictionary<string, double>? UserData
+        ) {
+            public AsyncTask MainTask { get; } = new AsyncTask();
+            internal Awaitable MainProcess => this.MainTask.Awaitable;
         }
     }
 }

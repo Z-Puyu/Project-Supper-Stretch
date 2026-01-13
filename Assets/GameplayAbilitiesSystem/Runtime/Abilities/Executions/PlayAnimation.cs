@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using CommonFrameworks.Async;
 using CommonFrameworks.Extensions;
 using GameplayAbilitiesSystem.Runtime.Animations;
 using SaintsField;
@@ -27,46 +28,47 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
 
         private bool HasAnyAnimationSignal => this.AnimationSignals.Count > 0;
 
-        protected override async Awaitable Execute(
-            AbilitySystem system, Ability ability, CancellationToken interrupt,
-            IReadOnlyDictionary<string, double>? userData = null
-        ) {
-            try {
-                _ = animate();
-            } catch (OperationCanceledException) when (system.IsRunningAbility(ability)) {
-                foreach (IAbilityExecutor step in this.AnimationInterrupt) {
-                    try {
-                        await step.Run(system, ability, interrupt);
-                        step.Complete();
-                    } catch (OperationCanceledException) {
-                        break;
-                    }
-                }
+        protected override Awaitable Execute(Ability.Context context, CancellationToken interrupt) {
+            _ = this.Animate(context, interrupt);
+            return AsyncTask.CompletedTask;
+        }
+
+        private async Awaitable Animate(Ability.Context context, CancellationToken interrupt) {
+            if (!this.Clip) {
+                return;
             }
 
-            await AwaitableTask.CompletedTask;
-            return;
+            AnimationPlayResult result = await context.Source.PlayAnimation(
+                this.Clip, interrupt, notifier => this.TriggerSignal(notifier, context, interrupt)
+            );
 
-            async Awaitable animate() {
-                if (!this.Clip) {
-                    return;
+            switch (result) {
+                case AnimationPlayResult.Ended:
+                    foreach (IAbilityExecutor step in this.AnimationEnd) {
+                        if (!await step.Run(context, interrupt)) {
+                            break;
+                        }
+                    }
+                        
+                    break;
+                case AnimationPlayResult.Interrupted:
+                    foreach (IAbilityExecutor step in this.AnimationInterrupt) {
+                        if (!await step.Run(context, interrupt)) {
+                            break;
+                        }
+                    }
+                        
+                    break;
+            }
+        }
+
+        private void TriggerSignal(AnimationNotifier notifier, Ability.Context context, CancellationToken interrupt) {
+            foreach (AnimationSignal signal in this.AnimationSignals) {
+                if (signal.Name != notifier.Name || signal.OnSignal is null) {
+                    continue;
                 }
 
-                await system.PlayAnimation(
-                    this.Clip, interrupt, notifier => {
-                        this.AnimationSignals.FirstOrDefault(signal => signal.Name == notifier.Name)?.OnSignal
-                            ?.Run(system, ability, interrupt);
-                    }
-                );
-
-                foreach (IAbilityExecutor step in this.AnimationEnd) {
-                    try {
-                        await step.Run(system, ability, interrupt);
-                        step.Complete();
-                    } catch (OperationCanceledException) {
-                        break;
-                    }
-                }
+                _ = signal.OnSignal.Run(context, interrupt);
             }
         }
 

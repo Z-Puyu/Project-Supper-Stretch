@@ -6,52 +6,49 @@ using UnityEngine;
 namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
     [Serializable]
     public abstract class AbilityExecutionStep : IAbilityExecutor {
-        protected AbilitySystem? OwnerSystem { get; private set; }
-        protected Ability? OwnerAbility { get; private set; }
         [field: SerializeField] protected bool WillEndAbilityOnCompletion { get; private set; }
 
-        async Awaitable IAbilityExecutor.Run(
-            AbilitySystem system, Ability ability, CancellationToken interrupt,
-            IReadOnlyDictionary<string, double>? userData
-        ) {
-            this.OwnerSystem = system;
-            this.OwnerAbility = ability;
-            await this.Execute(system, ability, interrupt, userData);
+        async Awaitable<bool> IAbilityExecutor.Run(Ability.Context context, CancellationToken interrupt) {
+            try {
+                interrupt.ThrowIfCancellationRequested();
+                await this.Execute(context, interrupt);
+                interrupt.ThrowIfCancellationRequested();
+            } catch (OperationCanceledException) {
+                return this.OnInterrupt(context.Source, context.Ability);
+            }
+            
+            this.OnComplete(context.Source, context.Ability);
+            if (!this.WillEndAbilityOnCompletion) {
+                return true;
+            }
+
+            context.Source.Stop(context.Ability);
+            return false;
         }
 
         /// <summary>
         /// Executes the ability step.
         /// </summary>
-        /// <param name="system">The ability system that initiated the ability</param>
-        /// <param name="ability">The ability that is being executed</param>
-        /// <param name="interrupt">The cancellation token for interrupting the ability externally</param>
-        /// <param name="userData">Optional user data for the ability</param>
+        /// <param name="context">The context of the ability execution</param>
+        /// <param name="interrupt">The token provided by the ability owning this execution step to cancel it</param>
         /// <returns>An awaitable that completes when the execution is finished</returns>
-        protected abstract Awaitable Execute(
-            AbilitySystem system, Ability ability, CancellationToken interrupt,
-            IReadOnlyDictionary<string, double>? userData = null
-        );
+        protected abstract Awaitable Execute(Ability.Context context, CancellationToken interrupt);
 
         /// <summary>
-        /// CLeans up the ability step when it completes.
+        /// Cleans up the ability step when it completes.
         /// </summary>
         /// <param name="system">The ability system that initiated the ability</param>
         /// <param name="ability">The ability that is being executed</param>
         protected virtual void OnComplete(AbilitySystem system, Ability ability) { }
-        
-        void IAbilityExecutor.Complete() {
-            if (!this.OwnerSystem || !this.OwnerAbility) {
-                Debug.LogWarning("Ability execution completes when it is not running");
-                return;
-            }
-            
-            this.OnComplete(this.OwnerSystem, this.OwnerAbility);
-            if (this.WillEndAbilityOnCompletion) {
-                this.OwnerSystem.Stop(this.OwnerAbility);
-            }
-            
-            this.OwnerSystem = null;
-            this.OwnerAbility = null;
+
+        /// <summary>
+        /// Cleans up the ability step when it is interrupted.
+        /// </summary>
+        /// <param name="system">The ability system that initiated the ability</param>
+        /// <param name="ability">The ability that is being executed</param>
+        /// <returns>True if the ability should continue, false otherwise</returns>
+        protected virtual bool OnInterrupt(AbilitySystem system, Ability ability) {
+            return false;
         }
     }
 }

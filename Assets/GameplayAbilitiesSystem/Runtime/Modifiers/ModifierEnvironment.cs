@@ -40,31 +40,32 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
                 this.Modifiers.Add(modifier.Target, node);
             }
 
-            node.Modifiers[(int)modifier.Type] += modifier.Value;
+            node.Add(modifier);
             this.OnModifierUpdated.Invoke(modifier.Target);
         }
 
-        private void CollectModifiers(AttributeKey attribute, ModifierValue[] modifiers) {
+        private void CollectModifiers(AttributeKey attribute, (ModifierValue modifier, ModifierType op)[] modifiers) {
             if (!this.Modifiers.TryGetValue(attribute, out Node node)) {
                 return;
             }
 
             for (int i = 0; i < node.Modifiers.Length; i += 1) {
-                modifiers[i] += node.Modifiers[i];
+                modifiers[i].modifier += node.Modifiers[i].modifier;
             }
         }
 
         private Attribute Query(
-            ref AttributeQuery query, ModifierValue[] modifiers, in IEvaluable<IAttributeReader>? max,
-            in IEvaluable<IAttributeReader>? min, in AttributeApproximator? approximator
+            ref AttributeQuery query, (ModifierValue modifier, ModifierType op)[] modifiers, 
+            in IEvaluable<IAttributeReader>? max, in IEvaluable<IAttributeReader>? min, 
+            in AttributeApproximator? approximator
         ) {
             this.CollectModifiers(query.Id, modifiers);
             if (!this.IsGlobalEnvironment && this.ParentEnvironment) {
                 return this.ParentEnvironment.Query(ref query, modifiers, max, min, approximator);
             }
 
-            for (ModifierType op = ModifierType.Shift; op < ModifierType.Offset; op += 1) {
-                double value = modifiers[(int)op].ApplyTo(query.Value, op);
+            foreach ((ModifierValue modifier, ModifierType op) in modifiers) {
+                double value = modifier.ApplyTo(query.Value, op);
                 if (max is not null) {
                     value = Math.Min(max.Evaluate(query.Source), value);
                 }
@@ -86,7 +87,13 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
             ref AttributeQuery query, in IEvaluable<IAttributeReader>? max, in IEvaluable<IAttributeReader>? min,
             in AttributeApproximator? approximator
         ) {
-            ModifierValue[] modifiers = { ModifierValue.Zero, ModifierValue.Zero, ModifierValue.Zero };
+            (ModifierValue modifier, ModifierType op)[] modifiers = {
+                (ModifierValue.Zero, ModifierType.Shift), 
+                (ModifierValue.Zero, ModifierType.Multiplier), 
+                (ModifierValue.Zero, ModifierType.Offset), 
+                (ModifierValue.Zero, ModifierType.Offset)
+            };
+            
             return this.Query(ref query, modifiers, max, min, approximator);
         }
 
@@ -102,17 +109,42 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
         }
 
         private sealed class Node {
-            internal ModifierValue[] Modifiers { get; } = {
-                ModifierValue.Zero, ModifierValue.Zero, ModifierValue.Zero
+            private ModifierValue Shift { get; set; } = ModifierValue.Zero;
+            private ModifierValue Multiplier { get; set; } = ModifierValue.Zero;
+            private ModifierValue PositiveOffset { get; set; } = ModifierValue.Zero;
+            private ModifierValue NegativeOffset { get; set; } = ModifierValue.Zero;
+
+            internal (ModifierValue modifier, ModifierType op)[] Modifiers => new[] {
+                (this.Shift, ModifierType.Shift), 
+                (this.Multiplier, ModifierType.Multiplier),
+                (this.PositiveOffset, ModifierType.Offset), 
+                (this.NegativeOffset, ModifierType.Offset)
             };
 
-            internal Node Duplicate() {
-                Node node = new Node();
-                for (int i = 0; i < this.Modifiers.Length; i += 1) {
-                    node.Modifiers[i] = this.Modifiers[i];
+            internal void Add(Modifier modifier) {
+                switch (modifier.Type) {
+                    case ModifierType.Shift:
+                        this.Shift += modifier.Value;
+                        break;
+                    case ModifierType.Multiplier:
+                        this.Multiplier += modifier.Value;
+                        break;
+                    case ModifierType.Offset when modifier.Value >= 0:
+                        this.PositiveOffset += modifier.Value;
+                        break;
+                    case ModifierType.Offset when modifier.Value < 0:
+                        this.NegativeOffset += modifier.Value;
+                        break;
                 }
+            }
 
-                return node;
+            internal Node Duplicate() {
+                return new Node {
+                    Shift = this.Shift,
+                    Multiplier = this.Multiplier,
+                    PositiveOffset = this.PositiveOffset,
+                    NegativeOffset = this.NegativeOffset
+                };
             }
         }
     }

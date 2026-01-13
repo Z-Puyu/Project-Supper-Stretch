@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using CommonFrameworks.Async;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Events;
@@ -39,33 +40,30 @@ namespace GameplayAbilitiesSystem.Runtime.Animations {
             this.PlayableGraph.Destroy();
         }
 
-        public async Awaitable PlayActionAnimation(
+        public async Awaitable<AnimationPlayResult> PlayActionAnimation(
             AnimationClip clip, UnityAction<AnimationNotifier> onNotify, Action? onInterrupt = null,
             CancellationToken interrupter = default
         ) {
             this.InterruptCurrentAction();
-            createClip();
+            this.FinalMixer.SetInputCount(2);
+            this.ActionAnimationClip = AnimationClipPlayable.Create(this.PlayableGraph, clip);
+            this.ActionAnimationClip.SetDuration(clip.length);
+            this.ActionAnimationClip.SetApplyFootIK(false);
+            this.ActionAnimationClip.SetPropagateSetTime(true);
+            this.ActionAnimationClip.SetTime(0);
+            this.FinalMixer.ConnectInput(1, this.ActionAnimationClip, 0);
             this.OnAnimationStarted.Invoke(clip, onNotify);
             using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(
                 interrupter, this.InternalInterrupter.Token
             );
-            
+
             try {
                 await this.Crossfade(clip, cts.Token);
+                return AnimationPlayResult.Ended;
+            } catch (OperationCanceledException) {
+                return AnimationPlayResult.Interrupted;
             } finally {
                 this.ResetPlayableGraph();
-            }
-
-            return;
-
-            void createClip() {
-                this.FinalMixer.SetInputCount(2);
-                this.ActionAnimationClip = AnimationClipPlayable.Create(this.PlayableGraph, clip);
-                this.ActionAnimationClip.SetDuration(clip.length);
-                this.ActionAnimationClip.SetApplyFootIK(false);
-                this.ActionAnimationClip.SetPropagateSetTime(true);
-                this.ActionAnimationClip.SetTime(0);
-                this.FinalMixer.ConnectInput(1, this.ActionAnimationClip, 0);
             }
         }
 
