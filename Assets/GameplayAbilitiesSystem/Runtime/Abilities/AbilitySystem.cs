@@ -168,8 +168,11 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                 return;
             }
 
-            if (!context.MainTask.TryInterrupt()) {
-                context.MainTask.TryComplete();
+            if (!context.MainTask.TryInterrupt() && !context.MainTask.TryComplete()) {
+#if DEBUG
+                Debug.LogError($"{ability} is running but the asynchronous task has ended unexpectedly.");
+#endif
+                return;
             }
 
             this.AvailableAbilities.Add(ability);
