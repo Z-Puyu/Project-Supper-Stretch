@@ -74,7 +74,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
                 this.KeywordPreset.Apply(source, target);
                 if (this.Periodicity != Type.Periodic || this.ShouldExecuteBeforeFirstInterval) {
                     foreach (Modifier modifier in modifiers) {
-                        target.ModifierConsumer.AddModifier(modifier);
+                        target.AddModifier(modifier);
                     }
                 } else {
                     using CancellationTokenSource interrupter = target.Register(
@@ -101,7 +101,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
                         await Awaitable.WaitForSecondsAsync(this.Duration, interrupt);
                     } finally {
                         foreach (Modifier modifier in modifiers) {
-                            target.ModifierConsumer.AddModifier(-modifier);
+                            target.AddModifier(-modifier);
                         }
                     }
                     
@@ -115,13 +115,13 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
                                 float delta = Mathf.Min(Time.deltaTime, this.Interval - progress);
                                 progress += Time.deltaTime;
                                 foreach (Modifier modifier in modifiers) {
-                                    target.ModifierConsumer.AddModifier(modifier * (delta / this.Interval));
+                                    target.AddModifier(modifier * (delta / this.Interval));
                                 }
                             }
                         } else {
                             await Awaitable.WaitForSecondsAsync(this.Interval, interrupt);
                             foreach (Modifier modifier in modifiers) {
-                                target.ModifierConsumer.AddModifier(modifier);
+                                target.AddModifier(modifier);
                             }
                         }
                     }

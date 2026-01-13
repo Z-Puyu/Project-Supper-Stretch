@@ -1,8 +1,7 @@
 ﻿namespace GameplayKeywordsSystem.Runtime {
     public interface ITaggable<in T> {
-        public bool Add(T label);
-        public bool Remove(T keyword);
-        public bool Contains(T keyword);
-        public void Clear();
+        public bool Tag(T label);
+        public bool Untag(T keyword);
+        public bool HasTag(T keyword);
     }
 }

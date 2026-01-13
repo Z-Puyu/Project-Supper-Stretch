@@ -13,8 +13,10 @@ using GameplayAbilitiesSystem.Runtime.Attributes;
 using GameplayAbilitiesSystem.Runtime.Effects;
 using GameplayAbilitiesSystem.Runtime.Modifiers;
 using GameplayKeywordsSystem.Runtime;
+using SaintsField;
 using UnityEngine;
 using UnityEngine.Events;
+using Attribute = GameplayAbilitiesSystem.Runtime.Attributes.Attribute;
 
 namespace GameplayAbilitiesSystem.Runtime.Abilities {
     [DisallowMultipleComponent]
@@ -33,18 +35,15 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
 
         private EffectRegistry EffectRegistry { get; } = new EffectRegistry();
 
-        [NotNull] [field: SerializeField] private Animator? Animator { get; set; }
+        [NotNull] 
+        [field: SerializeField, Required]
+        private Animator? Animator { get; set; }
+        
         [NotNull] private KeywordContainer? KeywordContainer { get; set; }
         [NotNull] private AttributeSet? AttributeSet { get; set; }
+        [NotNull] private IModifiable? ModifierConsumer { get; set; } 
         [NotNull] private AbilitySystemAnimationHandler? AnimationHandler { get; set; }
         [field: SerializeField] private List<Ability> DefaultAbilities { get; set; } = new List<Ability>();
-
-        public IAttributeReader AttributeReader => this.AttributeSet;
-        public ITaggable<Keyword> EmitterKeywordContainer => this.KeywordContainer;
-
-        IAttributeReader IEffectReceiverFacade.AttributeReader => this.AttributeSet;
-        public IModifiable ModifierConsumer => this.AttributeSet;
-        ITaggable<Keyword> IEffectReceiverFacade.ReceiverKeywordContainer => this.KeywordContainer;
 
         public event UnityAction<Ability> OnAbilityStarted = delegate { };
         public event UnityAction<Ability> OnAbilityStopped = delegate { };
@@ -57,14 +56,8 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                 this.Grant(ability);
             }
 
-            if (!this.Animator) {
-                this.Animator = this.Owner.TryGetComponentInChildren(out Animator animator)
-                        ? animator
-                        : this.Owner.AddComponent<Animator>();
-            }
-
             this.KeywordContainer = this.Root.GetOrAdd<KeywordContainer>();
-            this.AttributeSet = this.Root.GetOrAdd<AttributeSet>();
+            this.ModifierConsumer = this.AttributeSet = this.Root.GetOrAdd<AttributeSet>();
             this.AnimationController = AnimationController.Create(this.Animator);
             this.AnimationHandler = this.Animator.GetOrAddComponent<AbilitySystemAnimationHandler>();
             this.AnimationHandler.ConnectToAnimationController(this.AnimationController);
@@ -226,9 +219,49 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                 yield return ability;
             }
         }
+        
+        IEnumerator<Attribute> IEnumerable<Attribute>.GetEnumerator() {
+            return this.AttributeSet.GetEnumerator();
+        }
 
         IEnumerator IEnumerable.GetEnumerator() {
             return this.GetEnumerator();
+        }
+
+        bool ITaggable<Keyword>.Tag(Keyword label) {
+            return this.KeywordContainer.Tag(label);
+        }
+
+        bool ITaggable<Keyword>.Untag(Keyword keyword) {
+            return this.KeywordContainer.Untag(keyword);
+        }
+
+        bool ITaggable<Keyword>.HasTag(Keyword keyword) {
+            return this.KeywordContainer.HasTag(keyword);
+        }
+
+        double IAttributeReader.Query(AttributeKey key) {
+            return this.AttributeSet.Query(key);
+        }
+
+        double IAttributeReader.QueryMax(AttributeKey key) {
+            return this.AttributeSet.QueryMax(key);
+        }
+
+        double IAttributeReader.QueryMin(AttributeKey key) {
+            return this.AttributeSet.QueryMin(key);
+        }
+
+        bool IAttributeReader.HasAtLeast(double threshold, AttributeKey key) {
+            return this.AttributeSet.HasAtLeast(threshold, key);
+        }
+
+        bool IAttributeReader.HasAtMost(double cap, AttributeKey key) {
+            return this.AttributeSet.HasAtMost(cap, key);
+        }
+
+        void IModifiable.AddModifier(Modifier modifier) {
+            this.ModifierConsumer.AddModifier(modifier);
         }
     }
 }

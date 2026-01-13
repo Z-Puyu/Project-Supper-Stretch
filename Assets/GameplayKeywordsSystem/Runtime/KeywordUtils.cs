@@ -22,7 +22,7 @@ namespace GameplayKeywordsSystem.Runtime {
         }
 
         public static bool HasKeyword(this GameObject obj, Keyword keyword) {
-            return obj.TryGetComponentInChildren(out KeywordContainer container) && container.Contains(keyword);
+            return obj.TryGetComponentInChildren(out KeywordContainer container) && container.HasTag(keyword);
         }
 
         public static bool HasKeywordOnGameObject(this Component comp, Keyword keyword) {

@@ -7,15 +7,19 @@ using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Abilities.Predicate {
     [Serializable]
-    public struct RequiredKeywords : IPredicate<AbilitySystem> {
+    public struct RequiredKeywords : IPredicate<AbilitySystem>, IPredicate<ITaggable<Keyword>> {
         [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))] 
         private List<string> Keywords { get; set; } 
         
         private AdvancedDropdownList<string> AllKeywords => KeywordUtils.Fetch<KeywordSheet>();
-        
-        public bool Holds(AbilitySystem system) {
+
+        bool IPredicate<AbilitySystem>.Holds(AbilitySystem system) {
+            return this.Holds(system);
+        }
+
+        public bool Holds(ITaggable<Keyword> target) {
             foreach (string keyword in this.Keywords) {
-                if (!system.EmitterKeywordContainer.Contains(keyword)) {
+                if (!target.HasTag(keyword)) {
                     return false;
                 }
             }    

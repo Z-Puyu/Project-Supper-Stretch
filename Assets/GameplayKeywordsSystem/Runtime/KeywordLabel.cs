@@ -28,7 +28,15 @@ namespace GameplayKeywordsSystem.Runtime {
         }
 
         void ICollection<Keyword>.Add(Keyword item) {
-            this.Add(item);
+            this.Tag(item);
+        }
+        
+        bool ICollection<Keyword>.Remove(Keyword item) {
+            return this.Untag(item);
+        }
+        
+        bool ICollection<Keyword>.Contains(Keyword item) {
+            return this.HasTag(item);
         }
 
         public void Clear() {
@@ -44,7 +52,7 @@ namespace GameplayKeywordsSystem.Runtime {
         /// </summary>
         /// <param name="keyword">The keyword to check for.</param>
         /// <returns><c>true</c> if the keyword is a prefix of any keyword present in the label</returns>
-        public bool Contains(Keyword keyword) {
+        public bool HasTag(Keyword keyword) {
             return this.Keywords.ContainsPrefix(keyword);
         }
 
@@ -52,7 +60,7 @@ namespace GameplayKeywordsSystem.Runtime {
             this.Keywords.CopyTo(array, arrayIndex);
         }
 
-        public bool Add(Keyword label) {
+        public bool Tag(Keyword label) {
             if (!this.Keywords.Add(label)) {
                 return false;
             }
@@ -69,7 +77,7 @@ namespace GameplayKeywordsSystem.Runtime {
         /// <remarks>
         /// This removes all keywords that start with the given keyword.
         /// </remarks>
-        public bool Remove(Keyword keyword) {
+        public bool Untag(Keyword keyword) {
             if (!this.Keywords.RemoveAllWithPrefix(keyword, out IEnumerable<Keyword> removed)) {
                 return false;
             }

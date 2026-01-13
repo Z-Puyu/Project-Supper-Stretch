@@ -46,7 +46,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             }
 
             foreach (Cost cost in this.Costs) {
-                if (cost.IsAffordable(system.AttributeReader)) {
+                if (cost.IsAffordable(system)) {
                     continue;
                 }
 
@@ -55,7 +55,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             }
 
             foreach (Cost cost in this.Costs) {
-                cost.Spend(system.AttributeReader, system.ModifierConsumer);
+                cost.Spend(system, system);
             }
 
             context = new Context(system, this, userData);

@@ -23,37 +23,37 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         
         internal void Apply(IEffectEmitterFacade source, IEffectReceiverFacade target) {
             foreach (string keyword in this.SourceRemovesKeywords) {
-                source.EmitterKeywordContainer.Remove(keyword);
+                source.Untag(keyword);
             }
             
             foreach (string keyword in this.SourceReceivesKeywords) {
-                source.EmitterKeywordContainer.Add(keyword);
+                source.Tag(keyword);
             }
             
             foreach (string keyword in this.TargetRemovesKeywords) {
-                target.ReceiverKeywordContainer.Remove(keyword);
+                target.Untag(keyword);
             }
             
             foreach (string keyword in this.TargetReceivesKeywords) {
-                target.ReceiverKeywordContainer.Add(keyword);
+                target.Tag(keyword);
             }
         }
         
         internal void Revoke(IEffectEmitterFacade source, IEffectReceiverFacade target) {
             foreach (string keyword in this.TargetReceivesKeywords) {
-                target.ReceiverKeywordContainer.Remove(keyword);
+                target.Untag(keyword);
             }
 
             foreach (string keyword in this.TargetRemovesKeywords) {
-                target.ReceiverKeywordContainer.Add(keyword);
+                target.Tag(keyword);
             }
             
             foreach (string keyword in this.SourceReceivesKeywords) {
-                source.EmitterKeywordContainer.Remove(keyword);
+                source.Untag(keyword);
             }
             
             foreach (string keyword in this.SourceRemovesKeywords) {
-                source.EmitterKeywordContainer.Add(keyword);
+                source.Tag(keyword);
             }
         }
     }

@@ -29,7 +29,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects.Predicate {
             switch (this.Predicate) {
                 case PredicateType.All:
                     foreach (string keyword in this.Keywords) {
-                        if (!source.EmitterKeywordContainer.Contains(keyword)) {
+                        if (!source.HasTag(keyword)) {
                             return false;
                         }
                     }
@@ -37,7 +37,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects.Predicate {
                     return true;
                 case PredicateType.Any:
                     foreach (string keyword in this.Keywords) {
-                        if (source.EmitterKeywordContainer.Contains(keyword)) {
+                        if (source.HasTag(keyword)) {
                             return true;
                         }
                     }
@@ -45,7 +45,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects.Predicate {
                     return false;
                 case PredicateType.None:
                     foreach (string keyword in this.Keywords) {
-                        if (source.EmitterKeywordContainer.Contains(keyword)) {
+                        if (source.HasTag(keyword)) {
                             return false;
                         }
                     }
@@ -53,7 +53,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects.Predicate {
                     return true;
                 case PredicateType.NotAll:
                     foreach (string keyword in this.Keywords) {
-                        if (!source.EmitterKeywordContainer.Contains(keyword)) {
+                        if (!source.HasTag(keyword)) {
                             return true;
                         }
                     }
@@ -62,7 +62,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects.Predicate {
                 case PredicateType.ExactlyOne:
                     int count = 0;
                     foreach (string keyword in this.Keywords) {
-                        if (source.EmitterKeywordContainer.Contains(keyword)) {
+                        if (source.HasTag(keyword)) {
                             count += 1;
                         }
                         
@@ -81,7 +81,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects.Predicate {
             switch (this.Predicate) {
                 case PredicateType.All:
                     foreach (string keyword in this.Keywords) {
-                        if (!receiver.ReceiverKeywordContainer.Contains(keyword)) {
+                        if (!receiver.HasTag(keyword)) {
                             return false;
                         }
                     }
@@ -89,7 +89,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects.Predicate {
                     return true;
                 case PredicateType.Any:
                     foreach (string keyword in this.Keywords) {
-                        if (receiver.ReceiverKeywordContainer.Contains(keyword)) {
+                        if (receiver.HasTag(keyword)) {
                             return true;
                         }
                     }
@@ -97,7 +97,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects.Predicate {
                     return false;
                 case PredicateType.None:
                     foreach (string keyword in this.Keywords) {
-                        if (receiver.ReceiverKeywordContainer.Contains(keyword)) {
+                        if (receiver.HasTag(keyword)) {
                             return false;
                         }
                     }
@@ -105,7 +105,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects.Predicate {
                     return true;
                 case PredicateType.NotAll:
                     foreach (string keyword in this.Keywords) {
-                        if (!receiver.ReceiverKeywordContainer.Contains(keyword)) {
+                        if (!receiver.HasTag(keyword)) {
                             return true;
                         }
                     }
@@ -114,7 +114,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects.Predicate {
                 case PredicateType.ExactlyOne:
                     int count = 0;
                     foreach (string keyword in this.Keywords) {
-                        if (receiver.ReceiverKeywordContainer.Contains(keyword)) {
+                        if (receiver.HasTag(keyword)) {
                             count += 1;
                         }
                         

@@ -36,9 +36,9 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         internal Modifier Instantiate(
             IEffectEmitterFacade source, IEffectReceiverFacade target, IReadOnlyDictionary<string, double>? userData
         ) {
-            IAttributeReader? attributes = this.BackingAttributeSource switch {
-                ValueSource.Target => target.AttributeReader,
-                ValueSource.Instigator => source.AttributeReader,
+            IAttributeReader attributes = this.BackingAttributeSource switch {
+                ValueSource.Target => target,
+                ValueSource.Instigator => source,
                 var _ => throw new ArgumentOutOfRangeException(
                     nameof(this.BackingAttributeSource), this.BackingAttributeSource, ""
                 )

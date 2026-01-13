@@ -12,16 +12,18 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         private List<Modifier> AppliedModifiers { get; } = new List<Modifier>();
         
         public void Apply(AbilitySystem target, IReadOnlyDictionary<string, double>? userData) {
+            IEffectReceiverFacade receiver = target;
             this.KeywordPreset.Apply(target, target);
             this.AppliedModifiers.AddRange(this.ModifierPreset.Apply(target, target, userData));
             foreach (Modifier modifier in this.AppliedModifiers) {
-                target.ModifierConsumer.AddModifier(modifier);
+                receiver.AddModifier(modifier);
             }
         }
         
         public void Stop(AbilitySystem target) {
+            IEffectReceiverFacade receiver = target;
             foreach (Modifier modifier in this.AppliedModifiers) {
-                target.ModifierConsumer.AddModifier(-modifier);
+                receiver.AddModifier(-modifier);
             }
             
             this.AppliedModifiers.Clear();

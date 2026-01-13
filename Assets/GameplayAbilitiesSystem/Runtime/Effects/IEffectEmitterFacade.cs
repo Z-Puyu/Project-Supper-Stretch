@@ -2,10 +2,7 @@
 using GameplayKeywordsSystem.Runtime;
 
 namespace GameplayAbilitiesSystem.Runtime.Effects {
-    public interface IEffectEmitterFacade {
-        public IAttributeReader AttributeReader { get; }
-        public ITaggable<Keyword> EmitterKeywordContainer { get; }
-
+    public interface IEffectEmitterFacade : ITaggable<Keyword>, IAttributeReader {
         public void Apply(Effect effect, IEffectReceiverFacade target);
     }
 }
