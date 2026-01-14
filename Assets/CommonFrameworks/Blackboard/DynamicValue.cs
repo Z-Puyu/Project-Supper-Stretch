@@ -1,82 +1,115 @@
 ﻿using System;
+using SaintsField.Playa;
+using UnityEngine;
 
 namespace CommonFrameworks.Blackboard {
-    public struct DynamicValue {
-        public enum Type {
+    [Serializable]
+    internal record struct DynamicValue {
+        internal enum Type {
             Bool,
             Int,
             Float,
             String
         }
     
-        private Type ValueType { get; }
-        private double NumericValue { get; }
-        private string StringValue { get; }
+        internal Type DataType { get; private set; }
+        
+        [field: SerializeField, ShowIf(nameof(this.DataType), Type.Bool)]
+        private bool BoolValue { get; set; }
+        
+        [field: SerializeField, ShowIf(nameof(this.DataType), Type.Int)]
+        private int IntValue { get; set; }
+        
+        [field: SerializeField, ShowIf(nameof(this.DataType), Type.Float)]
+        private double FloatValue { get; set; }
+        
+        [field: SerializeField, ShowIf(nameof(this.DataType), Type.String)]
+        private string StringValue { get; set; }
 
         public T As<T>() {
-            return this.ValueType switch {
-                Type.Bool => this.AsBool<T>()!,
-                Type.Float => this.AsFloat<T>()!,
-                Type.Int => this.AsInteger<T>()!,
-                Type.String when typeof(T) == typeof(string) => (this.StringValue is T t ? t : default)!,
+            return this.DataType switch {
+                Type.Bool => this.AsBool<T>(),
+                Type.Float => this.AsFloat<T>(),
+                Type.Int => this.AsInteger<T>(),
+                Type.String when typeof(T) == typeof(string) => this.StringValue is T t ? t : default!,
                 var _ => throw new NotSupportedException($"{typeof(T)} is not a supported type!")
             };
         }
 
-        private T? AsBool<T>() {
-            bool value = this.NumericValue != 0;
-            return typeof(T) == typeof(bool) && value is T t ? t : default;
+        private T AsBool<T>() {
+            return typeof(T) == typeof(bool) && this.BoolValue is T t ? t : default!;
         }
 
-        private T? AsFloat<T>() {
+        private T AsFloat<T>() {
             if (typeof(T) == typeof(float)) {
-                float f = (float)this.NumericValue;
-                return f is T t ? t : default;
+                return (float)this.FloatValue is T t ? t : default!;
             }
 
             if (typeof(T) == typeof(double)) {
-                return this.NumericValue is T t ? t : default;
+                return this.FloatValue is T t ? t : default!;
             }
         
-            return default;
+            return default!;
         }
 
-        private T? AsInteger<T>() {
+        private T AsInteger<T>() {
             if (typeof(T) == typeof(int)) {
-                int i = (int)this.NumericValue;
-                return i is T t ? t : default;
+                return this.IntValue is T t ? t : default!;
             }
 
             if (typeof(T) == typeof(long)) {
-                long l = (long)this.NumericValue;
-                return l is T t ? t : default;
+                return (long)this.IntValue is T t ? t : default!;
+            }
+            
+            if (typeof(T) == typeof(short)) {
+                return (short)this.IntValue is T t ? t : default!;
+            }
+
+            if (typeof(T) == typeof(byte)) {
+                return (byte)this.IntValue is T t ? t : default!;
+            }
+
+            if (typeof(T) == typeof(sbyte)) {
+                return (sbyte)this.IntValue is T t ? t : default!;
+            }
+
+            if (typeof(T) == typeof(uint)) {
+                return (uint)this.IntValue is T t ? t : default!;
+            }
+            
+            if (typeof(T) == typeof(ulong)) {
+                return (ulong)this.IntValue is T t ? t : default!;
+            }
+            
+            if (typeof(T) == typeof(ushort)) {
+                return (ushort)this.IntValue is T t ? t : default!;
             }
         
-            return default;
+            return default!;
         }
 
         public static implicit operator bool(DynamicValue value) {
-            return value.NumericValue != 0;
+            return value is { DataType: Type.Bool, BoolValue: true };
         }
     
         public static implicit operator float(DynamicValue value) {
-            return (float)value.NumericValue;
+            return value.DataType == Type.Float ? (float)value.FloatValue : 0;
         }
 
         public static implicit operator double(DynamicValue value) {
-            return value.NumericValue;
+            return value.DataType == Type.Float ? value.FloatValue : 0;
         }
 
         public static implicit operator int(DynamicValue value) {
-            return (int)value.NumericValue;
+            return value.DataType == Type.Int ? value.IntValue : 0;
         }
 
         public static implicit operator long(DynamicValue value) {
-            return (long)value.NumericValue;
+            return value.DataType == Type.Int ? (long)value.IntValue : 0;
         }
 
         public static implicit operator string(DynamicValue value) {
-            return value.StringValue;
+            return value.DataType == Type.String ? value.StringValue : string.Empty;
         }
     }
 }
