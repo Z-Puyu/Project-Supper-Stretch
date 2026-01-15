@@ -12,7 +12,7 @@ namespace AnimationUtilities.Runtime {
     public sealed class AnimationController : MonoBehaviour {
         [NotNull] private Animator? Animator { get; set; }
         private CancellationTokenSource InternalInterrupter { get; set; } = new CancellationTokenSource();
-        private PlayableGraph PlayableGraph { get; } = PlayableGraph.Create("Animation Graph");
+        private PlayableGraph PlayableGraph { get; set; }
         private AnimationPlayableOutput Output { get; set; }
         private AnimationMixerPlayable FinalMixer { get; set; }
         private AnimatorControllerPlayable AnimatorController { get; set; }
@@ -24,6 +24,7 @@ namespace AnimationUtilities.Runtime {
 
         private void Awake() {
             this.Animator = this.GetComponent<Animator>();
+            this.PlayableGraph = PlayableGraph.Create("Animation Graph");
             this.AnimatorController = AnimatorControllerPlayable.Create(
                 this.PlayableGraph, this.Animator.runtimeAnimatorController
             );

@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
+using AnimationUtilities.Runtime;
 using CommonFrameworks.Async;
 using CommonFrameworks.Collections;
 using CommonFrameworks.Components;
 using CommonFrameworks.Extensions;
-using GameplayAbilitiesSystem.Runtime.Animations;
 using GameplayAbilitiesSystem.Runtime.Attributes;
 using GameplayAbilitiesSystem.Runtime.Effects;
 using GameplayAbilitiesSystem.Runtime.Modifiers;
@@ -24,7 +24,6 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                                         IEffectEmitterFacade,
                                         IEffectReceiverFacade,
                                         IEnumerable<Ability> {
-        private AnimationController? AnimationController { get; set; }
         private ICollection<Ability> AvailableAbilities { get; } = new HashSet<Ability>();
 
         private TrieDictionary<Keyword, char, ICollection<Ability>> AbilitiesByTag { get; } =
@@ -37,12 +36,12 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
 
         [NotNull] 
         [field: SerializeField, Required]
-        private Animator? Animator { get; set; }
+        private AnimationController? AnimationController { get; set; }
         
         [NotNull] private KeywordContainer? KeywordContainer { get; set; }
         [NotNull] private AttributeSet? AttributeSet { get; set; }
         [NotNull] private IModifiable? ModifierConsumer { get; set; } 
-        [NotNull] private AbilitySystemAnimationHandler? AnimationHandler { get; set; }
+        
         [field: SerializeField] private List<Ability> DefaultAbilities { get; set; } = new List<Ability>();
 
         public event UnityAction<Ability> OnAbilityStarted = delegate { };
@@ -58,13 +57,11 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
 
             this.KeywordContainer = this.Root.GetOrAdd<KeywordContainer>();
             this.ModifierConsumer = this.AttributeSet = this.Root.GetOrAdd<AttributeSet>();
-            this.AnimationController = AnimationController.Create(this.Animator);
-            this.AnimationHandler = this.Animator.GetOrAddComponent<AbilitySystemAnimationHandler>();
-            this.AnimationHandler.ConnectToAnimationController(this.AnimationController);
-        }
-
-        private void OnDestroy() {
-            this.AnimationController?.Destroy();
+            if (!this.AnimationController) {
+                this.AnimationController = this.Owner.TryGetComponentInChildren(out AnimationController controller) 
+                        ? controller
+                        : this.Owner.AddComponent<AnimationController>();
+            }
         }
 
         /// <summary>
@@ -190,12 +187,11 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         }
 
         public Awaitable<AnimationPlayResult> PlayAnimation(
-            AnimationClip anim, CancellationToken interrupter,
-            UnityAction<AnimationNotifier> onNotify, Action? onInterrupt = null
+            AnimationClip anim, CancellationToken interrupter, UnityAction<AnimationNotifier> onNotify
         ) {
-            return this.AnimationController is null
+            return !this.AnimationController
                     ? AsyncTask<AnimationPlayResult>.FromResult(AnimationPlayResult.Invalid)
-                    : this.AnimationController.PlayActionAnimation(anim, onNotify, onInterrupt, interrupter);
+                    : this.AnimationController.Play(anim, onNotify, interrupter);
         }
 
         CancellationTokenSource IEffectReceiverFacade.Register(EffectDescriptor effect, CancellationToken interrupt) {
