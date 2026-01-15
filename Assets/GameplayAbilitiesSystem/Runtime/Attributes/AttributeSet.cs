@@ -47,45 +47,45 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
                 node = this.AddNode(key, 0);
             }
 
-            double oldValue = node.Value;
-            Attribute updated = this.Query(key, node.BaseValue, node.MaxValue, node.MinValue, node.Approximator);
-            if (!updated.HasBeenApproximated) {
-                this.Approximator.Approximate(ref updated);
-            }
-
-            this.Attributes[updated.Id].Value = updated.Value;
+            this.Attributes[key].Value = this.QueryExact(key, node.BaseValue, node.MaxValue, node.MinValue);
         }
 
-        private Attribute Query(
-            AttributeKey key, double @base, IEvaluable<IAttributeReader>? max, IEvaluable<IAttributeReader>? min,
-            AttributeApproximator? approximator
+        private double QueryExact(
+            AttributeKey key, double @base, IEvaluable<IAttributeReader>? max, IEvaluable<IAttributeReader>? min
         ) {
             AttributeQuery query = new AttributeQuery(this.Owner, this, key, @base);
-            return this.ModifierEnvironment.Query(ref query, max, min, approximator);
+            this.ModifierEnvironment.Query(ref query, max, min);
+            return query.Value;
         }
 
         public double Query(AttributeKey key) {
-            return this.Attributes.TryGetValue(key, out Node node) ? node.Value : 0;
+            return this.Attributes.TryGetValue(key, out Node node) ? node.EffectiveValue : 0;
         }
 
         public double QueryMax(AttributeKey key) {
-            return this.Attributes.TryGetValue(key, out Node node)
-                    ? this.Query(key, int.MaxValue, node.MaxValue, node.MinValue, node.Approximator).Value
-                    : int.MaxValue;
+            if (!this.Attributes.TryGetValue(key, out Node node)) {
+                return int.MaxValue;
+            }
+            
+            double result = node.MaxValue?.Evaluate(this) ?? int.MaxValue;
+            return node.Approximator?.Approximate(result) ?? this.Approximator.Approximate(result);
         }
 
         public double QueryMin(AttributeKey key) {
-            return this.Attributes.TryGetValue(key, out Node node)
-                    ? this.Query(key, int.MinValue, node.MaxValue, node.MinValue, node.Approximator).Value
-                    : int.MinValue;
+            if (!this.Attributes.TryGetValue(key, out Node node)) {
+                return int.MinValue;
+            }
+
+            double result = node.MinValue?.Evaluate(this) ?? int.MinValue;
+            return node.Approximator?.Approximate(result) ?? this.Approximator.Approximate(result);
         }
 
         public bool HasAtLeast(double threshold, AttributeKey key) {
-            return this.Attributes.TryGetValue(key, out Node node) && node.Value >= threshold;
+            return this.Attributes.TryGetValue(key, out Node node) && node.EffectiveValue >= threshold;
         }
 
         public bool HasAtMost(double cap, AttributeKey key) {
-            return this.Attributes.TryGetValue(key, out Node node) && node.Value <= cap;
+            return this.Attributes.TryGetValue(key, out Node node) && node.EffectiveValue <= cap;
         }
 
         private void SetBase(AttributeKey key, double value) {
@@ -117,8 +117,12 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
 
         private Node AddNode(AttributeKey key, double value, AttributeType? type = null) {
             Node node = new Node(this, key, value, type);
-            node.OnValueChanged += this.OnAnyAttributeUpdated.Invoke;
+            node.OnValueChanged += this.OnAttributeUpdated;
             return node;
+        }
+
+        private void OnAttributeUpdated(AttributeKey key, AttributeChange change) {
+            this.OnAnyAttributeUpdated.Invoke(key, change);
         }
 
         public void Observe(AttributeKey attribute, Action<AttributeKey, AttributeChange> callback) {
@@ -134,14 +138,15 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         }
 
         public IEnumerator<Attribute> GetEnumerator() {
-            return this.Attributes.Select(entry => new Attribute(this, entry.Key, entry.Value.Value, true))
-                       .GetEnumerator();
+            foreach ((AttributeKey key, Node node) in this.Attributes) {
+                yield return new Attribute(this, key, node.EffectiveValue);
+            }
         }
 
         public override string ToString() {
             StringBuilder sb = new StringBuilder($"Attributes on {this.gameObject.name}:\n", this.Attributes.Count + 1);
             foreach (KeyValuePair<AttributeKey, Node> entry in this.Attributes) {
-                sb.AppendLine($"|{entry.Key}: {entry.Value.Value}");
+                sb.AppendLine($"|{entry.Key}: {entry.Value.EffectiveValue}");
             }
 
             return sb.ToString();
@@ -176,8 +181,12 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
                     double old = this.value;
                     this.value = value;
                     this.OnValueChanged.Invoke(this.Key, new AttributeChange(old, this.value));
+                    this.EffectiveValue = this.Approximator?.Approximate(this.value) ??
+                                          this.Owner.Approximator.Approximate(this.value);
                 }
             }
+
+            internal double EffectiveValue { get; private set; }
             
             internal event Action<AttributeKey, AttributeChange> OnValueChanged = delegate { };
 
