@@ -12,7 +12,6 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
             try {
                 interrupt.ThrowIfCancellationRequested();
                 await this.Execute(context, interrupt);
-                interrupt.ThrowIfCancellationRequested();
             } catch (OperationCanceledException) {
                 return this.OnInterrupt(context.Source, context.Ability);
             }

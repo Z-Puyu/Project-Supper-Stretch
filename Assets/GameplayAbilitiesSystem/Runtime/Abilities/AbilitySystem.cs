@@ -214,8 +214,8 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                     : this.AnimationController.Play(anim, onNotify, interrupter);
         }
 
-        CancellationTokenSource IEffectReceiverFacade.Register(EffectDescriptor effect, CancellationToken interrupt) {
-            return this.EffectRegistry.Register(effect, interrupt);
+        CancellationToken IEffectReceiverFacade.Register(EffectDescriptor effect) {
+            return this.EffectRegistry.Register(effect);
         }
 
         void IEffectReceiverFacade.StopEffects(EffectDescriptor effect) {
