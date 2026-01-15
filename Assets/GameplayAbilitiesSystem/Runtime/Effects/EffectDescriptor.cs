@@ -32,10 +32,10 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         }
         
         internal bool IsOnePossibleCaseOf(in EffectDescriptor descriptor) {
-            bool haveDifferentSourceAbility = !descriptor.SourceAbility || descriptor.SourceAbility == this.SourceAbility;
-            bool haveDifferentSourceEffect = !descriptor.SourceEffect || descriptor.SourceEffect == this.SourceEffect;
-            bool haveDifferentTag = this.Tag.StartsWith(descriptor.Tag);
-            return !haveDifferentSourceAbility && !haveDifferentSourceEffect && !haveDifferentTag;
+            bool haveSameSourceAbility = !descriptor.SourceAbility || descriptor.SourceAbility == this.SourceAbility;
+            bool haveSameSourceEffect = !descriptor.SourceEffect || descriptor.SourceEffect == this.SourceEffect;
+            bool haveTag = this.Tag.StartsWith(descriptor.Tag);
+            return haveSameSourceAbility && haveSameSourceEffect && haveTag;
         }
     }
 }
