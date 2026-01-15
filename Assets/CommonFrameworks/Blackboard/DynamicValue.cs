@@ -12,7 +12,7 @@ namespace CommonFrameworks.Blackboard {
             String
         }
     
-        internal Type DataType { get; private set; }
+        [field: SerializeField] internal Type DataType { get; private set; }
         
         [field: SerializeField, ShowIf(nameof(this.DataType), Type.Bool)]
         private bool BoolValue { get; set; }
