@@ -88,9 +88,9 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             return true;
         }
 
-        public void Revoke(Ability ability) {
+        public bool Revoke(Ability ability) {
             if (!this.AvailableAbilities.Remove(ability)) {
-                return;
+                return false;
             }
 
             foreach (Keyword keyword in ability.Tags) {
@@ -98,6 +98,21 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             }
 
             this.OnAbilityRevoked.Invoke(ability);
+            return true;
+        }
+        
+        /// <summary>
+        /// Attempts to execute the given ability. This will check if the ability system has the ability and
+        /// the conditions for the ability to start are met.
+        /// </summary>
+        /// <param name="ability">The ability to perform.</param>
+        /// <returns>An awaitable that completes when the ability has finished executing.</returns>
+        public async void Perform(Ability? ability) {
+            try {
+                await this.Perform(ability, null);
+            } catch (Exception e) {
+                Debug.LogException(e);
+            }
         }
 
         /// <summary>
@@ -107,7 +122,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         /// <param name="ability">The ability to perform.</param>
         /// <param name="userData">Optional user data for the ability.</param>
         /// <returns>An awaitable that completes when the ability has finished executing.</returns>
-        public async Awaitable Perform(Ability? ability, IReadOnlyDictionary<string, double>? userData = null) {
+        public async Awaitable Perform(Ability? ability, IReadOnlyDictionary<string, double>? userData) {
             if (!ability) {
                 return;
             }
@@ -141,7 +156,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                                    .DepthFirstPrefixSearch(keyword.Value)
                                    .FirstOrDefault().Value.FirstOrDefault();
             if (ability) {
-                await this.Perform(ability);
+                await this.Perform(ability, userData);
             }
         }
 
@@ -184,6 +199,11 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
 
         public bool IsRunningAbility(Ability ability) {
             return this.RunningAbilities.ContainsKey(ability);
+        }
+
+        public void CleanUp(Ability ability) {
+            this.Stop(ability);
+            this.EffectRegistry.Stop(new EffectDescriptor(ability));
         }
 
         public Awaitable<AnimationPlayResult> PlayAnimation(

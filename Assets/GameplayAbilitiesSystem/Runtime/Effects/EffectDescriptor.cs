@@ -25,6 +25,11 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
             this.SourceAbility = ability;
             this.Tag = tag;
         }
+
+        internal EffectDescriptor(Ability ability) {
+            this.SourceAbility = ability;
+            this.Tag = string.Empty;
+        }
         
         internal bool IsOnePossibleCaseOf(in EffectDescriptor descriptor) {
             bool haveDifferentSourceAbility = !descriptor.SourceAbility || descriptor.SourceAbility == this.SourceAbility;

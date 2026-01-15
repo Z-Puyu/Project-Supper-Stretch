@@ -2,6 +2,7 @@
 using SaintsField.Playa;
 using Unity.Plastic.Antlr3.Runtime.Misc;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 namespace Characters.Player {
@@ -12,6 +13,7 @@ namespace Characters.Player {
         public event Action OnDodge = delegate { };
         public event Action OnSprint = delegate { };
         public event Action OnCancelSprint = delegate { };
+        [field: SerializeField] private UnityEvent OnDodgeEvent { get; set; } = new UnityEvent();
 
         private void OnEnable() {
             this.PlayerControls ??= new PlayerControls();

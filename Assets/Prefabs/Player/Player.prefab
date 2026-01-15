@@ -75024,6 +75024,134 @@ PrefabInstance:
       propertyPath: <RotationSpeed>k__BackingField
       value: 45
       objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginRunning>k__BackingField.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginWalking>k__BackingField.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginSprinting>k__BackingField.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginRunning>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginWalking>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 6658280735558002848}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginRunning>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 6658280735558002848}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginSprinting>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginWalking>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 6658280735558002848}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginSprinting>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 6658280735558002848}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: CleanUp
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginRunning>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginWalking>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginRunning>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: CleanUp
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginWalking>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: CleanUp
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginSprinting>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginSprinting>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Perform
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem, GameplayAbilitiesSystem.Runtime
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginRunning>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem, GameplayAbilitiesSystem.Runtime
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginWalking>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem, GameplayAbilitiesSystem.Runtime
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginSprinting>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem, GameplayAbilitiesSystem.Runtime
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginRunning>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginWalking>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginSprinting>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: GameplayAbilitiesSystem.Runtime.Abilities.Ability, GameplayAbilitiesSystem.Runtime
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginRunning>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: GameplayAbilitiesSystem.Runtime.Abilities.Ability, GameplayAbilitiesSystem.Runtime
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginWalking>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: GameplayAbilitiesSystem.Runtime.Abilities.Ability, GameplayAbilitiesSystem.Runtime
+      objectReference: {fileID: 0}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnBeginSprinting>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: GameplayAbilitiesSystem.Runtime.Abilities.Ability, GameplayAbilitiesSystem.Runtime
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
