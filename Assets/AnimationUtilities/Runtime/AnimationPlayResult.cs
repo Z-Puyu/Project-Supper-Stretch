@@ -1,3 +1,3 @@
-﻿namespace GameplayAbilitiesSystem.Runtime.Animations {
+﻿namespace AnimationUtilities.Runtime {
     public enum AnimationPlayResult { Ended, Interrupted, Invalid }
 }

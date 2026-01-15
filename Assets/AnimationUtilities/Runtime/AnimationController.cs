@@ -1,50 +1,68 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
-using CommonFrameworks.Async;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Events;
 using UnityEngine.Playables;
 
-namespace GameplayAbilitiesSystem.Runtime.Animations {
-    public sealed class AnimationController {
-        private Animator Animator { get; set; }
+namespace AnimationUtilities.Runtime {
+    [DisallowMultipleComponent, RequireComponent(typeof(Animator))]
+    public sealed class AnimationController : MonoBehaviour {
+        [NotNull] private Animator? Animator { get; set; }
         private CancellationTokenSource InternalInterrupter { get; set; } = new CancellationTokenSource();
-        private PlayableGraph PlayableGraph { get; } = PlayableGraph.Create("Animation Graph");
+        private PlayableGraph PlayableGraph { get; set; }
         private AnimationPlayableOutput Output { get; set; }
         private AnimationMixerPlayable FinalMixer { get; set; }
         private AnimatorControllerPlayable AnimatorController { get; set; }
         private AnimationClipPlayable ActionAnimationClip { get; set; }
-        internal event UnityAction<AnimationClip, UnityAction<AnimationNotifier>> OnAnimationStarted = delegate { };
+        private HashSet<AnimationClip> PlaylistHistory { get; } = new HashSet<AnimationClip>();
+        
+        public event UnityAction<AnimationClip, UnityAction<AnimationNotifier>> OnAnimationStarted = delegate { };
+        public event UnityAction<AnimationNotifier> OnNotified = delegate { };
 
-        private AnimationController(Animator animator) {
-            this.Animator = animator;
-            this.FinalMixer = AnimationMixerPlayable.Create(this.PlayableGraph, 1);
-            this.Output = AnimationPlayableOutput.Create(this.PlayableGraph, "Output", animator);
+        private void Awake() {
+            this.Animator = this.GetComponent<Animator>();
+            this.PlayableGraph = PlayableGraph.Create("Animation Graph");
             this.AnimatorController = AnimatorControllerPlayable.Create(
-                this.PlayableGraph, animator.runtimeAnimatorController
+                this.PlayableGraph, this.Animator.runtimeAnimatorController
             );
+            
+            this.FinalMixer = AnimationMixerPlayable.Create(this.PlayableGraph, 1);
+            this.FinalMixer.DisconnectInput(0);
+            this.FinalMixer.ConnectInput(0, this.AnimatorController, 0);
+            this.FinalMixer.SetInputWeight(0, 1);
+            
+            this.Output = AnimationPlayableOutput.Create(this.PlayableGraph, "Output", this.Animator);
+            this.Output.SetSourcePlayable(this.FinalMixer);
+            
+            this.PlayableGraph.Play();
         }
 
-        internal static AnimationController Create(Animator animator) {
-            AnimationController controller = new AnimationController(animator);
-            controller.Output.SetSourcePlayable(controller.FinalMixer);
-            controller.FinalMixer.DisconnectInput(0);
-            controller.FinalMixer.ConnectInput(0, controller.AnimatorController, 0);
-            controller.FinalMixer.SetInputWeight(0, 1);
-            controller.PlayableGraph.Play();
-            return controller;
-        }
-
-        internal void Destroy() {
+        private void OnDestroy() {
             this.PlayableGraph.Destroy();
         }
+        
+        private void SendNotification(AnimationEvent @event) {
+            this.OnNotified.Invoke((AnimationNotifier)@event.objectReferenceParameter);
+        }
 
-        public async Awaitable<AnimationPlayResult> PlayActionAnimation(
-            AnimationClip clip, UnityAction<AnimationNotifier> onNotify, Action? onInterrupt = null,
+        public async Awaitable<AnimationPlayResult> Play(
+            AnimationClip clip, UnityAction<AnimationNotifier> onNotify,
             CancellationToken interrupter = default
         ) {
-            this.InterruptCurrentAction();
+            this.Interrupt();
+            if (this.PlaylistHistory.Add(clip)) {
+                foreach (AnimationEvent @event in clip.events) {
+                    if (@event.objectReferenceParameter.GetType() != typeof(AnimationNotifier)) {
+                        continue;
+                    }
+                    
+                    @event.functionName = nameof(this.SendNotification);
+                }    
+            }
+            
             this.FinalMixer.SetInputCount(2);
             this.ActionAnimationClip = AnimationClipPlayable.Create(this.PlayableGraph, clip);
             this.ActionAnimationClip.SetDuration(clip.length);
@@ -57,17 +75,19 @@ namespace GameplayAbilitiesSystem.Runtime.Animations {
                 interrupter, this.InternalInterrupter.Token
             );
 
+            this.OnNotified += onNotify;
             try {
                 await this.Crossfade(clip, cts.Token);
                 return AnimationPlayResult.Ended;
             } catch (OperationCanceledException) {
                 return AnimationPlayResult.Interrupted;
             } finally {
+                this.OnNotified -= onNotify;
                 this.ResetPlayableGraph();
             }
         }
 
-        public void InterruptCurrentAction() {
+        public void Interrupt() {
             if (!this.ActionAnimationClip.IsValid()) {
                 return;
             }

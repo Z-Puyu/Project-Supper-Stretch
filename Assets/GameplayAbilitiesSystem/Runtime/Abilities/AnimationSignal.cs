@@ -3,7 +3,7 @@ using GameplayAbilitiesSystem.Runtime.Abilities.Executions;
 using SaintsField;
 using UnityEngine;
 
-namespace GameplayAbilitiesSystem.Runtime.Animations {
+namespace GameplayAbilitiesSystem.Runtime.Abilities {
     [Serializable]
     internal sealed class AnimationSignal {
         [field: SerializeField, ReadOnly] internal string Name { get; private set; }
