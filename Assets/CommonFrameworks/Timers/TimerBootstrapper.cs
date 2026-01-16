@@ -17,12 +17,13 @@ namespace CommonFrameworks.Timers {
             };
 
             PlayerLoopSystem loop = PlayerLoop.GetCurrentPlayerLoop();
-            if (!loop.InsertSubsystem<PreUpdate>(TimerBootstrapper.Subsystem, 0)) {
+            if (!loop.InsertSubsystem<Update>(TimerBootstrapper.Subsystem)) {
                 Debug.LogError("Failed to insert timer subsystem");
             } else {
                 PlayerLoop.SetPlayerLoop(loop);
             }
             
+            loop = PlayerLoop.GetCurrentPlayerLoop();
 #if UNITY_EDITOR
             EditorApplication.playModeStateChanged -= handlePlayModeStateChange;
             EditorApplication.playModeStateChanged += handlePlayModeStateChange;
@@ -34,7 +35,7 @@ namespace CommonFrameworks.Timers {
                 }
 
                 PlayerLoopSystem loop = PlayerLoop.GetCurrentPlayerLoop();
-                loop.RemoveSubsystem<PreUpdate>(TimerBootstrapper.Subsystem);
+                loop.RemoveSubsystem<Update>(TimerBootstrapper.Subsystem);
                 PlayerLoop.SetPlayerLoop(loop);
                 TimerSubsystem.Clear();
             }

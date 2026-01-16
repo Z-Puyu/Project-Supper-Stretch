@@ -54,38 +54,31 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
             }
         }
 
-        private Attribute Query(
+        private void Query(
             ref AttributeQuery query, (ModifierValue modifier, ModifierType op)[] modifiers, 
-            in IEvaluable<IAttributeReader>? max, in IEvaluable<IAttributeReader>? min, 
-            in AttributeApproximator? approximator
+            in IEvaluable<IAttributeReader>? max, in IEvaluable<IAttributeReader>? min
         ) {
             this.CollectModifiers(query.Id, modifiers);
             if (!this.IsGlobalEnvironment && this.ParentEnvironment) {
-                return this.ParentEnvironment.Query(ref query, modifiers, max, min, approximator);
-            }
+                this.ParentEnvironment.Query(ref query, modifiers, max, min);
+            } else {
+                foreach ((ModifierValue modifier, ModifierType op) in modifiers) {
+                    double value = modifier.ApplyTo(query.Value, op);
+                    if (max is not null) {
+                        value = Math.Min(max.Evaluate(query.Source), value);
+                    }
 
-            foreach ((ModifierValue modifier, ModifierType op) in modifiers) {
-                double value = modifier.ApplyTo(query.Value, op);
-                if (max is not null) {
-                    value = Math.Min(max.Evaluate(query.Source), value);
+                    if (min is not null) {
+                        value = Math.Max(min.Evaluate(query.Source), value);
+                    }
+
+                    query.Value = value;
                 }
-
-                if (min is not null) {
-                    value = Math.Max(min.Evaluate(query.Source), value);
-                }
-
-                Attribute attribute = new Attribute(query.Source, query.Id, value, query.IsValueApproximated);
-                approximator?.Approximate(ref attribute);
-                query.Value = attribute.Value;
-                query.IsValueApproximated = attribute.HasBeenApproximated;
             }
-
-            return new Attribute(query.Source, query.Id, query.Value, query.IsValueApproximated);
         }
 
-        internal Attribute Query(
-            ref AttributeQuery query, in IEvaluable<IAttributeReader>? max, in IEvaluable<IAttributeReader>? min,
-            in AttributeApproximator? approximator
+        internal void Query(
+            ref AttributeQuery query, in IEvaluable<IAttributeReader>? max, in IEvaluable<IAttributeReader>? min
         ) {
             (ModifierValue modifier, ModifierType op)[] modifiers = {
                 (ModifierValue.Zero, ModifierType.Shift), 
@@ -94,7 +87,7 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
                 (ModifierValue.Zero, ModifierType.Offset)
             };
             
-            return this.Query(ref query, modifiers, max, min, approximator);
+            this.Query(ref query, modifiers, max, min);
         }
 
         public override string ToString() {
@@ -129,8 +122,15 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
                     case ModifierType.Multiplier:
                         this.Multiplier += modifier.Value;
                         break;
-                    case ModifierType.Offset when modifier.Value >= 0:
-                        this.PositiveOffset += modifier.Value;
+                    case ModifierType.Offset when modifier.Value >= 0 && -this.NegativeOffset > modifier.Value:
+                        this.NegativeOffset += modifier.Value;
+                        break;
+                    case ModifierType.Offset when modifier.Value >= 0 && -this.NegativeOffset < modifier.Value:
+                        this.PositiveOffset += modifier.Value + this.NegativeOffset;
+                        this.NegativeOffset = ModifierValue.Zero;
+                        break;
+                    case ModifierType.Offset when modifier.Value >= 0 && -this.NegativeOffset == modifier.Value:
+                        this.NegativeOffset = ModifierValue.Zero;
                         break;
                     case ModifierType.Offset when modifier.Value < 0:
                         this.NegativeOffset += modifier.Value;

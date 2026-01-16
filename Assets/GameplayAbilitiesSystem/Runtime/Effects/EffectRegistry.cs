@@ -19,19 +19,10 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
             );
         }
 
-        internal CancellationTokenSource Register(EffectDescriptor effect, CancellationToken interrupt) {
+        internal CancellationToken Register(EffectDescriptor effect) {
             CancellationTokenSource @internal = new CancellationTokenSource();
             this.Add(effect, @internal);
-            return CancellationTokenSource.CreateLinkedTokenSource(interrupt, @internal.Token);
-        }
-        
-        internal CancellationTokenSource Register(ISet<EffectDescriptor> effects, CancellationToken interrupt) {
-            CancellationTokenSource @internal = new CancellationTokenSource();
-            foreach (EffectDescriptor effect in effects) {
-                this.Add(effect, @internal);
-            }
-            
-            return CancellationTokenSource.CreateLinkedTokenSource(interrupt, @internal.Token);
+            return @internal.Token;
         }
 
         internal void Stop(EffectDescriptor effect) {

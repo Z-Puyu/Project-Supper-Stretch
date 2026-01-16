@@ -55,27 +55,27 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
         }
 
         public static bool operator ==(ModifierValue a, double n) {
-            return Math.Abs(a.Magnitude - n) < 0.001;
+            return Math.Abs(a.Magnitude - n) < 0.00001;
         }
 
         public static bool operator !=(ModifierValue a, double n) {
-            return Math.Abs(a.Magnitude - n) >= 0.001;
+            return Math.Abs(a.Magnitude - n) >= 0.00001;
         }
 
         public static bool operator >(ModifierValue a, double n) {
-            return a.Magnitude - n > 0.001;
+            return a.Magnitude > n;
         }
 
         public static bool operator <(ModifierValue a, double n) {
-            return a.Magnitude - n < 0.001;
+            return a.Magnitude < n;
         }
 
         public static bool operator >=(ModifierValue a, double n) {
-            return a == n || a > n;
+            return a > n || a == n;
         }
 
         public static bool operator <=(ModifierValue a, double n) {
-            return a == n || a < n;
+            return a > n || a == n;
         }
 
         public static implicit operator double(ModifierValue value) {

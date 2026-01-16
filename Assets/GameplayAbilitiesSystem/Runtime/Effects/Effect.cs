@@ -13,7 +13,7 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
     [CreateAssetMenu(fileName = "New Effect", menuName = "Gameplay Abilities/Effect")]
     public sealed class Effect : ScriptableObject {
         internal enum Type { Instant, Periodic, Persistent }
-        
+
         [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))]
         internal string Tag { get; private set; } = string.Empty;
 
@@ -37,15 +37,15 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
 
         [field: SerializeField, ShowIf(nameof(this.IsPeriodic))]
         private bool ShouldExecuteBeforeFirstInterval { get; set; }
-        
+
         [field: SerializeField] private EffectKeywordPreset KeywordPreset { get; set; } = new EffectKeywordPreset();
-        
-        [field: SerializeField, SaintsRow(true)] 
+
+        [field: SerializeField, SaintsRow(true)]
         private EffectModifierPreset ModifierPreset { get; set; } = new EffectModifierPreset();
-        
+
         [field: SerializeField, Table]
         private List<EffectDescriptor> TargetRemovesEffects { get; set; } = new List<EffectDescriptor>();
-        
+
         private bool IsFinite => !this.IsInfinite;
         private bool IsInstant => this.Periodicity == Type.Instant;
         private bool IsPeriodic => this.Periodicity == Type.Periodic;
@@ -59,17 +59,16 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
         /// <param name="target">The target of the effect</param>
         /// <param name="sourceAbility">Optional ability that caused the effect.</param>
         /// <param name="userData">Optional user data for the effect.</param>
-        /// <param name="interrupt">The cancellation token for interrupting the effect externally.</param>
         public async void Apply(
             IEffectEmitterFacade source, IEffectReceiverFacade target,
             IReadOnlyDictionary<string, double>? userData = null,
-            Ability? sourceAbility = null, CancellationToken interrupt = default
+            Ability? sourceAbility = null
         ) {
             try {
                 foreach (EffectDescriptor descriptor in this.TargetRemovesEffects) {
-                    target.StopEffects(descriptor);    
+                    target.StopEffects(descriptor);
                 }
-                
+
                 Modifier[] modifiers = this.ModifierPreset.Apply(source, target, userData).ToArray();
                 this.KeywordPreset.Apply(source, target);
                 if (this.Periodicity != Type.Periodic || this.ShouldExecuteBeforeFirstInterval) {
@@ -77,12 +76,9 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
                         target.AddModifier(modifier);
                     }
                 } else {
-                    using CancellationTokenSource interrupter = target.Register(
-                        new EffectDescriptor(this, sourceAbility), interrupt
-                    );
-
+                    CancellationToken interrupt = target.Register(new EffectDescriptor(this, sourceAbility));
                     try {
-                        await this.RunAsynchronously(target, modifiers, interrupter.Token);
+                        await this.RunAsynchronously(target, modifiers, interrupt);
                     } catch (OperationCanceledException) {
                         this.KeywordPreset.Revoke(source, target);
                     }
@@ -104,18 +100,16 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
                             target.AddModifier(-modifier);
                         }
                     }
-                    
+
                     break;
                 case Type.Periodic:
-                    for (int i = 0; i < this.PeriodCount; i += 1) {
+                    int period = 0;
+                    while (this.PeriodCount < 0 || period < this.PeriodCount) {
                         if (this.Interval <= 0) {
-                            float progress = 0;
-                            while (progress < this.Interval) {
+                            while (!interrupt.IsCancellationRequested) {
                                 await Awaitable.NextFrameAsync(interrupt);
-                                float delta = Mathf.Min(Time.deltaTime, this.Interval - progress);
-                                progress += Time.deltaTime;
                                 foreach (Modifier modifier in modifiers) {
-                                    target.AddModifier(modifier * (delta / this.Interval));
+                                    target.AddModifier(modifier * Time.deltaTime);
                                 }
                             }
                         } else {
@@ -124,8 +118,12 @@ namespace GameplayAbilitiesSystem.Runtime.Effects {
                                 target.AddModifier(modifier);
                             }
                         }
+
+                        if (this.PeriodCount >= 0) {
+                            period += 1;
+                        }
                     }
-                    
+
                     break;
             }
         }

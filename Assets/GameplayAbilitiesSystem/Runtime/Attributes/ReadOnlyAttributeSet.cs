@@ -44,8 +44,9 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
         }
 
         public IEnumerator<Attribute> GetEnumerator() {
-            return this.Attributes.Select(entry => new Attribute(this, entry.Key, entry.Value.value, true))
-                       .GetEnumerator();
+            foreach ((AttributeKey key, (double value, double max, double min) node) in this.Attributes) {
+                yield return new Attribute(this, key, node.value);
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator() {

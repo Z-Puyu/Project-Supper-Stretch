@@ -9,66 +9,63 @@ namespace CommonFrameworks.Extensions {
         }
         
         public static bool InsertSubsystem<T>(
-            this ref PlayerLoopSystem root, in PlayerLoopSystem subsystem, int index = int.MaxValue
+            this ref PlayerLoopSystem root, in PlayerLoopSystem subsystem, int index = 0
         ) {
-            if (!root.HasLoop<T>(out PlayerLoopSystem loop)) {
-                return false;
-            }
-
-            if (loop.subSystemList is null) {
-                loop.subSystemList = new[] { subsystem };
-            } else {
-                List<PlayerLoopSystem> list = new List<PlayerLoopSystem>(loop.subSystemList);
-                int pos = Math.Clamp(index, 0, loop.subSystemList.Length - 1);
-                list.Insert(pos, subsystem);
-                loop.subSystemList = list.ToArray();
-            }
-
-            return true;
-        }
-
-        public static bool RemoveSubsystem<T>(this ref PlayerLoopSystem root, in PlayerLoopSystem subsystem) {
-            if (!root.HasLoop<T>(out PlayerLoopSystem loop) || loop.subSystemList is null) {
-                return false;
-            }
-
-            for (int i = 0; i < loop.subSystemList.Length; i += 1) {
-                if (!loop.subSystemList[i].IsSameSystem(subsystem)) {
-                    continue;
+            if (root.type == typeof(T)) {
+                if (root.subSystemList is null) {
+                    root.subSystemList = new[] { subsystem };
+                } else {
+                    List<PlayerLoopSystem> list = new List<PlayerLoopSystem>(root.subSystemList);
+                    int pos = Math.Clamp(index, 0, list.Count);
+                    list.Insert(pos, subsystem);
+                    root.subSystemList = list.ToArray();
                 }
                 
-                loop.subSystemList[i] = default;
-                for (int j = i + 1; j < loop.subSystemList.Length; j += 1) {
-                    loop.subSystemList[j - 1] = loop.subSystemList[j];
-                }
-                
-                Array.Resize(ref loop.subSystemList, loop.subSystemList.Length - 1);
                 return true;
+            } 
+            
+            if (root.subSystemList is null) {
+                return false;
+            }
+
+            for (int i = 0; i < root.subSystemList.Length; i += 1) {
+                if (root.subSystemList[i].InsertSubsystem<T>(subsystem, index)) {
+                    return true;
+                }
             }
             
             return false;
         }
 
-        public static bool HasLoop<T>(this ref PlayerLoopSystem root, out PlayerLoopSystem loop) {
-            Stack<PlayerLoopSystem> stack = new Stack<PlayerLoopSystem>();
-            stack.Push(root);
-            Type target = typeof(T);
-            while (stack.TryPop(out PlayerLoopSystem curr)) {
-                if (curr.type == target) {
-                    loop = curr;
+        public static bool RemoveSubsystem<T>(this ref PlayerLoopSystem root, in PlayerLoopSystem subsystem) {
+            if (root.type == typeof(T) && root.subSystemList is not null) {
+                for (int i = 0; i < root.subSystemList.Length; i += 1) {
+                    if (!root.subSystemList[i].IsSameSystem(subsystem)) {
+                        continue;
+                    }
+                
+                    root.subSystemList[i] = default;
+                    for (int j = i + 1; j < root.subSystemList.Length; j += 1) {
+                        root.subSystemList[j - 1] = root.subSystemList[j];
+                    }
+                
+                    Array.Resize(ref root.subSystemList, root.subSystemList.Length - 1);
                     return true;
                 }
+                
+                return false;
+            }
 
-                if (curr.subSystemList is null) {
-                    continue;
-                }
+            if (root.subSystemList is null) {
+                return false;
+            }
 
-                foreach (PlayerLoopSystem child in curr.subSystemList) {
-                    stack.Push(child);
+            for (int i = 0; i < root.subSystemList.Length; i += 1) {
+                if (root.subSystemList[i].RemoveSubsystem<T>(subsystem)) {
+                    return true;
                 }
             }
             
-            loop = default;
             return false;
         }
     }
