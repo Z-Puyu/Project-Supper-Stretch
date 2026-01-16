@@ -178,6 +178,10 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
             internal double Value {
                 get => this.value;
                 set {
+                    if (this.value - value == 0) {
+                        return;
+                    }
+                    
                     double old = this.Value;
                     this.value = value;
                     this.OnValueChanged.Invoke(this.Key, new AttributeChange(old, this.Value));
