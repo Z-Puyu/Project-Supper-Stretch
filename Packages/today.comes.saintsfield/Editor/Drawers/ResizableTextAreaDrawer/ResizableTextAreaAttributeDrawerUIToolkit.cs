@@ -8,6 +8,7 @@ using SaintsField.Utils;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.ResizableTextAreaDrawer

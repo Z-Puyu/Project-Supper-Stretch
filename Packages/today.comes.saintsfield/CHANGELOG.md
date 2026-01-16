@@ -1,5 +1,27 @@
 # Changelog
 
+## 5.8.3 ##
+
+1.  Fix: Auto Validator gives error on a field
+2.  Fix: layout system on horizontal now calculate width better, fix the issue that some elements might take all space
+3.  Fix: Value Buttons didn't re-calculate layout when width changes
+4.  Improve: layout system now support tags (color, icon etc.) for boxed group (tabs, titleBoxed, foldout etc.)
+
+## 5.8.2 ##
+
+Fix: `SaintsDictionary` failed to deserialize data in build when instantiate a prefab [#355](https://github.com/TylerTemp/SaintsField/issues/355)
+
+## 5.8.1 ##
+
+1.  Fix: incorrect GC alloc in Custom editor window [#354](https://github.com/TylerTemp/SaintsField/issues/354)
+2.  Improve: Tabs in layout system now can break lines if there are way too many tabs
+3.  Fix: `ShowInInspector` for property tried to invoke a `OnValueChanged` even there is not one
+
+## 5.8.0 ##
+
+1.  Fix: layout system can not detect field order inside a general struct/class
+2.  Change: layout system no longer requires `Microsoft.CodeAnalysis.CSharp`. You can safely uninstall it from Package Manager
+
 ## 5.7.9 ##
 
 1.  Fix `RichText` did not work with `<field.subField/>`

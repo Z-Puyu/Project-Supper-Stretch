@@ -95,15 +95,12 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.7.9**
+**5.8.3**
 
-1.  Fix `RichText` did not work with `<field.subField/>`
-2.  Fix `AboveText`, `BelowText` did not update with `<field/>` tag
-3.  Add: static callback now support nested type finding
-4.  Change: `PlayEnableIf`/`PlayaDisableIf` now is `EnableIf`/`DisableIf`. And the original ones are now `FieldEnableIf`/`FieldDisableIf`
-5.  Fix: `ShowIf`/`HideIf`/`EnableIf`/`DisableIf` now gives an error box if the callback have errors
-6.  Fix: `ShowInInspector` for struct/class, switching type did not clean the old fields
-7.  Add: `OnValueChanged` now works with `ShowInInspector`
+1.  Fix: Auto Validator gives error on a field
+2.  Fix: layout system on horizontal now calculate width better, fix the issue that some elements might take all space
+3.  Fix: Value Buttons didn't re-calculate layout when width changes
+4.  Improve: layout system now support tags (color, icon etc.) for boxed group (tabs, titleBoxed, foldout etc.)
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -5749,16 +5746,21 @@ private string ShowGuid([Guid] string guidString) => guidString;
 
 ## Layout System ##
 
-### Setup ###
+### Overview ###
 
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
 Layout system allows you to group severral target (field, property, button etc) together. It also allows you to box it with/without a title box or foldout box.
 
-You can use this system once `SaintsEditor` is enabled in your project. However, because C# reflection can not give a correct order of targets between fields, properties, and method, the layout could gather targets incorrectly. Thus, it's highly recommended to install [Microsoft.CodeAnalysis.CSharp](https://www.nuget.org/packages/microsoft.codeanalysis.csharp/). This dependency will NOT be included in your build.
+This will generate:
 
-Which means, though it works 90% of the time:
+1.  Temp files under `Library/SaintsFieldTemp`
+2.  `Assets/Editor Default Resources/SaintsField/Temp.SaintsFieldSourceParser.additionalfile` (You should ignore this in your version control)
+
+You can change configs under `Assets/Editor Default Resources/SaintsField/Config.SaintsFieldSourceParser.additionalfile`
+
+The field can be groupd as:
 
 ```csharp
 using SaintsField.Playa;
@@ -5782,7 +5784,7 @@ public GameObjct out2;
 
 ![](https://github.com/user-attachments/assets/8b8342c0-166c-4df6-a345-0ec0c91b22c2)
 
-But if you mix some method, the method will not be placed where it anounced, because the limitation from C\# language
+You can also mix it with `Button` & `ShowInInspector`
 
 ```csharp
 [LayoutStart("Left Hand", ELayout.FoldoutBox)]
@@ -5802,67 +5804,11 @@ public int hp;
 public int mp;
 ```
 
-❌ Without `Microsoft.CodeAnalysis.CSharp`, it uses the default reflection order, which is field & property, then method:
-
-![](https://github.com/user-attachments/assets/0d019562-c10f-44c6-9597-e6957ee70342)
-
-✅ With `Microsoft.CodeAnalysis.CSharp`, it uses the source code declaration order:
-
 ![](https://github.com/user-attachments/assets/1368d7df-7505-44d3-8c03-703dce2f6fea)
 
-You can install it using any method below:
+All together showcase:
 
-**Auto Installer**
-
-1.  Go `Window` - `Saints` - `Enable Code Analysis...`
-2.  If it's not installed, click `Install` for "Code Analysis"
-3.  Click `Enable` for "Code Analysis"
-
-![](https://github.com/user-attachments/assets/d09344b0-9fbe-48b0-bad5-fbeb93e1164a)
-
-**Unity Package Manager + Unity NuGet**
-
-1.  Open `Project Settings` - `Package Manager`, click plus icon to add a scoped registries
-2.  Add:
-    *   Name: `Unity NuGet`
-    *   URL: `https://unitynuget-registry.openupm.com`
-    *   Scopes: `org.nuget`
-3.  Click `Save` button
-
-    ![](https://github.com/user-attachments/assets/aa48ab9a-b52b-4c10-a110-1f1a342d74d5)
-4.  Open `Window` - `Package Manager`, click the plus icon to add package by name
-
-    ![](https://github.com/user-attachments/assets/f8872324-5ce6-476f-be80-207ad60bb416)
-5.  Type `org.nuget.microsoft.codeanalysis.csharp` and hit `Add`
-
-    ![](https://github.com/user-attachments/assets/25f912e0-bb7a-43b3-8d89-a750652f84af)
-6.  Wait until you see the `Microsoft.CodeAnalysis.CSharp` under `Microsoft` part
-
-    ![](https://github.com/user-attachments/assets/42138dfb-1e11-409d-a4c0-36cf8c5a8bb4)
-
-7.  Go `Edit` - `Project Settings` - `SaintsField`
-
-[**OpenUPM Uplink**](https://openupm.com/nuget/#using-uplinked-unitynuget)
-
-```bash
-openupm add org.nuget.microsoft.codeanalysis.csharp
-```
-
-Then go `Edit` - `Project Settings` - `SaintsField`
-
-
-**NuGet for Unity**:
-
-1.  Install [NuGet for Unity](https://github.com/GlitchEnzo/NuGetForUnity?tab=readme-ov-file#how-do-i-install-nugetforunity)
-2.  Open `NuGet` - `Manage NuGet Packages`
-
-    ![](https://github.com/user-attachments/assets/98654064-2815-4769-b071-8863d74a4c78)
-3.  Type `Microsoft.CodeAnalysis.CSharp` and hit `Search`, on the result, click `Install` (the newest version should work just fine)
-
-    ![](https://github.com/user-attachments/assets/766775cd-9e7c-4361-8bab-abab8bda39e8)
-4.  Go `Edit` - `Project Settings` - `SaintsField`
-
-Or you can manually install related dll to Unity.
+![](https://github.com/user-attachments/assets/53cb154e-2bb3-4cd1-a7eb-17ded8e943d5)
 
 ### `Layout` ###
 
@@ -5877,7 +5823,31 @@ A layout decorator to group fields.
 *   `float marginTop = -1f` add some space before the layout. `-1` for using default spacing.
 *   `float marginBottom = -1f` add some space after the layout. `-1` for using default spacing.
 
-Options are:
+For more information, see `LayoutStart` below
+
+### `LayoutStart` / `LayoutEnd` ###
+
+> [!IMPORTANT]
+> Enable `SaintsEditor` before using
+
+`LayoutStart` allows you to continuously grouping fields with layout, until a new group appears. `LayoutEnd` will stop the grouping.
+
+`LayoutStart(name)` is the same as `Layout(name, keepGrouping: true)`
+
+For `LayoutStart`:
+
+*   `string groupBy` same as `Layout`
+*   `ELayout layout=0` same as `Layout`
+*   `float marginTop = -1f` same as `Layout`
+*   `float marginBottom = -1f` same as `Layout`
+
+For `LayoutEnd`:
+
+*   `string groupBy=null` same as `Layout`. When `null`, close all existing groups.
+
+It supports `./SubGroup` to create a nested subgroup:
+
+`ELayout` Options are:
 
 *   `Vertical`
 *   `Horizontal`
@@ -5892,162 +5862,149 @@ Options are:
 *   `FoldoutBox` = `Background | Title | TitleOut | Foldout`
 *   `CollapseBox` = `Background | Title | TitleOut | Collapse`
 
-**Appearance**
-
-![layout](https://github.com/user-attachments/assets/43afc0da-f801-4a2b-8a6a-fcd5cfb8a259)
-
-**Example**
+Example of title:
 
 ```csharp
-using SaintsField;
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
+[LayoutStart("Titled", ELayout.Title)]
+public string t1;
+public string t2;
+public string t3;
 
-[Layout("Titled", ELayout.Title | ELayout.TitleOut)]
-public string titledItem1, titledItem2;
+[LayoutStart("Titled <color=Chartreuse>Box", ELayout.TitleBox)]
+public string b1;
+public string b2;
+public string b3;
 
-// title
-[Layout("Titled Box", ELayout.Background | ELayout.TitleOut)]
-public string titledBoxItem1;
-[Layout("Titled Box")]  // you can omit config when you already declared one somewhere (no need to be the first one)
-public string titledBoxItem2;
-
-// foldout
-[LayoutStart("Collapse", ELayout.CollapseBox)]
-public string collapseItem1;
-public string collapseItem2;
-
-[LayoutStart("Foldout", ELayout.FoldoutBox)]
-public string foldoutItem1;
-public string foldoutItem2;
-
-// tabs
-[Layout("Tabs", ELayout.Tab | ELayout.Collapse)]
-[LayoutStart("./Tab1")]
-public string tab1Item1;
-public int tab1Item2;
-
-[LayoutStart("../Tab2")]
-public string tab2Item1;
-public int tab2Item2;
-
-[LayoutStart("../Tab3")]
-public string tab3Item1;
-public int tab3Item2;
-
-// nested groups
-[LayoutStart("Nested", ELayout.Background | ELayout.TitleOut)]
-public int nestedOne;
-
-[LayoutStart("./Nested Group 1", ELayout.TitleOut)]
-public int nestedTwo;
-public int nestedThree;
-
-[LayoutStart("./Nested Group 2", ELayout.TitleOut)]
-public int nestedFour;
-public string nestedFive;
-
-// Unlabeled Box
-[Layout("Unlabeled Box", ELayout.Background)]
-public int unlabeledBoxItem1, unlabeledBoxItem2;
-
-// Foldout In A Box
-[Layout("Foldout In A Box", ELayout.Foldout | ELayout.Background | ELayout.TitleOut)]
-public int foldoutInABoxItem1, foldoutInABoxItem2;
-
-// Complex example. Button and ShowInInspector works too
-[Ordered]
-[Layout("Root", ELayout.Tab | ELayout.Foldout | ELayout.Background)]
-[Layout("Root/V1")]
-[SepTitle("Basic", EColor.Pink)]
-public string hv1Item1;
-
-[Ordered]
-[Layout("Root/V1/buttons", ELayout.Horizontal)]
-[Button("Root/V1 Button1")]
-public void RootV1Button()
-{
-    Debug.Log("Root/V1 Button");
-}
-[Ordered]
-[Layout("Root/V1/buttons")]
-[Button("Root/V1 Button2")]
-public void RootV1Button2()
-{
-    Debug.Log("Root/V1 Button");
-}
-
-[Ordered]
-[Layout("Root/V1")]
-[ShowInInspector]
-public static Color color1 = Color.red;
-
-[Ordered]
-[DOTweenPlay("Tween1", "Root/V1")]
-public Tween RootV1Tween1()
-{
-    return DOTween.Sequence();
-}
-
-[Ordered]
-[DOTweenPlay("Tween2", "Root/V1")]
-public Tween RootV1Tween2()
-{
-    return DOTween.Sequence();
-}
-
-[Ordered]
-[Layout("Root/V1")]
-public string hv1Item2;
-
-// public string below;
-
-[Ordered]
-[Layout("Root/V2")]
-public string hv2Item1;
-
-[Ordered]
-[Layout("Root/V2/H", ELayout.Horizontal), NoLabel]
-public string hv2Item2, hv2Item3;
-
-[Ordered]
-[Layout("Root/V2")]
-public string hv2Item4;
-
-[Ordered]
-[Layout("Root/V3", ELayout.Horizontal)]
-[ResizableTextArea, NoLabel]
-public string hv3Item1, hv3Item2;
-
-[Ordered]
-[Layout("Root/Buggy")]
-[InfoBox("Sadly, Horizontal is buggy either in UI Toolkit or IMGUI", above: true)]
-public string buggy = "See below:";
-
-[Ordered]
-[Layout("Root/Buggy/H", ELayout.Horizontal)]
-public string buggy1, buggy2, buggy3;
-
-[Ordered]
-[Layout("Title+Tab", ELayout.Tab | ELayout.TitleBox)]
-[Layout("Title+Tab/g1")]
-public string titleTabG11, titleTabG21;
-
-[Ordered]
-[Layout("Title+Tab/g2")]
-public string titleTabG12, titleTabG22;
-
-[Ordered]
-[Layout("All Together", ELayout.Tab | ELayout.Foldout | ELayout.Title | ELayout.TitleOut | ELayout.Background)]
-[Layout("All Together/g1")]
-public string allTogetherG11, allTogetherG21;
-
-[Ordered]
-[Layout("All Together/g2")]
-public string allTogetherG12, allTogetherG22;
+[LayoutStart("Titled<icon=d_orangeLight/>", ELayout.TitleOut)]
+public string o1;
+public string o2;
+public string o3;
 ```
 
-[![video](https://github.com/TylerTemp/SaintsField/assets/6391063/0b8bc596-6a5d-4f90-bf52-195051a75fc9)](https://github.com/TylerTemp/SaintsField/assets/6391063/5b494903-9f73-4cee-82f3-5a43dcea7a01)
+![](https://github.com/user-attachments/assets/92e03303-0209-497c-a297-66d3c7a900e3)
+
+Example of foldout:
+
+```csharp
+[LayoutStart("Foldout", ELayout.Foldout)]
+public string t1;
+public string t2;
+public string t3;
+
+[LayoutStart("Foldout <color=DeepSkyBlue>Box", ELayout.Foldout |  ELayout.TitleBox)]
+public string b1;
+public string b2;
+public string b3;
+
+[LayoutStart("<icon=LensFlare Gizmo/>Foldout", ELayout.Foldout | ELayout.TitleOut)]
+public string o1;
+public string o2;
+public string o3;
+```
+
+![](https://github.com/user-attachments/assets/f2d5a36d-7818-4738-ab67-9d49eb99d50c)
+
+Example of tabs:
+
+```csharp
+[LayoutStart("Tabs", ELayout.Tab)]
+[LayoutStart("./Tab1")]
+public string t1;
+public string t2;
+public string t3;
+
+[LayoutStart("../Tab2")]
+public string b1;
+public string b2;
+public string b3;
+
+[LayoutStart("../Tab3")]
+public string o1;
+public string o2;
+public string o3;
+
+// Mix with title
+
+[LayoutStart("MixedTabs", ELayout.Tab | ELayout.TitleBox | ELayout.Foldout)]
+[LayoutStart("./Tab1")]
+public string mt1;
+public string mt2;
+public string mt3;
+
+[LayoutStart("../Tab2")]
+public string mb1;
+public string mb2;
+public string mb3;
+
+[LayoutStart("../Tab3")]
+public string mo1;
+public string mo2;
+public string mo3;
+
+// Colors + Icons
+
+[LayoutStart("Color Tab", ELayout.Tab)]
+
+[LayoutStart("./<color=#FCBF07><icon=d_AudioClip Icon/>Music")]
+public string m1;
+public string m2;
+public string m3;
+
+[LayoutStart("../<color=#34F42B><icon=greenLight/>Light")]
+public string l1;
+public string l2;
+public string l3;
+
+[LayoutStart("../<color=#B0FC58><icon=d_Cloth Icon/>Skin")]
+public string skin1;
+public string skin2;
+public string skin3;
+
+[LayoutStart("../<color=Aquamarine><icon=d_Settings Icon/>Settings")]
+public string s1;
+public string s2;
+public string s3;
+
+[LayoutStart("../<color=Bisque><icon=d_UnityEditor.GameView/>Controller")]
+public string g1;
+public string g2;
+public string g3;
+
+[LayoutStart("../<color=CadetBlue><icon=star.png/>Favorite")]
+public string f1;
+public string f2;
+public string f3;
+
+[LayoutStart("../<color=Chartreuse><icon=AudioSource Gizmo/>Audio")]
+public string a1;
+public string a2;
+public string a3;
+```
+
+![](https://github.com/user-attachments/assets/788df076-ae32-4b66-bca0-fdb05185e801)
+
+![](https://github.com/user-attachments/assets/cb3df1b5-465c-46bf-92d6-f76531cd134d)
+
+Example of horizental
+
+```csharp
+[LayoutStart("Horizontal", ELayout.Horizontal)]
+public string t1;
+public string t2;
+public string t3;
+
+[LayoutStart("HorizontalBox", ELayout.Horizontal | ELayout.TitleBox)]
+public string b1;
+public string b2;
+public string b3;
+
+[LayoutStart("HorizontalFoldout", ELayout.Horizontal | ELayout.FoldoutBox)]
+public string o1;
+public string o2;
+public string o3;
+```
+
+![](https://github.com/user-attachments/assets/6e926991-b0ae-4221-be52-fac43a187968)
 
 By combining `Layout` with `Seperator`/`InfoBox`, you can create some complex layout struct:
 
@@ -6082,29 +6039,7 @@ public bool toggle;
 
 ![image](https://github.com/user-attachments/assets/d2185e50-845a-47a5-abb4-fae0faac7ba4)
 
-If titled box is too heavy, you can use `PlayaSeparator` instead. See `PlayaSeparator` section for more information
-
-### `LayoutStart` / `LayoutEnd` ###
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-`LayoutStart` allows you to continuously grouping fields with layout, until a new group appears. `LayoutEnd` will stop the grouping.
-
-`LayoutStart(name)` is the same as `Layout(name, keepGrouping: true)`
-
-For `LayoutStart`:
-
-*   `string groupBy` same as `Layout`
-*   `ELayout layout=0` same as `Layout`
-*   `float marginTop = -1f` same as `Layout`
-*   `float marginBottom = -1f` same as `Layout`
-
-For `LayoutEnd`:
-
-*   `string groupBy=null` same as `Layout`. When `null`, close all existing groups.
-
-It supports `./SubGroup` to create a nested subgroup:
+If titled box is too heavy, you can use `Separator` instead. See `Separator` section for more information
 
 ```csharp
 // Please ensure you already have SaintsEditor enabled in your project before trying this example
@@ -6211,11 +6146,11 @@ public string afterGroupLast;
 
 ### `LayoutCloseHere` / `LayoutTerminateHere` ###
 
+> [!WARNING]  
+> You don't need this for most of the time. The new layout system can handle this quite well.
+ 
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
-
-> [!NOTE]
-> If you have code analysis enabled, you will not need this attribute. `LayoutEnd` should be enough.
 
 Include the current field into the coresponding group, then:
 *   `LayoutCloseHere` will close the most recent group, like a `LayoutEnd(".")`
@@ -6383,45 +6318,6 @@ public string layoutEnd;
 ```
 
 [![video](https://github.com/user-attachments/assets/f437ebe4-b4f0-4d3e-be8b-646dbdb74eca)](https://github.com/user-attachments/assets/fac5fce5-6458-4853-893c-23fa50f84872)
-
-### `Ordered` ###
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-> [!NOTE]
-> If you have code analysis enabled, you will not need this attribute. The order should be correct.
-
-`SaintsEditor` uses reflection to get each field. However, c# reflection does not give all the orders: `PropertyInfo`, `MethodInfo` and `FieldInfo` does not order with each other.
-
-Thus, if the order is incorrect, you can use `[Ordered]` to specify the order. But also note: `Ordered` ones are always after the ones without an `Ordered`. So if you want to add it, add it to every field.
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[Ordered] public string myStartField;
-
-[ShowInInspector, Ordered] public const float MyConstFloat = 3.14f;
-[ShowInInspector, Ordered] public static readonly Color MyColor = Color.green;
-
-[ShowInInspector, Ordered]
-public Color AutoColor
-{
-    get => Color.green;
-    set {}
-}
-
-[Button, Ordered]
-private void EditorButton()
-{
-    Debug.Log("EditorButton");
-}
-
-[Ordered] public string myOtherFieldUnderneath;
-```
-
-![ordered](https://github.com/TylerTemp/SaintsField/assets/6391063/a64ff7f1-55d7-44c5-8f1c-7804734831f4)
 
 ## Handles ##
 

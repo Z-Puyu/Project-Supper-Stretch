@@ -6,6 +6,7 @@ using SaintsField.Editor.Linq;
 using SaintsField.Editor.UIToolkitElements;
 using SaintsField.Utils;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 

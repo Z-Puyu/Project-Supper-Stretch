@@ -10,6 +10,7 @@ using SaintsField.Interfaces;
 using SaintsField.Playa;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 using PropertyAttribute = UnityEngine.PropertyAttribute;
 

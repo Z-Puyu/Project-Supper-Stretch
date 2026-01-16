@@ -71382,6 +71382,7 @@ GameObject:
   - component: {fileID: 3149564668375874624}
   - component: {fileID: 62607394211588175}
   - component: {fileID: 7461919093305455027}
+  - component: {fileID: 1011507290102434938}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -71512,6 +71513,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd1482349e924c4f82b4d9a909bf540e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AnimationUtilities.Runtime::AnimationUtilities.Runtime.AnimationController
+--- !u!114 &1011507290102434938
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8829115338478182532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 925e0c2148c949fca2e76e6da6533df2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Scripts.Characters::Characters.Player.PlayerSaveDataProcessor
+  <Id>k__BackingField: 3f06e0c3-011c-4323-8a28-5b6afbf8814b
+  <Component>k__BackingField: {fileID: 3201459543287357664}
 --- !u!1 &8850985187954054067
 GameObject:
   m_ObjectHideFlags: 0

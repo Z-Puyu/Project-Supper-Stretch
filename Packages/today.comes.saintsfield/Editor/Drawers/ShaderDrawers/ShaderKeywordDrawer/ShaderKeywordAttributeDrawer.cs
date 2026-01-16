@@ -8,6 +8,7 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace SaintsField.Editor.Drawers.ShaderDrawers.ShaderKeywordDrawer
 {

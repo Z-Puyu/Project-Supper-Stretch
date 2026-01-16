@@ -1,7 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Linq;
+using SaintsField.Editor.Playa.Renderer;
+using SaintsField.Editor.Playa.Renderer.BaseRenderer;
+using SaintsField.Editor.Playa.Utils;
 using SaintsField.Editor.Utils;
 using SaintsField.Playa;
 using UnityEditor;
@@ -59,9 +64,6 @@ namespace SaintsField.Editor.Playa.RendererGroup
             return _fancyBoxLeftIconButtonStyle;
         }
 
-        // TODO: dispose it, but... does it really matters
-        private static Texture2D _dropdownIcon;
-        private static Texture2D _dropdownRightIcon;
 
         private static (Texture2D dropdownIcon, Texture2D dropdownRightIcon) GetDropdownIcons()
         {
@@ -266,7 +268,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                     if (!hasFoldout && hasTitle)  // in this case, draw title above, alone
                     {
                         titleRect.height = EditorGUIUtility.singleLineHeight;
-                        EditorGUI.LabelField(titleRect, _groupPath.Split('/').Last(), _titleLabelStyle);
+                        EditorGUI.LabelField(titleRect, _groupPath.Last(), _titleLabelStyle);
                         titleRect.y += titleRect.height;
                         titleUsedHeight += titleRect.height;
 
@@ -295,7 +297,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         {
                             titleRect.height = EditorGUIUtility.singleLineHeight;
 
-                            if (GUI.Button(titleRect, _groupPath.Split('/').Last(), GetFancyBoxLeftIconButtonStyle()))
+                            if (GUI.Button(titleRect, _groupPath.Last(), GetFancyBoxLeftIconButtonStyle()))
                             {
                                 _foldout = !_foldout;
                             }
@@ -315,7 +317,7 @@ namespace SaintsField.Editor.Playa.RendererGroup
                         else
                         {
                             titleRect.height = EditorGUIUtility.singleLineHeight;
-                            _foldout = EditorGUI.Foldout(titleRect, _foldout, _groupPath.Split('/').Last(), true,
+                            _foldout = EditorGUI.Foldout(titleRect, _foldout, _groupPath.Last(), true,
                                 new GUIStyle(EditorStyles.foldout)
                                 {
                                     fontStyle = FontStyle.Bold,

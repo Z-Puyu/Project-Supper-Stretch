@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.Linq;
+using UnityEditor;
 using Object = UnityEngine.Object;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -26,7 +27,7 @@ namespace SaintsField.Editor.AutoRunner.AutoRunnerResultsRenderer
 
         protected override PreCheckResult OnUpdateUIToolKit(VisualElement root)
         {
-            PreCheckResult preCheckResult = base.OnUpdateUIToolKit(root);
+            PreCheckResult preCheckResult = UpdatePreCheckUIToolkitInternal(FieldWithInfo, _root);
 
             // if(_autoRunner.results == null)
             // {

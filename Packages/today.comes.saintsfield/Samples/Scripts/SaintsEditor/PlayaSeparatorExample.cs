@@ -1,3 +1,5 @@
+using SaintsField.Playa;
+
 namespace SaintsField.Samples.Scripts.SaintsEditor
 {
     public class PlayaSeparatorExample : SaintsMonoBehaviour

@@ -229,8 +229,12 @@ namespace HierarchyDesigner
         {
             #region Header
             if (HD_Editor.IsPlaying && disableEditorDesignerMajorOperationsDuringPlayMode) { return; }
-            GameObject gameObject = EditorUtility.InstanceIDToObject(instanceID) as GameObject;        
-            
+            #if UNITY_6000_3_OR_NEWER
+            GameObject gameObject = EditorUtility.EntityIdToObject(instanceID) as GameObject;
+            #else
+            GameObject gameObject = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
+            #endif
+
             if (gameObject == null) 
             {
                 if (enableHeaderUtilities) HD_Header.DrawHeader(selectionRect); 
@@ -315,7 +319,11 @@ namespace HierarchyDesigner
                     List<int> keysToRemove = new();
                     foreach (int key in gameObjectDataCache.Keys)
                     {
+                        #if UNITY_6000_3_OR_NEWER
+                        if (EditorUtility.EntityIdToObject(key) == null)
+                        #else
                         if (EditorUtility.InstanceIDToObject(key) == null)
+                        #endif
                         {
                             keysToRemove.Add(key);
                         }
@@ -380,7 +388,11 @@ namespace HierarchyDesigner
                 }
 
                 bool isHovering = finalSelectionRect.Contains(Event.current.mousePosition);
+                #if UNITY_6000_3_OR_NEWER
+                bool isSelected = Array.IndexOf(Selection.entityIds, instanceID) >= 0;
+                #else
                 bool isSelected = Array.IndexOf(Selection.instanceIDs, instanceID) >= 0;
+                #endif
                 bool isHierarchyFocused = EditorWindow.focusedWindow != null && EditorWindow.focusedWindow.titleContent.text == HD_Constants.HierarchyWindow;
 
                 if (isSelected && !isHierarchyFocused)

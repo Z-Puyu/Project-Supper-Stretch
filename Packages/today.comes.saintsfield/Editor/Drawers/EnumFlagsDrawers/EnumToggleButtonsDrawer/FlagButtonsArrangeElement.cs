@@ -1,10 +1,11 @@
+using SaintsField.Editor.Drawers.ValueButtonsDrawer;
 using SaintsField.Editor.UIToolkitElements.ValueButtons;
 
 namespace SaintsField.Editor.Drawers.EnumFlagsDrawers.EnumToggleButtonsDrawer
 {
     public class FlagButtonsArrangeElement: AbsValueButtonsArrangeElement<FlagButton>
     {
-        public FlagButtonsArrangeElement(AbsValueButtonsCalcElement<FlagButton> valueButtonsCalcElement) : base(valueButtonsCalcElement, MakeRow())
+        public FlagButtonsArrangeElement(AbsValueButtonsCalcElement valueButtonsCalcElement) : base(valueButtonsCalcElement, MakeRow())
         {
         }
 
