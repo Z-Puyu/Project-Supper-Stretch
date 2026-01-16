@@ -45,7 +45,7 @@ namespace GameplayAbilitiesSystem.Runtime.Stats {
 
         private void Regenerate() {
             if (this.RegenerationEffect && this.RegenReceiver != null && this.RegenEmitter != null) {
-                this.RegenerationEffect!.Apply(this.RegenEmitter!, this.RegenReceiver!);
+                this.RegenerationEffect.Apply(this.RegenEmitter, this.RegenReceiver);
             }
         }
     }
