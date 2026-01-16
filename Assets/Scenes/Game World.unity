@@ -443,27 +443,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6013413687176798642, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 2.25
       objectReference: {fileID: 0}
     - target: {fileID: 6013413687176798642, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -10
+      value: -4
       objectReference: {fileID: 0}
     - target: {fileID: 6013413687176798642, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.9673613
       objectReference: {fileID: 0}
     - target: {fileID: 6013413687176798642, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.00000004234981
+      value: 0.25340134
       objectReference: {fileID: 0}
     - target: {fileID: 6013413687176798642, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.00000006330537
+      value: 0.000000029099832
       objectReference: {fileID: 0}
     - target: {fileID: 6013413687176798642, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -2.6809705e-15
+      value: -0.000000007622733
       objectReference: {fileID: 0}
     - target: {fileID: 7903798642183644050, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
       propertyPath: <LocalSpace>k__BackingField
@@ -495,17 +495,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ac7568156bc4747a5ed7d8f1127f013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem
---- !u!114 &854738947 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 751088201373927237, guid: a2354c515dc13fe4eb3e0529c16bce77, type: 3}
-  m_PrefabInstance: {fileID: 854738944}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58c4126f963a44ae87159f571bd974e3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Scripts.Characters::Characters.Player.LocomotionAbilityController
 --- !u!1001 &1043356088
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -986,23 +975,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Scripts.GameManagement::GameManagement.PlayerInputInterpreter
   <LevelOfPersistence>k__BackingField: 0
-  <OnDodgeEvent>k__BackingField:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 854738947}
-        m_TargetAssemblyTypeName: Characters.Player.LocomotionAbilityController,
-          Scripts.Characters
-        m_MethodName: UseAbility
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.Ability,
-            GameplayAbilitiesSystem.Runtime
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

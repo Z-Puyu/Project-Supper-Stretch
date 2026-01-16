@@ -40,7 +40,7 @@ namespace CommonFrameworks.Timers {
         }
         
         public CountdownTimer Reset(double duration) {
-            this.RemainingTime = duration;
+            this.Duration = duration;
             this.Reset();
             return this;
         }

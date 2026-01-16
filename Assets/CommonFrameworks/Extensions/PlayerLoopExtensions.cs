@@ -9,7 +9,7 @@ namespace CommonFrameworks.Extensions {
         }
         
         public static bool InsertSubsystem<T>(
-            this ref PlayerLoopSystem root, in PlayerLoopSystem subsystem, int index = int.MaxValue
+            this ref PlayerLoopSystem root, in PlayerLoopSystem subsystem, int index = 0
         ) {
             if (root.type == typeof(T)) {
                 if (root.subSystemList is null) {
