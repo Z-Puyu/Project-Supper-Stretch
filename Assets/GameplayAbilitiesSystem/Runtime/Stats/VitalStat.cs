@@ -30,8 +30,8 @@ namespace GameplayAbilitiesSystem.Runtime.Stats {
             this.Timer.OnTimeOut += this.Regenerate;
         }
 
-        private void React(AttributeKey stat, AttributeChange change) {
-            if (change.IsNegligible || stat != this.TrackedAttribute || this.RegenReceiver == null || change >= 0) {
+        private void React(AttributeKey _, AttributeChange change) {
+            if (change.IsNegligible || this.RegenReceiver == null || change >= 0) {
                 return;
             }
 

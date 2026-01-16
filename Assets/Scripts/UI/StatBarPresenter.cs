@@ -29,17 +29,12 @@ namespace UI {
             float max = (float)this.Model.QueryMax(this.TrackedAttribute);
             float current = (float)this.Model.Query(this.TrackedAttribute);
             this.Present((current, max));
-            this.Model.OnAnyAttributeUpdated += this.HandleAttributeUpdate;
+            this.Model.Observe(this.TrackedAttribute, this.HandleAttributeUpdate);
         }
 
-        private void HandleAttributeUpdate(AttributeKey key, AttributeChange change) {
-            if (key != this.TrackedAttribute) {
-                return;
-            }
-
+        private void HandleAttributeUpdate(AttributeKey _, AttributeChange change) {
             float max = (float)this.Model.QueryMax(this.TrackedAttribute);
-            float current = (float)this.Model.Query(this.TrackedAttribute);
-            this.Present((current, max));
+            this.Present(((float)change.NewValue, max));
         }
 
         public override void Present((float current, float max) data) {

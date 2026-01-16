@@ -178,11 +178,11 @@ namespace GameplayAbilitiesSystem.Runtime.Attributes {
             internal double Value {
                 get => this.value;
                 set {
-                    double old = this.value;
+                    double old = this.Value;
                     this.value = value;
-                    this.OnValueChanged.Invoke(this.Key, new AttributeChange(old, this.value));
-                    this.EffectiveValue = this.Approximator?.Approximate(this.value) ??
-                                          this.Owner.Approximator.Approximate(this.value);
+                    this.OnValueChanged.Invoke(this.Key, new AttributeChange(old, this.Value));
+                    this.EffectiveValue = this.Approximator?.Approximate(this.Value) ??
+                                          this.Owner.Approximator.Approximate(this.Value);
                 }
             }
 
