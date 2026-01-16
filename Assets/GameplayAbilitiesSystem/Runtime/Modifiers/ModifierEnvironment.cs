@@ -122,8 +122,15 @@ namespace GameplayAbilitiesSystem.Runtime.Modifiers {
                     case ModifierType.Multiplier:
                         this.Multiplier += modifier.Value;
                         break;
-                    case ModifierType.Offset when modifier.Value >= 0:
-                        this.PositiveOffset += modifier.Value;
+                    case ModifierType.Offset when modifier.Value >= 0 && -this.NegativeOffset > modifier.Value:
+                        this.NegativeOffset += modifier.Value;
+                        break;
+                    case ModifierType.Offset when modifier.Value >= 0 && -this.NegativeOffset < modifier.Value:
+                        this.PositiveOffset += modifier.Value + this.NegativeOffset;
+                        this.NegativeOffset = ModifierValue.Zero;
+                        break;
+                    case ModifierType.Offset when modifier.Value >= 0 && -this.NegativeOffset == modifier.Value:
+                        this.NegativeOffset = ModifierValue.Zero;
                         break;
                     case ModifierType.Offset when modifier.Value < 0:
                         this.NegativeOffset += modifier.Value;
