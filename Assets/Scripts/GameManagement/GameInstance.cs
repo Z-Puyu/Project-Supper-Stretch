@@ -9,7 +9,7 @@ namespace GameManagement {
         [field: SerializeField, Scene] private int GameWorldScene { get; set; }
         
         public void StartNewGame() {
-            Singleton<SaveGameSystem>.Instance.NewGame();
+            Singleton<SaveGameSystem>.Instance.NewGame(0, "Current Game");
             SceneManager.LoadSceneAsync(this.GameWorldScene);
         }
     }

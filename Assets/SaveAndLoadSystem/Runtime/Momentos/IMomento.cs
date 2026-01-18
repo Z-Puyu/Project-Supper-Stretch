@@ -4,7 +4,7 @@
     }
     
     public interface IMomento<in T> : IMomento {
-        public void Capture(T transform);
-        public void Restore(T transform);
+        public void Capture(T entity);
+        public void Restore(T entity);
     }
 }

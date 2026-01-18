@@ -36,7 +36,7 @@ namespace SaveAndLoadSystem.Runtime {
             }
 
             this.Data.Capture(this.Component);
-            Singleton<SaveGameSystem>.Instance.UpdateSaveData(this.Id, this.Data);
+            Singleton<SaveGameSystem>.Instance.WriteSaveData(this.Id, this.Data);
         }
 
         void ISaveable.Load() {
