@@ -12,6 +12,7 @@ namespace SaveAndLoadSystem.Runtime {
         [SerializeField] internal Metadata metadata;
         [SerializeReference] internal List<IMomento> data = new List<IMomento>();
         
+        public string Name => this.metadata.DisplayName;
         public DateTime Timestamp => DateTime.Parse(this.metadata.Timestamp);
         private Lazy<IDictionary<string, IMomento>> Momentos { get; }
 
@@ -43,6 +44,12 @@ namespace SaveAndLoadSystem.Runtime {
             this.Momentos.Value[id] = data;
             this.data.Add(data);
             return data;
+        }
+
+        internal void MoveToSlot(SaveSlot slot) {
+            this.metadata = new Metadata(
+                slot, this.metadata.SaveFilePath, this.metadata.DisplayName, this.metadata.Timestamp
+            );
         }
         
         public int CompareTo(SaveGame? other) {

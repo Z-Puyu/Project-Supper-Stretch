@@ -26,13 +26,14 @@ namespace SaveAndLoadSystem.Runtime {
         [field: SerializeReference, ReferencePicker]
         private ISerialiser Serialiser { get; set; } = new JsonSerialiser();
         
-        public int MaxSlotIndex => this.HasUnlimitedSlots ? int.MaxValue : this.SlotCount - 1;
-        public int MaxPresentSlotIndex => this.SaveSlots.Count - 1;
         private List<SaveSlot> SaveSlots { get; } = new List<SaveSlot>();
         private List<List<SaveGame>> Saves { get; } = new List<List<SaveGame>>();
-        
-        public int OccupiedSlotCount => this.SaveSlots.Count(slot => !string.IsNullOrWhiteSpace(slot.Name));
         private GameSessionInfo CurrentGameSession { get; set; }
+        
+        public int MaxSlotIndex => this.HasUnlimitedSlots ? int.MaxValue : this.SlotCount - 1;
+        public int MaxPresentSlotIndex => this.SaveSlots.Count - 1;
+        public int OccupiedSlotCount => this.SaveSlots.Count(slot => !string.IsNullOrWhiteSpace(slot.Name));
+        public SaveSlot CurrentSaveSlot => this.CurrentGameSession.SaveSlot;
 
         private string Extension => this.SaveFileExtension.StartsWith(".")
                 ? this.SaveFileExtension
@@ -127,7 +128,20 @@ namespace SaveAndLoadSystem.Runtime {
             this.SaveSlots[slot] = new SaveSlot(slot);
         }
         
+        /// <summary>
+        /// Creates a new game session with the given slot and display name.
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <param name="displayName"></param>
+        /// <returns><c>true</c> if the game session was successfully created, <c>false</c> otherwise.</returns>
         public bool NewGame(int slot, string displayName) {
+            if (slot >= this.MaxSlotIndex) {
+#if DEBUG
+                Debug.LogError($"Cannot create new game with out-of-range save slot {slot}", this);       
+#endif
+                return false;
+            }
+            
             this.Clear(slot);
             slot = Math.Clamp(slot, 0, this.MaxSlotIndex);
             if (string.IsNullOrWhiteSpace(displayName)) {
@@ -207,7 +221,46 @@ namespace SaveAndLoadSystem.Runtime {
             File.WriteAllText(this.CurrentGameSession.GameState.metadata.SaveFilePath, data);
             return true;
         }
+        
+        /// <summary>
+        /// Renames the current save slot for the current game session.
+        /// </summary>
+        /// <param name="newName">The new name for the save slot.</param>
+        /// <remarks>Existing saves in the slot will be retained.</remarks>
+        public void RenameCurrentSaveSlot(string newName) {
+            SaveSlot newSlot = new SaveSlot(this.CurrentGameSession.SaveSlot.Index, newName);
+            this.CurrentGameSession = this.CurrentGameSession with { SaveSlot = newSlot };
+            this.SaveSlots[newSlot.Index] = newSlot;
+            foreach (SaveGame save in this.Saves[newSlot.Index]) {
+                save.MoveToSlot(newSlot);
+            }
+        }
 
+        /// <summary>
+        /// Creates a new save slot with the given display name for the current game session.
+        /// </summary>
+        /// <param name="displayName">The display name for the new save slot.</param>
+        /// <returns><c>true</c> if the slot was created successfully, <c>false</c> otherwise.</returns>
+        /// <remarks>Existing saves in the old slot used for the current game session
+        /// will not be moved to the new slot.</remarks>
+        public bool CreateNewSaveSlot(string displayName) {
+            if (this.MaxPresentSlotIndex >= this.MaxSlotIndex) {
+#if DEBUG
+                Debug.LogError("Maximum allowed slot index is reached.", this);
+#endif
+                return false;
+            }
+
+            SaveSlot slot = new SaveSlot(this.SaveSlots.Count, displayName);
+            this.SaveSlots.Add(slot);
+            this.Saves.Add(new List<SaveGame>());
+            this.CurrentGameSession = this.CurrentGameSession with { SaveSlot = slot };
+            return true;
+        }
+
+        /// <summary>
+        /// Deletes all save slots and saves.
+        /// </summary>
         public void Clear() {
             for (int slot = 0; slot < this.SaveSlots.Count; slot += 1) {
                 this.Clear(slot);
