@@ -14,7 +14,7 @@ namespace UI {
         [field: SerializeReference, ReferencePicker, FieldLabelText(nameof(this.LabelPresenter), true)]
         private protected List<IPresenter> Presenters { get; private set; } = new List<IPresenter>();
 
-        private void Awake() {
+        protected virtual void Awake() {
             this.Document = this.GetComponent<UIDocument>();
         }
 
@@ -35,8 +35,13 @@ namespace UI {
             }
         }
 
-        public abstract void Open();
-        public abstract void Close();
+        public virtual void Open() {
+            this.gameObject.SetActive(true);
+        }
+
+        public virtual void Close() {
+            this.gameObject.SetActive(false);
+        }
 
         private void OnValidate() {
             foreach (IPresenter presenter in this.Presenters) {

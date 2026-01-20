@@ -18,12 +18,21 @@ namespace SaveAndLoadSystem.Runtime {
 
         internal IMomento this[string id] {
             get => this.Momentos.Value[id];
-            set => this.Momentos.Value[id] = value;
+            set {
+                if (this.Momentos.Value.TryAdd(id, value)) {
+                    this.data.Add(value);
+                } else {
+                    this.Momentos.Value[id] = value;
+                }
+            }
         }
 
-        internal SaveGame(Metadata metadata) {
-            this.metadata = metadata;
+        private SaveGame() {
             this.Momentos = new Lazy<IDictionary<string, IMomento>>(this.CacheMomentos);
+        }
+
+        internal SaveGame(Metadata metadata) : this() {
+            this.metadata = metadata;
         }
 
         internal static SaveGame Create(SaveSlot slot) {
@@ -36,14 +45,14 @@ namespace SaveAndLoadSystem.Runtime {
         }
         
         internal S ReadSaveData<S>(string id) where S : IMomento, new() {
-            if (this.Momentos.Value.TryGetValue(id, out IMomento momento) && momento is S data) {
-                return data;
+            if (this.Momentos.Value.TryGetValue(id, out IMomento momento) && momento is S s) {
+                return s;
             }
             
-            data = new S { Id = id };
-            this.Momentos.Value[id] = data;
-            this.data.Add(data);
-            return data;
+            s = new S { Id = id };
+            this.Momentos.Value[id] = s;
+            this.data.Add(s);
+            return s;
         }
 
         internal void MoveToSlot(SaveSlot slot) {

@@ -34,6 +34,7 @@ namespace SaveAndLoadSystem.Runtime {
         public int MaxPresentSlotIndex => this.SaveSlots.Count - 1;
         public int OccupiedSlotCount => this.SaveSlots.Count(slot => !string.IsNullOrWhiteSpace(slot.Name));
         public SaveSlot CurrentSaveSlot => this.CurrentGameSession.SaveSlot;
+        public bool HasAnySaveGame => this.Saves.Any(slot => slot.Count > 0);
 
         private string Extension => this.SaveFileExtension.StartsWith(".")
                 ? this.SaveFileExtension
@@ -47,13 +48,20 @@ namespace SaveAndLoadSystem.Runtime {
             base.Awake();
             Directory.CreateDirectory(this.SaveGameDirectory);
             foreach (string path in Directory.EnumerateFiles(this.SaveGameDirectory, $"*{this.Extension}")) {
-                SaveGame save = this.Serialiser.Deserialise<SaveGame>(File.ReadAllText(path));
-                SaveSlot slot = save.metadata.Slot;
-                if (this.FindSlot(slot.Index) != slot) {
-                    this.SaveSlots[slot.Index] = slot;
+                try {
+                    using FileStream stream = File.OpenRead(path);
+                    using StreamReader reader = new StreamReader(stream);
+                    string data = reader.ReadToEnd();
+                    SaveGame save = this.Serialiser.Deserialise<SaveGame>(data);
+                    SaveSlot slot = save.metadata.Slot;
+                    if (this.FindSlot(slot.Index) != slot) {
+                        this.SaveSlots[slot.Index] = slot;
+                    }
+
+                    this.Saves[slot.Index].Add(save);
+                } catch (Exception e) {
+                    Debug.LogException(e);
                 }
-            
-                this.Saves[slot.Index].Add(save);
             }
             
             this.Saves.ForEach(slot => slot.Sort());
@@ -135,7 +143,7 @@ namespace SaveAndLoadSystem.Runtime {
         /// <param name="displayName"></param>
         /// <returns><c>true</c> if the game session was successfully created, <c>false</c> otherwise.</returns>
         public bool NewGame(int slot, string displayName) {
-            if (slot >= this.MaxSlotIndex) {
+            if (slot > this.MaxSlotIndex) {
 #if DEBUG
                 Debug.LogError($"Cannot create new game with out-of-range save slot {slot}", this);       
 #endif
@@ -153,7 +161,23 @@ namespace SaveAndLoadSystem.Runtime {
             
             SaveGame save = SaveGame.Create(this.FindSlot(slot));
             this.CurrentGameSession = new GameSessionInfo(save, save, this.FindSlot(slot));
+            this.RenameCurrentSaveSlot(displayName);
             return true;
+        }
+        
+        [Button]
+        public bool LoadLatestSave() {
+            try {
+                SaveGame save = this.Saves.Where(slot => slot.Count > 0).Select(slot => slot.Max()).Max();
+                this.CurrentGameSession = new GameSessionInfo(
+                    save, SaveGame.Create(save.metadata.Slot), save.metadata.Slot
+                );
+                
+                return true;
+            } catch (Exception e) {
+                Debug.LogException(e);
+                return false;
+            }
         }
         
         /// <summary>
@@ -206,7 +230,7 @@ namespace SaveAndLoadSystem.Runtime {
             if (string.IsNullOrWhiteSpace(displayName)) {
                 displayName = this.DefaultSaveGameName;
             }
-
+            
             string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
             string filename = $"{this.CurrentGameSession.SaveSlot.Name}_{timestamp}{this.SaveFileExtension}";
             string path = this.FindPathToSaveFile(filename);
@@ -216,6 +240,13 @@ namespace SaveAndLoadSystem.Runtime {
             
             int slot = this.CurrentGameSession.SaveSlot.Index;
             this.Delete(slot, index);   
+            IEnumerable<ISaveable> objects = Object.FindObjectsByType<Component>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None
+            ).OfType<ISaveable>();
+            foreach (ISaveable obj in objects) {
+                obj.Save();
+            }
+            
             this.Saves[slot].Insert(Math.Clamp(index, 0, this.Saves[slot].Count), this.CurrentGameSession.GameState);
             string data = this.Serialiser.Serialise(this.CurrentGameSession.GameState);
             File.WriteAllText(this.CurrentGameSession.GameState.metadata.SaveFilePath, data);
