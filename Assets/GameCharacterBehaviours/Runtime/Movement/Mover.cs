@@ -1,8 +1,10 @@
-﻿using SaintsField;
+﻿using System;
+using SaintsField;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace GameCharacterBehaviours.Runtime.Movement {
+    [Serializable]
     public abstract class Mover : IMover {
         [field: SerializeField, MinValue(0)] public float WalkingSpeed { get; set; } = 1;
         [field: SerializeField, MinValue(0)] public float RunningSpeed { get; set; } = 2;
