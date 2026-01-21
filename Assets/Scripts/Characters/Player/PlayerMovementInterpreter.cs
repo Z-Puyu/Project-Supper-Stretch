@@ -53,8 +53,6 @@ namespace Characters.Player {
         private void Update() {
             Vector2 input = Singleton<PlayerInputInterpreter>.Instance.MovementInput * this.Locomotion.CurrentSpeed;
             Vector3 direction = CameraSystem.PlanarForward * input.y + CameraSystem.PlanarRight * input.x;
-            this.Locomotion.IsMoving = input.sqrMagnitude >= 0.0001;
-            
             this.Animator.SetFloat(
                 this.LeftRightVelocityAnimatorParameter, input.x, this.AnimationBlendTime, Time.deltaTime
             );

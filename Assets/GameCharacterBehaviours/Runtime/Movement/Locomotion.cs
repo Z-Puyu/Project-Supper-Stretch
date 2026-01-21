@@ -4,35 +4,50 @@ using SaintsField;
 using SaintsField.Playa;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace GameCharacterBehaviours.Runtime.Movement {
     [DisallowMultipleComponent]
-    public abstract class Locomotion : BehaviourComponent {
+    public sealed class Locomotion : BehaviourComponent {
+        private const float DirectionTolerance = 0.0001f;
+        
         public enum Gesture { Walk, Run, Sprint }
         
-        private bool isMoving;
-        [field: SerializeField] private Gesture gesture = Gesture.Run;
+        public enum Stance { Standing, Sneaking }
 
-        [NotNull] protected Transform? OwnerTransform { get; private set; }
+        [NotNull] [field: SerializeField] private Transform? ReferenceSpace { get; set; }
+        [SerializeField] private bool onlyAllowRotationWhenMoving = true;
+        [SerializeField] private Gesture gesture = Gesture.Run;
+        [SerializeField] private Stance stance = Stance.Standing;
+        [SerializeField] private UnityEvent onBeginSprinting = new UnityEvent();
+        [SerializeField] private UnityEvent onBeginWalking = new UnityEvent();
+        [SerializeField] private UnityEvent onBeginRunning = new UnityEvent();
+        [SerializeField] private UnityEvent onStopMoving = new UnityEvent();
+        
+        [field: SerializeReference, ReferencePicker, Required] 
+        private IMover? Mover { get; set; } = new SimpleMover();
+        
+        [field: SerializeReference, Required, ReferencePicker]
+        private IRotator? Rotator { get; set; } = new SmoothDampRotator();
 
-        public bool IsMoving {
-            get => this.isMoving;
+        public Vector3 Direction { get; private set; }
+        
+        public bool IsMoving => this.Direction.sqrMagnitude > Locomotion.DirectionTolerance;
+        public float CurrentSpeed => this.Mover?.Speed ?? 0f;
+
+        /// <summary>
+        /// The movement direction in the x-z plane.
+        /// </summary>
+        public Vector2 PlanarDirection {
             set {
-                if (this.isMoving == value) {
-                    return;
-                }
-
-                this.isMoving = value;
-                if (!this.isMoving) {
-                    this.OnStopMoving.Invoke();
+                bool wasMoving = this.IsMoving;
+                Vector3 dir = new Vector3(value.x, 0, value.y);
+                this.Direction = value.sqrMagnitude >= Locomotion.DirectionTolerance ? dir.normalized : Vector3.zero;
+                if (wasMoving && !this.IsMoving) {
+                    this.onStopMoving.Invoke();
                 }
             }
         }
-
-        public Vector2 PlanarDirection { get; set; }
-
-        // [field: SerializeField, MinValue(0), EndText("<color=gray>degrees / s")]
-        // protected float RotationSpeed { get; private set; } = 1;
 
         public Gesture Mode {
             get => this.gesture;
@@ -40,72 +55,59 @@ namespace GameCharacterBehaviours.Runtime.Movement {
                 switch (value) {
                     case Gesture.Walk when this.gesture != Gesture.Walk:
                         this.gesture = Gesture.Walk;
-                        this.OnBeginWalking.Invoke();
+                        this.onBeginWalking.Invoke();
                         break;
                     case Gesture.Run when this.gesture != Gesture.Run:
                         this.gesture = Gesture.Run;
-                        this.OnBeginRunning.Invoke();
+                        this.onBeginRunning.Invoke();
                         break;
                     case Gesture.Sprint when this.gesture != Gesture.Sprint:
                         this.gesture = Gesture.Sprint;
-                        this.OnBeginSprinting.Invoke();
+                        this.onBeginSprinting.Invoke();
                         break;
                 }
-                
-                this.gesture = value;
             }
         }
-
-        [field: SerializeField, MinValue(0)] public float WalkingSpeed { get; set; } = 1;
-        [field: SerializeField, MinValue(0)] public float RunningSpeed { get; set; } = 2;
-        [field: SerializeField, MinValue(0)] public float SprintingSpeed { get; set; } = 3;
-        [field: SerializeField, MinValue(0)] public float SpeedMultiplier { get; set; } = 1;
-        [field: SerializeField] private UnityEvent OnBeginSprinting { get; set; } = new UnityEvent();
-        [field: SerializeField] private UnityEvent OnBeginWalking { get; set; } = new UnityEvent();
-        [field: SerializeField] private UnityEvent OnBeginRunning { get; set; } = new UnityEvent();
-        [field: SerializeField] private UnityEvent OnStopMoving { get; set; } = new UnityEvent();
         
+        internal bool UseRootMotion { private get; set; } 
         public bool CanMove { protected get; set; } = true;
         public bool CanRotate { protected get; set; } = true;
-        
-        public float CurrentSpeed => this.Mode switch {
-            Gesture.Walk => this.WalkingSpeed,
-            Gesture.Run => this.RunningSpeed,
-            Gesture.Sprint => this.SprintingSpeed,
-            var _ => this.WalkingSpeed
-        } * this.SpeedMultiplier;
 
         protected override void Awake() {
             base.Awake();
-            this.OwnerTransform = this.Owner.transform;
-        }
-
-        public void MoveAndRotate(Vector3 displacement, float deltaTime, bool forced = true) {
-            if (forced || this.CanMove) {
-                this.MoveBy(forced ? displacement : displacement * this.CurrentSpeed);
+            if (!this.ReferenceSpace) {
+                this.ReferenceSpace = this.Owner.transform;
             }
-
-            // if (forced || this.CanRotate) {
-            //     this.Rotate(Time.deltaTime);
-            // }
         }
 
-        protected abstract void MoveBy(Vector3 displacement);
-
-        protected abstract void Move(float deltaTime);
-
-        protected abstract void Rotate(float deltaTime);
-        
-        protected virtual void Update() {
+        public void MoveBy(Vector3 displacement) {
             if (this.CanMove) {
-                this.Move(Time.deltaTime);
+                this.Mover?.MoveBy(displacement);
+            }
+        }
+
+        protected void Rotate(float deltaTime) {
+            if (!this.CanRotate || (this.onlyAllowRotationWhenMoving && !this.IsMoving)) {
+                return;
+            }
+            
+            Vector3 forward = this.ReferenceSpace.forward;
+            this.Rotator?.RotateTowards(this.Owner.transform, forward, deltaTime);
+#if DEBUG
+            Vector3 position = this.Owner.transform.position;
+            Debug.DrawRay(position, this.Owner.transform.forward * 100, Color.red);
+            Debug.DrawRay(position, forward * 100, Color.green);
+#endif
+        }
+        
+        private void Update() {
+            if (this.CanMove && !this.UseRootMotion) {
+                this.Mover?.Move(Time.deltaTime, this.Direction, this.gesture, this.stance);
             }
         }
 
         private void LateUpdate() {
-            if (this.CanRotate) {
-                this.Rotate(Time.deltaTime);
-            }
+            this.Rotate(Time.deltaTime);
         }
     }
 }
