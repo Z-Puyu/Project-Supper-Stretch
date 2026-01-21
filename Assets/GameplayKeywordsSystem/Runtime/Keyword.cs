@@ -18,7 +18,8 @@ namespace GameplayKeywordsSystem.Runtime {
         }
 
         public bool StartsWith(Keyword prefix) {
-            return this.Value.StartsWith(prefix.Value, StringComparison.OrdinalIgnoreCase);
+            return this.Value.StartsWith(prefix.Value, StringComparison.OrdinalIgnoreCase) &&
+                   (this.Value.Length == prefix.Value.Length || this.Value[prefix.Value.Length] == '/');
         }
         
         public int CompareTo(Keyword other) {

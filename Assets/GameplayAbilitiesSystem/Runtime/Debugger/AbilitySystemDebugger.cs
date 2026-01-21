@@ -45,8 +45,6 @@ namespace GameplayAbilitiesSystem.Runtime.Debugger {
             this.ListOfKeywords.text = string.Empty;
             
             KeywordContainer container = this.ObservedSystem.Root.GetOrAdd<KeywordContainer>();
-            container.RegisterCallbackOnKeywordAdded(this.OnKeywordsChanged);
-            container.RegisterCallbackOnKeywordRemoved(this.OnKeywordsChanged);
             this.ObservedSystem.OnAbilityStarted += this.OnAbilitySystemChanged;
             this.ObservedSystem.OnAbilityStopped += this.OnAbilitySystemChanged;
             this.ObservedSystem.OnAbilityRevoked += this.OnAbilitySystemChanged;

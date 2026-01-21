@@ -1,10 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using CommonFrameworks.Components;
 using SaintsField;
-using SaintsField.Playa;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 
 namespace GameCharacterBehaviours.Runtime.Movement {
     [DisallowMultipleComponent]
@@ -70,8 +68,8 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         }
         
         internal bool UseRootMotion { private get; set; } 
-        public bool CanMove { protected get; set; } = true;
-        public bool CanRotate { protected get; set; } = true;
+        public bool CanMove { private get; set; } = true;
+        public bool CanRotate { private get; set; } = true;
 
         protected override void Awake() {
             base.Awake();
@@ -86,7 +84,7 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             }
         }
 
-        protected void Rotate(float deltaTime) {
+        private void Rotate(float deltaTime) {
             if (!this.CanRotate || (this.onlyAllowRotationWhenMoving && !this.IsMoving)) {
                 return;
             }

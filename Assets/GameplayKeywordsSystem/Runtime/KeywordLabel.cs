@@ -1,20 +1,27 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using CommonFrameworks.Collections;
 using SaintsField;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace GameplayKeywordsSystem.Runtime {
     [Serializable]
     public sealed class KeywordLabel : ITaggable<Keyword>, ICollection<Keyword> {
         private TrieSet<Keyword, char> Keywords { get; } = new TrieSet<Keyword, char>('/');
+
+        private TrieDictionary<Keyword, char, EventTrigger> Events { get; } =
+            new TrieDictionary<Keyword, char, EventTrigger>();
         
         [field: SerializeField, TreeDropdown(nameof(this.AllKeywords)), DefaultExpand] 
         private List<string> PreexistingKeywords { get; set; } = new List<string>();
         
-        public event Action<Keyword> OnKeywordAdded = delegate { };
-        public event Action<Keyword> OnKeywordRemoved = delegate { };
+        [field: SerializeField, Table] private List<KeywordEventTrigger> OnAddKeywordEvents { get; set; } = new List<KeywordEventTrigger>();
+        [field: SerializeField, Table] private List<KeywordEventTrigger> OnRemoveKeywordEvents { get; set; } = new List<KeywordEventTrigger>();
+        [field: SerializeField] private UnityEvent<Keyword> OnAnyKeywordAdded { get; set; } = new UnityEvent<Keyword>();
+        [field: SerializeField] private UnityEvent<Keyword> OnAnyKeywordRemoved { get; set; } = new UnityEvent<Keyword>();
         
         public int Count => this.Keywords.Count;
         public bool IsReadOnly => this.Keywords.IsReadOnly;
@@ -24,6 +31,24 @@ namespace GameplayKeywordsSystem.Runtime {
         internal void Initialise() {
             foreach (string keyword in this.PreexistingKeywords) {
                 this.Keywords.Add(keyword);
+            }
+
+            IEnumerable<string> observed = this.OnAddKeywordEvents
+                                               .Concat(this.OnRemoveKeywordEvents)
+                                               .Select(@event => @event.Keyword)
+                                               .Distinct();
+            Dictionary<string, UnityEvent> onAdd = this.OnAddKeywordEvents.ToDictionary(
+                trigger => trigger.Keyword, trigger => trigger.Event
+            );
+            
+            Dictionary<string, UnityEvent> onRemove = this.OnRemoveKeywordEvents.ToDictionary(
+                trigger => trigger.Keyword, trigger => trigger.Event
+            );
+            
+            foreach (string keyword in observed) {
+                this.Events.Add(
+                    keyword, new EventTrigger(onAdd.GetValueOrDefault(keyword), onRemove.GetValueOrDefault(keyword))
+                );
             }
         }
 
@@ -39,9 +64,32 @@ namespace GameplayKeywordsSystem.Runtime {
             return this.HasTag(item);
         }
 
+        private void TriggerEvents(Keyword keyword, bool removed) {
+            if (removed) {
+                this.OnAnyKeywordRemoved.Invoke(keyword);
+            } else {
+                this.OnAnyKeywordAdded.Invoke(keyword);
+            }
+            
+            Keyword prefix = string.Empty;
+            while (this.Events.FindLongestPrefixKey(keyword, out KeyValuePair<Keyword, EventTrigger> trigger)) {
+                keyword = keyword.Chop();
+                if (prefix == trigger.Key) {
+                    continue;
+                }
+                
+                prefix = trigger.Key;
+                if (removed) {
+                    trigger.Value.OnKeywordRemoved?.Invoke();
+                } else {
+                    trigger.Value.OnKeywordAdded?.Invoke();
+                }
+            }
+        }
+
         public void Clear() {
             foreach (Keyword keyword in this.Keywords) {
-                this.OnKeywordRemoved.Invoke(keyword);
+                this.TriggerEvents(keyword, true);
             }
             
             this.Keywords.Clear();
@@ -65,7 +113,7 @@ namespace GameplayKeywordsSystem.Runtime {
                 return false;
             }
 
-            this.OnKeywordAdded.Invoke(label);
+            this.TriggerEvents(label, false);
             return true;
         }
 
@@ -83,7 +131,7 @@ namespace GameplayKeywordsSystem.Runtime {
             }
 
             foreach (Keyword k in removed) {
-                this.OnKeywordRemoved.Invoke(k);
+                this.TriggerEvents(k, true);
             }
                 
             return true;
@@ -96,5 +144,7 @@ namespace GameplayKeywordsSystem.Runtime {
         IEnumerator IEnumerable.GetEnumerator() {
             return this.GetEnumerator();
         }
+
+        private readonly record struct EventTrigger(UnityEvent? OnKeywordAdded, UnityEvent? OnKeywordRemoved);
     }
 }

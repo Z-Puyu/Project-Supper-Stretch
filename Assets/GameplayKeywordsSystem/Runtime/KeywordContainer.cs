@@ -21,29 +21,6 @@ namespace GameplayKeywordsSystem.Runtime {
         protected override void Awake() {
             base.Awake();
             this.Label.Initialise();
-            this.Label.OnKeywordRemoved += this.OnKeywordRemoved.Invoke;
-            this.Label.OnKeywordAdded += this.OnKeywordAdded.Invoke;
-        }
-
-        private void OnDestroy() {
-            this.Label.OnKeywordRemoved -= this.OnKeywordRemoved.Invoke;
-            this.Label.OnKeywordAdded -= this.OnKeywordAdded.Invoke;
-        }
-
-        public void RegisterCallbackOnKeywordAdded(Action<Keyword> callback) {
-            this.Label.OnKeywordAdded += callback;
-        }
-        
-        public void RegisterCallbackOnKeywordRemoved(Action<Keyword> callback) {
-            this.Label.OnKeywordRemoved += callback;
-        }
-        
-        public void UnregisterCallbackOnKeywordAdded(Action<Keyword> callback) {
-            this.Label.OnKeywordAdded -= callback;
-        }
-
-        public void UnregisterCallbackOnKeywordRemoved(Action<Keyword> callback) {
-            this.Label.OnKeywordRemoved -= callback;
         }
 
         public bool Tag(Keyword label) {
