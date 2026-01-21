@@ -10,19 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 955fa20d01bb40b3a53dd2d24209eca9, type: 3}
-  m_Name: Backstep
+  m_Name: Jump
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Abilities.Ability
   <Tags>k__BackingField:
-  - Ability/Movement/Dodge
+  - Ability/Movement/Jump
   <Costs>k__BackingField:
   - <BenchmarkScheme>k__BackingField: 0
     <Amount>k__BackingField:
-      rid: 1692152173614334054
+      rid: 1692152173614334053
     <CostAttribute>k__BackingField: Stamina
   <Conditions>k__BackingField:
   - rid: 1692151751057866752
-  <ExecutionSteps>k__BackingField:
-  - rid: 1692151813856559430
+  <ExecutionSteps>k__BackingField: []
   <SideEffect>k__BackingField:
     <KeywordPreset>k__BackingField:
       <TargetReceivesKeywords>k__BackingField: []
@@ -39,23 +38,7 @@ MonoBehaviour:
       data:
         <Keywords>k__BackingField:
         - Character Flags/Movement Blocked
-    - rid: 1692151813856559430
-      type: {class: PlayAnimation, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
-      data:
-        <WillEndAbilityOnCompletion>k__BackingField: 0
-        <Clip>k__BackingField: {fileID: -5558953238165532788, guid: e55ef2f4572af804f9745df51162dfe7, type: 3}
-        <AnimationSignals>k__BackingField: []
-        <AnimationEnd>k__BackingField:
-        - rid: 1692151973348376702
-        <AnimationInterrupt>k__BackingField:
-        - rid: 1692151973348376703
-    - rid: 1692151973348376702
-      type: {class: EndAbility, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
-      data: 
-    - rid: 1692151973348376703
-      type: {class: EndAbility, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
-      data: 
-    - rid: 1692152173614334054
+    - rid: 1692152173614334053
       type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
       data:
         <Value>k__BackingField: 25

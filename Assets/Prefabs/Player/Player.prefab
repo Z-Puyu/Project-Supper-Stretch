@@ -71377,6 +71377,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3201459543287357664}
   - component: {fileID: 6388006269725896587}
+  - component: {fileID: 6278911486092408700}
   - component: {fileID: 6504065115825005498}
   - component: {fileID: 6265021832810256200}
   - component: {fileID: 3149564668375874624}
@@ -71432,6 +71433,33 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!54 &6278911486092408700
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8829115338478182532}
+  serializedVersion: 5
+  m_Mass: 100
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!143 &6504065115825005498
 CharacterController:
   m_ObjectHideFlags: 0
@@ -75027,6 +75055,10 @@ PrefabInstance:
       propertyPath: <Animator>k__BackingField
       value: 
       objectReference: {fileID: 6388006269725896587}
+    - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <Rigidbody>k__BackingField
+      value: 
+      objectReference: {fileID: 6278911486092408700}
     - target: {fileID: 9069747608524974673, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: <Controller>k__BackingField
       value: 

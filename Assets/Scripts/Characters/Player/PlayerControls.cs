@@ -172,7 +172,7 @@ namespace Characters.Player
                 {
                     ""name"": """",
                     ""id"": ""ae0ab2ea-d9ea-4387-ac56-ec16cfe756ac"",
-                    ""path"": ""<Keyboard>/leftShift"",
+                    ""path"": ""<Keyboard>/leftAlt"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -194,17 +194,37 @@ namespace Characters.Player
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""a84d34aa-bbc7-42cc-9c66-0231dce8affa"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
                 {
                     ""name"": """",
                     ""id"": ""c26791bb-3ac0-44c8-bab9-3113ef7ba9dd"",
-                    ""path"": ""<Keyboard>/space"",
+                    ""path"": ""<Keyboard>/leftShift"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Dodge"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3d097f3d-1ec3-4aa9-ae3e-eb461142d631"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -220,6 +240,7 @@ namespace Characters.Player
             // Actions
             m_Actions = asset.FindActionMap("Actions", throwIfNotFound: true);
             m_Actions_Dodge = m_Actions.FindAction("Dodge", throwIfNotFound: true);
+            m_Actions_Jump = m_Actions.FindAction("Jump", throwIfNotFound: true);
         }
 
         ~@PlayerControls()
@@ -409,6 +430,7 @@ namespace Characters.Player
         private readonly InputActionMap m_Actions;
         private List<IActionsActions> m_ActionsActionsCallbackInterfaces = new List<IActionsActions>();
         private readonly InputAction m_Actions_Dodge;
+        private readonly InputAction m_Actions_Jump;
         /// <summary>
         /// Provides access to input actions defined in input action map "Actions".
         /// </summary>
@@ -424,6 +446,10 @@ namespace Characters.Player
             /// Provides access to the underlying input action "Actions/Dodge".
             /// </summary>
             public InputAction @Dodge => m_Wrapper.m_Actions_Dodge;
+            /// <summary>
+            /// Provides access to the underlying input action "Actions/Jump".
+            /// </summary>
+            public InputAction @Jump => m_Wrapper.m_Actions_Jump;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -453,6 +479,9 @@ namespace Characters.Player
                 @Dodge.started += instance.OnDodge;
                 @Dodge.performed += instance.OnDodge;
                 @Dodge.canceled += instance.OnDodge;
+                @Jump.started += instance.OnJump;
+                @Jump.performed += instance.OnJump;
+                @Jump.canceled += instance.OnJump;
             }
 
             /// <summary>
@@ -467,6 +496,9 @@ namespace Characters.Player
                 @Dodge.started -= instance.OnDodge;
                 @Dodge.performed -= instance.OnDodge;
                 @Dodge.canceled -= instance.OnDodge;
+                @Jump.started -= instance.OnJump;
+                @Jump.performed -= instance.OnJump;
+                @Jump.canceled -= instance.OnJump;
             }
 
             /// <summary>
@@ -536,6 +568,13 @@ namespace Characters.Player
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnDodge(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Jump" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnJump(InputAction.CallbackContext context);
         }
     }
 }

@@ -14,7 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Abilities.Ability
   <Tags>k__BackingField:
   - Ability/Movement/Dodge
-  <Costs>k__BackingField: []
+  <Costs>k__BackingField:
+  - <BenchmarkScheme>k__BackingField: 0
+    <Amount>k__BackingField:
+      rid: 1692152173614334055
+    <CostAttribute>k__BackingField: Stamina
   <Conditions>k__BackingField:
   - rid: 1692151751057866752
   <ExecutionSteps>k__BackingField:
@@ -51,3 +55,7 @@ MonoBehaviour:
     - rid: 1692151973348376701
       type: {class: EndAbility, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
       data: 
+    - rid: 1692152173614334055
+      type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <Value>k__BackingField: 25

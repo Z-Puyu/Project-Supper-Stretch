@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace GameCharacterBehaviours.Runtime.Movement {
     public sealed class Locomotion3D : Locomotion {
+        [NotNull] 
+        [field: SerializeField, Required] 
+        private Rigidbody? Rigidbody { get; set; }
+        
         [field: SerializeField] private CharacterController? Controller { get; set; }
 
         [NotNull]
