@@ -17,9 +17,7 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         [NotNull] [field: SerializeField] private Transform? ReferenceSpace { get; set; }
         [SerializeField] private bool onlyAllowRotationWhenMoving = true;
         [SerializeField] private Stance stance = Stance.Standing;
-        [SerializeField] private UnityEvent onBeginSprinting = new UnityEvent();
-        [SerializeField] private UnityEvent onBeginWalking = new UnityEvent();
-        [SerializeField] private UnityEvent onBeginRunning = new UnityEvent();
+        [SerializeField] private UnityEvent onStartMoving = new UnityEvent();
         [SerializeField] private UnityEvent onStopMoving = new UnityEvent();
         
         [field: SerializeReference, ReferencePicker, Required] 
@@ -51,6 +49,8 @@ namespace GameCharacterBehaviours.Runtime.Movement {
                 this.Direction = value.sqrMagnitude >= Locomotion.DirectionTolerance ? dir.normalized : Vector3.zero;
                 if (wasMoving && !this.IsMoving) {
                     this.onStopMoving.Invoke();
+                } else if (!wasMoving && this.IsMoving) {
+                    this.onStartMoving.Invoke();
                 }
             }
         }
