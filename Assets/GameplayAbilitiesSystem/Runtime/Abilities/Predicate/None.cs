@@ -26,5 +26,9 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Predicate {
 
             return this.CompiledPredicates.None(source);
         }
+        
+        public override string ToString() {
+            return "None of";
+        }
     }
 }

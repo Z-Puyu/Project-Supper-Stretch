@@ -8,6 +8,7 @@ using UnityEngine;
 namespace Characters.Player {
     [DisallowMultipleComponent, RequireComponent(typeof(Locomotion))]
     public class PlayerMovementInterpreter : MonoBehaviour {
+        internal Vector2 Input { private get; set; } = Vector2.zero;
         [NotNull] private Locomotion? Locomotion { get; set; }
         
         [NotNull] 
@@ -28,30 +29,8 @@ namespace Characters.Player {
             this.Locomotion = this.GetComponent<Locomotion>();
         }
 
-        private void OnEnable() {
-            Singleton<PlayerInputInterpreter>.Instance.OnSprint += this.BeginSprint;
-            Singleton<PlayerInputInterpreter>.Instance.OnCancelSprint += this.StopSprint;
-        }
-        
-        private void OnDisable() {
-            Singleton<PlayerInputInterpreter>.Instance.OnSprint -= this.BeginSprint;
-            Singleton<PlayerInputInterpreter>.Instance.OnCancelSprint -= this.StopSprint;
-        }
-        
-        private void BeginSprint() {
-            if (this.Locomotion.Mode == Locomotion.Gesture.Run) {
-                this.Locomotion.Mode = Locomotion.Gesture.Sprint;
-            }
-        }
-
-        private void StopSprint() {
-            if (this.Locomotion.Mode == Locomotion.Gesture.Sprint) {
-                this.Locomotion.Mode = Locomotion.Gesture.Run;
-            }
-        }
-
         private void Update() {
-            Vector2 input = Singleton<PlayerInputInterpreter>.Instance.MovementInput * this.Locomotion.CurrentSpeed;
+            Vector2 input = this.Input * this.Locomotion.CurrentSpeed;
             Vector3 direction = CameraSystem.PlanarForward * input.y + CameraSystem.PlanarRight * input.x;
             this.Animator.SetFloat(
                 this.LeftRightVelocityAnimatorParameter, input.x, this.AnimationBlendTime, Time.deltaTime

@@ -16,7 +16,6 @@ namespace GameCharacterBehaviours.Runtime.Movement {
 
         [NotNull] [field: SerializeField] private Transform? ReferenceSpace { get; set; }
         [SerializeField] private bool onlyAllowRotationWhenMoving = true;
-        [SerializeField] private Gesture gesture = Gesture.Run;
         [SerializeField] private Stance stance = Stance.Standing;
         [SerializeField] private UnityEvent onBeginSprinting = new UnityEvent();
         [SerializeField] private UnityEvent onBeginWalking = new UnityEvent();
@@ -32,6 +31,11 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         [field: SerializeReference, ReferencePicker] 
         private IJumper? JumpModule { get; set; } = new AnimatorJumper();
         
+        [field: SerializeField] public Gesture Mode { get; set; } = Gesture.Run;
+        internal bool UseRootMotion { private get; set; } 
+        public bool CanMove { private get; set; } = true;
+        public bool CanRotate { private get; set; } = true;
+        public bool CanJump { private get; set; } = true;
         public Vector3 Direction { get; private set; }
         
         public bool IsMoving => this.Direction.sqrMagnitude > Locomotion.DirectionTolerance;
@@ -51,36 +55,35 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             }
         }
 
-        public Gesture Mode {
-            get => this.gesture;
-            set {
-                switch (value) {
-                    case Gesture.Walk when this.gesture != Gesture.Walk:
-                        this.gesture = Gesture.Walk;
-                        this.onBeginWalking.Invoke();
-                        break;
-                    case Gesture.Run when this.gesture != Gesture.Run:
-                        this.gesture = Gesture.Run;
-                        this.onBeginRunning.Invoke();
-                        break;
-                    case Gesture.Sprint when this.gesture != Gesture.Sprint:
-                        this.gesture = Gesture.Sprint;
-                        this.onBeginSprinting.Invoke();
-                        break;
-                }
-            }
-        }
-        
-        internal bool UseRootMotion { private get; set; } 
-        public bool CanMove { private get; set; } = true;
-        public bool CanRotate { private get; set; } = true;
-        public bool CanJump { private get; set; } = true;
-
         protected override void Awake() {
             base.Awake();
             if (!this.ReferenceSpace) {
                 this.ReferenceSpace = this.Owner.transform;
             }
+        }
+
+        public void Run() {
+            if (this.Mode == Gesture.Run) {
+                return;
+            }
+            
+            this.Mode = Gesture.Run;
+        }
+        
+        public void Walk() {
+            if (this.Mode == Gesture.Walk) {
+                return;
+            }
+            
+            this.Mode = Gesture.Walk;
+        }
+        
+        public void Sprint() {
+            if (this.Mode == Gesture.Sprint) {
+                return;
+            }
+            
+            this.Mode = Gesture.Sprint;
         }
 
         public void MoveBy(Vector3 displacement) {
@@ -111,7 +114,7 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         
         private void Update() {
             if (this.CanMove && !this.UseRootMotion) {
-                this.MovementModule?.Move(Time.deltaTime, this.Direction, this.gesture, this.stance);
+                this.MovementModule?.Move(Time.deltaTime, this.Direction, this.Mode, this.stance);
             }
         }
 

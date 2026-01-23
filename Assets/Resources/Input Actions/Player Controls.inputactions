@@ -3,7 +3,7 @@
     "name": "Player Controls",
     "maps": [
         {
-            "name": "Movement",
+            "name": "Player",
             "id": "036ce93b-8517-4988-90a9-4a9e1de9d2a3",
             "actions": [
                 {
@@ -22,6 +22,24 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "Hold",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Dodge",
+                    "type": "Button",
+                    "id": "2e79005e-5aa5-44fe-a2f8-05f1f740ade2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Jump",
+                    "type": "Button",
+                    "id": "79cbb2c9-21ee-4adf-914c-2320e4177dfe",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
                     "initialStateCheck": false
                 }
             ],
@@ -84,43 +102,17 @@
                 {
                     "name": "",
                     "id": "ae0ab2ea-d9ea-4387-ac56-ec16cfe756ac",
-                    "path": "<Keyboard>/leftAlt",
-                    "interactions": "",
+                    "path": "<Keyboard>/space",
+                    "interactions": "Hold",
                     "processors": "",
                     "groups": "",
                     "action": "Sprint",
                     "isComposite": false,
                     "isPartOfComposite": false
-                }
-            ]
-        },
-        {
-            "name": "Actions",
-            "id": "27d44c45-dba5-483b-84d8-5fbd59fac1ec",
-            "actions": [
-                {
-                    "name": "Dodge",
-                    "type": "Button",
-                    "id": "e8359e9a-3d02-4b6c-93e0-d6f01c23c6bb",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 },
                 {
-                    "name": "Jump",
-                    "type": "Button",
-                    "id": "a84d34aa-bbc7-42cc-9c66-0231dce8affa",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                }
-            ],
-            "bindings": [
-                {
                     "name": "",
-                    "id": "c26791bb-3ac0-44c8-bab9-3113ef7ba9dd",
+                    "id": "ad1dff03-749d-4a58-a15c-3f3af363c3cf",
                     "path": "<Keyboard>/leftShift",
                     "interactions": "",
                     "processors": "",
@@ -131,9 +123,9 @@
                 },
                 {
                     "name": "",
-                    "id": "3d097f3d-1ec3-4aa9-ae3e-eb461142d631",
+                    "id": "51311f77-a421-4f70-80c0-bac3c46f3786",
                     "path": "<Keyboard>/space",
-                    "interactions": "",
+                    "interactions": "Tap",
                     "processors": "",
                     "groups": "",
                     "action": "Jump",

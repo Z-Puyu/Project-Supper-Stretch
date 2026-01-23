@@ -201,6 +201,10 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             return this.RunningAbilities.ContainsKey(ability);
         }
 
+        /// <summary>
+        /// Stops the ability and removes all effects associated with it.
+        /// </summary>
+        /// <param name="ability">The ability to stop and clean up.</param>
         public void CleanUp(Ability ability) {
             this.Stop(ability);
             this.EffectRegistry.Stop(new EffectDescriptor(ability));

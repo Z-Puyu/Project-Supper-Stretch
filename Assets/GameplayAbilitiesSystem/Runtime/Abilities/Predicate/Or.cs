@@ -26,5 +26,9 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Predicate {
             
             return this.CompiledPredicates.Any(source);
         }
+        
+        public override string ToString() {
+            return "Any of";
+        }
     }
 }

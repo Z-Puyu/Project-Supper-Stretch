@@ -21,7 +21,8 @@ MonoBehaviour:
     <CostAttribute>k__BackingField: Stamina
   <Conditions>k__BackingField:
   - rid: 1692151751057866752
-  <ExecutionSteps>k__BackingField: []
+  <ExecutionSteps>k__BackingField:
+  - rid: 1692152225826603148
   <SideEffect>k__BackingField:
     <KeywordPreset>k__BackingField:
       <TargetReceivesKeywords>k__BackingField: []
@@ -42,3 +43,13 @@ MonoBehaviour:
       type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
       data:
         <Value>k__BackingField: 25
+    - rid: 1692152225826603148
+      type: {class: SetAnimatorParameter, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
+      data:
+        <WillEndAbilityOnCompletion>k__BackingField: 0
+        <AnimatorController>k__BackingField: {fileID: 9100000, guid: f95d8e59bef1628438f8fc6edb660cbc, type: 2}
+        <Type>k__BackingField: 9
+        <Parameter>k__BackingField: 125937960
+        <IntegerValue>k__BackingField: 0
+        <BoolValue>k__BackingField: 0
+        <FloatValue>k__BackingField: 0

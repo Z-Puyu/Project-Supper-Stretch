@@ -26,5 +26,9 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Predicate {
             
             return true;
         }
+
+        public override string ToString() {
+            return "Must not have forbidden keywords";
+        }
     }
 }

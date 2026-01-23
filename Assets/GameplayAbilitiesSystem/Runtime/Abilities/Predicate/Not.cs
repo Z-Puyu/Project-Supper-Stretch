@@ -12,5 +12,9 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Predicate {
         public bool Holds(AbilitySystem source) {
             return !this.Predicate.Holds(source);
         }
+        
+        public override string ToString() {
+            return $"Not {this.Predicate}";
+        }
     }
 }

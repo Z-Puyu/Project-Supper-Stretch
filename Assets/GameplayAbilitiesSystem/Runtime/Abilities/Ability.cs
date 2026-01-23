@@ -32,7 +32,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         private AdvancedDropdownList<string> AllKeywords => KeywordUtils.FetchLeaves<AbilityTagSheet>();
 
         private string LabelCondition(object condition) {
-            return condition.GetType().Name;
+            return condition.ToString();
         }
 
         internal bool TryCommit(

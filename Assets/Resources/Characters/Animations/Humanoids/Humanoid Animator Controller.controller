@@ -409,7 +409,7 @@ AnimatorStateMachine:
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: 50, y: 20, z: 0}
   m_EntryPosition: {x: 50, y: 120, z: 0}
-  m_ExitPosition: {x: 800, y: 120, z: 0}
+  m_ExitPosition: {x: 550, y: 120, z: 0}
   m_ParentStateMachinePosition: {x: 530, y: 0, z: 0}
   m_DefaultState: {fileID: 1049210146861790318}
 --- !u!1102 &-2215590377055268904
@@ -658,7 +658,8 @@ AnimatorState:
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 8032809010655079676}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: 5899153792591961832}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -773,6 +774,20 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &5899153792591961832
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ef3bcd4e7d149a5b64bd4fe06d22b8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Animations.StopAbilityFromAnimatorState
+  timing: 4
+  <Ability>k__BackingField: {fileID: 11400000, guid: aa6eb1ac61788c34eb7fba511f3cc26e, type: 2}
 --- !u!206 &6529460329111533070
 BlendTree:
   m_ObjectHideFlags: 1
@@ -788,6 +803,18 @@ BlendTree:
   m_UseAutomaticThresholds: 1
   m_NormalizedBlendValues: 0
   m_BlendType: 0
+--- !u!114 &6632389439713127473
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 907ff07a77ed493408fad09f6134c996, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
 --- !u!1102 &6794782143663231812
 AnimatorState:
   serializedVersion: 6

@@ -26,5 +26,9 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Predicate {
 
             return this.CompiledPredicates.NotAll(source);
         }
+        
+        public override string ToString() {
+            return "Not all of";
+        }
     }
 }

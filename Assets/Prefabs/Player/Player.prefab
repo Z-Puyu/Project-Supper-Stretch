@@ -54241,6 +54241,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 46e1df1ad72d91d45828c65fa4dad265, type: 2}
   - {fileID: 11400000, guid: d1b5f047207a9004b88750d8f1cecf3e, type: 2}
   - {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
+  - {fileID: 11400000, guid: aa6eb1ac61788c34eb7fba511f3cc26e, type: 2}
 --- !u!1 &6894017745684009813
 GameObject:
   m_ObjectHideFlags: 0
@@ -58488,7 +58489,7 @@ MonoBehaviour:
   <OnKeywordAdded>k__BackingField:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 62607394211588175}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Characters.KeywordEventHandler, Scripts.Characters
         m_MethodName: HandleNewlyAddedKeyword
         m_Mode: 0
@@ -58503,7 +58504,7 @@ MonoBehaviour:
   <OnKeywordRemoved>k__BackingField:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 62607394211588175}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Characters.KeywordEventHandler, Scripts.Characters
         m_MethodName: HandleRemovedKeyword
         m_Mode: 0
@@ -71387,9 +71388,8 @@ GameObject:
   - component: {fileID: 6388006269725896587}
   - component: {fileID: 6504065115825005498}
   - component: {fileID: 6265021832810256200}
-  - component: {fileID: 3149564668375874624}
-  - component: {fileID: 62607394211588175}
   - component: {fileID: 7461919093305455027}
+  - component: {fileID: 2138317279119354623}
   - component: {fileID: 1011507290102434938}
   m_Layer: 0
   m_Name: Player
@@ -71478,37 +71478,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameCharacterBehaviours.Runtime::GameCharacterBehaviours.Runtime.Movement.RootMotion
   <MovementController>k__BackingField: {fileID: 5425651491289196887}
---- !u!114 &3149564668375874624
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8829115338478182532}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d364f3f9ec2245f6ac4e2647336b280e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Scripts.Characters::Characters.Player.Actor
-  <AbilitySystem>k__BackingField: {fileID: 6658280735558002848}
-  <ComponentRoot>k__BackingField: {fileID: 5972498177023485511}
-  <RollAbility>k__BackingField: {fileID: 11400000, guid: 46e1df1ad72d91d45828c65fa4dad265, type: 2}
-  <BackstepAbility>k__BackingField: {fileID: 11400000, guid: d1b5f047207a9004b88750d8f1cecf3e, type: 2}
---- !u!114 &62607394211588175
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8829115338478182532}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64630a10c8844e93b2bd645eea6b1dcc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Scripts.Characters::Characters.KeywordEventHandler
-  <KeywordToBlockMovement>k__BackingField: Character Flags/Movement Blocked
-  <KeywordToBlockRotation>k__BackingField: Character Flags/Rotation Blocked
-  <LocomotionComponent>k__BackingField: {fileID: 5425651491289196887}
 --- !u!114 &7461919093305455027
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71521,6 +71490,120 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd1482349e924c4f82b4d9a909bf540e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AnimationUtilities.Runtime::AnimationUtilities.Runtime.AnimationController
+--- !u!114 &2138317279119354623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8829115338478182532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5be3cc767d0d4cd183edfc92f9c0e83e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Scripts.Characters::Characters.Player.PlayerInputReader
+  <MovementInterpreter>k__BackingField: {fileID: 428337316439139779}
+  <OnBeginSprinting>k__BackingField:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6658280735558002848}
+        m_TargetAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem,
+          GameplayAbilitiesSystem.Runtime
+        m_MethodName: Perform
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
+          m_ObjectArgumentAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.Ability,
+            GameplayAbilitiesSystem.Runtime
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  <OnStopSprinting>k__BackingField:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6658280735558002848}
+        m_TargetAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem,
+          GameplayAbilitiesSystem.Runtime
+        m_MethodName: CleanUp
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
+          m_ObjectArgumentAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.Ability,
+            GameplayAbilitiesSystem.Runtime
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 5425651491289196887}
+        m_TargetAssemblyTypeName: GameCharacterBehaviours.Runtime.Movement.Locomotion,
+          GameCharacterBehaviours.Runtime
+        m_MethodName: Run
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  <OnBeginWalking>k__BackingField:
+    m_PersistentCalls:
+      m_Calls: []
+  <OnStopWalking>k__BackingField:
+    m_PersistentCalls:
+      m_Calls: []
+  <OnDodge>k__BackingField:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6658280735558002848}
+        m_TargetAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem,
+          GameplayAbilitiesSystem.Runtime
+        m_MethodName: Perform
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11400000, guid: d1b5f047207a9004b88750d8f1cecf3e, type: 2}
+          m_ObjectArgumentAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.Ability,
+            GameplayAbilitiesSystem.Runtime
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 6658280735558002848}
+        m_TargetAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem,
+          GameplayAbilitiesSystem.Runtime
+        m_MethodName: Perform
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11400000, guid: 46e1df1ad72d91d45828c65fa4dad265, type: 2}
+          m_ObjectArgumentAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.Ability,
+            GameplayAbilitiesSystem.Runtime
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  <OnJump>k__BackingField:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6658280735558002848}
+        m_TargetAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem,
+          GameplayAbilitiesSystem.Runtime
+        m_MethodName: Perform
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11400000, guid: aa6eb1ac61788c34eb7fba511f3cc26e, type: 2}
+          m_ObjectArgumentAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.Ability,
+            GameplayAbilitiesSystem.Runtime
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1011507290102434938
 MonoBehaviour:
   m_ObjectHideFlags: 0

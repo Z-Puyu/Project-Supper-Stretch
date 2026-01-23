@@ -91,7 +91,7 @@ namespace Characters.Player
     ""name"": ""Player Controls"",
     ""maps"": [
         {
-            ""name"": ""Movement"",
+            ""name"": ""Player"",
             ""id"": ""036ce93b-8517-4988-90a9-4a9e1de9d2a3"",
             ""actions"": [
                 {
@@ -110,6 +110,24 @@ namespace Characters.Player
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": ""Hold"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Dodge"",
+                    ""type"": ""Button"",
+                    ""id"": ""2e79005e-5aa5-44fe-a2f8-05f1f740ade2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""79cbb2c9-21ee-4adf-914c-2320e4177dfe"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
                     ""initialStateCheck"": false
                 }
             ],
@@ -172,43 +190,17 @@ namespace Characters.Player
                 {
                     ""name"": """",
                     ""id"": ""ae0ab2ea-d9ea-4387-ac56-ec16cfe756ac"",
-                    ""path"": ""<Keyboard>/leftAlt"",
-                    ""interactions"": """",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": ""Hold"",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Sprint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                }
-            ]
-        },
-        {
-            ""name"": ""Actions"",
-            ""id"": ""27d44c45-dba5-483b-84d8-5fbd59fac1ec"",
-            ""actions"": [
-                {
-                    ""name"": ""Dodge"",
-                    ""type"": ""Button"",
-                    ""id"": ""e8359e9a-3d02-4b6c-93e0-d6f01c23c6bb"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Jump"",
-                    ""type"": ""Button"",
-                    ""id"": ""a84d34aa-bbc7-42cc-9c66-0231dce8affa"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                }
-            ],
-            ""bindings"": [
-                {
                     ""name"": """",
-                    ""id"": ""c26791bb-3ac0-44c8-bab9-3113ef7ba9dd"",
+                    ""id"": ""ad1dff03-749d-4a58-a15c-3f3af363c3cf"",
                     ""path"": ""<Keyboard>/leftShift"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -219,9 +211,9 @@ namespace Characters.Player
                 },
                 {
                     ""name"": """",
-                    ""id"": ""3d097f3d-1ec3-4aa9-ae3e-eb461142d631"",
+                    ""id"": ""51311f77-a421-4f70-80c0-bac3c46f3786"",
                     ""path"": ""<Keyboard>/space"",
-                    ""interactions"": """",
+                    ""interactions"": ""Tap"",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Jump"",
@@ -233,20 +225,17 @@ namespace Characters.Player
     ],
     ""controlSchemes"": []
 }");
-            // Movement
-            m_Movement = asset.FindActionMap("Movement", throwIfNotFound: true);
-            m_Movement_Movement = m_Movement.FindAction("Movement", throwIfNotFound: true);
-            m_Movement_Sprint = m_Movement.FindAction("Sprint", throwIfNotFound: true);
-            // Actions
-            m_Actions = asset.FindActionMap("Actions", throwIfNotFound: true);
-            m_Actions_Dodge = m_Actions.FindAction("Dodge", throwIfNotFound: true);
-            m_Actions_Jump = m_Actions.FindAction("Jump", throwIfNotFound: true);
+            // Player
+            m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
+            m_Player_Movement = m_Player.FindAction("Movement", throwIfNotFound: true);
+            m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
+            m_Player_Dodge = m_Player.FindAction("Dodge", throwIfNotFound: true);
+            m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         }
 
         ~@PlayerControls()
         {
-            UnityEngine.Debug.Assert(!m_Movement.enabled, "This will cause a leak and performance issues, PlayerControls.Movement.Disable() has not been called.");
-            UnityEngine.Debug.Assert(!m_Actions.enabled, "This will cause a leak and performance issues, PlayerControls.Actions.Disable() has not been called.");
+            UnityEngine.Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, PlayerControls.Player.Disable() has not been called.");
         }
 
         /// <summary>
@@ -319,34 +308,44 @@ namespace Characters.Player
             return asset.FindBinding(bindingMask, out action);
         }
 
-        // Movement
-        private readonly InputActionMap m_Movement;
-        private List<IMovementActions> m_MovementActionsCallbackInterfaces = new List<IMovementActions>();
-        private readonly InputAction m_Movement_Movement;
-        private readonly InputAction m_Movement_Sprint;
+        // Player
+        private readonly InputActionMap m_Player;
+        private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
+        private readonly InputAction m_Player_Movement;
+        private readonly InputAction m_Player_Sprint;
+        private readonly InputAction m_Player_Dodge;
+        private readonly InputAction m_Player_Jump;
         /// <summary>
-        /// Provides access to input actions defined in input action map "Movement".
+        /// Provides access to input actions defined in input action map "Player".
         /// </summary>
-        public struct MovementActions
+        public struct PlayerActions
         {
             private @PlayerControls m_Wrapper;
 
             /// <summary>
             /// Construct a new instance of the input action map wrapper class.
             /// </summary>
-            public MovementActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+            public PlayerActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
             /// <summary>
-            /// Provides access to the underlying input action "Movement/Movement".
+            /// Provides access to the underlying input action "Player/Movement".
             /// </summary>
-            public InputAction @Movement => m_Wrapper.m_Movement_Movement;
+            public InputAction @Movement => m_Wrapper.m_Player_Movement;
             /// <summary>
-            /// Provides access to the underlying input action "Movement/Sprint".
+            /// Provides access to the underlying input action "Player/Sprint".
             /// </summary>
-            public InputAction @Sprint => m_Wrapper.m_Movement_Sprint;
+            public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
+            /// <summary>
+            /// Provides access to the underlying input action "Player/Dodge".
+            /// </summary>
+            public InputAction @Dodge => m_Wrapper.m_Player_Dodge;
+            /// <summary>
+            /// Provides access to the underlying input action "Player/Jump".
+            /// </summary>
+            public InputAction @Jump => m_Wrapper.m_Player_Jump;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
-            public InputActionMap Get() { return m_Wrapper.m_Movement; }
+            public InputActionMap Get() { return m_Wrapper.m_Player; }
             /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
             public void Enable() { Get().Enable(); }
             /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
@@ -354,9 +353,9 @@ namespace Characters.Player
             /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
             public bool enabled => Get().enabled;
             /// <summary>
-            /// Implicitly converts an <see ref="MovementActions" /> to an <see ref="InputActionMap" /> instance.
+            /// Implicitly converts an <see ref="PlayerActions" /> to an <see ref="InputActionMap" /> instance.
             /// </summary>
-            public static implicit operator InputActionMap(MovementActions set) { return set.Get(); }
+            public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
             /// <summary>
             /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
             /// </summary>
@@ -364,118 +363,17 @@ namespace Characters.Player
             /// <remarks>
             /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
             /// </remarks>
-            /// <seealso cref="MovementActions" />
-            public void AddCallbacks(IMovementActions instance)
+            /// <seealso cref="PlayerActions" />
+            public void AddCallbacks(IPlayerActions instance)
             {
-                if (instance == null || m_Wrapper.m_MovementActionsCallbackInterfaces.Contains(instance)) return;
-                m_Wrapper.m_MovementActionsCallbackInterfaces.Add(instance);
+                if (instance == null || m_Wrapper.m_PlayerActionsCallbackInterfaces.Contains(instance)) return;
+                m_Wrapper.m_PlayerActionsCallbackInterfaces.Add(instance);
                 @Movement.started += instance.OnMovement;
                 @Movement.performed += instance.OnMovement;
                 @Movement.canceled += instance.OnMovement;
                 @Sprint.started += instance.OnSprint;
                 @Sprint.performed += instance.OnSprint;
                 @Sprint.canceled += instance.OnSprint;
-            }
-
-            /// <summary>
-            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
-            /// </summary>
-            /// <remarks>
-            /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
-            /// </remarks>
-            /// <seealso cref="MovementActions" />
-            private void UnregisterCallbacks(IMovementActions instance)
-            {
-                @Movement.started -= instance.OnMovement;
-                @Movement.performed -= instance.OnMovement;
-                @Movement.canceled -= instance.OnMovement;
-                @Sprint.started -= instance.OnSprint;
-                @Sprint.performed -= instance.OnSprint;
-                @Sprint.canceled -= instance.OnSprint;
-            }
-
-            /// <summary>
-            /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="MovementActions.UnregisterCallbacks(IMovementActions)" />.
-            /// </summary>
-            /// <seealso cref="MovementActions.UnregisterCallbacks(IMovementActions)" />
-            public void RemoveCallbacks(IMovementActions instance)
-            {
-                if (m_Wrapper.m_MovementActionsCallbackInterfaces.Remove(instance))
-                    UnregisterCallbacks(instance);
-            }
-
-            /// <summary>
-            /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
-            /// </summary>
-            /// <remarks>
-            /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
-            /// </remarks>
-            /// <seealso cref="MovementActions.AddCallbacks(IMovementActions)" />
-            /// <seealso cref="MovementActions.RemoveCallbacks(IMovementActions)" />
-            /// <seealso cref="MovementActions.UnregisterCallbacks(IMovementActions)" />
-            public void SetCallbacks(IMovementActions instance)
-            {
-                foreach (var item in m_Wrapper.m_MovementActionsCallbackInterfaces)
-                    UnregisterCallbacks(item);
-                m_Wrapper.m_MovementActionsCallbackInterfaces.Clear();
-                AddCallbacks(instance);
-            }
-        }
-        /// <summary>
-        /// Provides a new <see cref="MovementActions" /> instance referencing this action map.
-        /// </summary>
-        public MovementActions @Movement => new MovementActions(this);
-
-        // Actions
-        private readonly InputActionMap m_Actions;
-        private List<IActionsActions> m_ActionsActionsCallbackInterfaces = new List<IActionsActions>();
-        private readonly InputAction m_Actions_Dodge;
-        private readonly InputAction m_Actions_Jump;
-        /// <summary>
-        /// Provides access to input actions defined in input action map "Actions".
-        /// </summary>
-        public struct ActionsActions
-        {
-            private @PlayerControls m_Wrapper;
-
-            /// <summary>
-            /// Construct a new instance of the input action map wrapper class.
-            /// </summary>
-            public ActionsActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
-            /// <summary>
-            /// Provides access to the underlying input action "Actions/Dodge".
-            /// </summary>
-            public InputAction @Dodge => m_Wrapper.m_Actions_Dodge;
-            /// <summary>
-            /// Provides access to the underlying input action "Actions/Jump".
-            /// </summary>
-            public InputAction @Jump => m_Wrapper.m_Actions_Jump;
-            /// <summary>
-            /// Provides access to the underlying input action map instance.
-            /// </summary>
-            public InputActionMap Get() { return m_Wrapper.m_Actions; }
-            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
-            public void Enable() { Get().Enable(); }
-            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
-            public void Disable() { Get().Disable(); }
-            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
-            public bool enabled => Get().enabled;
-            /// <summary>
-            /// Implicitly converts an <see ref="ActionsActions" /> to an <see ref="InputActionMap" /> instance.
-            /// </summary>
-            public static implicit operator InputActionMap(ActionsActions set) { return set.Get(); }
-            /// <summary>
-            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
-            /// </summary>
-            /// <param name="instance">Callback instance.</param>
-            /// <remarks>
-            /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
-            /// </remarks>
-            /// <seealso cref="ActionsActions" />
-            public void AddCallbacks(IActionsActions instance)
-            {
-                if (instance == null || m_Wrapper.m_ActionsActionsCallbackInterfaces.Contains(instance)) return;
-                m_Wrapper.m_ActionsActionsCallbackInterfaces.Add(instance);
                 @Dodge.started += instance.OnDodge;
                 @Dodge.performed += instance.OnDodge;
                 @Dodge.canceled += instance.OnDodge;
@@ -490,9 +388,15 @@ namespace Characters.Player
             /// <remarks>
             /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
             /// </remarks>
-            /// <seealso cref="ActionsActions" />
-            private void UnregisterCallbacks(IActionsActions instance)
+            /// <seealso cref="PlayerActions" />
+            private void UnregisterCallbacks(IPlayerActions instance)
             {
+                @Movement.started -= instance.OnMovement;
+                @Movement.performed -= instance.OnMovement;
+                @Movement.canceled -= instance.OnMovement;
+                @Sprint.started -= instance.OnSprint;
+                @Sprint.performed -= instance.OnSprint;
+                @Sprint.canceled -= instance.OnSprint;
                 @Dodge.started -= instance.OnDodge;
                 @Dodge.performed -= instance.OnDodge;
                 @Dodge.canceled -= instance.OnDodge;
@@ -502,12 +406,12 @@ namespace Characters.Player
             }
 
             /// <summary>
-            /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="ActionsActions.UnregisterCallbacks(IActionsActions)" />.
+            /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="PlayerActions.UnregisterCallbacks(IPlayerActions)" />.
             /// </summary>
-            /// <seealso cref="ActionsActions.UnregisterCallbacks(IActionsActions)" />
-            public void RemoveCallbacks(IActionsActions instance)
+            /// <seealso cref="PlayerActions.UnregisterCallbacks(IPlayerActions)" />
+            public void RemoveCallbacks(IPlayerActions instance)
             {
-                if (m_Wrapper.m_ActionsActionsCallbackInterfaces.Remove(instance))
+                if (m_Wrapper.m_PlayerActionsCallbackInterfaces.Remove(instance))
                     UnregisterCallbacks(instance);
             }
 
@@ -517,27 +421,27 @@ namespace Characters.Player
             /// <remarks>
             /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
             /// </remarks>
-            /// <seealso cref="ActionsActions.AddCallbacks(IActionsActions)" />
-            /// <seealso cref="ActionsActions.RemoveCallbacks(IActionsActions)" />
-            /// <seealso cref="ActionsActions.UnregisterCallbacks(IActionsActions)" />
-            public void SetCallbacks(IActionsActions instance)
+            /// <seealso cref="PlayerActions.AddCallbacks(IPlayerActions)" />
+            /// <seealso cref="PlayerActions.RemoveCallbacks(IPlayerActions)" />
+            /// <seealso cref="PlayerActions.UnregisterCallbacks(IPlayerActions)" />
+            public void SetCallbacks(IPlayerActions instance)
             {
-                foreach (var item in m_Wrapper.m_ActionsActionsCallbackInterfaces)
+                foreach (var item in m_Wrapper.m_PlayerActionsCallbackInterfaces)
                     UnregisterCallbacks(item);
-                m_Wrapper.m_ActionsActionsCallbackInterfaces.Clear();
+                m_Wrapper.m_PlayerActionsCallbackInterfaces.Clear();
                 AddCallbacks(instance);
             }
         }
         /// <summary>
-        /// Provides a new <see cref="ActionsActions" /> instance referencing this action map.
+        /// Provides a new <see cref="PlayerActions" /> instance referencing this action map.
         /// </summary>
-        public ActionsActions @Actions => new ActionsActions(this);
+        public PlayerActions @Player => new PlayerActions(this);
         /// <summary>
-        /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Movement" which allows adding and removing callbacks.
+        /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Player" which allows adding and removing callbacks.
         /// </summary>
-        /// <seealso cref="MovementActions.AddCallbacks(IMovementActions)" />
-        /// <seealso cref="MovementActions.RemoveCallbacks(IMovementActions)" />
-        public interface IMovementActions
+        /// <seealso cref="PlayerActions.AddCallbacks(IPlayerActions)" />
+        /// <seealso cref="PlayerActions.RemoveCallbacks(IPlayerActions)" />
+        public interface IPlayerActions
         {
             /// <summary>
             /// Method invoked when associated input action "Movement" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
@@ -553,14 +457,6 @@ namespace Characters.Player
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnSprint(InputAction.CallbackContext context);
-        }
-        /// <summary>
-        /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Actions" which allows adding and removing callbacks.
-        /// </summary>
-        /// <seealso cref="ActionsActions.AddCallbacks(IActionsActions)" />
-        /// <seealso cref="ActionsActions.RemoveCallbacks(IActionsActions)" />
-        public interface IActionsActions
-        {
             /// <summary>
             /// Method invoked when associated input action "Dodge" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
