@@ -12,9 +12,6 @@ namespace GameplayKeywordsSystem.Runtime {
         [field: SerializeField, SaintsRow(inline: true)] 
         private KeywordLabel Label { get; set; } = new KeywordLabel();
         
-        [field: SerializeField] private UnityEvent<Keyword> OnKeywordAdded { get; set; } = new UnityEvent<Keyword>();
-        [field: SerializeField] private UnityEvent<Keyword> OnKeywordRemoved { get; set; } = new UnityEvent<Keyword>();
-        
         public int Count => this.Label.Count;
         public bool IsReadOnly => this.Label.IsReadOnly;
         

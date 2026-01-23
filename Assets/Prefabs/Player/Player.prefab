@@ -32432,16 +32432,16 @@ MonoBehaviour:
       type: {class: StatBarPresenter, ns: UI, asm: Scripts.UI}
       data:
         <Model>k__BackingField: {fileID: 6624264980163878195}
-        <View>k__BackingField: HealthBar (.health-bar)
+        <View>k__BackingField: Vitals/HealthBar/StatBar (.unity-progress-bar)
         <TrackedAttribute>k__BackingField: Health
-        <UnitLength>k__BackingField: 0
+        <UnitLength>k__BackingField: 25
     - rid: 1692151951056961709
       type: {class: StatBarPresenter, ns: UI, asm: Scripts.UI}
       data:
         <Model>k__BackingField: {fileID: 6624264980163878195}
-        <View>k__BackingField: StaminaBar (.stamina-bar)
+        <View>k__BackingField: Vitals/StaminaBar/StatBar (.unity-progress-bar)
         <TrackedAttribute>k__BackingField: Stamina
-        <UnitLength>k__BackingField: 0
+        <UnitLength>k__BackingField: 25
 --- !u!1 &4256974226788895607
 GameObject:
   m_ObjectHideFlags: 0
@@ -48009,7 +48009,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Scripts.GameManagement::GameManagement.CameraSystem
   <LevelOfPersistence>k__BackingField: 0
-  <CameraTransform>k__BackingField: {fileID: 0}
+  <CameraTransform>k__BackingField: {fileID: 4264279494460778467}
 --- !u!1 &6356031882833635183
 GameObject:
   m_ObjectHideFlags: 0
@@ -58478,44 +58478,82 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameplayKeywordsSystem.Runtime::GameplayKeywordsSystem.Runtime.KeywordContainer
   <Label>k__BackingField:
     <PreexistingKeywords>k__BackingField: []
-    <OnAddKeywordEvents>k__BackingField: []
-    <OnRemoveKeywordEvents>k__BackingField: []
+    <OnAddKeywordEvents>k__BackingField:
+    - <Keyword>k__BackingField: Character Flags/Movement Blocked
+      <Event>k__BackingField:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 5425651491289196887}
+            m_TargetAssemblyTypeName: GameCharacterBehaviours.Runtime.Movement.Locomotion,
+              GameCharacterBehaviours.Runtime
+            m_MethodName: set_CanMove
+            m_Mode: 6
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+    - <Keyword>k__BackingField: Character Flags/Rotation Blocked
+      <Event>k__BackingField:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 5425651491289196887}
+            m_TargetAssemblyTypeName: GameCharacterBehaviours.Runtime.Movement.Locomotion,
+              GameCharacterBehaviours.Runtime
+            m_MethodName: set_CanRotate
+            m_Mode: 6
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+    <OnRemoveKeywordEvents>k__BackingField:
+    - <Keyword>k__BackingField: Character Flags/Movement Blocked
+      <Event>k__BackingField:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 5425651491289196887}
+            m_TargetAssemblyTypeName: GameCharacterBehaviours.Runtime.Movement.Locomotion,
+              GameCharacterBehaviours.Runtime
+            m_MethodName: set_CanMove
+            m_Mode: 6
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 1
+            m_CallState: 2
+    - <Keyword>k__BackingField: Character Flags/Rotation Blocked
+      <Event>k__BackingField:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 5425651491289196887}
+            m_TargetAssemblyTypeName: GameCharacterBehaviours.Runtime.Movement.Locomotion,
+              GameCharacterBehaviours.Runtime
+            m_MethodName: set_CanRotate
+            m_Mode: 6
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 1
+            m_CallState: 2
     <OnAnyKeywordAdded>k__BackingField:
       m_PersistentCalls:
         m_Calls: []
     <OnAnyKeywordRemoved>k__BackingField:
       m_PersistentCalls:
         m_Calls: []
-  <OnKeywordAdded>k__BackingField:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Characters.KeywordEventHandler, Scripts.Characters
-        m_MethodName: HandleNewlyAddedKeyword
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  <OnKeywordRemoved>k__BackingField:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Characters.KeywordEventHandler, Scripts.Characters
-        m_MethodName: HandleRemovedKeyword
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1 &7450872485352935328
 GameObject:
   m_ObjectHideFlags: 0

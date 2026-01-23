@@ -21,6 +21,7 @@ MonoBehaviour:
     <CostAttribute>k__BackingField: Stamina
   <Conditions>k__BackingField:
   - rid: 1692151751057866752
+  - rid: 1692152225826603308
   <ExecutionSteps>k__BackingField:
   - rid: 1692151813856559430
   <SideEffect>k__BackingField:
@@ -59,3 +60,6 @@ MonoBehaviour:
       type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
       data:
         <Value>k__BackingField: 25
+    - rid: 1692152225826603308
+      type: {class: IsMoving, ns: Characters.Abilities, asm: Scripts.Characters}
+      data: 
