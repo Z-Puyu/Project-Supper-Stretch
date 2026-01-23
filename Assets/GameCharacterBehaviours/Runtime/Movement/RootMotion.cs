@@ -20,7 +20,7 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         }
 
         private void OnAnimatorMove() {
-            this.MovementController.MoveBy(this.Animator.deltaPosition);
+            this.MovementController.MoveBy(this.Animator.deltaPosition, Time.deltaTime);
         }
     }
 }

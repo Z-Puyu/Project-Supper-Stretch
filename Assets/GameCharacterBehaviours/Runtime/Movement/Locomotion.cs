@@ -86,7 +86,7 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             this.Mode = Gesture.Sprint;
         }
 
-        public void MoveBy(Vector3 displacement) {
+        public void MoveBy(Vector3 displacement, float duration = 0) {
             if (this.CanMove) {
                 this.MovementModule?.MoveBy(displacement);
             }

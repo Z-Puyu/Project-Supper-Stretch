@@ -15,7 +15,7 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             this.RootTransform.position, this.GroundDistanceTolerance, this.GroundLayer
         );
 
-        public override void MoveBy(Vector3 displacement) {
+        protected override void SupplyMovement(Vector3 displacement) {
             this.RootTransform.Translate(displacement, Space.World);
         }
     }

@@ -9,6 +9,8 @@ namespace GameCharacterBehaviours.Runtime.PhysicalProperties {
         
         public float TotalMass { get; private set; }
         public Vector3 Weight => Physics.gravity * this.TotalMass;
+        public Vector3 ExternalForce { get; set; }
+        public Vector3 NetForce => this.Weight + this.ExternalForce;
 
         private void OnEnable() {
             foreach (Mass mass in this.GetComponentsInParent<Mass>(true)) {
