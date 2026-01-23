@@ -214,6 +214,26 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
                     : this.AnimationController.Play(anim, onNotify, interrupter);
         }
 
+        public void SetAnimatorInt(int hash, int value) {
+            this.AnimationController.SetInteger(hash, value);
+        }
+        
+        public void SetAnimatorFloat(int hash, float value) {
+            this.AnimationController.SetFloat(hash, value);
+        }
+        
+        public void SetAnimatorBool(int hash, bool value) {
+            this.AnimationController.SetBool(hash, value);
+        }
+        
+        public void SetAnimatorTrigger(int hash) {
+            this.AnimationController.SetTrigger(hash);
+        }
+
+        public void ResetAnimatorTrigger(int hash) {
+            this.AnimationController.ResetTrigger(hash);
+        }
+
         CancellationToken IEffectReceiverFacade.Register(EffectDescriptor effect) {
             return this.EffectRegistry.Register(effect);
         }

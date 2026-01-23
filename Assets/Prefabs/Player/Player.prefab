@@ -58477,6 +58477,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameplayKeywordsSystem.Runtime::GameplayKeywordsSystem.Runtime.KeywordContainer
   <Label>k__BackingField:
     <PreexistingKeywords>k__BackingField: []
+    <OnAddKeywordEvents>k__BackingField: []
+    <OnRemoveKeywordEvents>k__BackingField: []
+    <OnAnyKeywordAdded>k__BackingField:
+      m_PersistentCalls:
+        m_Calls: []
+    <OnAnyKeywordRemoved>k__BackingField:
+      m_PersistentCalls:
+        m_Calls: []
   <OnKeywordAdded>k__BackingField:
     m_PersistentCalls:
       m_Calls:
@@ -74975,6 +74983,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6576315276943627755}
     m_Modifications:
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <ReferenceSpace>k__BackingField
+      value: 
+      objectReference: {fileID: 1210495657512681727}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: onStopMoving.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 6658280735558002848}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: onBeginRunning.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 6658280735558002848}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: onBeginWalking.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 6658280735558002848}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: onBeginSprinting.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 6658280735558002848}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: managedReferences[1692152225826603121].<Controller>k__BackingField
+      value: 
+      objectReference: {fileID: 6504065115825005498}
     - target: {fileID: 7778497221915971296, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -75173,11 +75205,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8857036086179365746, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
-      insertIndex: -1
+      insertIndex: 1
       addedObject: {fileID: 428337316439139779}
-    - targetCorrespondingSourceObject: {fileID: 8857036086179365746, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5425651491289196887}
   m_SourcePrefab: {fileID: 100100000, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
 --- !u!4 &622304388507415446 stripped
 Transform:
@@ -75205,11 +75234,10 @@ MonoBehaviour:
   <LeftRightVelocityAnimatorParameter>k__BackingField: 2041851446
   <ForwardBackVelocityAnimatorParameter>k__BackingField: 72152147
   <AnimationBlendTime>k__BackingField: 0.1
---- !u!114 &5425651491289196887
+--- !u!114 &5425651491289196887 stripped
 MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+  m_PrefabInstance: {fileID: 7156246786821897590}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1853965640067792388}
   m_Enabled: 1
@@ -75217,95 +75245,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0ce46db85c846568888f49ebdff9546, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameCharacterBehaviours.Runtime::GameCharacterBehaviours.Runtime.Movement.Locomotion
-  <ReferenceSpace>k__BackingField: {fileID: 1210495657512681727}
-  onlyAllowRotationWhenMoving: 1
-  gesture: 1
-  stance: 0
-  onBeginSprinting:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6658280735558002848}
-        m_TargetAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem,
-          GameplayAbilitiesSystem.Runtime
-        m_MethodName: Perform
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
-          m_ObjectArgumentAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.Ability,
-            GameplayAbilitiesSystem.Runtime
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onBeginWalking:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6658280735558002848}
-        m_TargetAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem,
-          GameplayAbilitiesSystem.Runtime
-        m_MethodName: Stop
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
-          m_ObjectArgumentAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.Ability,
-            GameplayAbilitiesSystem.Runtime
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onBeginRunning:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6658280735558002848}
-        m_TargetAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem,
-          GameplayAbilitiesSystem.Runtime
-        m_MethodName: Stop
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
-          m_ObjectArgumentAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.Ability,
-            GameplayAbilitiesSystem.Runtime
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onStopMoving:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6658280735558002848}
-        m_TargetAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem,
-          GameplayAbilitiesSystem.Runtime
-        m_MethodName: Stop
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
-          m_ObjectArgumentAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.Ability,
-            GameplayAbilitiesSystem.Runtime
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  <Mover>k__BackingField:
-    rid: 1692152173614334275
-  <Rotator>k__BackingField:
-    rid: 1692152173614334274
-  references:
-    version: 2
-    RefIds:
-    - rid: 1692152173614334274
-      type: {class: SmoothDampRotator, ns: GameCharacterBehaviours.Runtime.Movement, asm: GameCharacterBehaviours.Runtime}
-      data:
-        <SmoothTime>k__BackingField: 0.12
-    - rid: 1692152173614334275
-      type: {class: CharacterControllerMover, ns: GameCharacterBehaviours.Runtime.Movement, asm: GameCharacterBehaviours.Runtime}
-      data:
-        <WalkingSpeed>k__BackingField: 1
-        <RunningSpeed>k__BackingField: 2
-        <SprintingSpeed>k__BackingField: 3
-        <SpeedMultiplier>k__BackingField: 1
-        <StealthSpeedMultiplier>k__BackingField: 0.5
-        <Controller>k__BackingField: {fileID: 6504065115825005498}

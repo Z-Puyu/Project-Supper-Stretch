@@ -3,6 +3,7 @@ using CommonFrameworks.Components;
 using SaintsField;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace GameCharacterBehaviours.Runtime.Movement {
     [DisallowMultipleComponent]
@@ -23,15 +24,18 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         [SerializeField] private UnityEvent onStopMoving = new UnityEvent();
         
         [field: SerializeReference, ReferencePicker, Required] 
-        private IMover? Mover { get; set; } = new SimpleMover();
+        private IMover? MovementModule { get; set; } = new SimpleMover();
         
         [field: SerializeReference, Required, ReferencePicker]
-        private IRotator? Rotator { get; set; } = new SmoothDampRotator();
-
+        private IRotator? RotationModule { get; set; } = new SmoothDampRotator();
+        
+        [field: SerializeReference, ReferencePicker] 
+        private IJumper? JumpModule { get; set; } = new AnimatorJumper();
+        
         public Vector3 Direction { get; private set; }
         
         public bool IsMoving => this.Direction.sqrMagnitude > Locomotion.DirectionTolerance;
-        public float CurrentSpeed => this.Mover?.Speed ?? 0f;
+        public float CurrentSpeed => this.MovementModule?.Speed ?? 0f;
 
         /// <summary>
         /// The movement direction in the x-z plane.
@@ -70,6 +74,7 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         internal bool UseRootMotion { private get; set; } 
         public bool CanMove { private get; set; } = true;
         public bool CanRotate { private get; set; } = true;
+        public bool CanJump { private get; set; } = true;
 
         protected override void Awake() {
             base.Awake();
@@ -80,7 +85,7 @@ namespace GameCharacterBehaviours.Runtime.Movement {
 
         public void MoveBy(Vector3 displacement) {
             if (this.CanMove) {
-                this.Mover?.MoveBy(displacement);
+                this.MovementModule?.MoveBy(displacement);
             }
         }
 
@@ -90,17 +95,23 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             }
             
             Vector3 forward = this.ReferenceSpace.forward;
-            this.Rotator?.RotateTowards(this.Owner.transform, forward, deltaTime);
+            this.RotationModule?.RotateTowards(this.Owner.transform, forward, deltaTime);
 #if DEBUG
             Vector3 position = this.Owner.transform.position;
             Debug.DrawRay(position, this.Owner.transform.forward * 100, Color.red);
             Debug.DrawRay(position, forward * 100, Color.green);
 #endif
         }
+
+        public void Jump() {
+            if (this.CanJump && this.CanMove && (this.MovementModule?.IsGrounded ?? true)) {
+                this.JumpModule?.Jump();
+            }
+        }
         
         private void Update() {
             if (this.CanMove && !this.UseRootMotion) {
-                this.Mover?.Move(Time.deltaTime, this.Direction, this.gesture, this.stance);
+                this.MovementModule?.Move(Time.deltaTime, this.Direction, this.gesture, this.stance);
             }
         }
 

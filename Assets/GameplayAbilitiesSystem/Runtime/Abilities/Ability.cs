@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using CommonFrameworks.Async;
-using CommonFrameworks.Extensions;
+using CommonFrameworks.Events;
 using CommonFrameworks.Logic;
 using GameplayAbilitiesSystem.Runtime.Abilities.Executions;
 using GameplayAbilitiesSystem.Runtime.Effects;
@@ -24,6 +24,8 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
 
         [field: SerializeReference, ReferencePicker]
         private List<IAbilityExecutor> ExecutionSteps { get; set; } = new List<IAbilityExecutor>();
+        
+        // [field: SerializeField] private List<GameEventHandler> EventHandlers { get; set; } = new List<GameEventHandler>();
 
         [field: SerializeField] private AbilityEffect? SideEffect { get; set; }
 

@@ -134,5 +134,25 @@ namespace AnimationUtilities.Runtime {
                 await Awaitable.NextFrameAsync(interrupter);
             }
         }
+
+        public void SetInteger(int hash, int value) {
+            this.Animator.SetInteger(hash, value);
+        }
+        
+        public void SetFloat(int hash, float value) {
+            this.Animator.SetFloat(hash, value);
+        }
+        
+        public void SetBool(int hash, bool value) {
+            this.Animator.SetBool(hash, value);
+        }
+        
+        public void SetTrigger(int hash) {
+            this.Animator.SetTrigger(hash);
+        }
+
+        public void ResetTrigger(int hash) {
+            this.Animator.ResetTrigger(hash);
+        }
     }
 }

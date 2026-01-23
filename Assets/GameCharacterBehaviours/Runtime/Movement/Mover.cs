@@ -14,6 +14,7 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         [field: SerializeField, PropRange(0, 1, 0.05)] 
         private float StealthSpeedMultiplier { get; set; } = 0.5f;
 
+        public abstract bool IsGrounded { get; }
         public float Speed { get; private set; }
         public abstract void MoveBy(Vector3 displacement);
         
