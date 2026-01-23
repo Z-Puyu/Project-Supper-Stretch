@@ -224,27 +224,27 @@ namespace CommonFrameworks.Extensions {
         }
 
         public static bool TryGetComponentInProperParent<T>(
-            this GameObject obj, [MaybeNullWhen(false)] out T component
+            this GameObject obj, [NotNullWhen(true)] out T? component
         ) where T : class {
             component = obj.GetComponentInProperParent<T>();
             return component != null;
         }
 
         public static bool TryGetEnabledComponentInProperParent<T>(
-            this GameObject obj, [MaybeNullWhen(false)] out T component
+            this GameObject obj, [NotNullWhen(true)] out T? component
         ) where T : class {
             component = obj.GetEnabledComponentInProperParent<T>();
             return component != null;
         }
 
         public static bool TryGetComponentInProperParent<T>(
-            this Component self, [MaybeNullWhen(false)] out T component
+            this Component self, [NotNullWhen(true)] out T? component
         ) where T : class {
             return self.gameObject.TryGetComponentInProperParent(out component);
         }
 
         public static bool TryGetEnabledComponentInProperParent<T>(
-            this Component self, [MaybeNullWhen(false)] out T component
+            this Component self, [NotNullWhen(true)] out T? component
         ) where T : class {
             return self.gameObject.TryGetEnabledComponentInProperParent(out component);
         }
