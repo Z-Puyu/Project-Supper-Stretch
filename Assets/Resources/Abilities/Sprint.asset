@@ -17,7 +17,7 @@ MonoBehaviour:
   <Costs>k__BackingField: []
   <Conditions>k__BackingField:
   - rid: 1692151863182360969
-  - rid: 1692152225826603173
+  - rid: 1692152357399823133
   <ExecutionSteps>k__BackingField:
   - rid: 1692152357399822892
   - rid: 1692151973348376681
@@ -43,12 +43,11 @@ MonoBehaviour:
         <WillEndAbilityOnCompletion>k__BackingField: 1
         <Effects>k__BackingField:
         - {fileID: 11400000, guid: 87a347297b1e3b345b8b5c6e5e39b356, type: 2}
-    - rid: 1692152225826603173
-      type: {class: RequiredLocomotionGesture, ns: Characters.Abilities, asm: Scripts.Characters}
-      data:
-        <RequiredGesture>k__BackingField: 1
     - rid: 1692152357399822892
       type: {class: SwitchLocomotionGesture, ns: SOULS.Runtime.GameplayAbilities.Executions, asm: SOULS.Runtime.GameplayAbilities}
       data:
         <WillEndAbilityOnCompletion>k__BackingField: 0
         <TargetGesture>k__BackingField: 2
+    - rid: 1692152357399823133
+      type: {class: IsGrounded, ns: SOULS.Runtime.GameplayAbilities.Predicates, asm: SOULS.Runtime.GameplayAbilities}
+      data: 

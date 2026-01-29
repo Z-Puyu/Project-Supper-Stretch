@@ -108,9 +108,12 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         }
 
         public void MoveBy(Vector3 displacement, float duration) {
-            if (this.CanMove) {
-                this.MovementModule.MoveBy(displacement, duration);
+            if (!this.CanMove) {
+                return;
             }
+
+            this.PlanarDirection = new Vector2(displacement.x, displacement.z).normalized;
+            this.MovementModule.MoveBy(displacement, duration);
         }
 
         private void Rotate(float deltaTime) {

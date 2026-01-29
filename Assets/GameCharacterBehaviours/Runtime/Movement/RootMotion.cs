@@ -15,12 +15,18 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             this.Animator = this.GetComponent<Animator>();
         }
 
-        private void Start() {
+        private void OnEnable() {
             this.MovementController.UseRootMotion = true;
+        }
+        
+        private void OnDisable() {
+            this.MovementController.UseRootMotion = false;
         }
 
         private void OnAnimatorMove() {
-            this.MovementController.MoveBy(this.Animator.deltaPosition, Time.deltaTime);
+            if (this.MovementController.IsMoving) { 
+                this.MovementController.MoveBy(this.Animator.deltaPosition, Time.deltaTime);
+            }
         }
     }
 }

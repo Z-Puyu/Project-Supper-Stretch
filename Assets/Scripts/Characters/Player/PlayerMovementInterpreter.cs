@@ -37,6 +37,7 @@ namespace Characters.Player {
             this.Animator.SetBool(this.GroundedFlagAnimatorParameter, this.Locomotion.IsGrounded);
             Vector2 input = this.Input * this.Locomotion.CurrentSpeed;
             Vector3 direction = CameraSystem.PlanarForward * input.y + CameraSystem.PlanarRight * input.x;
+            this.Locomotion.PlanarDirection = new Vector2(direction.x, direction.z).normalized;
             this.Animator.SetFloat(
                 this.LeftRightVelocityAnimatorParameter, input.x, this.AnimationBlendTime, Time.deltaTime
             );
@@ -44,8 +45,6 @@ namespace Characters.Player {
             this.Animator.SetFloat(
                 this.ForwardBackVelocityAnimatorParameter, input.y, this.AnimationBlendTime, Time.deltaTime
             );
-            
-            this.Locomotion.PlanarDirection = new Vector2(direction.x, direction.z).normalized;
         }
     }
 }

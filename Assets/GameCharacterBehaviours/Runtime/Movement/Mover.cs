@@ -18,25 +18,18 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         
         public abstract bool IsGrounded { get; }
 
-        public float Speed {
-            get => this.gesture switch {
-                Locomotion.Gesture.Walk => this.WalkingSpeed,
-                Locomotion.Gesture.Run => this.RunningSpeed,
-                Locomotion.Gesture.Sprint => this.SprintingSpeed,
-                var _ => this.WalkingSpeed
-            } * this.SpeedMultiplier * this.stance switch {
-                Locomotion.Stance.Standing => 1,
-                Locomotion.Stance.Sneaking => this.StealthSpeedMultiplier,
-                var _ => 1
-            };
-            set {
-                switch (this.gesture) {
-                    case Locomotion.Gesture.Walk: this.WalkingSpeed = value; break;
-                    case Locomotion.Gesture.Run: this.RunningSpeed = value; break;
-                    case Locomotion.Gesture.Sprint: this.SprintingSpeed = value; break;
-                }
-            }
-        }
+        private float BaseSpeed => this.gesture switch {
+            Locomotion.Gesture.Walk => this.WalkingSpeed,
+            Locomotion.Gesture.Run => this.RunningSpeed,
+            Locomotion.Gesture.Sprint => this.SprintingSpeed,
+            var _ => this.WalkingSpeed
+        } * this.stance switch {
+            Locomotion.Stance.Standing => 1,
+            Locomotion.Stance.Sneaking => this.StealthSpeedMultiplier,
+            var _ => 1
+        };
+
+        public float Speed => this.BaseSpeed * this.SpeedMultiplier;
 
         Locomotion.Gesture IMover.Gesture { get => this.gesture; set => this.gesture = value; }
         Locomotion.Stance IMover.Stance { get => this.stance; set => this.stance = value; }
@@ -44,9 +37,9 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         protected abstract void SupplyMovement(Vector3 displacement);
 
         public void MoveBy(Vector3 displacement, float duration = 0) {
-            if (duration > 0) {
-                this.Speed = displacement.magnitude / duration;
-            }
+            // if (duration > 0) {
+            //     this.SpeedMultiplier = displacement.magnitude / duration / this.BaseSpeed;
+            // }
             
             this.SupplyMovement(displacement);
         }
