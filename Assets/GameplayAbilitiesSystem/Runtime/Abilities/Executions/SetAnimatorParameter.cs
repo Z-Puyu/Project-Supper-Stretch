@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using CommonFrameworks.Async;
 using SaintsField;
@@ -13,7 +14,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
         [field: SerializeField, ShowIf(nameof(this.AnimatorController))] 
         private AnimatorControllerParameterType Type { get; set; }
         
-        [field: SerializeField, Dropdown(nameof(this.Parameters)), ShowIf(nameof(this.AnimatorController))] 
+        [field: SerializeField, MenuDropdown(nameof(this.Parameters)), ShowIf(nameof(this.AnimatorController))] 
         private int Parameter { get; set; }
         
         [field: SerializeField]
@@ -26,7 +27,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities.Executions {
         
         [field: SerializeField]
         [field: ShowIf(nameof(this.Type), AnimatorControllerParameterType.Float, nameof(this.AnimatorController))]
-        private float FloatValue { get; set; } 
+        private float FloatValue { get; set; }
 
         private DropdownList<int> Parameters => this.AnimatorController
                 ? new DropdownList<int>(

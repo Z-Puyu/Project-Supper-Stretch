@@ -57327,8 +57327,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7234192289941891906}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.18076181, y: -0.36075765, z: 0.07148958, w: 0.91217786}
-  m_LocalPosition: {x: 1.1562489, y: 1.6276162, z: -4.4205713}
+  m_LocalRotation: {x: 0.0135080395, y: 0.7214594, z: -0.014079398, w: 0.6921818}
+  m_LocalPosition: {x: -5.1458216, y: 0.099102736, z: 28.604965}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -75109,6 +75109,22 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1210495657512681727}
     - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <GroundCheckBox>k__BackingField.x
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <GroundCheckBox>k__BackingField.y
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <GroundCheckBox>k__BackingField.z
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <GroundCheckLayerMask>k__BackingField.m_Bits
+      value: 33025
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: onStopMoving.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 6658280735558002848}
@@ -75125,9 +75141,41 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 6658280735558002848}
     - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: managedReferences[1692152225826603121].<Controller>k__BackingField
       value: 
       objectReference: {fileID: 6504065115825005498}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 6658280735558002848}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: CleanUp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem, GameplayAbilitiesSystem.Runtime
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
+    - target: {fileID: 2890134214639932449, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <OnStopMoving>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: GameplayAbilitiesSystem.Runtime.Abilities.Ability, GameplayAbilitiesSystem.Runtime
+      objectReference: {fileID: 0}
     - target: {fileID: 7778497221915971296, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -75354,6 +75402,7 @@ MonoBehaviour:
   <Animator>k__BackingField: {fileID: 6388006269725896587}
   <LeftRightVelocityAnimatorParameter>k__BackingField: 2041851446
   <ForwardBackVelocityAnimatorParameter>k__BackingField: 72152147
+  <GroundedFlagAnimatorParameter>k__BackingField: 255863575
   <AnimationBlendTime>k__BackingField: 0.1
 --- !u!114 &5425651491289196887 stripped
 MonoBehaviour:

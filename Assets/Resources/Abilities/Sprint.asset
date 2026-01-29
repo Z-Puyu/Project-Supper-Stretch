@@ -19,7 +19,7 @@ MonoBehaviour:
   - rid: 1692151863182360969
   - rid: 1692152225826603173
   <ExecutionSteps>k__BackingField:
-  - rid: 1692152225826603204
+  - rid: 1692152357399822892
   - rid: 1692151973348376681
   <SideEffect>k__BackingField:
     <KeywordPreset>k__BackingField:
@@ -47,8 +47,8 @@ MonoBehaviour:
       type: {class: RequiredLocomotionGesture, ns: Characters.Abilities, asm: Scripts.Characters}
       data:
         <RequiredGesture>k__BackingField: 1
-    - rid: 1692152225826603204
-      type: {class: SwitchLocomotionGesture, ns: Characters.Abilities, asm: Scripts.Characters}
+    - rid: 1692152357399822892
+      type: {class: SwitchLocomotionGesture, ns: SOULS.Runtime.GameplayAbilities.Executions, asm: SOULS.Runtime.GameplayAbilities}
       data:
         <WillEndAbilityOnCompletion>k__BackingField: 0
         <TargetGesture>k__BackingField: 2

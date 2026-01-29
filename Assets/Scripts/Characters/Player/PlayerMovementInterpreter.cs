@@ -23,6 +23,9 @@ namespace Characters.Player {
         [field: ShowIf(nameof(this.Animator)), Required]
         private int ForwardBackVelocityAnimatorParameter { get; set; }
         
+        [field: SerializeField, AnimatorParam(nameof(this.Animator), AnimatorControllerParameterType.Bool)]
+        private int GroundedFlagAnimatorParameter { get; set; }
+        
         [field: SerializeField, MinValue(0)] private float AnimationBlendTime { get; set; } = 0.1f;
 
         private void Awake() {
@@ -30,6 +33,7 @@ namespace Characters.Player {
         }
 
         private void Update() {
+            this.Animator.SetBool(this.GroundedFlagAnimatorParameter, this.Locomotion.IsGrounded);
             Vector2 input = this.Input * this.Locomotion.CurrentSpeed;
             Vector3 direction = CameraSystem.PlanarForward * input.y + CameraSystem.PlanarRight * input.x;
             this.Animator.SetFloat(
