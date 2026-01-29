@@ -131,8 +131,9 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             if (!this.AvailableAbilities.Remove(ability)) {
                 return;
             }
-
+            
             if (!ability.TryCommit(this, userData, out Ability.Context context)) {
+                this.AvailableAbilities.Add(ability);
                 return;
             }
 
@@ -140,10 +141,6 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             Awaitable execution = ability.Execute(context);
             this.OnAbilityStarted.Invoke(ability);
             await execution;
-            
-            this.RunningAbilities.Remove(ability);
-            this.AvailableAbilities.Add(ability);
-            this.OnAbilityStopped.Invoke(ability);
         }
 
         /// <summary>

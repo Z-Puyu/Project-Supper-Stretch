@@ -1,9 +1,11 @@
-﻿using CommonFrameworks.Logic;
+﻿using System;
+using CommonFrameworks.Logic;
 using GameCharacterBehaviours.Runtime.Movement;
 using GameplayAbilitiesSystem.Runtime.Abilities;
 using UnityEngine;
 
-namespace Characters.Abilities { 
+namespace SOULS.Runtime.GameplayAbilities.Predicates { 
+    [Serializable]
     internal sealed class RequiredLocomotionGesture : IPredicate<AbilitySystem> {
         [field: SerializeField] private Locomotion.Gesture RequiredGesture { get; set; }
         

@@ -39,7 +39,7 @@ namespace Characters.Player {
         void PlayerControls.IPlayerActions.OnSprint(InputAction.CallbackContext context) {
             if (context.performed) {
                 this.OnBeginSprinting.Invoke();
-            } else if (context.canceled) {
+            } else if (context.canceled && this.MovementInterpreter.IsSprinting) {
                 this.OnStopSprinting.Invoke();
             }
         }

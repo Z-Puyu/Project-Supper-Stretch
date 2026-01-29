@@ -10,6 +10,7 @@ namespace Characters.Player {
     public class PlayerMovementInterpreter : MonoBehaviour {
         internal Vector2 Input { private get; set; } = Vector2.zero;
         [NotNull] private Locomotion? Locomotion { get; set; }
+        internal bool IsSprinting => this.Locomotion.CurrentGesture == Locomotion.Gesture.Sprint;
         
         [NotNull] 
         [field: SerializeField, Required] 

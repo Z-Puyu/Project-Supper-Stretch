@@ -1,8 +1,10 @@
-﻿using CommonFrameworks.Logic;
+﻿using System;
+using CommonFrameworks.Logic;
 using GameCharacterBehaviours.Runtime.Movement;
 using GameplayAbilitiesSystem.Runtime.Abilities;
 
-namespace Characters.Abilities {
+namespace SOULS.Runtime.GameplayAbilities.Predicates {
+    [Serializable]
     internal sealed class IsMoving : IPredicate<AbilitySystem> {
         public bool Holds(AbilitySystem args) {
             return args.Root.HasComponent(out Locomotion? component) && component.IsMoving;

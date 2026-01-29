@@ -8,7 +8,7 @@ namespace GameCharacterBehaviours.Runtime.Movement {
     [DisallowMultipleComponent]
     public sealed class Locomotion : BehaviourComponent {
         private const float DirectionTolerance = 0.0001f;
-        private const float GroundedVelocityDown = -20;
+        private const float GroundedVelocityDown = -1;
         
         public enum Gesture { Walk, Run, Sprint }
         
@@ -19,8 +19,10 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         [field: SerializeField] public Gesture DefaultGesture { get; set; } = Gesture.Run;
         [field: SerializeField] private Stance DefaultStance { get; set; } = Stance.Standing;
         [field: SerializeField] private LayerMask GroundCheckLayerMask { get; set; } = -1;
-        
         [field: SerializeField] private Vector3 GroundCheckBox { get; set; } = new Vector3(1f, 0.1f, 1f);
+        
+        [field: SerializeField, PropRange(0.01, 0.5, 0.01)] 
+        private float GroundCheckDistance { get; set; } = 0.2f;
         
         [field: SerializeField] private UnityEvent OnStartMoving { get; set; } = new UnityEvent();
         [field: SerializeField] private UnityEvent OnStopMoving { get; set; } = new UnityEvent();
@@ -38,10 +40,10 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         public bool CanRotate { private get; set; } = true;
         public bool CanJump { private get; set; } = true;
         public Vector3 Direction { get; private set; }
-        private Vector3 ExternalVelocity { get; set; } = Vector3.zero;
+        private Vector3 ExternalVelocity { get; set; } = Locomotion.GroundedVelocityDown * Vector3.down;
         
         public bool IsMoving => this.Direction.sqrMagnitude > Locomotion.DirectionTolerance;
-        public float CurrentSpeed => this.MovementModule?.Speed ?? 0f;
+        public float CurrentSpeed => this.MovementModule.Speed;
         public Gesture CurrentGesture => this.MovementModule.Gesture;
         public Stance CurrentStance => this.MovementModule.Stance;
 
@@ -98,12 +100,16 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         }
 
         public void SupplyVelocity(Vector3 velocity) {
+            if (velocity.y != 0) {
+                velocity = velocity with { y = velocity.y - Locomotion.GroundedVelocityDown };
+            }
+            
             this.ExternalVelocity += velocity;
         }
 
-        public void MoveBy(Vector3 displacement, float duration = 0) {
+        public void MoveBy(Vector3 displacement, float duration) {
             if (this.CanMove) {
-                this.MovementModule.MoveBy(displacement);
+                this.MovementModule.MoveBy(displacement, duration);
             }
         }
 
@@ -125,13 +131,13 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             this.MovementModule.MoveBy(this.ExternalVelocity * Time.deltaTime);
             this.IsGrounded = Physics.BoxCast(
                 this.transform.position, this.GroundCheckBox / 2, Vector3.down, Quaternion.identity,
-                0.5f, this.GroundCheckLayerMask
+                this.GroundCheckDistance, this.GroundCheckLayerMask
             );
             
             if (!this.IsGrounded) {
                 this.ExternalVelocity += Physics.gravity * Time.deltaTime;
             } else if (!this.WasGrounded) {
-                this.ExternalVelocity = this.ExternalVelocity with { y = 0 };
+                this.ExternalVelocity = this.ExternalVelocity with { y = -1 };
             }
             
             this.WasGrounded = this.IsGrounded;
