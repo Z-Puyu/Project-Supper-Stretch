@@ -1,25 +1,14 @@
 using System.Diagnostics;
-using System.Linq;
 
 // ReSharper disable once CheckNamespace
 namespace SaintsField
 {
     [Conditional("UNITY_EDITOR")]
-    public class OptionsTreeDropdownAttribute: TreeDropdownAttribute
+    [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.Property | System.AttributeTargets.Method | System.AttributeTargets.Parameter)]
+    public class OptionsTreeDropdownAttribute: OptionsDropdownAttribute
     {
-        public override Mode BehaveMode => Mode.Options;
-
-        public OptionsTreeDropdownAttribute(params object[] options)
+        public OptionsTreeDropdownAttribute(params object[] options) : base(options)
         {
-            if (options[0].GetType() == typeof(EUnique))
-            {
-                EUnique = (EUnique)options[0];
-                Options = options.Skip(1).ToArray();
-            }
-            else
-            {
-                Options = options;
-            }
         }
     }
 }

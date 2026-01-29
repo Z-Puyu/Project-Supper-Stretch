@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using CommonFrameworks.Utilities;
@@ -8,8 +7,6 @@ using SaintsField;
 using SaintsField.Playa;
 using SaveAndLoadSystem.Runtime.Momentos;
 using UnityEngine;
-using UnityEngine.Assertions;
-using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 
 namespace SaveAndLoadSystem.Runtime {
@@ -68,7 +65,7 @@ namespace SaveAndLoadSystem.Runtime {
         }
 
         public IReadOnlyList<SaveSlot> EnumerateSaveSlots() {
-            return this.SaveSlots.ToImmutableList();
+            return this.SaveSlots.ToList().AsReadOnly();
         }
         
         public IReadOnlyList<SaveGame> EnumerateSaves(int slot) {
@@ -76,7 +73,7 @@ namespace SaveAndLoadSystem.Runtime {
                 return Array.Empty<SaveGame>();
             }
             
-            return this.Saves[slot].ToImmutableList();
+            return this.Saves[slot].ToList().AsReadOnly();
         }
 
         private SaveSlot FindSlot(int i) {

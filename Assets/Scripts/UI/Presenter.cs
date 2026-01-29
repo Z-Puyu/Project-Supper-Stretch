@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using SaintsField;
@@ -12,14 +13,14 @@ namespace UI {
         [NotNull] [field: SerializeField] protected M? Model { get; set; }
         [NotNull] protected V? ViewRoot { get; set; }
         
-        [field: SerializeField, Dropdown(nameof(this.UniqueElements), false, EUnique.Remove)] 
+        [field: SerializeField, Dropdown(nameof(this.UniqueElements), EUnique.Remove)] 
         protected string View { get; set; } = string.Empty;
 
         string IPresenter.Name => this.View.Split(' ')[0];
         
-        protected DropdownList<string> UniqueElements => this.Owner
+        protected IEnumerable<string> UniqueElements => this.Owner
                 ? this.Owner.FetchUniqueElements<V>()
-                : new DropdownList<string>();
+                : Enumerable.Empty<string>();
 
         void IPresenter.Bind(UiPage page) {
             this.Owner = page;

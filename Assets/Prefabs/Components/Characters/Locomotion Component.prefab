@@ -46,59 +46,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameCharacterBehaviours.Runtime::GameCharacterBehaviours.Runtime.Movement.Locomotion
   <ReferenceSpace>k__BackingField: {fileID: 0}
   onlyAllowRotationWhenMoving: 1
-  gesture: 1
   stance: 0
-  onBeginSprinting:
+  onStartMoving:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem,
-          GameplayAbilitiesSystem.Runtime
-        m_MethodName: Perform
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
-          m_ObjectArgumentAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.Ability,
-            GameplayAbilitiesSystem.Runtime
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onBeginWalking:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem,
-          GameplayAbilitiesSystem.Runtime
-        m_MethodName: CleanUp
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
-          m_ObjectArgumentAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.Ability,
-            GameplayAbilitiesSystem.Runtime
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onBeginRunning:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem,
-          GameplayAbilitiesSystem.Runtime
-        m_MethodName: CleanUp
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
-          m_ObjectArgumentAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.Ability,
-            GameplayAbilitiesSystem.Runtime
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onStopMoving:
     m_PersistentCalls:
       m_Calls:
@@ -120,6 +71,7 @@ MonoBehaviour:
     rid: 1692152225826603121
   <RotationModule>k__BackingField:
     rid: 1692152225826603112
+  <Mode>k__BackingField: 1
   references:
     version: 2
     RefIds:

@@ -2,7 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using I2.Loc;
+using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.AdvancedDropdownDrawer;
+using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Utils;
 using SaintsField.Interfaces;
 using UnityEditor;
@@ -62,6 +65,7 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
         }
 
         // private bool _mismatch;
+        // private SaintsTreeDropdownUIToolkit _dropdownUICache;
 
         protected override void OnAwakeUIToolkit(SerializedProperty property, ISaintsAttribute saintsAttribute, int index,
             IReadOnlyList<PropertyAttribute> allAttributes, VisualElement container, Action<object> onValueChangedCallback, FieldInfo info, object parent)
@@ -88,12 +92,12 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
 
                 (Rect worldBound, float maxHeight) = SaintsAdvancedDropdownUIToolkit.GetProperPos(objectField.worldBound);
 
-                UnityEditor.PopupWindow.Show(worldBound, new SaintsAdvancedDropdownUIToolkit(
+                UnityEditor.PopupWindow.Show(worldBound, new SaintsTreeDropdownUIToolkit(
                     metaInfo,
                     worldBound.width,
                     maxHeight,
                     false,
-                    (_, curItem) =>
+                    (curItem, _) =>
                     {
                         string newValue = (string)curItem;
                         SetValue(property, newValue);
@@ -101,27 +105,42 @@ namespace SaintsField.Editor.Drawers.I2Loc.LocalizedStringPickerDrawer
                         if(property.propertyType == SerializedPropertyType.String)
                         {
                             onValueChangedCallback.Invoke(newValue);
-                            return;
+                            return null;
                         }
 
                         object noCacheParent = SerializedUtils.GetFieldInfoAndDirectParent(property).parent;
                         if (noCacheParent == null)
                         {
                             Debug.LogWarning("Property disposed unexpectedly, skip onChange callback.");
-                            return;
+                            return null;
                         }
 
                         (string error, int _, object reflectedValue) = Util.GetValue(property, info, noCacheParent);
                         if (error != "")
                         {
                             Debug.LogError(error);
-                            return;
+                            return null;
                         }
 
                         onValueChangedCallback.Invoke(reflectedValue);
+                        return null;
                     }
                 ));
             };
+
+            // SaintsEditorApplicationChanged.OnAnyEvent.AddListener(CleanCache);
+            // // SaintsAssetPostprocessor.OnAnyEvent.AddListener(CleanCache);
+            // LocalizationManager.OnLocalizeEvent += CleanCache;
+            // // Debug.Log("All listener done.");
+            // selectorButton.RegisterCallback<DetachFromPanelEvent>(_ =>
+            // {
+            //     SaintsEditorApplicationChanged.OnAnyEvent.RemoveListener(CleanCache);
+            //     // SaintsAssetPostprocessor.OnAnyEvent.RemoveListener(CleanCache);
+            //     LocalizationManager.OnLocalizeEvent -= CleanCache;
+            // });
+            // return;
+            //
+            // void CleanCache() => _dropdownUICache = null;
         }
 
         private static void UpdateHelpBox(HelpBox helpBox, string error)

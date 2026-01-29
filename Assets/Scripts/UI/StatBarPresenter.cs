@@ -40,7 +40,13 @@ namespace UI {
         public override void Present((float current, float max) data) {
             this.ViewRoot.highValue = data.max;
             this.ViewRoot.value = data.current;
-            if (this.UnitLength > 0) {
+            if (this.UnitLength <= 0) {
+                return;
+            }
+
+            if (this.ViewRoot.parent is TemplateContainer container) {
+                container.style.width = this.UnitLength * data.max;
+            } else {
                 this.ViewRoot.style.width = this.UnitLength * data.max;
             }
         }

@@ -26,9 +26,6 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         [field: SerializeReference, Required, ReferencePicker]
         private IRotator? RotationModule { get; set; } = new SmoothDampRotator();
         
-        [field: SerializeReference, ReferencePicker] 
-        private IJumper? JumpModule { get; set; } = new AnimatorJumper();
-        
         [field: SerializeField] public Gesture Mode { get; set; } = Gesture.Run;
         internal bool UseRootMotion { private get; set; } 
         public bool CanMove { private get; set; } = true;
@@ -86,6 +83,10 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             this.Mode = Gesture.Sprint;
         }
 
+        public void SupplyVelocity(Vector3 velocity) {
+            this.MovementModule?.SupplyVelocity(velocity);
+        }
+
         public void MoveBy(Vector3 displacement, float duration = 0) {
             if (this.CanMove) {
                 this.MovementModule?.MoveBy(displacement);
@@ -104,12 +105,6 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             Debug.DrawRay(position, this.Owner.transform.forward * 100, Color.red);
             Debug.DrawRay(position, forward * 100, Color.green);
 #endif
-        }
-
-        public void Jump() {
-            if (this.CanJump && this.CanMove && (this.MovementModule?.IsGrounded ?? true)) {
-                this.JumpModule?.Jump();
-            }
         }
         
         private void Update() {

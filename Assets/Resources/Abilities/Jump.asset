@@ -23,6 +23,7 @@ MonoBehaviour:
   - rid: 1692151751057866752
   <ExecutionSteps>k__BackingField:
   - rid: 1692152225826603148
+  - rid: 1692152357399822423
   <SideEffect>k__BackingField:
     <KeywordPreset>k__BackingField:
       <TargetReceivesKeywords>k__BackingField: []
@@ -53,3 +54,8 @@ MonoBehaviour:
         <IntegerValue>k__BackingField: 0
         <BoolValue>k__BackingField: 0
         <FloatValue>k__BackingField: 0
+    - rid: 1692152357399822423
+      type: {class: SupplyMotion, ns: SOULS.Runtime.GameplayAbilities.Executions, asm: SOULS.Runtime.GameplayAbilities}
+      data:
+        <WillEndAbilityOnCompletion>k__BackingField: 0
+        <Velocity>k__BackingField: {x: 0, y: 2, z: 0}

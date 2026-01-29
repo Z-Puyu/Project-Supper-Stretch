@@ -95,12 +95,11 @@ namespace: `SaintsField`
 
 ### Change Log ###
 
-**5.8.3**
+**5.10.1**
 
-1.  Fix: Auto Validator gives error on a field
-2.  Fix: layout system on horizontal now calculate width better, fix the issue that some elements might take all space
-3.  Fix: Value Buttons didn't re-calculate layout when width changes
-4.  Improve: layout system now support tags (color, icon etc.) for boxed group (tabs, titleBoxed, foldout etc.)
+1.  Fix: Unity below 2023.2 gave warning on serialized field
+2.  Change: `LocalizedStringPicker` now support translated content search, and now uses `TreeDropdown`
+3.  Change: `Dropdown` no longer watch space bar as select, because some IM uses space bar to select the input charactor
 
 Note: all `Handle` attributes (draw stuff in the scene view) are in stage 1, which means the arguments might change in the future.
 
@@ -4182,7 +4181,7 @@ public Vector2Int v2Value;
 
 ### Miscellaneous ###
 
-#### `TreeDropdown` ####
+#### `Dropdown` ####
 
 A tree dropdown selector. Supports reference type, sub-menu, separator, search, and disabled select item, plus icon.
 
@@ -4202,7 +4201,7 @@ This is the recommended way to make a searchable dropdown.
 First, it can make a quick searchable dropdown:
 
 ```csharp
-[TreeDropdown(nameof(BookDrop))] public string bookName;
+[Dropdown(nameof(BookDrop))] public string bookName;
 
 private IEnumerable<string> BookDrop()
 {
@@ -4221,7 +4220,7 @@ private IEnumerable<string> BookDrop()
 Second, it can set labels for these items with rich text support
 
 ```csharp
-[TreeDropdown(nameof(QuickDrop))] public float percent;
+[Dropdown(nameof(QuickDrop))] public float percent;
 
 private AdvancedDropdownList<float> QuickDrop()
 {
@@ -4248,7 +4247,7 @@ Finally, it support nested items
 ```csharp
 using SaintsField;
 
-[TreeDropdown(nameof(AdvDropdown))] public int drops;
+[Dropdown(nameof(AdvDropdown))] public int drops;
 
 public AdvancedDropdownList<int> AdvDropdown()
 {
@@ -4288,14 +4287,14 @@ Example of up-walk
 [Serializable]
 public struct Down
 {
-    [TreeDropdown("../../" + nameof(options))]  // Up walk 2 levels
+    [Dropdown("../../" + nameof(options))]  // Up walk 2 levels
     public string stringV;
 }
 
 [Serializable]
 public struct MyStruct
 {
-    [TreeDropdown("../" + nameof(options))]  // Up walk 1 level
+    [Dropdown("../" + nameof(options))]  // Up walk 1 level
     public string stringV;
     public Down down;
 }
@@ -4312,7 +4311,7 @@ It can work with `ShowInInspector`
 ```csharp
 using SainsField;
 
-[ShowInInspector, TreeDropdown(nameof(GetItems))]
+[ShowInInspector, Dropdown(nameof(GetItems))]
 public string SelectedItem
 {
     get => _selectItem;
@@ -4329,15 +4328,15 @@ using SainsField;
 using SainsField.Playa;
 
 [ShowInInspector]
-[TreeDropdown(nameof(GetItems))]  // change the returned value display
-private string SelectItemWithButton([TreeDropdown(nameof(GetItems))] string item)
+[Dropdown(nameof(GetItems))]  // change the returned value display
+private string SelectItemWithButton([Dropdown(nameof(GetItems))] string item)
 {
     return item;
 }
 
 [Button]
-[TreeDropdown(nameof(GetItems))]  // change the returned value display
-private string SelectItemWithButton([TreeDropdown(nameof(GetItems))] string item)
+[Dropdown(nameof(GetItems))]  // change the returned value display
+private string SelectItemWithButton([Dropdown(nameof(GetItems))] string item)
 {
     return item;
 }
@@ -4345,9 +4344,9 @@ private string SelectItemWithButton([TreeDropdown(nameof(GetItems))] string item
 
 ![](https://github.com/user-attachments/assets/c2534cdd-a257-4b27-9346-ea439741cdff)
 
-#### `OptionsTreeDropdown` / `PairsTreeDropdown` ####
+#### `OptionsDropdown` / `PairsDropdown` ####
 
-Like `OptionsDropdown` / `PairsDropdown`, but in a tree view
+Like `Dropdown`, but allows you to quickly set some const expression value
 
 > [!WARNING]
 > UI Toolkit only.
@@ -4355,7 +4354,7 @@ Like `OptionsDropdown` / `PairsDropdown`, but in a tree view
 ```csharp
 use SaintsField;
 
-[OptionsTreeDropdown(EUnique.Disable, "Hor/Left", "Hor/Right", "Vert/Top", "Vert/Bottom", "Center")]
+[OptionsDropdown(EUnique.Disable, "Hor/Left", "Hor/Right", "Vert/Top", "Vert/Bottom", "Center")]
 public string[] treeOpt;
 ```
 
@@ -4374,11 +4373,11 @@ public enum Direction
     Center,
 }
 
-[PairsTreeDropdown("negative/1", -1, "negative/2", 2, "negative/3", -3, "zero", 0, "positive/1", 1, "positive/2", 2, "positive/3", 3)]
+[PairsDropdown("negative/1", -1, "negative/2", 2, "negative/3", -3, "zero", 0, "positive/1", 1, "positive/2", 2, "positive/3", 3)]
 public int treeIntOpt;
 
 // useful if you don't want the entire enum
-[PairsTreeDropdown(EUnique.Disable, "Hor/<-", Direction.Left, "Hor/->", Direction.Right, "Vert/↑", Direction.Up, "Vert/↓", Direction.Down)]
+[PairsDropdown(EUnique.Disable, "Hor/<-", Direction.Left, "Hor/->", Direction.Right, "Vert/↑", Direction.Up, "Vert/↓", Direction.Down)]
 public Direction[] treeDireOpt;
 ```
 
@@ -4597,7 +4596,7 @@ public MyStruct myStruct;
 ![](https://github.com/user-attachments/assets/c9f42bf2-632a-496a-8ffc-74b2abbaceb9)
 
 
-#### `OptionsDropdown` / `PairsDropdown` ####
+#### `AdvancedOptionsDropdown` / `AdvancedPairsDropdown` ####
 
 Like `AdvancedDropdown`, but allows you to quickly set some const expression value
 
@@ -4606,10 +4605,10 @@ Useful when you don't want the entire enum
 ```csharp
 use SaintsField;
 
-[OptionsDropdown(0.5f, 1f, 1.5f, 2f, 2.5f, 3f)]
+[AdvancedOptionsDropdown(0.5f, 1f, 1.5f, 2f, 2.5f, 3f)]
 public float floatOpt;
 
-[OptionsDropdown(EUnique.Disable, "Left", "Right", "Top", "Bottom", "Center")]
+[AdvancedOptionsDropdown(EUnique.Disable, "Left", "Right", "Top", "Bottom", "Center")]
 public string[] stringOpt;
 ```
 
@@ -4618,7 +4617,7 @@ public string[] stringOpt;
 ```csharp
 use SaintsField;
 
-[PairsDropdown("negative/1", -1, "negative/2", 2, "negative/3", -3, "zero", 0, "positive/1", 1, "positive/2", 2, "positive/3", 3)]
+[AdvancedPairsDropdown("negative/1", -1, "negative/2", 2, "negative/3", -3, "zero", 0, "positive/1", 1, "positive/2", 2, "positive/3", 3)]
 public int intOpt;
 
 public enum Direction
@@ -4632,13 +4631,13 @@ public enum Direction
 }
 
 // useful if you don't want the entire enum
-[PairsDropdown(EUnique.Disable, "<-", Direction.Left, "->", Direction.Right, "↑", Direction.Up, "↓", Direction.Down)]
+[AdvancedPairsDropdown(EUnique.Disable, "<-", Direction.Left, "->", Direction.Right, "↑", Direction.Up, "↓", Direction.Down)]
 public Direction[] direOpt;
 ```
 
 ![](https://github.com/user-attachments/assets/01501513-d00d-4320-94e9-6c76a81a3c2a)
 
-#### `Dropdown` ####
+#### `MenuDropdown` ####
 
 A dropdown selector. Supports reference type, sub-menu, separator, and disabled select item.
 
@@ -4660,11 +4659,11 @@ If you're using UI Toolkit, the search box can also search the path too (rather 
 ```csharp
 using SaintsField;
 
-[Dropdown(nameof(GetDropdownItems))] public float _float;
+[MenuDropdown(nameof(GetDropdownItems))] public float _float;
 
 public GameObject _go1;
 public GameObject _go2;
-[Dropdown(nameof(GetDropdownRefs))] public GameObject _refs;
+[MenuDropdown(nameof(GetDropdownRefs))] public GameObject _refs;
 
 private DropdownList<float> GetDropdownItems()
 {
@@ -4692,7 +4691,7 @@ To control the separator and disabled item
 ```csharp
 using SaintsField;
 
-[Dropdown(nameof(GetDropdownItems))]
+[MenuDropdown(nameof(GetDropdownItems))]
 public Color color;
 
 private DropdownList<Color> GetDropdownItems()
@@ -4747,7 +4746,7 @@ public enum MyEnum
     ForthOne,
 }
 
-[Dropdown] public MyEnum myEnumDropdown;
+[MenuDropdown] public MyEnum myEnumDropdown;
 ```
 
 ![image](https://github.com/user-attachments/assets/46ddc541-8773-4571-9aeb-f3fe25c5f783)
@@ -6146,9 +6145,9 @@ public string afterGroupLast;
 
 ### `LayoutCloseHere` / `LayoutTerminateHere` ###
 
-> [!WARNING]  
+> [!WARNING]
 > You don't need this for most of the time. The new layout system can handle this quite well.
- 
+
 > [!IMPORTANT]
 > Enable `SaintsEditor` before using
 
@@ -7860,52 +7859,6 @@ public int areaName;
 
 ![nav_mesh_area](https://github.com/TylerTemp/SaintsField/assets/6391063/41da521c-df9e-45a0-aea6-ff1a139a5ff1)
 
-## Netcode for Game Objects ##
-
-Unity's [Netcode for Game Objects](https://docs-multiplayer.unity3d.com/netcode/current/about/) uses a custom editor that
-`SaintsEditor` can not be applied to.
-
-To use ability from `SaintsEditor`, the most simple way is to inherent from `SaintsField.Playa.SaintsNetworkBehaviour`
-
-```csharp
-using SaintsField.Playa;
-using Unity.Netcode;
-using UnityEngine;
-
-public class RpcTestSaints : SaintsNetworkBehaviour  // inherent this one
-{
-    [PlayaInfoBox("Saints Info Box for Array")]  // SaintsEditor specific decorator
-    public int[] normalIntArrays;
-
-    [LayoutStart("SaintsLayout", ELayout.FoldoutBox)]  // SaintsEditor specific decorator
-    public string normalString;
-
-    [ResizableTextArea]
-    public string content;
-
-    public NetworkVariable<int> testVar = new NetworkVariable<int>(0);
-    public NetworkList<bool> TestList = new NetworkList<bool>();
-
-    [Button]  // SaintsEditor specific decorator
-    private void TestRpc()
-    {
-        Debug.Log("Button Invoked");
-    }
-}
-```
-
-Result using `SaintsNetworkBehaviour`:
-
-![image](https://github.com/user-attachments/assets/1ee1cf4e-8f3f-49d8-94c3-c37449246cdc)
-
-Result using default one:
-
-![image](https://github.com/user-attachments/assets/74952ea4-60f1-4327-8f17-4db6c06b820d)
-
-The drawer is called `SaintsField.Editor.Playa.NetCode.SaintsNetworkBehaviourEditor`, in case if you want to apply it manually.
-
-Please note: `NetworkVariable` and `NetworkList` will always be rendered at the top, just like Unity's default behavior. Putting it under `Layout` will not change this order and will have no effect.
-
 ## Spine ##
 
 [`Spine`](http://en.esotericsoftware.com/spine-in-depth) has [Unity Attributes](http://en.esotericsoftware.com/spine-unity) like `SpineAnimation`,
@@ -8159,54 +8112,6 @@ The check of each row means autoplay when you click the start in the global cont
 
 To use `DOTweenPlay`: `Tools` - `Demigaint` - `DOTween Utility Panel`, click `Create ASMDEF`
 
-### `DOTweenPlayStart` / `DOTweenPlayEnd` ###
-
-> [!IMPORTANT]
-> Enable `SaintsEditor` before using
-
-A convenient way to add many method to `DOTweenPlay`.
-
-```csharp
-// Please ensure you already have SaintsEditor enabled in your project before trying this example
-using SaintsField.Playa;
-
-[DOTweenPlayStart(groupBy: "Color")]
-private Sequence PlayColor()
-{
-    return DOTween.Sequence()
-        .Append(spriteRenderer.DOColor(Color.red, 1f))
-        .Append(spriteRenderer.DOColor(Color.green, 1f))
-        .Append(spriteRenderer.DOColor(Color.blue, 1f))
-        .SetLoops(-1);
-}
-
-private Sequence PlayColor2()  // this will be automaticlly added to DOTweenPlay
-{
-    return DOTween.Sequence()
-        .Append(spriteRenderer.DOColor(Color.cyan, 1f))
-        .Append(spriteRenderer.DOColor(Color.magenta, 1f))
-        .Append(spriteRenderer.DOColor(Color.yellow, 1f))
-        .SetLoops(-1);
-}
-
-// this will be automaticlly added to DOTweenPlay
-// Note: if you want to add this in DOTweenPlay but also stop the grouping, use:
-// [DOTweenPlay("Color", keepGrouping: false)]
-private Sequence PlayColor3()
-{
-    return DOTween.Sequence()
-        .Append(spriteRenderer.DOColor(Color.yellow, 1f))
-        .Append(spriteRenderer.DOColor(Color.magenta, 1f))
-        .Append(spriteRenderer.DOColor(Color.cyan, 1f))
-        .SetLoops(-1);
-}
-
-[DOTweenPlayEnd("Color")]
-public Sequence DoNotIncludeMe() => DOTween.Sequence();    // this will NOT be added
-```
-
-![image](https://github.com/TylerTemp/SaintsField/assets/6391063/db6b60b5-0d1d-43e2-9ab9-b2c7912d7e8d)
-
 ## Wwise ##
 
 Wwise itself already has very nice drawer. SaintsField only provide some utility to make it easier to use.
@@ -8432,6 +8337,141 @@ public class ToggleInputRenderer: AbsRenderer
 ```
 
 [![video](https://github.com/user-attachments/assets/922d2cf8-267f-4c9c-b30e-c77fb4ed6675)](https://github.com/user-attachments/assets/6feb2f62-6396-4347-87ec-686874524a3a)
+
+
+### Integerate ###
+
+You can integrate `SaintsEditor` with other editors.
+
+```csharp
+public class MyEditorCore: SaintsEditorCore
+{
+    public MyEditorCore(UnityEditor.Editor editor, bool editorShowMonoScript) : base(editor, editorShowMonoScript)
+    {
+    }
+
+    public override IEnumerable<IReadOnlyList<AbsRenderer>> MakeRenderer(SerializedObject so, SaintsFieldWithInfo fieldWithInfo)
+    {
+        if(fieldWithInfo.FieldInfo?.Name == "...")  // skip a field
+        {
+            return Array.Empty<IReadOnlyList<AbsRenderer>>();
+        }
+        if(fieldWithInfo.PlayaAttributes?.Any(each => each is ShowInInspectorAttribute || each is ButtonAttribute))  // render ShowInInspector/Button
+        {
+            return base.MakeRenderer(so, fieldWithInfo);
+        }
+        // Otherwise, do not render it
+        return Array.Empty<IReadOnlyList<AbsRenderer>>();
+    }
+}
+```
+
+Then, in your editor script:
+
+```csharp
+[CustomEditor(typeof(MyTargetType), true)]
+public class IntegerateSaintsEditor: MyEditor
+{
+    public override VisualElement CreateInspectorGUI()
+    {
+        VisualElement root = new VisualElement();
+        root.Bind(serializedObject);
+
+        root.Add(base.CreateInspectorGUI());  // Fill with default behavior
+        root.Add(new MyEditorCore(this).CreateInspectorGUI());  // Fill with SaintsEditor
+        return root;
+    }
+}
+```
+
+### Netcode for Game Objects ###
+
+Unity's [Netcode for Game Objects](https://docs-multiplayer.unity3d.com/netcode/current/about/) uses a custom editor that
+`SaintsEditor` can not be applied to.
+
+To use ability from `SaintsEditor`, the most simple way is to inherent from `SaintsField.Playa.SaintsNetworkBehaviour`
+
+```csharp
+using SaintsField.Playa;
+using Unity.Netcode;
+using UnityEngine;
+
+public class RpcTestSaints : SaintsNetworkBehaviour  // inherent this one
+{
+    [PlayaInfoBox("Saints Info Box for Array")]  // SaintsEditor specific decorator
+    public int[] normalIntArrays;
+
+    [LayoutStart("SaintsLayout", ELayout.FoldoutBox)]  // SaintsEditor specific decorator
+    public string normalString;
+
+    [ResizableTextArea]
+    public string content;
+
+    public NetworkVariable<int> testVar = new NetworkVariable<int>(0);
+    public NetworkList<bool> TestList = new NetworkList<bool>();
+
+    [Button]  // SaintsEditor specific decorator
+    private void TestRpc()
+    {
+        Debug.Log("Button Invoked");
+    }
+}
+```
+
+Result using `SaintsNetworkBehaviour`:
+
+![image](https://github.com/user-attachments/assets/1ee1cf4e-8f3f-49d8-94c3-c37449246cdc)
+
+Result using default one:
+
+![image](https://github.com/user-attachments/assets/74952ea4-60f1-4327-8f17-4db6c06b820d)
+
+The drawer is called `SaintsField.Editor.Playa.NetCode.SaintsNetworkBehaviourEditor`, in case if you want to apply it manually.
+
+Please note: `NetworkVariable` and `NetworkList` will always be rendered at the top, just like Unity's default behavior. Putting it under `Layout` will not change this order and will have no effect.
+
+### Scriptable Renderer Data ###
+
+`ScriptableRendererData` uses `ScriptableRendererDataEditor` with IMGUI. Which makes `SaintsEditor` unable to kick-in.
+
+To use the functions in SaintsEditor, inherent from `SaintsScriptableRendererData`
+
+```csharp
+using SaintsField.ScriptableRenderer;
+
+public class MyScriptableRendererData: SaintsScriptableRendererData
+{
+    // ...
+}
+```
+
+Result:
+
+![](https://github.com/user-attachments/assets/0c5de2fb-53ae-471b-8b03-3c18040b1854)
+
+To use URP, inherent from `SaintsUniversalRendererData`:
+
+```csharp
+using SaintsField.ScriptableRenderer;
+
+public class MyUniversalRendererData : SaintsUniversalRendererData
+{
+    // ...
+}
+```
+
+![](https://github.com/user-attachments/assets/e25bc1a9-8b9e-48c6-84a1-9be7e8f6781e)
+
+Note: this requires you to enable `SaintsEditor` in project too. If you can not, you also need to inherent from `SaintsScriptableRendererFeature`
+
+```csharp
+using SaintsField.ScriptableRenderer;
+
+public class MyRendererFeature: SaintsScriptableRendererFeature
+{
+    // ...
+}
+```
 
 ## Extended Serialization ##
 

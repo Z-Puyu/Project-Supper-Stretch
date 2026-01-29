@@ -1,5 +1,66 @@
 # Changelog
 
+## 5.10.1 ##
+
+1.  Fix: Unity below 2023.2 gave warning on serialized field
+2.  Change: `LocalizedStringPicker` now support translated content search, and now uses `TreeDropdown`
+3.  Change: `Dropdown` no longer watch space bar as select, because some IM uses space bar to select the input charactor
+
+## 5.10.0 ##
+
+> [!CAUTION]
+> Contains Breaking Changes
+
+1.  Add: `SaintsDictionary` old version migration [#361](https://github.com/TylerTemp/SaintsField/issues/361)
+2.  Improve: Better look of tree dropdown
+3.  Add: `Copy` right click menu for `ShowInInspector`
+4.  Fix: `[Searchable]` gave error when click
+5.  **Breaking Changes**: Make `TreeDropdown` the major dropdown:
+
+Old Name | New Name
+---------|----------
+`TreeDropdown` | `Dropdown`
+`Dropdown` | `MenuDropdown`
+`OptionsDropdown` | `AdvancedOptionsDropdown`
+`PairsDropdown` | `AdvancedPairsTreeDropdown`
+`OptionsTreeDropdown` | `OptionsDropdown`
+`PairsTreeDropdown` | `PairsDropdown`
+
+Name (Deprecated) | Alias Of
+------------------|--------------
+`TreeDropdown` | `Dropdown`
+`OptionsTreeDropdown` | `OptionsDropdown`
+`PairsTreeDropdown` | `PairsDropdown`
+
+## 5.9.0 ##
+
+1.  **Breaking Changes**: Remove `DOTweenPlayStart`/`DOTweenPlayEnd` due to the complexity them introduce.
+2.  Fix: `DOTweenPlay` did not work.
+
+## 5.8.9 ##
+
+Fix: some field might not get rendered if it uses relative path binding internally (e.g. `Physics LowLevel Settings 2D`)
+
+## 5.8.8 ##
+
+1.  Fix: enum underlying of non-int (byte, short, uint etc) did not work [#359](https://github.com/TylerTemp/SaintsField/issues/359)
+2.  Fix: `SaintsEditorWindow` displays an unwanted field
+3.  Fix: Incorrect URP version checker which gives an error on URP 17.0.x [#360](https://github.com/TylerTemp/SaintsField/issues/360)
+
+## 5.8.7 ##
+
+1.  Add: Support URP `UniversalRendererData` editor
+2.  Fix: Fields in `SaintsUniversalRendererData`, `SaintsScriptableRendererData` can now be rendered correctly
+3.  Add: you can now use `SaintsEditorCore` to integerate `SaintsEditor` with other Editor plugin
+
+## 5.8.4 ##
+
+1.  Fix: `Searchable` rendered twice
+2.  Add: config to display `Searchable` to all inspector. Default is on.
+3.  Add: Support for ScriptableRendererData [#356](https://github.com/TylerTemp/SaintsField/issues/356)
+4.  Fix: `SaintsEvent` error when UI Toolkit clone elements in Unity 6k.3, fix error when try to remove on empty list [#357](https://github.com/TylerTemp/SaintsField/issues/357)
+5.  Improve: `SaintsEvent` dropdown now uses `TreeDropdown`
+
 ## 5.8.3 ##
 
 1.  Fix: Auto Validator gives error on a field

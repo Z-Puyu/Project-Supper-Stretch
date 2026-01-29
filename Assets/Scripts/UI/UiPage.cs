@@ -13,26 +13,22 @@ namespace UI {
 
         [field: SerializeReference, ReferencePicker, FieldLabelText(nameof(this.LabelPresenter), true)]
         private protected List<IPresenter> Presenters { get; private set; } = new List<IPresenter>();
+        
+        private IEnumerable<string> ui = Enumerable.Empty<string>();
 
         protected virtual void Awake() {
             this.Document = this.GetComponent<UIDocument>();
         }
 
-        private string LabelPresenter(IPresenter presenter, int index) {
-            return $"[{index}] {presenter.Name}";
+        private string LabelPresenter(IPresenter? presenter, int index) {
+            return $"[{index}] {presenter?.Name}";
         }
         
-        internal DropdownList<string> FetchUniqueElements<V>() where V : VisualElement {
-            VisualElement root = this.Document ? this.Root : this.GetComponent<UIDocument>().rootVisualElement;
-            IEnumerable<(string, string)> identifiers = root.FetchNamedChildren<V>()
-                                                            .OrderBy(element => element.name)
-                                                            .Select(selector);
-            return new DropdownList<string>(identifiers);
-
-            (string, string) selector(V element) {
-                VisualElementIdentifier id = new VisualElementIdentifier(element, root);
-                return string.IsNullOrWhiteSpace(id.Name) ? ("root", id.ToString()) : (id.ToString(), id.ToString());
-            }
+        internal IEnumerable<string> FetchUniqueElements<V>() where V : VisualElement {
+            VisualElement root = this.GetComponent<UIDocument>().visualTreeAsset.CloneTree();
+            return root.FetchNamedChildren<V>()
+                       .Select(element => new VisualElementIdentifier(element, root))
+                       .Select(id => string.IsNullOrWhiteSpace(id.Name) ? "root" : id.ToString());
         }
 
         public virtual void Open() {

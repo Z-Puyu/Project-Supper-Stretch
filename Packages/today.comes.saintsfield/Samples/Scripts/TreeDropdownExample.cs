@@ -6,7 +6,7 @@ namespace SaintsField.Samples.Scripts
 {
     public class TreeDropdownExample: MonoBehaviour
     {
-        [TreeDropdown(nameof(BookDrop))] public string bookName;
+        [Dropdown(nameof(BookDrop))] public string bookName;
 
         private IEnumerable<string> BookDrop()
         {
@@ -21,27 +21,27 @@ namespace SaintsField.Samples.Scripts
             };
         }
 
-        [TreeDropdown(nameof(QuickDrop))] public float percent;
+        [Dropdown(nameof(QuickDrop))] public float percent;
 
         private AdvancedDropdownList<float> QuickDrop()
         {
             AdvancedDropdownList<float> result = new AdvancedDropdownList<float>
             {
-                // { "20%", 0.2f },
-                // { "40%", 0.4f },
-                // { "60%", 0.6f },
+                { "20%", 0.2f },
+                { "40%", 0.4f },
+                { "60%", 0.6f },
             };
             // `Add` is supported
-            // result.Add("80%", 0.8f);
+            result.Add("80%", 0.8f);
             // rich tag is supported
             result.Add($"<color={EColor.GoldenRod}>100%<icon=lightMeter/redLight/>", 1f);
             // disable is supported
-            // result.Add("120%", 1.2f, true);
+            result.Add("120%", 1.2f, true);
             return result;
         }
 
         [
-            TreeDropdown(nameof(AdvDropdown)),
+            Dropdown(nameof(AdvDropdown)),
             // PostFieldButton(nameof(Reset), "R"),
         ] public int selectIt;
 
@@ -83,7 +83,7 @@ namespace SaintsField.Samples.Scripts
             [OnValueChanged(nameof(ShowNewValue))]
             [FieldAboveText(nameof(selectIt), true)]
             [FieldLabelText("<icon=star.png /><label />")]
-            [TreeDropdown(nameof(AdvDropdown))] public int selectIt;
+            [Dropdown(nameof(AdvDropdown))] public int selectIt;
 
             public AdvancedDropdownList<int> AdvDropdown()
             {

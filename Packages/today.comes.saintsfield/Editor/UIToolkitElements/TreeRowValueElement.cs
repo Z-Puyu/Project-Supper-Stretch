@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.UIToolkitElements
 {
-#if UNITY_6000_0_OR_NEWER && SAINTSFIELD_UI_TOOLKIT_XUML
+#if UNITY_6000_0_OR_NEWER
     [UxmlElement]
 #endif
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -69,8 +69,8 @@ namespace SaintsField.Editor.UIToolkitElements
             if (!_checkedIcon)
             {
                 _checkedIcon = Util.LoadResource<Texture2D>("check.png");
-                _boxUncheckedIcon = Util.LoadResource<Texture2D>("checkbox-outline-blank.png");
-                _boxCheckedIcon = Util.LoadResource<Texture2D>("checkbox-checked.png");
+                _boxUncheckedIcon = Util.LoadResource<Texture2D>("dot.png");
+                _boxCheckedIcon = Util.LoadResource<Texture2D>("check.png");
             }
 
             _isToggle = toggle;
@@ -151,10 +151,15 @@ namespace SaintsField.Editor.UIToolkitElements
             }
             else
             {
-                DisplayStyle display = IsOn ? DisplayStyle.Flex : DisplayStyle.None;
-                if (_toggleButton.style.display != display)
+                // DisplayStyle display = IsOn ? DisplayStyle.Flex : DisplayStyle.None;
+                // if (_toggleButton.style.display != display)
+                // {
+                //     _toggleButton.style.display = display;
+                // }
+                Visibility display = IsOn ? Visibility.Visible : Visibility.Hidden;
+                if (_toggleButton.style.visibility != display)
                 {
-                    _toggleButton.style.display = display;
+                    _toggleButton.style.visibility = display;
                 }
             }
         }

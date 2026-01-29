@@ -1,5 +1,4 @@
 ﻿using System;
-using GameCharacterBehaviours.Runtime.PhysicalProperties;
 using SaintsField;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,7 +6,6 @@ using UnityEngine.Events;
 namespace GameCharacterBehaviours.Runtime.Movement {
     [Serializable]
     public abstract class Mover : IMover {
-        [field: SerializeField] protected Mass? Mass { get; set; }
         [field: SerializeField, MinValue(0)] public float WalkingSpeed { get; set; } = 1;
         [field: SerializeField, MinValue(0)] public float RunningSpeed { get; set; } = 2;
         [field: SerializeField, MinValue(0)] public float SprintingSpeed { get; set; } = 3;
@@ -15,9 +13,9 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         
         [field: SerializeField, PropRange(0, 1, 0.05)] 
         private float StealthSpeedMultiplier { get; set; } = 0.5f;
-
+        
         private Vector3 FallVelocity { get; set; } = Vector3.zero;
-        protected Vector3 ExternalVelocity { get; set; } = Vector3.zero;
+        private Vector3 ExternalVelocity { get; set; } = Vector3.zero;
         public abstract bool IsGrounded { get; }
         public float Speed { get; private set; }
 
@@ -25,15 +23,14 @@ namespace GameCharacterBehaviours.Runtime.Movement {
 
         public void MoveBy(Vector3 displacement, float duration = 0) {
             if (this.IsGrounded) {
+                this.ExternalVelocity -= this.FallVelocity;
                 this.FallVelocity = Vector3.zero;
+            } else {
+                this.FallVelocity += Physics.gravity * duration;
+                this.ExternalVelocity += Physics.gravity * duration;
             }
 
-            if (this.Mass) {
-                this.FallVelocity += this.Mass.Weight * duration;
-                this.ExternalVelocity += this.Mass.ExternalForce * duration;
-            }
-            
-            this.SupplyMovement(displacement + this.FallVelocity + this.ExternalVelocity);
+            this.SupplyMovement(displacement + this.ExternalVelocity * duration);
         }
         
         public void Move(float duration, Vector3 direction, Locomotion.Gesture gesture, Locomotion.Stance stance) {
@@ -49,6 +46,10 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             };
                     
             this.MoveBy(direction.normalized * (duration * this.Speed), duration);
+        }
+        
+        public void SupplyVelocity(Vector3 velocity) {
+            this.ExternalVelocity += velocity;
         }
     }
 }

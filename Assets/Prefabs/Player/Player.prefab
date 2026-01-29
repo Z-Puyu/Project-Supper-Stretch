@@ -32422,26 +32422,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Scripts.UI::UI.Hud
   <Presenters>k__BackingField:
-  - rid: 1692151951056961708
-  - rid: 1692151951056961709
+  - rid: 1692152357399822461
+  - rid: 1692152357399822469
   <Owner>k__BackingField: {fileID: 8829115338478182532}
   references:
     version: 2
     RefIds:
-    - rid: 1692151951056961708
+    - rid: 1692152357399822461
       type: {class: StatBarPresenter, ns: UI, asm: Scripts.UI}
       data:
         <Model>k__BackingField: {fileID: 6624264980163878195}
         <View>k__BackingField: Vitals/HealthBar/StatBar (.unity-progress-bar)
         <TrackedAttribute>k__BackingField: Health
-        <UnitLength>k__BackingField: 25
-    - rid: 1692151951056961709
+        <UnitLength>k__BackingField: 5
+    - rid: 1692152357399822469
       type: {class: StatBarPresenter, ns: UI, asm: Scripts.UI}
       data:
         <Model>k__BackingField: {fileID: 6624264980163878195}
         <View>k__BackingField: Vitals/StaminaBar/StatBar (.unity-progress-bar)
         <TrackedAttribute>k__BackingField: Stamina
-        <UnitLength>k__BackingField: 25
+        <UnitLength>k__BackingField: 5
 --- !u!1 &4256974226788895607
 GameObject:
   m_ObjectHideFlags: 0
@@ -57327,8 +57327,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7234192289941891906}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.00000004234981, y: -0.00000006330537, z: -2.6809705e-15, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalRotation: {x: 0.18076181, y: -0.36075765, z: 0.07148958, w: 0.91217786}
+  m_LocalPosition: {x: 1.1562489, y: 1.6276162, z: -4.4205713}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
