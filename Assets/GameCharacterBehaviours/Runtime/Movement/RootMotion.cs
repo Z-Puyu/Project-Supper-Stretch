@@ -1,14 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using SaintsField;
 using UnityEngine;
 
 namespace GameCharacterBehaviours.Runtime.Movement {
-    [DisallowMultipleComponent, RequireComponent(typeof(Animator))]
+    [DisallowMultipleComponent, RequireComponent(typeof(Animator)), AddComponentMenu("")]
     public sealed class RootMotion : MonoBehaviour {
-        [NotNull] 
-        [field: SerializeField, Required] 
-        private Locomotion? MovementController { get; set; }
-    
+        [NotNull] internal Locomotion? MovementController { private get; set; }
         [NotNull] private Animator? Animator { get; set; }
 
         private void Awake() {
@@ -21,11 +17,12 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         
         private void OnDisable() {
             this.MovementController.UseRootMotion = false;
+            this.Animator.applyRootMotion = false;
         }
 
         private void OnAnimatorMove() {
             if (this.MovementController.IsMoving) { 
-                this.MovementController.MoveBy(this.Animator.deltaPosition, Time.deltaTime);
+                this.MovementController.MoveBy(this.Animator.deltaPosition);
             }
         }
     }

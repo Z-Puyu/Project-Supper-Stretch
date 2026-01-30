@@ -7,7 +7,7 @@ using GameplayAbilitiesSystem.Runtime.Effects;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Stats {
-    internal sealed class VitalStatistics : BehaviourComponent {
+    internal sealed class VitalStatistics : Module {
         [NotNull] private AttributeSet? AttributeSet { get; set; }
         [NotNull] private IEffectReceiverFacade? EffectReceiver { get; set; }
         [NotNull] private IEffectEmitterFacade? EffectEmitter { get; set; }
@@ -16,10 +16,10 @@ namespace GameplayAbilitiesSystem.Runtime.Stats {
         protected override void Awake() {
             base.Awake();
             this.AttributeSet = this.Root.GetOrAdd<AttributeSet>();
-            this.EffectReceiver = this.Root.HasComponent(out IEffectReceiverFacade? facade)
+            this.EffectReceiver = this.Root.HasModule(out IEffectReceiverFacade? facade)
                     ? facade
                     : this.Root.Add<AbilitySystem>();
-            this.EffectEmitter = this.Root.HasComponent(out IEffectEmitterFacade? emitter)
+            this.EffectEmitter = this.Root.HasModule(out IEffectEmitterFacade? emitter)
                     ? emitter
                     : this.Root.Add<AbilitySystem>();
         }

@@ -10,8 +10,8 @@ namespace SOULS.Runtime.GameplayAbilities.Predicates {
         [field: SerializeField] private Locomotion.Gesture RequiredGesture { get; set; }
         
         public bool Holds(AbilitySystem args) {
-            return args.Root.HasComponent(out Locomotion? component) &&
-                   component.CurrentGesture == this.RequiredGesture;
+            return args.Root.HasModule(out Locomotion? component) &&
+                   component.Mode == this.RequiredGesture;
         }
         
         public override string ToString() {

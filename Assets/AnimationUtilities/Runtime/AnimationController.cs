@@ -2,15 +2,19 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
+using CommonFrameworks.Components;
+using CommonFrameworks.Extensions;
+using SaintsField;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Events;
 using UnityEngine.Playables;
 
 namespace AnimationUtilities.Runtime {
-    [DisallowMultipleComponent, RequireComponent(typeof(Animator))]
-    public sealed class AnimationController : MonoBehaviour {
-        [NotNull] private Animator? Animator { get; set; }
+    [DisallowMultipleComponent]
+    public sealed class AnimationController : Module {
+        [NotNull] [field: SerializeField, Required] private Animator? Animator { get; set; }
+        [field: SerializeField] private RuntimeAnimatorController? RuntimeAnimatorController { get; set; }
         private CancellationTokenSource InternalInterrupter { get; set; } = new CancellationTokenSource();
         private PlayableGraph PlayableGraph { get; set; }
         private AnimationPlayableOutput Output { get; set; }
@@ -23,7 +27,20 @@ namespace AnimationUtilities.Runtime {
         public event UnityAction<AnimationNotifier> OnNotified = delegate { };
 
         private void Awake() {
-            this.Animator = this.GetComponent<Animator>();
+            if (!this.Animator) {
+                if (this.TryGetComponentInChildren(out Animator? animator)) {
+                    this.Animator = animator;
+                } else if (this.transform.childCount > 0) {
+                    this.Animator = this.transform.GetChild(0).gameObject.AddComponent<Animator>();
+                } else {
+                    this.Animator = this.AddSubobject<Animator>();
+                }
+            }
+
+            if (this.RuntimeAnimatorController) {
+                this.Animator.runtimeAnimatorController = this.RuntimeAnimatorController;
+            }
+            
             this.PlayableGraph = PlayableGraph.Create("Animation Graph");
             this.AnimatorController = AnimatorControllerPlayable.Create(
                 this.PlayableGraph, this.Animator.runtimeAnimatorController

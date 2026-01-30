@@ -8,7 +8,7 @@ using UnityEngine.Events;
 
 namespace GameplayKeywordsSystem.Runtime {
     [DisallowMultipleComponent]
-    public sealed class KeywordContainer : BehaviourComponent, ITaggable<Keyword>, ICollection<Keyword> {
+    public sealed class KeywordContainer : Module, ITaggable<Keyword>, ICollection<Keyword> {
         [field: SerializeField, SaintsRow(inline: true)] 
         private KeywordLabel Label { get; set; } = new KeywordLabel();
         

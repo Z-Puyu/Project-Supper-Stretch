@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using CommonFrameworks.Utilities;
 using GameCharacterBehaviours.Runtime.Movement;
 using SaintsField;
@@ -6,11 +7,11 @@ using SaintsField.Playa;
 using UnityEngine;
 
 namespace Characters.Player {
-    [DisallowMultipleComponent, RequireComponent(typeof(Locomotion))]
-    public class PlayerMovementInterpreter : MonoBehaviour {
+    [Serializable]
+    internal sealed class MovementController {
         internal Vector2 Input { private get; set; } = Vector2.zero;
         [NotNull] private Locomotion? Locomotion { get; set; }
-        internal bool IsSprinting => this.Locomotion.CurrentGesture == Locomotion.Gesture.Sprint;
+        // internal bool IsSprinting => this.Locomotion.CurrentGesture == Locomotion.Gesture.Sprint;
         
         [NotNull] 
         [field: SerializeField, Required] 
@@ -29,12 +30,16 @@ namespace Characters.Player {
         
         [field: SerializeField, MinValue(0)] private float AnimationBlendTime { get; set; } = 0.1f;
 
-        private void Awake() {
+        /*private void Awake() {
             this.Locomotion = this.GetComponent<Locomotion>();
+        }*/
+
+        internal void SupplyMovement(Vector2 input) {
+            
         }
 
         private void Update() {
-            this.Animator.SetBool(this.GroundedFlagAnimatorParameter, this.Locomotion.IsGrounded);
+            /*this.Animator.SetBool(this.GroundedFlagAnimatorParameter, this.Locomotion.IsGrounded);
             Vector2 input = this.Input * this.Locomotion.CurrentSpeed;
             Vector3 direction = CameraSystem.PlanarForward * input.y + CameraSystem.PlanarRight * input.x;
             this.Locomotion.PlanarDirection = new Vector2(direction.x, direction.z).normalized;
@@ -44,7 +49,7 @@ namespace Characters.Player {
             
             this.Animator.SetFloat(
                 this.ForwardBackVelocityAnimatorParameter, input.y, this.AnimationBlendTime, Time.deltaTime
-            );
+            );*/
         }
     }
 }

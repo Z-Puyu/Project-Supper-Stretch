@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7778497221915971296}
-  - component: {fileID: 2890134214639932449}
+  - component: {fileID: 8863079818014629256}
   m_Layer: 0
   m_Name: Locomotion Component
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2890134214639932449
+--- !u!114 &8863079818014629256
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,50 +41,51 @@ MonoBehaviour:
   m_GameObject: {fileID: 8857036086179365746}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0ce46db85c846568888f49ebdff9546, type: 3}
+  m_Script: {fileID: 11500000, guid: 739399c4ed5d4b2180635a5a4c255737, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GameCharacterBehaviours.Runtime::GameCharacterBehaviours.Runtime.Movement.Locomotion
+  m_EditorClassIdentifier: GameCharacterBehaviours.Runtime::GameCharacterBehaviours.Runtime.Movement.CharacterControllerLocomotion
   <ReferenceSpace>k__BackingField: {fileID: 0}
-  onlyAllowRotationWhenMoving: 1
-  stance: 0
-  onStartMoving:
-    m_PersistentCalls:
-      m_Calls: []
-  onStopMoving:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem,
-          GameplayAbilitiesSystem.Runtime
-        m_MethodName: CleanUp
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
-          m_ObjectArgumentAssemblyTypeName: GameplayAbilitiesSystem.Runtime.Abilities.Ability,
-            GameplayAbilitiesSystem.Runtime
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  <MovementModule>k__BackingField:
-    rid: 1692152225826603121
+  <OnlyAllowRotationWhenMoving>k__BackingField: 1
   <RotationModule>k__BackingField:
-    rid: 1692152225826603112
+    rid: 1692152385227718748
+  <StateMachine>k__BackingField:
+    rid: 1000
   <Mode>k__BackingField: 1
+  <WalkSpeedMultiplier>k__BackingField: 1
+  <RunSpeedMultiplier>k__BackingField: 2
+  <SprintSpeedMultiplier>k__BackingField: 3
+  <StealthSpeedMultiplier>k__BackingField: 0.5
+  <GroundCheckCaster>k__BackingField:
+    rid: 1692152385227718749
+  <GroundCheckPolicy>k__BackingField:
+    <GroundLayers>k__BackingField:
+      serializedVersion: 2
+      m_Bits: 33025
+    <FloatingHeightTolerance>k__BackingField: 0
+    <MaxSlopeAngle>k__BackingField: 0
+  <Controller>k__BackingField: {fileID: 0}
   references:
     version: 2
     RefIds:
-    - rid: 1692152225826603112
+    - rid: 1000
+      type: {class: AnimatorLocomotionStateMachine, ns: GameCharacterBehaviours.Runtime.Movement, asm: GameCharacterBehaviours.Runtime}
+      data:
+        <Animator>k__BackingField: {fileID: 0}
+        <RunningStateTrigger>k__BackingField: 1748754976
+        <WalkingStateTrigger>k__BackingField: 765711723
+        <SprintingStateTrigger>k__BackingField: -399748991
+    - rid: 1692152385227718748
       type: {class: SmoothDampRotator, ns: GameCharacterBehaviours.Runtime.Movement, asm: GameCharacterBehaviours.Runtime}
       data:
         <SmoothTime>k__BackingField: 0.12
-    - rid: 1692152225826603121
-      type: {class: CharacterControllerMover, ns: GameCharacterBehaviours.Runtime.Movement, asm: GameCharacterBehaviours.Runtime}
+    - rid: 1692152385227718749
+      type: {class: SphereCaster, ns: GameplaySensors.Runtime, asm: GameplaySensors.Runtime}
       data:
-        <WalkingSpeed>k__BackingField: 1
-        <RunningSpeed>k__BackingField: 2
-        <SprintingSpeed>k__BackingField: 3
-        <SpeedMultiplier>k__BackingField: 1
-        <StealthSpeedMultiplier>k__BackingField: 0.5
-        <Controller>k__BackingField: {fileID: 0}
+        <MaxDistance>k__BackingField: 0.2
+        <IgnoredLayers>k__BackingField:
+          serializedVersion: 2
+          m_Bits: 0
+        <CheckedLayers>k__BackingField:
+          serializedVersion: 2
+          m_Bits: 0
+        <Radius>k__BackingField: 0.4

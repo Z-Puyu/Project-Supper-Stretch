@@ -10,7 +10,7 @@ namespace SOULS.Runtime.GameplayAbilities.Executions {
         [field: SerializeField] private Locomotion.Gesture TargetGesture { get; set; }
         
         protected override Awaitable Execute(Ability.Context context, CancellationToken interrupt) {
-            if (context.Source.Root.HasComponent(out Locomotion? component)) {
+            if (context.Source.Root.HasModule(out Locomotion? component)) {
                 component.SwitchGesture(this.TargetGesture);
             }
             

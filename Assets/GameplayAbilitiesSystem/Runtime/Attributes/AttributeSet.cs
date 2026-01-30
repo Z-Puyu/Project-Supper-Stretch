@@ -16,7 +16,7 @@ using UnityEngine.Events;
 
 namespace GameplayAbilitiesSystem.Runtime.Attributes {
     [DisallowMultipleComponent, RequireComponent(typeof(ModifierEnvironment))]
-    public sealed class AttributeSet : BehaviourComponent, IAttributeReader, IModifiable {
+    public sealed class AttributeSet : Module, IAttributeReader, IModifiable {
         private TrieDictionary<AttributeKey, char, Node> Attributes { get; } =
             new TrieDictionary<AttributeKey, char, Node>('/');
 

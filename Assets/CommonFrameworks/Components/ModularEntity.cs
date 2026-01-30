@@ -7,15 +7,15 @@ using UnityEngine;
 
 namespace CommonFrameworks.Components {
     [DisallowMultipleComponent]
-    public sealed class ComponentManager : MonoBehaviour {
+    public sealed class ModularEntity : MonoBehaviour {
         [NotNull] 
         [field: SerializeField, Required] 
         public GameObject? Owner { get; private set; }
         
-        private Dictionary<Type, BehaviourComponent> Components { get; } = new Dictionary<Type, BehaviourComponent>();
+        private Dictionary<Type, Module> Components { get; } = new Dictionary<Type, Module>();
 
-        private Dictionary<Type, BehaviourComponent> BaseComponents { get; } =
-            new Dictionary<Type, BehaviourComponent>();
+        private Dictionary<Type, Module> BaseComponents { get; } =
+            new Dictionary<Type, Module>();
 
         private void Awake() {
             if (!this.Owner) {
@@ -23,14 +23,14 @@ namespace CommonFrameworks.Components {
             }
         }
 
-        internal bool RegisterComponent(BehaviourComponent component) {
+        internal bool Register(Module component) {
             Type type = component.GetType();
             if (!this.Components.TryAdd(type, component)) {
                 return false;
             }
 
             Type? @base = type.BaseType;
-            while (@base is not null && @base != typeof(BehaviourComponent)) {
+            while (@base is not null && @base != typeof(Module)) {
                 if (this.BaseComponents.TryAdd(@base, component)) {
                     continue;
                 }
@@ -55,24 +55,24 @@ namespace CommonFrameworks.Components {
             return true;
         }
         
-        public bool HasComponent<T>() where T : class {
+        public bool HasModule<T>() where T : class {
             return this.Components.ContainsKey(typeof(T)) || this.BaseComponents.ContainsKey(typeof(T)) ||
                    this.GetClosestComponentInProperChildren<T>() != null;
         }
         
-        public bool HasComponent<T>([NotNullWhen(true)] out T? component) where T : class {
-            if (this.Components.TryGetValue(typeof(T), out BehaviourComponent c) ||
+        public bool HasModule<T>([NotNullWhen(true)] out T? module) where T : class {
+            if (this.Components.TryGetValue(typeof(T), out Module c) ||
                 this.BaseComponents.TryGetValue(typeof(T), out c)) {
-                component = c as T;
-                return component != null;
+                module = c as T;
+                return module != null;
             }
             
-            component = this.GetClosestComponentInProperChildren<T>();
-            return component != null;
+            module = this.GetClosestComponentInProperChildren<T>();
+            return module != null;
         }
 
-        public T GetOrAdd<T>() where T : BehaviourComponent {
-            if (this.HasComponent(out T? component)) {
+        public T GetOrAdd<T>() where T : Module {
+            if (this.HasModule(out T? component)) {
                 return component;
             }
 
@@ -80,9 +80,9 @@ namespace CommonFrameworks.Components {
             return component ? component : this.Add<T>();
         }
         
-        public T Add<T>() where T : BehaviourComponent {
+        public T Add<T>() where T : Module {
             T comp = this.AddSubobject<T>();
-            this.RegisterComponent(comp);
+            this.Register(comp);
             return comp;
         }
     }

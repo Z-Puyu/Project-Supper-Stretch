@@ -7,7 +7,7 @@ namespace SOULS.Runtime.GameplayAbilities.Predicates {
     [Serializable]
     internal sealed class IsGrounded : IPredicate<AbilitySystem> {
         public bool Holds(AbilitySystem args) {
-            return !args.Root.HasComponent(out Locomotion? locomotion) || locomotion.IsGrounded;
+            return !args.Root.HasModule(out Locomotion? locomotion) || locomotion.IsGrounded;
         }
         
         public override string ToString() {

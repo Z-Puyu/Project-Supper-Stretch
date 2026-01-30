@@ -7,7 +7,7 @@ namespace SOULS.Runtime.GameplayAbilities.Predicates {
     [Serializable]
     internal sealed class IsMoving : IPredicate<AbilitySystem> {
         public bool Holds(AbilitySystem args) {
-            return args.Root.HasComponent(out Locomotion? component) && component.IsMoving;
+            return args.Root.HasModule(out Locomotion? component) && component.IsMoving;
         }
         
         public override string ToString() {

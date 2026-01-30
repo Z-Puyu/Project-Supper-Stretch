@@ -20,7 +20,7 @@ using Attribute = GameplayAbilitiesSystem.Runtime.Attributes.Attribute;
 
 namespace GameplayAbilitiesSystem.Runtime.Abilities {
     [DisallowMultipleComponent]
-    public sealed class AbilitySystem : BehaviourComponent,
+    public sealed class AbilitySystem : Module,
                                         IEffectEmitterFacade,
                                         IEffectReceiverFacade,
                                         IEnumerable<Ability> {
@@ -34,9 +34,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
 
         private EffectRegistry EffectRegistry { get; } = new EffectRegistry();
 
-        [NotNull] 
-        [field: SerializeField, Required]
-        private AnimationController? AnimationController { get; set; }
+        [NotNull] private AnimationController? AnimationController { get; set; }
         
         [NotNull] private KeywordContainer? KeywordContainer { get; set; }
         [NotNull] private AttributeSet? AttributeSet { get; set; }
@@ -51,16 +49,11 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
 
         protected override void Awake() {
             base.Awake();
-            foreach (Ability ability in this.DefaultAbilities) {
-                this.Grant(ability);
-            }
-
             this.KeywordContainer = this.Root.GetOrAdd<KeywordContainer>();
             this.ModifierConsumer = this.AttributeSet = this.Root.GetOrAdd<AttributeSet>();
-            if (!this.AnimationController) {
-                this.AnimationController = this.Owner.TryGetComponentInChildren(out AnimationController controller) 
-                        ? controller
-                        : this.Owner.AddComponent<AnimationController>();
+            this.AnimationController = this.Root.GetOrAdd<AnimationController>();
+            foreach (Ability ability in this.DefaultAbilities) {
+                this.Grant(ability);
             }
         }
 
