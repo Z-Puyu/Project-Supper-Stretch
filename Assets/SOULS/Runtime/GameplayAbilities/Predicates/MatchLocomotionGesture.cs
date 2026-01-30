@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SOULS.Runtime.GameplayAbilities.Predicates { 
     [Serializable]
-    internal sealed class RequiredLocomotionGesture : IPredicate<AbilitySystem> {
+    internal struct MatchLocomotionGesture : IPredicate<AbilitySystem> {
         [field: SerializeField] private Locomotion.Gesture RequiredGesture { get; set; }
         
         public bool Holds(AbilitySystem args) {

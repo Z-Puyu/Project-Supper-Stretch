@@ -9,6 +9,7 @@ using CommonFrameworks.Async;
 using CommonFrameworks.Collections;
 using CommonFrameworks.Components;
 using CommonFrameworks.Extensions;
+using GameplayAbilitiesSystem.Runtime.Animations;
 using GameplayAbilitiesSystem.Runtime.Attributes;
 using GameplayAbilitiesSystem.Runtime.Effects;
 using GameplayAbilitiesSystem.Runtime.Modifiers;
@@ -35,7 +36,6 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         private EffectRegistry EffectRegistry { get; } = new EffectRegistry();
 
         [NotNull] private AnimationController? AnimationController { get; set; }
-        
         [NotNull] private KeywordContainer? KeywordContainer { get; set; }
         [NotNull] private AttributeSet? AttributeSet { get; set; }
         [NotNull] private IModifiable? ModifierConsumer { get; set; } 
@@ -55,6 +55,10 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
             foreach (Ability ability in this.DefaultAbilities) {
                 this.Grant(ability);
             }
+        }
+
+        private void Start() {
+            ComponentBindings<Animator, AbilitySystem>.Bind(this.AnimationController.Animator, this);
         }
 
         /// <summary>
@@ -100,7 +104,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         /// </summary>
         /// <param name="ability">The ability to perform.</param>
         /// <returns>An awaitable that completes when the ability has finished executing.</returns>
-        public async void Perform(Ability? ability) {
+        public async void Perform(Ability ability) {
             try {
                 await this.Perform(ability, null);
             } catch (Exception e) {
@@ -115,11 +119,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         /// <param name="ability">The ability to perform.</param>
         /// <param name="userData">Optional user data for the ability.</param>
         /// <returns>An awaitable that completes when the ability has finished executing.</returns>
-        public async Awaitable Perform(Ability? ability, IReadOnlyDictionary<string, double>? userData) {
-            if (!ability) {
-                return;
-            }
-
+        public async Awaitable Perform(Ability ability, IReadOnlyDictionary<string, double>? userData) {
             this.Stop(ability);
             if (!this.AvailableAbilities.Remove(ability)) {
                 return;
@@ -154,11 +154,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         /// Stops the given ability from executing.
         /// </summary>
         /// <param name="ability">The ability to stop.</param>
-        public void Stop(Ability? ability) {
-            if (!ability) {
-                return;
-            }
-
+        public void Stop(Ability ability) {
             if (!this.RunningAbilities.Remove(ability, out Ability.Context context)) {
                 return;
             }
@@ -195,7 +191,7 @@ namespace GameplayAbilitiesSystem.Runtime.Abilities {
         /// Stops the ability and removes all effects associated with it.
         /// </summary>
         /// <param name="ability">The ability to stop and clean up.</param>
-        public void CleanUp(Ability ability) {
+        public void CompletelyStop(Ability ability) {
             this.Stop(ability);
             this.EffectRegistry.Stop(new EffectDescriptor(ability));
         }

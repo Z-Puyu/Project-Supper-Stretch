@@ -5,7 +5,7 @@ using GameplayAbilitiesSystem.Runtime.Abilities;
 
 namespace SOULS.Runtime.GameplayAbilities.Predicates {
     [Serializable]
-    internal sealed class IsGrounded : IPredicate<AbilitySystem> {
+    internal struct IsGrounded : IPredicate<AbilitySystem> {
         public bool Holds(AbilitySystem args) {
             return !args.Root.HasModule(out Locomotion? locomotion) || locomotion.IsGrounded;
         }

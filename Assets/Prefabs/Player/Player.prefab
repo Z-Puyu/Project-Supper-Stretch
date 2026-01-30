@@ -282,29 +282,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5be3cc767d0d4cd183edfc92f9c0e83e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Scripts.Characters::Characters.Player.PlayerController
-  <Animator>k__BackingField: {fileID: 0}
-  <LeftRightVelocityAnimatorParameter>k__BackingField: 0
-  <ForwardBackVelocityAnimatorParameter>k__BackingField: 0
-  <GroundedFlagAnimatorParameter>k__BackingField: 0
+  <Animator>k__BackingField: {fileID: 1135260277088119739}
+  <LeftRightVelocity>k__BackingField: 2041851446
+  <ForwardBackVelocity>k__BackingField: 72152147
+  <GroundedFlag>k__BackingField: 255863575
+  <JumpTrigger>k__BackingField: 125937960
+  <DodgeTrigger>k__BackingField: 1353639306
   <AnimationBlendTime>k__BackingField: 0.1
-  <OnBeginSprinting>k__BackingField:
-    m_PersistentCalls:
-      m_Calls: []
-  <OnStopSprinting>k__BackingField:
-    m_PersistentCalls:
-      m_Calls: []
-  <OnBeginWalking>k__BackingField:
-    m_PersistentCalls:
-      m_Calls: []
-  <OnStopWalking>k__BackingField:
-    m_PersistentCalls:
-      m_Calls: []
-  <OnDodge>k__BackingField:
-    m_PersistentCalls:
-      m_Calls: []
-  <OnJump>k__BackingField:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &4983186340066043904
 GameObject:
   m_ObjectHideFlags: 0
@@ -978,6 +962,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1135260277088119739}
     - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <GroundCheckPolicy>k__BackingField.<MaxSlopeAngle>k__BackingField
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: managedReferences[1692152385227718807].<RunningStateFlag>k__BackingField
       value: -863127849
       objectReference: {fileID: 0}
@@ -988,6 +976,10 @@ PrefabInstance:
     - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: managedReferences[1692152385227718807].<SprintingStateFlag>k__BackingField
       value: -521096443
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <GroundCheckPolicy>k__BackingField.<FloatingHeightTolerance>k__BackingField
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: managedReferences[1692152385227718807].<RunningStateTrigger>k__BackingField

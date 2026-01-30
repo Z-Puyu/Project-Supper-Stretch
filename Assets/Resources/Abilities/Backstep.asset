@@ -20,10 +20,9 @@ MonoBehaviour:
       rid: 1692152173614334054
     <CostAttribute>k__BackingField: Stamina
   <Conditions>k__BackingField:
-  - rid: 1692151751057866752
-  - rid: 1692152225826603309
-  <ExecutionSteps>k__BackingField:
-  - rid: 1692151813856559430
+  - rid: 1692152385227718957
+  - rid: 1692152385227718958
+  <ExecutionSteps>k__BackingField: []
   <SideEffect>k__BackingField:
     <KeywordPreset>k__BackingField:
       <TargetReceivesKeywords>k__BackingField: []
@@ -35,36 +34,14 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 1692151751057866752
-      type: {class: ForbiddenKeywords, ns: GameplayAbilitiesSystem.Runtime.Abilities.Predicate, asm: GameplayAbilitiesSystem.Runtime}
-      data:
-        <Keywords>k__BackingField:
-        - Character Flags/Movement Blocked
-    - rid: 1692151813856559430
-      type: {class: PlayAnimation, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
-      data:
-        <WillEndAbilityOnCompletion>k__BackingField: 0
-        <Clip>k__BackingField: {fileID: -5558953238165532788, guid: e55ef2f4572af804f9745df51162dfe7, type: 3}
-        <AnimationSignals>k__BackingField: []
-        <AnimationEnd>k__BackingField:
-        - rid: 1692151973348376702
-        <AnimationInterrupt>k__BackingField:
-        - rid: 1692151973348376703
-    - rid: 1692151973348376702
-      type: {class: EndAbility, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
-      data: 
-    - rid: 1692151973348376703
-      type: {class: EndAbility, ns: GameplayAbilitiesSystem.Runtime.Abilities.Executions, asm: GameplayAbilitiesSystem.Runtime}
-      data: 
     - rid: 1692152173614334054
       type: {class: Constant, ns: GameplayAbilitiesSystem.Runtime.Attributes.Evaluation, asm: GameplayAbilitiesSystem.Runtime}
       data:
         <Value>k__BackingField: 25
-    - rid: 1692152225826603309
-      type: {class: Not, ns: GameplayAbilitiesSystem.Runtime.Abilities.Predicate, asm: GameplayAbilitiesSystem.Runtime}
-      data:
-        <Predicate>k__BackingField:
-          rid: 1692152357399823130
-    - rid: 1692152357399823130
-      type: {class: IsMoving, ns: SOULS.Runtime.GameplayAbilities.Predicates, asm: SOULS.Runtime.GameplayAbilities}
+    - rid: 1692152385227718957
+      type: {class: IsGrounded, ns: SOULS.Runtime.GameplayAbilities.Predicates, asm: SOULS.Runtime.GameplayAbilities}
       data: 
+    - rid: 1692152385227718958
+      type: {class: MatchLocomotionGesture, ns: SOULS.Runtime.GameplayAbilities.Predicates, asm: SOULS.Runtime.GameplayAbilities}
+      data:
+        <RequiredGesture>k__BackingField: 3

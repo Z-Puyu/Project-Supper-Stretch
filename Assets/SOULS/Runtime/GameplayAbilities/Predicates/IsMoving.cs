@@ -5,7 +5,7 @@ using GameplayAbilitiesSystem.Runtime.Abilities;
 
 namespace SOULS.Runtime.GameplayAbilities.Predicates {
     [Serializable]
-    internal sealed class IsMoving : IPredicate<AbilitySystem> {
+    internal struct IsMoving : IPredicate<AbilitySystem> {
         public bool Holds(AbilitySystem args) {
             return args.Root.HasModule(out Locomotion? component) && component.IsMoving;
         }

@@ -185,7 +185,7 @@ namespace CommonFrameworks.Extensions {
         }
 
         public static bool TryGetComponentInProperChildren<T>(
-            this GameObject obj, [MaybeNullWhen(false)] out T component
+            this GameObject obj, [NotNullWhen(true)] out T? component
         ) {
             component = obj.GetComponentInProperChildren<T>();
             return component != null;
@@ -200,7 +200,7 @@ namespace CommonFrameworks.Extensions {
         }
 
         public static bool TryGetComponentInProperChildren<T>(
-            this Component self, [MaybeNullWhen(false)] out T component
+            this Component self, [NotNullWhen(true)] out T? component
         ) {
             return self.gameObject.TryGetComponentInProperChildren(out component);
         }

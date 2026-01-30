@@ -13,9 +13,14 @@ namespace GameCharacterBehaviours.Runtime.Movement {
     public abstract class Locomotion : Module {
         private const float DirectionTolerance = 0.0001f;
         private const float GroundedVelocityDown = -1;
-        
-        public enum Gesture { Walk, Run, Sprint }
-        
+
+        public enum Gesture {
+            Walk,
+            Run,
+            Sprint,
+            Stationary
+        }
+
         [NotNull] [field: SerializeField] private Transform? ReferenceSpace { get; set; }
         [field: SerializeField] internal bool UseRootMotion { private get; set; } = true;
         [field: SerializeField] private bool OnlyAllowRotationWhenMoving { get; set; } = true;
@@ -62,6 +67,7 @@ namespace GameCharacterBehaviours.Runtime.Movement {
                 case Gesture.Walk: this.StateMachine.Walk(); break;
                 case Gesture.Run: this.StateMachine.Run(); break;
                 case Gesture.Sprint: this.StateMachine.Sprint(); break;
+                case Gesture.Stationary: this.StateMachine.StandStill(); break;
             }
         }
 
@@ -95,13 +101,23 @@ namespace GameCharacterBehaviours.Runtime.Movement {
         }
 
         public void MoveIn(Vector3 direction, bool useGlobalCoordinates = false) {
-            if (!useGlobalCoordinates) {
-                direction = this.ReferenceSpace.TransformDirection(direction);
+            if (direction.magnitude > Locomotion.DirectionTolerance) {
+                if (!useGlobalCoordinates) {
+                    direction = this.ReferenceSpace.TransformDirection(direction);
+                }
+
+                Vector3 velocity = direction.normalized * this.SpeedMultiplier;
+                this.SupplyVelocity(velocity - this.InherentVelocity);
+                this.InherentVelocity = velocity;
+            } else {
+                this.Stop();
             }
-            
-            Vector3 velocity = direction.normalized * this.SpeedMultiplier; 
-            this.SupplyVelocity(velocity - this.InherentVelocity);
-            this.InherentVelocity = velocity;
+        }
+
+        public void Stop() {
+            this.SupplyVelocity(-this.InherentVelocity);
+            this.InherentVelocity = Vector3.zero;
+            this.SwitchGesture(Gesture.Stationary);
         }
         
         private void Update() {
@@ -142,15 +158,6 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             internal bool ConsidersAsGround(RaycastHit surface) {
                 return Vector3.Angle(surface.normal, Vector3.up) <= this.MaxSlopeAngle;
             }
-        }
-
-        [Serializable]
-        private sealed class LocomotionEvent {
-            [field: SerializeField, LabelText("Run -> Sprint")] 
-            internal UnityEvent OnRunToSprint { get; private set; } = new UnityEvent(); 
-            
-            [field: SerializeField, LabelText("Sprint -> Run")] 
-            internal UnityEvent OnSprintToRun { get; private set; } = new UnityEvent();
         }
     }
 }

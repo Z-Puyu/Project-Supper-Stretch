@@ -1,14 +1,12 @@
-﻿using System.Collections.Generic;
-using CommonFrameworks.Components;
+﻿using CommonFrameworks.Components;
 using CommonFrameworks.Extensions;
 using CommonFrameworks.Utilities;
 using GameplayAbilitiesSystem.Runtime.Abilities;
 using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Animations {
-    internal sealed class StopAbilityFromAnimatorState : AnimatorStateBehaviour {
+    internal sealed class StartAbilityFromAnimatorState : AnimatorStateBehaviour {
         [field: SerializeField] private Ability? Ability { get; set; }
-        [field: SerializeField] private bool AlsoStopEffects { get; set; }
         
         protected override void Execute(Animator animator, AnimatorStateInfo state, int layer) {
             if (!this.Ability) {
@@ -16,11 +14,7 @@ namespace GameplayAbilitiesSystem.Runtime.Animations {
             }
             
             AbilitySystem system = ComponentBindings<Animator, AbilitySystem>.GetOrAdd(animator);
-            if (this.AlsoStopEffects) {
-                system.CompletelyStop(this.Ability);
-            } else {
-                system.Stop(this.Ability);
-            }
+            system.Perform(this.Ability);
         }
     }
 }

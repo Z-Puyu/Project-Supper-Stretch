@@ -13,7 +13,7 @@ using UnityEngine.Playables;
 namespace AnimationUtilities.Runtime {
     [DisallowMultipleComponent]
     public sealed class AnimationController : Module {
-        [NotNull] [field: SerializeField, Required] private Animator? Animator { get; set; }
+        [NotNull] [field: SerializeField, Required] public Animator? Animator { get; private set; }
         [field: SerializeField] private RuntimeAnimatorController? RuntimeAnimatorController { get; set; }
         private CancellationTokenSource InternalInterrupter { get; set; } = new CancellationTokenSource();
         private PlayableGraph PlayableGraph { get; set; }
@@ -26,7 +26,8 @@ namespace AnimationUtilities.Runtime {
         public event UnityAction<AnimationClip, UnityAction<AnimationNotifier>> OnAnimationStarted = delegate { };
         public event UnityAction<AnimationNotifier> OnNotified = delegate { };
 
-        private void Awake() {
+        protected override void Awake() {
+            base.Awake();
             if (!this.Animator) {
                 if (this.TryGetComponentInChildren(out Animator? animator)) {
                     this.Animator = animator;
@@ -36,7 +37,7 @@ namespace AnimationUtilities.Runtime {
                     this.Animator = this.AddSubobject<Animator>();
                 }
             }
-
+            
             if (this.RuntimeAnimatorController) {
                 this.Animator.runtimeAnimatorController = this.RuntimeAnimatorController;
             }

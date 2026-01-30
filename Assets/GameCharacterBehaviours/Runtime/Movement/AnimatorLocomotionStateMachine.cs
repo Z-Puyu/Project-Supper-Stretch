@@ -59,5 +59,9 @@ namespace GameCharacterBehaviours.Runtime.Movement {
             this.ResetAllFlags();
             this.Animator.SetBool(this.SprintingStateFlag, true);
         }
+
+        public void StandStill() {
+            this.ResetAllFlags();
+        }
     }
 }

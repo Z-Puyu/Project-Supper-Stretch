@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace GameplayAbilitiesSystem.Runtime.Abilities.Predicate {
     [Serializable]
-    public struct ForbiddenKeywords : IPredicate<AbilitySystem>, IPredicate<ITaggable<Keyword>> {
+    public struct KeywordsAbsent : IPredicate<AbilitySystem>, IPredicate<ITaggable<Keyword>> {
         [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))] 
         private List<string> Keywords { get; set; }
 
