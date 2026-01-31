@@ -1,6 +1,6 @@
 ﻿using System;
 using CommonFrameworks.Extensions;
-using GameplayAbilitiesSystem.Runtime.Attributes;
+using GameplayAbilities.Attributes;
 using SaintsField;
 using UnityEngine;
 using UnityEngine.UIElements;

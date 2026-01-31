@@ -2,7 +2,7 @@
 using SaintsField;
 using UnityEngine;
 
-namespace GameplaySensors.Runtime {
+namespace GameplaySensors {
     [Serializable]
     public abstract class PhysicsCaster : IPhysicsCaster {
         [field: SerializeField, MinValue(0.01f)] 

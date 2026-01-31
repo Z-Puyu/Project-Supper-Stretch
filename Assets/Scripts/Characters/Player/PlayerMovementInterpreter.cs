@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using CommonFrameworks.Utilities;
-using GameCharacterBehaviours.Runtime.Movement;
+using GameplayBehaviours.Movement;
 using SaintsField;
 using SaintsField.Playa;
 using UnityEngine;

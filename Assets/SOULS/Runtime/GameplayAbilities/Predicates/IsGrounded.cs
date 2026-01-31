@@ -1,9 +1,9 @@
 ﻿using System;
 using CommonFrameworks.Logic;
-using GameCharacterBehaviours.Runtime.Movement;
-using GameplayAbilitiesSystem.Runtime.Abilities;
+using GameplayAbilities.Abilities;
+using GameplayBehaviours.Movement;
 
-namespace SOULS.Runtime.GameplayAbilities.Predicates {
+namespace SOULS.GameplayAbilities.Predicates {
     [Serializable]
     internal struct IsGrounded : IPredicate<AbilitySystem> {
         public bool Holds(AbilitySystem args) {

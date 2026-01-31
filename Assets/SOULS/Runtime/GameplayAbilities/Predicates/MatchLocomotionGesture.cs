@@ -1,10 +1,10 @@
 ﻿using System;
 using CommonFrameworks.Logic;
-using GameCharacterBehaviours.Runtime.Movement;
-using GameplayAbilitiesSystem.Runtime.Abilities;
+using GameplayAbilities.Abilities;
+using GameplayBehaviours.Movement;
 using UnityEngine;
 
-namespace SOULS.Runtime.GameplayAbilities.Predicates { 
+namespace SOULS.GameplayAbilities.Predicates { 
     [Serializable]
     internal struct MatchLocomotionGesture : IPredicate<AbilitySystem> {
         [field: SerializeField] private Locomotion.Gesture RequiredGesture { get; set; }

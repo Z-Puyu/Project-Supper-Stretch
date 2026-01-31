@@ -1,13 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using CommonFrameworks.Extensions;
 using SaintsField;
+using SaintsField.Playa;
 using UnityEngine;
 
 namespace CommonFrameworks.Components {
     [DisallowMultipleComponent]
     public sealed class ModularEntity : MonoBehaviour {
+        private static AdvancedDropdownList<Type> ModuleTypes => new AdvancedDropdownList<Type>(
+            "",
+            typeof(Module).GetConcreteSubclasses()
+                          .Select(tree => tree.Collate((label, _) => $"{label.Split('.').LastOrDefault()}"))
+        );
+        
         [NotNull] 
         [field: SerializeField, Required] 
         public GameObject? Owner { get; private set; }
@@ -84,6 +92,13 @@ namespace CommonFrameworks.Components {
             T comp = this.AddSubobject<T>();
             this.Register(comp);
             return comp;
+        }
+
+        [Button]
+        private void AddModule([Dropdown(nameof(ModularEntity.ModuleTypes))] Type type) {
+#if DEBUG
+            Debug.Log($"Add {type.Name} to {this.gameObject.name}");
+#endif
         }
     }
 }

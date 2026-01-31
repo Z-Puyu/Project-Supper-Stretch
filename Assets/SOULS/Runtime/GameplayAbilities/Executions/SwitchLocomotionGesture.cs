@@ -1,11 +1,11 @@
 ﻿using System.Threading;
 using CommonFrameworks.Async;
-using GameCharacterBehaviours.Runtime.Movement;
-using GameplayAbilitiesSystem.Runtime.Abilities;
-using GameplayAbilitiesSystem.Runtime.Abilities.Executions;
+using GameplayAbilities.Abilities;
+using GameplayAbilities.Abilities.Executions;
+using GameplayBehaviours.Movement;
 using UnityEngine;
 
-namespace SOULS.Runtime.GameplayAbilities.Executions {
+namespace SOULS.GameplayAbilities.Executions {
     internal sealed class SwitchLocomotionGesture : AbilityExecutionStep {
         [field: SerializeField] private Locomotion.Gesture TargetGesture { get; set; }
         

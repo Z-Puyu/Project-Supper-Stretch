@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using GameCharacterBehaviours.Runtime.Movement;
-using GameplayKeywordsSystem.Runtime;
+using GameplayBehaviours.Movement;
+using GameplayKeywords;
 using SaintsField;
 using UnityEngine;
 

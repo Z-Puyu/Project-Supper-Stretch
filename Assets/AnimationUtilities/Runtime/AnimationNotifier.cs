@@ -1,5 +1,5 @@
 ﻿using CommonFrameworks.Blackboard;
-using GameplayKeywordsSystem.Runtime;
+using GameplayKeywords;
 using SaintsField;
 using UnityEngine;
 
