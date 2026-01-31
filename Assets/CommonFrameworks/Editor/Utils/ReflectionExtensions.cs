@@ -1,39 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommonFrameworks.Collections;
+using System.Reflection;
 
-namespace CommonFrameworks.Extensions {
+namespace CommonFrameworks.Editor.Utils {
     public static class ReflectionExtensions {
-        private readonly record struct TypeReference(Type Type) {
-            internal string AssemblyName { get; } = Type.Assembly.GetName().Name;
-            internal string Namespace { get; } = Type.Namespace ?? string.Empty;
-            internal string Name { get; } = Type.Name;
-        }
-        
-        private readonly record struct Namespace(string Name) {
-            internal int NumberOfParts => this.Name.Split('.', StringSplitOptions.RemoveEmptyEntries).Length;
-            internal string Root => string.IsNullOrWhiteSpace(this.Name) ? string.Empty : this.Name.Split('.')[0];
-            
-            internal static IEnumerable<Namespace> Denumerate(string @namespace) {
-                string[] parts = @namespace.Split('.', StringSplitOptions.RemoveEmptyEntries);
-                for (int i = 1; i <= parts.Length; i += 1) {
-                    yield return new Namespace(string.Join(".", parts[..i]));
-                }
-            }
-
-            internal bool IsImmediateChildOf(Namespace @namespace) {
-                return this.Name.StartsWith(@namespace.Name) && this.NumberOfParts == @namespace.NumberOfParts + 1;
-            }
-            
-            internal bool IsImmediateParentOf(Namespace @namespace) {
-                return @namespace.IsImmediateChildOf(this);
-            }
-            
-            public static implicit operator Namespace(string @namespace) => new Namespace(@namespace);
-            public static implicit operator string(Namespace @namespace) => @namespace.Name;
-        }
-        
         public static Type Resolve(this Type type) {
             if (!type.IsGenericType) {
                 return type;
@@ -43,9 +14,27 @@ namespace CommonFrameworks.Extensions {
             return res != type ? res : type;
         }
 
-        private static void BuildTree(this Type type, IDictionary<string, ITree<string, Type>> trees) {
+        public static IEnumerable<Type> GetSubtypes(this Type type) {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                            .SelectMany(assembly => assembly.GetTypes())
+                            .Where(type.IsAssignableFrom);
+        }
+        
+        public static IEnumerable<Type> GetSubclasses(this Type type) {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                            .SelectMany(assembly => assembly.GetTypes())
+                            .Where(subtype => subtype.IsSubclassOf(type));
+        }
+        
+        public static IEnumerable<Type> GetConcreteSubclasses(this Type type) {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                            .SelectMany(assembly => assembly.GetTypes())
+                            .Where(subtype => subtype.IsSubclassOf(type) && !subtype.IsAbstract);
+        }
+
+        /*private static void BuildTree(this Type type, IDictionary<string, ITree<string, Type>> trees) {
             Type self = type.Resolve();
-            string name = $"{self.Assembly.GetName().Name}.{self.Namespace}.{self.Name}";
+            string name = $"{self.Namespace}.{self.Name}";
             string[] parts = name.Split('.', StringSplitOptions.RemoveEmptyEntries);
             if (!trees.TryGetValue(parts[0], out ITree<string, Type>? tree)) {
                 tree = Tree<string, Type>.CreateDirected(parts[0]);
@@ -99,6 +88,6 @@ namespace CommonFrameworks.Extensions {
             }
             
             return trees.Values;
-        }
+        }*/
     }
 }

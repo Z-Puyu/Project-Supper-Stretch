@@ -2,6 +2,7 @@
 using UnityEngine;
 
 namespace GameplayBehaviours.Movement {
+    [AddComponentMenu("")]
     internal sealed class CharacterControllerLocomotion : Locomotion {
         [NotNull] [field: SerializeField] private CharacterController? Controller { get; set; }
 

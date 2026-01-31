@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using CommonFrameworks.Editor.PropertyAttributes;
+using CommonFrameworks.Editor.Serialisation;
+using CommonFrameworks.Editor.Utils;
 using CommonFrameworks.Extensions;
 using SaintsField;
 using SaintsField.Playa;
@@ -10,12 +13,6 @@ using UnityEngine;
 namespace CommonFrameworks.Components {
     [DisallowMultipleComponent]
     public sealed class ModularEntity : MonoBehaviour {
-        private static AdvancedDropdownList<Type> ModuleTypes => new AdvancedDropdownList<Type>(
-            "",
-            typeof(Module).GetConcreteSubclasses()
-                          .Select(tree => tree.Collate((label, _) => $"{label.Split('.').LastOrDefault()}"))
-        );
-        
         [NotNull] 
         [field: SerializeField, Required] 
         public GameObject? Owner { get; private set; }
@@ -24,6 +21,22 @@ namespace CommonFrameworks.Components {
 
         private Dictionary<Type, Module> BaseComponents { get; } =
             new Dictionary<Type, Module>();
+        
+#if UNITY_EDITOR
+        [field: SerializeField, Type(nameof(this.HasModule)), LayoutStart("Module Manager", ELayout.TitleBox)] 
+        private TypeRef<Module> NewModuleType { get; set; } = new TypeRef<Module>();
+        
+        [Button]
+        private void AddModule() {
+            if (this.NewModuleType.Type.IsAbstract) {
+                return;
+            }
+#if DEBUG
+            Debug.Log($"Add {this.NewModuleType.Type.Name} to {this.gameObject.name}");
+#endif 
+            this.AddSubobject(this.NewModuleType.Type, this.NewModuleType.Type.Name);
+        }
+#endif
 
         private void Awake() {
             if (!this.Owner) {
@@ -62,6 +75,11 @@ namespace CommonFrameworks.Components {
                 
             return true;
         }
+
+        public bool HasModule(Type type) {
+            return this.Components.ContainsKey(type) || this.BaseComponents.ContainsKey(type) ||
+                   this.GetComponentInChildren(type);
+        }
         
         public bool HasModule<T>() where T : class {
             return this.Components.ContainsKey(typeof(T)) || this.BaseComponents.ContainsKey(typeof(T)) ||
@@ -92,13 +110,6 @@ namespace CommonFrameworks.Components {
             T comp = this.AddSubobject<T>();
             this.Register(comp);
             return comp;
-        }
-
-        [Button]
-        private void AddModule([Dropdown(nameof(ModularEntity.ModuleTypes))] Type type) {
-#if DEBUG
-            Debug.Log($"Add {type.Name} to {this.gameObject.name}");
-#endif
         }
     }
 }

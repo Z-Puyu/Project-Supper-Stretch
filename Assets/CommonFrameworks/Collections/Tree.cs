@@ -12,6 +12,8 @@ namespace CommonFrameworks.Collections {
         private IDictionary<T, S> VertexData { get; } = new Dictionary<T, S>();
         
         public S this[T vertex] { get => this.VertexData[vertex]; set => this.VertexData[vertex] = value; }
+        public IEnumerable<S> Values => this.VertexData.Values;
+        public IEnumerable<T> Vertices => this.AdjacencyList.Keys;
 
         private Tree(T root, bool directed) {
             this.Root = root;
@@ -94,17 +96,9 @@ namespace CommonFrameworks.Collections {
 
         public U Aggregate<U>(Func<T, S?, IEnumerable<U>, U> combiner, T source, Func<T, S?, U> synthesiser) {
             S? data = this.TryGetValue(source, out S? value) ? value : default;
-            if (this.AdjacencyList.TryGetValue(source, out ISet<T> children) && children.Count > 0) {
-                U result = combiner(source, data, children.Select(v => this.Aggregate(combiner, v, synthesiser)));
-                return result;
-            } else {
-                U result = synthesiser(source, data);
-                return result;
-            }
-            
-            /*return this.AdjacencyList.TryGetValue(source, out ISet<T> children)
+            return this.AdjacencyList.TryGetValue(source, out ISet<T> children)
                     ? combiner(source, data, children.Select(v => this.Aggregate(combiner, v, synthesiser)))
-                    : synthesiser(source, data);*/
+                    : synthesiser(source, data);
         }
 
         public bool Add(T vertex) {

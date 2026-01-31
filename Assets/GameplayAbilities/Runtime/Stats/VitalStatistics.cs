@@ -7,6 +7,7 @@ using GameplayAbilities.Effects;
 using UnityEngine;
 
 namespace GameplayAbilities.Stats {
+    [AddComponentMenu("")]
     internal sealed class VitalStatistics : Module {
         [NotNull] private AttributeSet? AttributeSet { get; set; }
         [NotNull] private IEffectReceiverFacade? EffectReceiver { get; set; }

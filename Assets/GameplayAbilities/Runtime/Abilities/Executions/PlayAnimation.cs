@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using AnimationUtilities.Runtime;
+using AnimationUtilities;
 using CommonFrameworks.Async;
 using SaintsField;
 using SaintsField.Playa;

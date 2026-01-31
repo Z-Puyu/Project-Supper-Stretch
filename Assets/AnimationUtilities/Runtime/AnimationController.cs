@@ -10,8 +10,8 @@ using UnityEngine.Animations;
 using UnityEngine.Events;
 using UnityEngine.Playables;
 
-namespace AnimationUtilities.Runtime {
-    [DisallowMultipleComponent]
+namespace AnimationUtilities {
+    [AddComponentMenu("")]
     public sealed class AnimationController : Module {
         [NotNull] [field: SerializeField, Required] public Animator? Animator { get; private set; }
         [field: SerializeField] private RuntimeAnimatorController? RuntimeAnimatorController { get; set; }

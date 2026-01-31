@@ -6,6 +6,8 @@ namespace CommonFrameworks.Collections {
     public interface ITree<T, S> {
         public T Root { get; }
         public S this[T vertex] { get; set; }
+        public IEnumerable<T> Vertices { get; }
+        public IEnumerable<S> Values { get; }
         
         public bool Join(T from, T to);
         public bool Add(T vertex);

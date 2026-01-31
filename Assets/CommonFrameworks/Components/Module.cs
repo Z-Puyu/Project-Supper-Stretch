@@ -5,6 +5,7 @@ using Object = UnityEngine.Object;
 
 
 namespace CommonFrameworks.Components {
+    [DisallowMultipleComponent]
     public abstract class Module : MonoBehaviour {
         [NotNull] public ModularEntity? Root { get; private set; }
         public GameObject Owner => this.Root.Owner;

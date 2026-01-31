@@ -3,7 +3,7 @@ using GameplayKeywords;
 using SaintsField;
 using UnityEngine;
 
-namespace AnimationUtilities.Runtime {
+namespace AnimationUtilities {
     [CreateAssetMenu(fileName = "New Animation Notifier", menuName = "Gameplay Abilities/Animation Notifier")]
     public sealed class AnimationNotifier : ScriptableObject {
         [field: SerializeField, Required, TreeDropdown(nameof(this.AllKeywords))] 

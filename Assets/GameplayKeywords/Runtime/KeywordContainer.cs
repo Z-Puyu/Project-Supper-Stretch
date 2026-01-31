@@ -5,7 +5,7 @@ using SaintsField;
 using UnityEngine;
 
 namespace GameplayKeywords {
-    [DisallowMultipleComponent]
+    [AddComponentMenu("")]
     public sealed class KeywordContainer : Module, ITaggable<Keyword>, ICollection<Keyword> {
         [field: SerializeField, SaintsRow(inline: true)] 
         private KeywordLabel Label { get; set; } = new KeywordLabel();

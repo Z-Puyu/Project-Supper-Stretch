@@ -7,7 +7,6 @@ using SaintsField;
 using UnityEngine;
 
 namespace GameplayBehaviours.Movement {
-    [DisallowMultipleComponent]
     public abstract class Locomotion : Module {
         private const float DirectionTolerance = 0.0001f;
         private const float GroundedVelocityDown = -1;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -263,6 +264,25 @@ namespace CommonFrameworks.Extensions {
         
         public static T AddSubobject<T>(this Component comp, string name = "") where T : Component {
             return comp.gameObject.AddSubobject<T>(name);
+        }
+        
+        public static Component? AddSubobject(this GameObject obj, Type type, string name = "") {
+            if (!typeof(Component).IsAssignableFrom(type)) {
+                Debug.LogError($"Cannot add subobject of type {type.Name} to GameObject {obj.name}");
+                return null;
+            }
+            
+            if (string.IsNullOrEmpty(name)) {
+                name = $"{type.Name} (auto-generated)";
+            }
+            
+            GameObject c = new GameObject(name);
+            c.transform.SetParent(obj.transform);
+            return c.AddComponent(type);
+        }
+        
+        public static Component? AddSubobject(this Component comp, Type type, string name = "") {
+            return comp.gameObject.AddSubobject(type, name);
         }
     }
 }

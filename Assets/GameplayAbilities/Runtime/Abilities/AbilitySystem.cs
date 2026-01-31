@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
-using AnimationUtilities.Runtime;
+using AnimationUtilities;
 using CommonFrameworks.Async;
 using CommonFrameworks.Collections;
 using CommonFrameworks.Components;
@@ -17,7 +17,7 @@ using UnityEngine.Events;
 using Attribute = GameplayAbilities.Attributes.Attribute;
 
 namespace GameplayAbilities.Abilities {
-    [DisallowMultipleComponent]
+    [AddComponentMenu("")]
     public sealed class AbilitySystem : Module,
                                         IEffectEmitterFacade,
                                         IEffectReceiverFacade,
