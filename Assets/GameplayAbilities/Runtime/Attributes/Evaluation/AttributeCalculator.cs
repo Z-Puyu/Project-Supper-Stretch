@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommonFrameworks.Maths;
-using SaintsField;
-using SaintsField.Playa;
+using GameplayAbilities.EditorTooling;
 using UnityEngine;
 
 namespace GameplayAbilities.Attributes.Evaluation {
     [Serializable]
-    internal sealed class AttributeCalculator : IEvaluable<IAttributeReader> {
-        [field: SerializeReference, ReferencePicker]
-        private IEvaluable<IAttributeReader>? Seed { get; set; }
+    internal sealed class AttributeCalculator {
+        [field: SerializeReference, SubtypeSelector]
+        private IAttributeMagnitude? Seed { get; set; }
 
-        [field: SerializeReference, ReferencePicker, HideIf(nameof(this.Seed), null)]
+        /*[field: SerializeReference, ReferencePicker, HideIf(nameof(this.Seed), null)]
         private List<Calculation<double, IAttributeReader>> CalculationSteps { get; set; } =
-            new List<Calculation<double, IAttributeReader>>();
+            new List<Calculation<double, IAttributeReader>>();*/
 
         internal bool Exists => this.Seed is not null;
         
-        public ICollection<object> DependentParameters =>
+        /*public ICollection<object> DependentParameters =>
                 this.CalculationSteps.SelectMany(step => step.AuxiliaryParameters).ToArray();
 
         public double Evaluate(IAttributeReader context) {
@@ -28,6 +26,6 @@ namespace GameplayAbilities.Attributes.Evaluation {
             }
             
             return result;
-        }
+        }*/
     }
 }

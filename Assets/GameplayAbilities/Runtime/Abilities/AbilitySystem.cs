@@ -2,60 +2,45 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading;
-using AnimationUtilities;
-using CommonFrameworks.Async;
-using CommonFrameworks.Collections;
-using CommonFrameworks.Components;
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Effects;
 using GameplayAbilities.Modifiers;
-using GameplayKeywords;
 using UnityEngine;
 using UnityEngine.Events;
-using Attribute = GameplayAbilities.Attributes.Attribute;
 
 namespace GameplayAbilities.Abilities {
     [AddComponentMenu("")]
-    public sealed class AbilitySystem : Module,
+    public sealed class AbilitySystem : MonoBehaviour,
                                         IEffectEmitterFacade,
                                         IEffectReceiverFacade,
                                         IEnumerable<Ability> {
         private ICollection<Ability> AvailableAbilities { get; } = new HashSet<Ability>();
-
-        private TrieDictionary<Keyword, char, ICollection<Ability>> AbilitiesByTag { get; } =
-            new TrieDictionary<Keyword, char, ICollection<Ability>>();
 
         private IDictionary<Ability, Ability.Context> RunningAbilities { get; } =
             new Dictionary<Ability, Ability.Context>();
 
         private EffectRegistry EffectRegistry { get; } = new EffectRegistry();
 
-        [NotNull] private AnimationController? AnimationController { get; set; }
-        [NotNull] private KeywordContainer? KeywordContainer { get; set; }
-        [NotNull] private AttributeSet? AttributeSet { get; set; }
+        [NotNull] [field: SerializeField] private Animator? Animator { get; set; }
+        [NotNull] [field: SerializeField] private AttributeSet? AttributeSet { get; set; }
         [NotNull] private IModifiable? ModifierConsumer { get; set; } 
         
         [field: SerializeField] private List<Ability> DefaultAbilities { get; set; } = new List<Ability>();
+
+        [field: SerializeField]
+        private RuntimeAbilityResourceContainer ResourceContainer { get; set; } = new RuntimeAbilityResourceContainer();
 
         public event UnityAction<Ability> OnAbilityStarted = delegate { };
         public event UnityAction<Ability> OnAbilityStopped = delegate { };
         public event UnityAction<Ability> OnAbilityGranted = delegate { };
         public event UnityAction<Ability> OnAbilityRevoked = delegate { };
 
-        protected override void Awake() {
-            base.Awake();
-            this.KeywordContainer = this.Root.GetOrAdd<KeywordContainer>();
-            this.ModifierConsumer = this.AttributeSet = this.Root.GetOrAdd<AttributeSet>();
-            this.AnimationController = this.Root.GetOrAdd<AnimationController>();
+        private void Awake() {
+            this.ModifierConsumer = this.AttributeSet;
             foreach (Ability ability in this.DefaultAbilities) {
                 this.Grant(ability);
             }
-        }
-
-        private void Start() {
-            ComponentBindings<Animator, AbilitySystem>.Bind(this.AnimationController.Animator, this);
         }
 
         /// <summary>
@@ -69,15 +54,6 @@ namespace GameplayAbilities.Abilities {
             }
 
             this.AvailableAbilities.Add(ability);
-            foreach (Keyword keyword in ability.Tags) {
-                if (!this.AbilitiesByTag.TryGetValue(keyword, out ICollection<Ability> abilities)) {
-                    abilities = new List<Ability>();
-                    this.AbilitiesByTag.Add(keyword, abilities);
-                }
-
-                abilities.Add(ability);
-            }
-
             this.OnAbilityGranted.Invoke(ability);
             return true;
         }
@@ -86,11 +62,7 @@ namespace GameplayAbilities.Abilities {
             if (!this.AvailableAbilities.Remove(ability)) {
                 return false;
             }
-
-            foreach (Keyword keyword in ability.Tags) {
-                this.AbilitiesByTag[keyword].Remove(ability);
-            }
-
+            
             this.OnAbilityRevoked.Invoke(ability);
             return true;
         }
@@ -134,20 +106,6 @@ namespace GameplayAbilities.Abilities {
         }
 
         /// <summary>
-        /// Attempts to execute the first ability with the given keyword tag.
-        /// </summary>
-        /// <param name="keyword">The keyword tag to search for.</param>
-        /// <param name="userData">Optional user data for the ability.</param>
-        public async Awaitable Perform(Keyword keyword, IReadOnlyDictionary<string, double>? userData = null) {
-            Ability? ability = this.AbilitiesByTag
-                                   .DepthFirstPrefixSearch(keyword.Value)
-                                   .FirstOrDefault().Value.FirstOrDefault();
-            if (ability) {
-                await this.Perform(ability, userData);
-            }
-        }
-
-        /// <summary>
         /// Stops the given ability from executing.
         /// </summary>
         /// <param name="ability">The ability to stop.</param>
@@ -156,28 +114,15 @@ namespace GameplayAbilities.Abilities {
                 return;
             }
 
-            if (!context.MainTask.TryInterrupt() && !context.MainTask.TryComplete()) {
-#if DEBUG
-                Debug.LogError($"{ability} is running but the asynchronous task has ended unexpectedly.");
-#endif
-                return;
-            }
+//             if (!context.MainTask.TryInterrupt() && !context.MainTask.TryComplete()) {
+// #if DEBUG
+//                 Debug.LogError($"{ability} is running but the asynchronous task has ended unexpectedly.");
+// #endif
+//                 return;
+//             }
 
             this.AvailableAbilities.Add(ability);
             this.OnAbilityStopped.Invoke(ability);
-        }
-
-        /// <summary>
-        /// Stops all abilities that have the given keyword tag.
-        /// </summary>
-        /// <param name="keyword">The keyword tag to stop abilities with.</param>
-        public void Stop(Keyword keyword) {
-            IEnumerable<Ability> abilities = this.AbilitiesByTag
-                                                 .DepthFirstPrefixSearch(keyword.Value)
-                                                 .SelectMany(pair => pair.Value);
-            foreach (Ability ability in abilities) {
-                this.Stop(ability);
-            }
         }
 
         public bool IsRunningAbility(Ability ability) {
@@ -193,32 +138,24 @@ namespace GameplayAbilities.Abilities {
             this.EffectRegistry.Stop(new EffectDescriptor(ability));
         }
 
-        public Awaitable<AnimationPlayResult> PlayAnimation(
-            AnimationClip anim, CancellationToken interrupter, UnityAction<AnimationNotifier> onNotify
-        ) {
-            return !this.AnimationController
-                    ? AsyncTask<AnimationPlayResult>.FromResult(AnimationPlayResult.Invalid)
-                    : this.AnimationController.Play(anim, onNotify, interrupter);
-        }
-
         public void SetAnimatorInt(int hash, int value) {
-            this.AnimationController.SetInteger(hash, value);
+            this.Animator.SetInteger(hash, value);
         }
         
         public void SetAnimatorFloat(int hash, float value) {
-            this.AnimationController.SetFloat(hash, value);
+            this.Animator.SetFloat(hash, value);
         }
         
         public void SetAnimatorBool(int hash, bool value) {
-            this.AnimationController.SetBool(hash, value);
+            this.Animator.SetBool(hash, value);
         }
         
         public void SetAnimatorTrigger(int hash) {
-            this.AnimationController.SetTrigger(hash);
+            this.Animator.SetTrigger(hash);
         }
 
         public void ResetAnimatorTrigger(int hash) {
-            this.AnimationController.ResetTrigger(hash);
+            this.Animator.ResetTrigger(hash);
         }
 
         CancellationToken IEffectReceiverFacade.Register(EffectDescriptor effect) {
@@ -243,7 +180,7 @@ namespace GameplayAbilities.Abilities {
             }
         }
         
-        IEnumerator<Attribute> IEnumerable<Attribute>.GetEnumerator() {
+        IEnumerator<GameplayAttribute> IEnumerable<GameplayAttribute>.GetEnumerator() {
             return this.AttributeSet.GetEnumerator();
         }
 
@@ -251,40 +188,28 @@ namespace GameplayAbilities.Abilities {
             return this.GetEnumerator();
         }
 
-        bool ITaggable<Keyword>.Tag(Keyword label) {
-            return this.KeywordContainer.Tag(label);
-        }
-
-        bool ITaggable<Keyword>.Untag(Keyword keyword) {
-            return this.KeywordContainer.Untag(keyword);
-        }
-
-        bool ITaggable<Keyword>.HasTag(Keyword keyword) {
-            return this.KeywordContainer.HasTag(keyword);
-        }
-
-        double IAttributeReader.Query(AttributeKey key) {
+        AttributeValue IAttributeReader.Query(GameplayAttributeType key) {
             return this.AttributeSet.Query(key);
         }
 
-        double IAttributeReader.QueryMax(AttributeKey key) {
+        double IAttributeReader.QueryMax(GameplayAttributeType key) {
             return this.AttributeSet.QueryMax(key);
         }
 
-        double IAttributeReader.QueryMin(AttributeKey key) {
+        double IAttributeReader.QueryMin(GameplayAttributeType key) {
             return this.AttributeSet.QueryMin(key);
         }
 
-        bool IAttributeReader.HasAtLeast(double threshold, AttributeKey key) {
+        bool IAttributeReader.HasAtLeast(double threshold, GameplayAttributeType key) {
             return this.AttributeSet.HasAtLeast(threshold, key);
         }
 
-        bool IAttributeReader.HasAtMost(double cap, AttributeKey key) {
+        bool IAttributeReader.HasAtMost(double cap, GameplayAttributeType key) {
             return this.AttributeSet.HasAtMost(cap, key);
         }
 
-        void IModifiable.AddModifier(Modifier modifier) {
-            this.ModifierConsumer.AddModifier(modifier);
+        void IModifiable.AddModifier(GameplayAttributeType target, Modifier modifier) {
+            this.ModifierConsumer.AddModifier(target, modifier);
         }
     }
 }

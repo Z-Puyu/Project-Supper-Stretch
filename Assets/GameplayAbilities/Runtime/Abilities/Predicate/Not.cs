@@ -1,12 +1,11 @@
 ﻿using System;
-using CommonFrameworks.Logic;
-using SaintsField;
+using GameplayAbilities.EditorTooling;
 using UnityEngine;
 
 namespace GameplayAbilities.Abilities.Predicate {
     [Serializable]
     internal struct Not : IPredicate<AbilitySystem> {
-        [field: SerializeReference, ReferencePicker]
+        [field: SerializeReference, SubtypeSelector]
         private IPredicate<AbilitySystem> Predicate { get; set; }
 
         public bool Holds(AbilitySystem source) {

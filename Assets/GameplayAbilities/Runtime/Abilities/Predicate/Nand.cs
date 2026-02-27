@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using CommonFrameworks.Logic;
-using SaintsField;
+using GameplayAbilities.EditorTooling;
 using UnityEngine;
 
 namespace GameplayAbilities.Abilities.Predicate {
     [Serializable]
     internal struct Nand : IPredicate<AbilitySystem> {
-        [field: SerializeReference, ReferencePicker]
+        [field: SerializeReference, SubtypeSelector]
         private List<IPredicate<AbilitySystem>> Predicates { get; set; }
 
         private List<Predicate<AbilitySystem>> CompiledPredicates { get; }
@@ -24,7 +23,7 @@ namespace GameplayAbilities.Abilities.Predicate {
                 }
             }
 
-            return this.CompiledPredicates.NotAll(source);
+            return this.CompiledPredicates.Exists(p => !p(source));
         }
         
         public override string ToString() {

@@ -1,5 +1,4 @@
 ﻿using System;
-using CommonFrameworks.Utilities;
 
 namespace GameplayAbilities.Effects.Custom {
     [Serializable]

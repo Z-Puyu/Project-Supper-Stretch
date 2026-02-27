@@ -2,98 +2,80 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Text;
-using CommonFrameworks.Collections;
-using CommonFrameworks.Components;
-using CommonFrameworks.Extensions;
-using CommonFrameworks.Maths;
-using GameplayAbilities.Attributes.Evaluation;
 using GameplayAbilities.Modifiers;
-using SaintsField;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace GameplayAbilities.Attributes {
     [RequireComponent(typeof(ModifierEnvironment)), AddComponentMenu("")]
-    public sealed class AttributeSet : Module, IAttributeReader, IModifiable {
-        private TrieDictionary<AttributeKey, char, Node> Attributes { get; } =
-            new TrieDictionary<AttributeKey, char, Node>('/');
+    public sealed class AttributeSet : MonoBehaviour, IAttributeReader, IModifiable {
+        private IDictionary<GameplayAttributeType, Value> Attributes { get; } =
+            new Dictionary<GameplayAttributeType, Value>();
 
-        [field: SerializeField] private AttributeTable? DefaultBaseAttributes { get; set; }
+        private IDictionary<GameplayAttributeType, Action<GameplayAttributeType, AttributeChange>> Observers { get; } =
+            new Dictionary<GameplayAttributeType, Action<GameplayAttributeType, AttributeChange>>();
 
-        [field: SerializeField, Required]
-        [field: InfoBox(
-            "Attribute values are approximated by this after change." +
-            "You can overwrite this in specific attribute types."
-        )]
-        private AttributeApproximator Approximator { get; set; } = new AttributeApproximator();
+        [NotNull] [field: SerializeField] private GameObject? Owner { get; set; }
+
+        [field: SerializeField]
+        private GameplayAttributeType.ApproximationPolicy DefaultRoundingPolicy { get; set; } =
+            GameplayAttributeType.ApproximationPolicy.RoundToNearest;
 
         [NotNull] private ModifierEnvironment? ModifierEnvironment { get; set; }
 
-        public event UnityAction<AttributeKey, AttributeChange> OnAnyAttributeUpdated = delegate { };
+        public event UnityAction<GameplayAttributeType, AttributeChange> OnAnyAttributeUpdated = delegate { };
 
-        protected override void Awake() {
-            base.Awake();
-            this.ModifierEnvironment = this.GetOrAddComponent<ModifierEnvironment>();
+        private void Awake() {
             this.ModifierEnvironment.OnModifierUpdated += this.Evaluate;
-            if (this.Attributes.Count == 0 && this.DefaultBaseAttributes) {
-                this.DefaultBaseAttributes.Initialise(this);
+        }
+
+        private void Evaluate(GameplayAttributeType key) {
+            if (!this.Attributes.TryGetValue(key, out Value oldValue)) {
+                return;
+            }
+
+            AttributeQuery query = new AttributeQuery(this, key, oldValue.Base);
+            this.ModifierEnvironment.Query(ref query);
+            double current = query.Evaluate();
+            this.Attributes[key] = oldValue with { Current = current, Effective = key.Approximate(current) };
+            AttributeValue old = new AttributeValue(oldValue.Base, oldValue.Effective, oldValue.Current);
+            AttributeChange change = new AttributeChange(old, this.Query(key));
+            this.OnAnyAttributeUpdated.Invoke(key, change);
+            if (this.Observers.TryGetValue(key, out Action<GameplayAttributeType, AttributeChange> observer)) {
+                observer.Invoke(key, change);
             }
         }
 
-        private void Evaluate(AttributeKey key) {
-            if (!this.Attributes.TryGetValue(key, out Node node)) {
-                node = this.AddNode(key, 0);
-            }
-
-            this.Attributes[key].Value = this.QueryExact(key, node.BaseValue, node.MaxValue, node.MinValue);
+        public AttributeValue Query(GameplayAttributeType key) {
+            return this.Attributes.TryGetValue(key, out Value value)
+                    ? new AttributeValue(value.Base, value.Effective, value.Current)
+                    : AttributeValue.Zero;
         }
 
-        private double QueryExact(
-            AttributeKey key, double @base, IEvaluable<IAttributeReader>? max, IEvaluable<IAttributeReader>? min
-        ) {
-            AttributeQuery query = new AttributeQuery(this.Owner, this, key, @base);
-            this.ModifierEnvironment.Query(ref query, max, min);
-            return query.Value;
+        public double QueryMax(GameplayAttributeType key) {
+            return this.Attributes.ContainsKey(key) ? key.Approximate(key.Clamp(int.MaxValue, this)) : int.MaxValue;
         }
 
-        public double Query(AttributeKey key) {
-            return this.Attributes.TryGetValue(key, out Node node) ? node.EffectiveValue : 0;
+        public double QueryMin(GameplayAttributeType key) {
+            return this.Attributes.ContainsKey(key) ? key.Approximate(key.Clamp(int.MinValue, this)) : int.MinValue;
         }
 
-        public double QueryMax(AttributeKey key) {
-            if (!this.Attributes.TryGetValue(key, out Node node)) {
-                return int.MaxValue;
+        public bool HasAtLeast(double threshold, GameplayAttributeType key) {
+            return this.Attributes.TryGetValue(key, out Value value) && value.Effective >= threshold;
+        }
+
+        public bool HasAtMost(double cap, GameplayAttributeType key) {
+            return this.Attributes.TryGetValue(key, out Value value) && value.Effective <= cap;
+        }
+
+        private void SetBase(GameplayAttributeType key, double value) {
+            if (!this.Attributes.TryGetValue(key, out Value v)) {
+                this.Attributes.Add(key, new Value(value, 0, 0));
+            } else {
+                this.Attributes[key] = v with { Base = value };
             }
             
-            double result = node.MaxValue?.Evaluate(this) ?? int.MaxValue;
-            return node.Approximator?.Approximate(result) ?? this.Approximator.Approximate(result);
-        }
-
-        public double QueryMin(AttributeKey key) {
-            if (!this.Attributes.TryGetValue(key, out Node node)) {
-                return int.MinValue;
-            }
-
-            double result = node.MinValue?.Evaluate(this) ?? int.MinValue;
-            return node.Approximator?.Approximate(result) ?? this.Approximator.Approximate(result);
-        }
-
-        public bool HasAtLeast(double threshold, AttributeKey key) {
-            return this.Attributes.TryGetValue(key, out Node node) && node.EffectiveValue >= threshold;
-        }
-
-        public bool HasAtMost(double cap, AttributeKey key) {
-            return this.Attributes.TryGetValue(key, out Node node) && node.EffectiveValue <= cap;
-        }
-
-        private void SetBase(AttributeKey key, double value) {
-            if (!this.Attributes.TryGetValue(key, out Node node)) {
-                node = this.AddNode(key, value);
-            }
-
-            node.BaseValue = value;
             this.Evaluate(key);
         }
 
@@ -101,52 +83,50 @@ namespace GameplayAbilities.Attributes {
             this.Attributes.Clear();
         }
 
-        internal void Initialise(AttributeType type, double value) {
-            if (this.Attributes.ContainsKey(type.Id)) {
+        internal void Initialise(GameplayAttributeType type, double value) {
+            if (this.Attributes.ContainsKey(type)) {
 #if DEBUG
                 Debug.LogError($"Attribute {type.Id} is already initialised", this.Owner);
 #endif
             } else {
-                this.AddNode(type.Id, value, type);
-                this.Evaluate(type.Id);
+                this.Attributes.Add(type, new Value(value, 0, 0));
+                this.Evaluate(type);
 #if DEBUG
-                Debug.Log($"Attribute {type.Id} initialised to {this.Query(type.Id)}", this.Owner);
+                Debug.Log($"Attribute {type.Id} initialised to {this.Query(type).Value}", this.Owner);
 #endif
             }
         }
-
-        private Node AddNode(AttributeKey key, double value, AttributeType? type = null) {
-            Node node = new Node(this, key, value, type);
-            node.OnValueChanged += this.OnAttributeUpdated;
-            return node;
-        }
-
-        private void OnAttributeUpdated(AttributeKey key, AttributeChange change) {
-            this.OnAnyAttributeUpdated.Invoke(key, change);
-        }
-
-        public void Observe(AttributeKey attribute, Action<AttributeKey, AttributeChange> callback) {
-            if (this.Attributes.TryGetValue(attribute, out Node node)) {
-                node.OnValueChanged += callback;
+        
+        public void Observe(GameplayAttributeType attribute, Action<GameplayAttributeType, AttributeChange> callback) {
+            if (!this.Observers.TryAdd(attribute, callback)) {
+                this.Observers[attribute] += callback;
             }
         }
 
-        public void RemoveObserver(AttributeKey attribute, Action<AttributeKey, AttributeChange> callback) {
-            if (this.Attributes.TryGetValue(attribute, out Node node)) {
-                node.OnValueChanged -= callback;
+        public void RemoveObserver(GameplayAttributeType attribute, Action<GameplayAttributeType, AttributeChange> callback) {
+            if (!this.Observers.TryGetValue(attribute, out Action<GameplayAttributeType, AttributeChange>? observer)) {
+                return;
             }
+
+            Action<GameplayAttributeType, AttributeChange>? action = observer - callback;
+            if (action is null) {
+                this.Observers.Remove(attribute);
+                return;
+            }
+
+            this.Observers[attribute] = action;
         }
 
-        public IEnumerator<Attribute> GetEnumerator() {
-            foreach ((AttributeKey key, Node node) in this.Attributes) {
-                yield return new Attribute(this, key, node.EffectiveValue);
+        public IEnumerator<GameplayAttribute> GetEnumerator() {
+            foreach ((GameplayAttributeType key, Value value) in this.Attributes) {
+                yield return new GameplayAttribute(key, new AttributeValue(value.Base, value.Effective, value.Current));
             }
         }
 
         public override string ToString() {
             StringBuilder sb = new StringBuilder($"Attributes on {this.gameObject.name}:\n", this.Attributes.Count + 1);
-            foreach (KeyValuePair<AttributeKey, Node> entry in this.Attributes) {
-                sb.AppendLine($"|{entry.Key}: {entry.Value.EffectiveValue}");
+            foreach (KeyValuePair<GameplayAttributeType, Value> entry in this.Attributes) {
+                sb.AppendLine($"|{entry.Key}: {entry.Value.Effective}");
             }
 
             return sb.ToString();
@@ -156,94 +136,14 @@ namespace GameplayAbilities.Attributes {
             return this.GetEnumerator();
         }
 
-        void IModifiable.AddModifier(Modifier modifier) {
+        void IModifiable.AddModifier(GameplayAttributeType target, Modifier modifier) {
             if (modifier.Type == ModifierType.SetBase) {
-                this.SetBase(modifier.Target, modifier.Value);
+                this.SetBase(target, modifier.Value);
             } else {
-                this.ModifierEnvironment.AddModifier(modifier);
+                this.ModifierEnvironment.AddModifier(target, modifier);
             }
         }
 
-        private sealed class Node {
-            private double value;
-
-            private AttributeSet Owner { get; }
-            private AttributeKey Key { get; }
-            internal double BaseValue { get; set; }
-            internal IEvaluable<IAttributeReader>? MinValue { get; }
-            internal IEvaluable<IAttributeReader>? MaxValue { get; }
-            internal AttributeApproximator? Approximator { get; }
-            private AttributeCalculator? Derivation { get; }
-
-            internal double Value {
-                get => this.value;
-                set {
-                    if (this.value - value == 0) {
-                        return;
-                    }
-                    
-                    double old = this.Value;
-                    this.value = value;
-                    this.OnValueChanged.Invoke(this.Key, new AttributeChange(old, this.Value));
-                    this.EffectiveValue = this.Approximator?.Approximate(this.Value) ??
-                                          this.Owner.Approximator.Approximate(this.Value);
-                }
-            }
-
-            internal double EffectiveValue { get; private set; }
-            
-            internal event Action<AttributeKey, AttributeChange> OnValueChanged = delegate { };
-
-            private void Reevaluate() {
-                if (this.Derivation is not null && this.Derivation.Exists) {
-                    this.Owner.SetBase(this.Key, this.Derivation.Evaluate(this.Owner));
-                } else {
-                    this.Owner.Evaluate(this.Key);
-                }
-            }
-            
-            private void OnDependencyChange(AttributeKey k, AttributeChange change) {
-                this.Reevaluate();
-            }
-            
-            internal Node(AttributeSet owner, AttributeKey key, double initialValue, AttributeType? definition = null) {
-                this.Owner = owner;
-                this.Key = key;
-                this.BaseValue = initialValue;
-                this.MinValue = definition?.MinValue;
-                this.MaxValue = definition?.MaxValue;
-                this.Approximator = definition?.ApproximatorOverride;
-                this.Derivation = definition?.Derivation;
-                IEnumerable<object> dependencies = Enumerable.Empty<object>();
-                if (this.Derivation is not null) {
-                    dependencies = dependencies.Concat(this.Derivation.DependentParameters);
-                }
-
-                if (this.MinValue is not null) {
-                    dependencies = dependencies.Concat(this.MinValue.DependentParameters);
-                }
-                
-                if (this.MaxValue is not null) {
-                    dependencies = dependencies.Concat(this.MaxValue.DependentParameters);
-                }
-                
-                foreach (object param in dependencies.Distinct()) {
-                    switch (param) {
-                        case AttributeKey k:
-                            owner.Observe(k, this.OnDependencyChange);
-                            break;
-                        case string id:
-                            owner.Observe(id, this.OnDependencyChange);
-                            break;
-                        case AttributeType attribute:
-                            owner.Observe(attribute.Id, this.OnDependencyChange);
-                            break;
-                    }
-                }
-
-                owner.Attributes.Add(key, this);
-                this.Reevaluate();
-            }
-        }
+        private readonly record struct Value(double Base, double Current, double Effective);
     }
 }

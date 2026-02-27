@@ -1,24 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using GameplayAbilities.Attributes;
 using GameplayAbilities.Modifiers;
-using SaintsField;
 using UnityEngine;
 
 namespace GameplayAbilities.Effects {
     [Serializable]
     internal sealed class EffectModifierPreset {
-        [field: SerializeField, FieldLabelText(nameof(this.LabelModifier), true)]
-        private List<ModifierConfig> Modifiers { get; set; } = new List<ModifierConfig>();
+        [field: SerializeField] private List<ModifierConfig> Modifiers { get; set; } = new List<ModifierConfig>();
 
         private string LabelModifier(ModifierConfig config) {
             return $"<b>{config}</b>";
         }
 
-        internal IEnumerable<Modifier> Apply(
+        internal IEnumerable<KeyValuePair<GameplayAttributeType, Modifier>> Apply(
             IEffectEmitterFacade source, IEffectReceiverFacade target, IReadOnlyDictionary<string, double>? userData
         ) {
             foreach (ModifierConfig config in this.Modifiers) {
-                yield return config.Instantiate(source, target, userData);
+                if (!config.Target) {
+                    continue;
+                }
+                
+                Modifier modifier = config.Instantiate(source, target, userData);
+                foreach (GameplayAttributeType t in config.Target.Resolve()) {
+                    yield return new KeyValuePair<GameplayAttributeType, Modifier>(t, modifier);
+                }
             }
         }
     }

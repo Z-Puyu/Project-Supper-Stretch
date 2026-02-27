@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using GameplayAbilities.Abilities;
+using GameplayAbilities.Attributes;
 using GameplayAbilities.Modifiers;
-using GameplayKeywords;
-using SaintsField;
-using SaintsField.Playa;
 using UnityEngine;
 
 namespace GameplayAbilities.Effects {
@@ -14,43 +12,35 @@ namespace GameplayAbilities.Effects {
     public sealed class Effect : ScriptableObject {
         internal enum Type { Instant, Periodic, Persistent }
 
-        [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))]
-        internal string Tag { get; private set; } = string.Empty;
-
         [field: SerializeField] internal Type Periodicity { get; private set; } = Type.Instant;
 
-        [field: SerializeField, HideIf(nameof(this.IsInstant))]
+        [field: SerializeField]
         [field: Tooltip("Whether the effect should run forever until explicitly removed?")]
         internal bool IsInfinite { get; private set; }
 
-        [field: SerializeField, MinValue(0), EndText("seconds")]
-        [field: ReadOnly(nameof(this.IsPeriodic)), HideIf(nameof(this.IsInstant), nameof(this.IsInfinite))]
+        [field: SerializeField]
         private float Duration { get; set; }
 
-        [field: SerializeField, MinValue(1), EndText("ticks")]
-        [field: ShowIf(nameof(this.IsPeriodic), nameof(this.IsFinite))]
+        [field: SerializeField]
         private int PeriodCount { get; set; } = 1;
 
-        [field: SerializeField, MinValue(0), EndText("seconds"), ShowIf(nameof(this.IsPeriodic))]
+        [field: SerializeField]
         [field: Tooltip("If 0, the effect applies once per frame and modifiers are interpreted as per-second values")]
         private float Interval { get; set; }
 
-        [field: SerializeField, ShowIf(nameof(this.IsPeriodic))]
+        [field: SerializeField]
         private bool ShouldExecuteBeforeFirstInterval { get; set; }
 
-        [field: SerializeField] private EffectKeywordPreset KeywordPreset { get; set; } = new EffectKeywordPreset();
-
-        [field: SerializeField, SaintsRow(true)]
+        [field: SerializeField]
         private EffectModifierPreset ModifierPreset { get; set; } = new EffectModifierPreset();
 
-        [field: SerializeField, Table]
+        [field: SerializeField]
         private List<EffectDescriptor> TargetRemovesEffects { get; set; } = new List<EffectDescriptor>();
 
         private bool IsFinite => !this.IsInfinite;
         private bool IsInstant => this.Periodicity == Type.Instant;
         private bool IsPeriodic => this.Periodicity == Type.Periodic;
         private bool IsContinuous => this.Periodicity == Type.Persistent;
-        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.FetchLeaves<EffectTagSheet>();
 
         /// <summary>
         /// Applies the effect.
@@ -69,18 +59,18 @@ namespace GameplayAbilities.Effects {
                     target.StopEffects(descriptor);
                 }
 
-                Modifier[] modifiers = this.ModifierPreset.Apply(source, target, userData).ToArray();
-                this.KeywordPreset.Apply(source, target);
+                KeyValuePair<GameplayAttributeType, Modifier>[] modifiers =
+                        this.ModifierPreset.Apply(source, target, userData).ToArray();
                 if (this.Periodicity != Type.Periodic || this.ShouldExecuteBeforeFirstInterval) {
-                    foreach (Modifier modifier in modifiers) {
-                        target.AddModifier(modifier);
+                    foreach ((GameplayAttributeType t, Modifier modifier) in modifiers) {
+                        target.AddModifier(t, modifier);
                     }
                 } else {
                     CancellationToken interrupt = target.Register(new EffectDescriptor(this, sourceAbility));
                     try {
                         await this.RunAsynchronously(target, modifiers, interrupt);
                     } catch (OperationCanceledException) {
-                        this.KeywordPreset.Revoke(source, target);
+
                     }
                 }
             } catch (Exception e) {
@@ -89,15 +79,16 @@ namespace GameplayAbilities.Effects {
         }
 
         private async Awaitable RunAsynchronously(
-            IEffectReceiverFacade target, Modifier[] modifiers, CancellationToken interrupt
+            IEffectReceiverFacade target, KeyValuePair<GameplayAttributeType, Modifier>[] modifiers,
+            CancellationToken interrupt
         ) {
             switch (this.Periodicity) {
                 case Type.Persistent:
                     try {
                         await Awaitable.WaitForSecondsAsync(this.Duration, interrupt);
                     } finally {
-                        foreach (Modifier modifier in modifiers) {
-                            target.AddModifier(-modifier);
+                        foreach ((GameplayAttributeType t, Modifier modifier) in modifiers) {
+                            target.AddModifier(t, -modifier);
                         }
                     }
 
@@ -108,14 +99,14 @@ namespace GameplayAbilities.Effects {
                         if (this.Interval <= 0) {
                             while (!interrupt.IsCancellationRequested) {
                                 await Awaitable.NextFrameAsync(interrupt);
-                                foreach (Modifier modifier in modifiers) {
-                                    target.AddModifier(modifier * Time.deltaTime);
+                                foreach ((GameplayAttributeType t, Modifier modifier) in modifiers) {
+                                    target.AddModifier(t, modifier * Time.deltaTime);
                                 }
                             }
                         } else {
                             await Awaitable.WaitForSecondsAsync(this.Interval, interrupt);
-                            foreach (Modifier modifier in modifiers) {
-                                target.AddModifier(modifier);
+                            foreach ((GameplayAttributeType t, Modifier modifier) in modifiers) {
+                                target.AddModifier(t, modifier);
                             }
                         }
 

@@ -1,17 +1,29 @@
-using UnityEngine;
+using System.Linq;
+using GameplayAbilities.Modifiers;
 
 namespace GameplayAbilities.Attributes {
-    internal ref struct AttributeQuery {
-        internal GameObject SourceObject { get; }
+    internal readonly ref struct AttributeQuery {
         internal IAttributeReader Source { get; }
-        internal AttributeKey Id { get; }
-        internal double Value { get; set; }
+        internal GameplayAttributeType AttributeType { get; }
+        private double BaseValue { get; }
+        
+        internal Modifier[] Modifiers { get; } = {
+            Modifier.ZeroShift, Modifier.ZeroMultiplier, Modifier.ZeroOffset, Modifier.ZeroOffset
+        };
 
-        internal AttributeQuery(GameObject sourceObject, IAttributeReader source, AttributeKey id, double value) {
-            this.SourceObject = sourceObject;
+        internal double Evaluate() {
+            double result = this.BaseValue;
+            foreach (Modifier modifier in this.Modifiers) {
+                result = this.AttributeType.Clamp(modifier.Modify(result), this.Source);
+            }
+            
+            return result;
+        }
+
+        internal AttributeQuery(IAttributeReader source, GameplayAttributeType id, double value = 0) {
             this.Source = source;
-            this.Id = id;
-            this.Value = value;
+            this.AttributeType = id;
+            this.BaseValue = value;
         }
     }
 }

@@ -1,11 +1,13 @@
 using System;
 
 namespace GameplayAbilities.Attributes {
-    public readonly record struct AttributeChange(double OldValue, double NewValue, double Delta) {
+    public readonly record struct AttributeChange(AttributeValue OldValue, AttributeValue NewValue, double Delta) {
         public bool IsNegligible => Math.Abs(this.Delta) < 0.001;
-        
-        internal AttributeChange(double oldValue, double newValue) : this(oldValue, newValue, newValue - oldValue) { }
-        
+
+        internal AttributeChange(AttributeValue oldValue, AttributeValue newValue) : this(
+            oldValue, newValue, newValue.Value - oldValue.Value
+        ) { }
+
         public static bool operator >(AttributeChange change, double threshold) {
             return change.Delta > threshold;
         }

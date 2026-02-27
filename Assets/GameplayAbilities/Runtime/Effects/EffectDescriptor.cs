@@ -1,7 +1,5 @@
 ﻿using System;
 using GameplayAbilities.Abilities;
-using GameplayKeywords;
-using SaintsField;
 using UnityEngine;
 
 namespace GameplayAbilities.Effects {
@@ -10,15 +8,13 @@ namespace GameplayAbilities.Effects {
         [field: SerializeField] private Ability? SourceAbility { get; set; }
         [field: SerializeField] private Effect? SourceEffect { get; set; } = null;
         
-        [field: SerializeField, TreeDropdown(nameof(this.AllKeywords))] 
+        [field: SerializeField] 
         private string Tag { get; set; }
         
-        private AdvancedDropdownList<string> AllKeywords => KeywordUtils.Fetch<EffectTagSheet>();
-
         internal EffectDescriptor(Effect? effect, Ability? ability = null) {
             this.SourceAbility = ability;
             this.SourceEffect = effect;
-            this.Tag = effect ? effect.Tag : string.Empty;
+            this.Tag = string.Empty;
         }
         
         internal EffectDescriptor(string tag, Ability? ability = null) {

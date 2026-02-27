@@ -2,7 +2,6 @@
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Attributes.Evaluation;
 using GameplayAbilities.Modifiers;
-using SaintsField;
 using UnityEngine;
 
 namespace GameplayAbilities.Abilities {
@@ -20,14 +19,15 @@ namespace GameplayAbilities.Abilities {
         }
         
         [field: SerializeField] private Verdict BenchmarkScheme { get; set; } = Verdict.HasEnough;
+        [field: SerializeField] private GameplayAttributeType? CostAttribute { get; set; }
         [field: SerializeReference] private IAttributeMagnitude? Amount { get; set; } = new Constant();
         
-        [field: SerializeField, TreeDropdown(nameof(this.AllAttributes))] 
-        private string CostAttribute { get; set; } = string.Empty;
-
-        private AdvancedDropdownList<string> AllAttributes => AttributeUtils.GetLeafAttributes();
         
         internal bool IsAffordable(IAttributeReader consumer) {
+            if (!this.CostAttribute) {
+                return true;
+            }
+            
             double cost = this.Amount?.Evaluate(consumer) ?? 0;
             const double d = 0.001;
             return this.BenchmarkScheme switch {
@@ -48,6 +48,10 @@ namespace GameplayAbilities.Abilities {
         }
         
         internal void Spend(IAttributeReader consumer, IModifiable wallet) {
+            if (!this.CostAttribute) {
+                return;
+            }
+            
             double cost = this.Amount?.Evaluate(consumer) ?? 0;
             double change = this.BenchmarkScheme switch {
                 Verdict.HasEnough or Verdict.MoreThanEnough or Verdict.HasAny => -cost,
@@ -55,7 +59,7 @@ namespace GameplayAbilities.Abilities {
                 var _ => 0
             };
             
-            wallet.AddModifier(new Modifier(this.CostAttribute, ModifierType.Offset, ModifierValue.Of(change)));
+            wallet.AddModifier(this.CostAttribute, new Modifier(ModifierType.Offset, change));
         }
     }
 }
