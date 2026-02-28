@@ -6,7 +6,6 @@ using SaintsField.Editor.Core;
 using SaintsField.Editor.Drawers.HandleDrawers;
 using SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer;
 using SaintsField.Editor.Utils;
-using SaintsField.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;

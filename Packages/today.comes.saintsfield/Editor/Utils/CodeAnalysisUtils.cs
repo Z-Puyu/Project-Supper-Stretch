@@ -1,10 +1,6 @@
 using System;
 using System.Collections.Generic;
-using SaintsField.Editor.Linq;
 using System.Linq;
-using UnityEditor;
-using UnityEditor.Build;
-using UnityEngine;
 
 #if SAINTSFIELD_CODE_ANALYSIS
 using Microsoft.CodeAnalysis;

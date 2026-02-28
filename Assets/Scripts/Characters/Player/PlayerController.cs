@@ -1,15 +1,10 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
 using CommonFrameworks.Components;
 using GameplayBehaviours.Movement;
 using SaintsField;
 using SaintsField.Playa;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
-using Module = CommonFrameworks.Components.Module;
 
 namespace Characters.Player {
     [DisallowMultipleComponent, RequireComponent(typeof(ModularEntity))]

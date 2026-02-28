@@ -1,6 +1,5 @@
 #if UNITY_2022_2_OR_NEWER
 using SaintsField.Editor.Utils;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SaintsField.Editor.Drawers.SaintsInterfacePropertyDrawer

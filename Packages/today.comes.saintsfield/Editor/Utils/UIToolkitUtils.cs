@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using SaintsField.Editor.Drawers.EnumFlagsDrawers.FlagsDropdownDrawer;
 using SaintsField.Editor.Drawers.TreeDropdownDrawer;
 using SaintsField.Editor.Playa.Renderer.BaseRenderer;
 using SaintsField.Interfaces;

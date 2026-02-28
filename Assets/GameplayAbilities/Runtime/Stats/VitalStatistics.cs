@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using GameplayAbilities.Abilities;
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Effects;
 using UnityEngine;

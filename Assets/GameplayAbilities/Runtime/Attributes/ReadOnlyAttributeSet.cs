@@ -1,18 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace GameplayAbilities.Attributes {
     public sealed class ReadOnlyAttributeSet : IAttributeReader {
-        private IDictionary<GameplayAttributeType, Entry> Attributes { get; } =
-            new Dictionary<GameplayAttributeType, Entry>();
+        private IReadOnlyDictionary<GameplayAttributeType, Entry> Attributes { get; }
 
         public ReadOnlyAttributeSet(IAttributeReader attributes) {
-            foreach (GameplayAttribute attribute in attributes) {
-                this.Attributes.Add(
-                    attribute.Type,
-                    new Entry(attribute.Value, attributes.QueryMax(attribute.Type), attributes.QueryMin(attribute.Type))
-                );
-            }
+            this.Attributes = new ReadOnlyDictionary<GameplayAttributeType, Entry>(
+                attributes.ToDictionary(
+                    attribute => attribute.Type,
+                    attribute => new Entry(
+                        attribute.Value, attributes.QueryMax(attribute.Type), attributes.QueryMin(attribute.Type)
+                    )
+                )
+            );
         }
         
         public AttributeValue Query(GameplayAttributeType key) {

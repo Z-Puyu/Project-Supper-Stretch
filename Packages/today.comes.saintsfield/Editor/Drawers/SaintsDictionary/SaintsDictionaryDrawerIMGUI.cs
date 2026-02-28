@@ -10,7 +10,6 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.Events;
-using Object = UnityEngine.Object;
 
 namespace SaintsField.Editor.Drawers.SaintsDictionary
 {

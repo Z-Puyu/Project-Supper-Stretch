@@ -37,7 +37,7 @@ namespace GameplayAbilities.Modifiers {
         internal void Query(ref AttributeQuery query) {
             if (this.Modifiers.TryGetValue(query.AttributeType, out Node node)) {
                 foreach (Modifier modifier in node) {
-                    query.Modifiers[modifier.Priority] += modifier.Value;
+                    query.AddModifier(modifier);
                 }
             }
             

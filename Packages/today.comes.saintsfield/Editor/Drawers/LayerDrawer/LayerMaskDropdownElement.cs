@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using SaintsField.Editor.UIToolkitElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 #if UNITY_2021_3_OR_NEWER

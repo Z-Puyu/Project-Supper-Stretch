@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using SaintsField.Playa;
-using UnityEngine;
 
 namespace SaintsField.Samples.Scripts
 {

@@ -1,16 +1,21 @@
-using System.Linq;
 using GameplayAbilities.Modifiers;
 
 namespace GameplayAbilities.Attributes {
     internal readonly ref struct AttributeQuery {
-        internal IAttributeReader Source { get; }
+        private IAttributeReader Source { get; }
         internal GameplayAttributeType AttributeType { get; }
         private double BaseValue { get; }
         
-        internal Modifier[] Modifiers { get; } = {
+        private Modifier[] Modifiers { get; } = {
             Modifier.ZeroShift, Modifier.ZeroMultiplier, Modifier.ZeroOffset, Modifier.ZeroOffset
         };
 
+        internal AttributeQuery(IAttributeReader source, GameplayAttributeType type, double value = 0) {
+            this.Source = source;
+            this.AttributeType = type;
+            this.BaseValue = value;
+        }
+        
         internal double Evaluate() {
             double result = this.BaseValue;
             foreach (Modifier modifier in this.Modifiers) {
@@ -19,11 +24,9 @@ namespace GameplayAbilities.Attributes {
             
             return result;
         }
-
-        internal AttributeQuery(IAttributeReader source, GameplayAttributeType id, double value = 0) {
-            this.Source = source;
-            this.AttributeType = id;
-            this.BaseValue = value;
+        
+        internal void AddModifier(Modifier modifier) {
+            this.Modifiers[modifier.Priority] += modifier.Value;
         }
     }
 }

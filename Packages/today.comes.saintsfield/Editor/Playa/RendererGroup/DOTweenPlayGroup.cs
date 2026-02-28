@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using SaintsField.Editor.Playa.Renderer;
-using SaintsField.Editor.Playa.Renderer.EmptyFakeRenderer;
-#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
+﻿#if DOTWEEN && !SAINTSFIELD_DOTWEEN_DISABLED
 using System;
 using System.Collections.Generic;
 using System.Reflection;

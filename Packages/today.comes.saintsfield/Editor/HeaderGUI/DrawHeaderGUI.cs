@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SaintsField.ComponentHeader;
-using SaintsField.Editor.Core;
 using SaintsField.Editor.HeaderGUI.Drawer;
 using SaintsField.Editor.Utils;
 using UnityEditor;

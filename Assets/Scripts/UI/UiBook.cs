@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using CommonFrameworks.Utilities;
-using UnityEngine;
 
 namespace UI {
     public sealed class UiBook : Singleton<UiBook> {

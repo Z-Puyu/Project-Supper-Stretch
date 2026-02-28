@@ -2,7 +2,6 @@
 using System.Collections;
 using SaintsField.Editor;
 using SaintsField.Playa;
-using UnityEditor;
 
 namespace SaintsField.Samples.EditorTest
 {

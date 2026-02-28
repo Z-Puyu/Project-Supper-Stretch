@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using UnityEngine.UIElements;
+﻿using UnityEngine.UIElements;
 
 namespace CommonFrameworks.Editor.CustomControls {
     internal sealed class DropdownMenuOption : CommonControl {

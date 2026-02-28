@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace CommonFrameworks.Editor.Utils {
     public static class ReflectionExtensions {

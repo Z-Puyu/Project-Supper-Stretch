@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using SaintsField.Playa;
 #if UNITY_EDITOR
 using SaintsField.SaintsXPathParser;
 #endif
-using SaintsField.Samples.Scripts.SaintsEditor;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.EPathExample

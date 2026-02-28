@@ -1,8 +1,6 @@
 #if UNITY_EDITOR
-using UnityEditor;
 #endif
 
-using System;
 using UnityEngine;
 
 namespace SaintsField.Samples.Scripts

@@ -1,5 +1,4 @@
 using SaintsField.ScriptableRenderer;
-using UnityEngine;
 
 namespace SaintsField.Samples.Scripts.ScriptableRenderer
 {

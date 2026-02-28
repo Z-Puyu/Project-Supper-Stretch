@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using CommonFrameworks.Editor.PropertyAttributes;
 using CommonFrameworks.Editor.Serialisation;
-using CommonFrameworks.Editor.Utils;
 using CommonFrameworks.Extensions;
 using SaintsField;
 using SaintsField.Playa;

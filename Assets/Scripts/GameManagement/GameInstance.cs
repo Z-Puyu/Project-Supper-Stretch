@@ -1,5 +1,4 @@
-﻿using System;
-using CommonFrameworks.Utilities;
+﻿using CommonFrameworks.Utilities;
 using SaintsField;
 using SaveAndLoad;
 using UnityEngine;

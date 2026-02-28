@@ -5,7 +5,6 @@ using System.Reflection;
 using GameplayAbilities.EditorTooling;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
@@ -104,14 +103,11 @@ namespace GameplayAbilities.Editor {
                 
                 property.managedReferenceValue = type == null ? null : Activator.CreateInstance(type);
                 property.serializedObject.ApplyModifiedProperties();
-                container.Q<Button>().text = string.IsNullOrEmpty(property.managedReferenceFullTypename)
-                        ? "-"
-                        : UiToolkitPropertyDrawer.GetTypeName(property);
                 container.value = type is not null;
             };
             
             // Calculate position relative to the button
-            Rect menuRect = container.worldBound;
+            Rect menuRect = container.Q<Button>().worldBound;
             dropdown.Show(menuRect);
             return;
             
