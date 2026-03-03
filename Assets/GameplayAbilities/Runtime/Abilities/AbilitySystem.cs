@@ -135,6 +135,18 @@ namespace GameplayAbilities.Abilities {
             interrupter.Cancel();
         }
 
+        /// <summary>
+        /// Tries to get the ability resource with the given key.
+        /// </summary>
+        /// <param name="key">The key of the resource to get.</param>
+        /// <param name="resource">The resource to get.</param>
+        /// <typeparam name="T">The type of the resource to get.</typeparam>
+        /// <returns><c>true</c> if the resource was found; otherwise, <c>false</c>.</returns>
+        public bool HasAbilityResource<T>(AbilityResourceKey<T> key, [NotNullWhen(true)] out T? resource)
+                where T : IAbilityResource {
+            return this.ResourceContainer.HasResource(key, out resource);
+        }
+
         public bool IsRunningAbility(Ability ability) {
             return this.RunningAbilities.ContainsKey(ability);
         }

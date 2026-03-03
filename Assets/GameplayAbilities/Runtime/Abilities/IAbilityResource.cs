@@ -1,3 +1,3 @@
 ﻿namespace GameplayAbilities.Abilities {
-    internal interface IAbilityResource { }
+    public interface IAbilityResource { }
 }
