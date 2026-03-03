@@ -1,4 +1,3 @@
-using System;
 using GameplayAbilities.Modifiers;
 
 namespace GameplayAbilities.Attributes {

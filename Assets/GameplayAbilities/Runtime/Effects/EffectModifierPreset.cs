@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GameplayAbilities.Attributes;
+using GameplayAbilities.Common;
 using GameplayAbilities.Modifiers;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ namespace GameplayAbilities.Effects {
         }
 
         internal IEnumerable<KeyValuePair<GameplayAttributeType, Modifier>> Apply(
-            IAttributeReader source, IAttributeReader target, IReadOnlyDictionary<string, double>? userData = null
+            IAttributeReader source, IAttributeReader target, IUserData? userData = null
         ) {
             foreach (ModifierConfig config in this.Modifiers) {
                 if (!config.Target) {

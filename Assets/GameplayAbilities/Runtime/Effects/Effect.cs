@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using GameplayAbilities.Abilities;
 using GameplayAbilities.Attributes;
+using GameplayAbilities.Common;
 using GameplayAbilities.Effects.Schedulers;
 using GameplayAbilities.Modifiers;
 using GameplayAbilities.Runtime.EditorTooling;
@@ -16,12 +17,9 @@ namespace GameplayAbilities.Effects {
         [field: SerializeField]
         private EffectModifierPreset ModifierPreset { get; set; } = new EffectModifierPreset();
 
-        [field: SerializeField]
-        private List<EffectDescriptor> TargetRemovesEffects { get; set; } = new List<EffectDescriptor>();
-
         Awaitable IEffect.Execute(
-            EffectExecutionContext context, ModifierEnvironment target, 
-            AbilityExecutionUserData? userData, CancellationToken interrupt
+            EffectExecutionContext context, ModifierEnvironment target,
+            IUserData? userData, CancellationToken interrupt
         ) {
             KeyValuePair<GameplayAttributeType, Modifier>[] modifiers = this.ModifierPreset.Apply(
                 context.SourceAttributes, context.TargetAttributes, userData

@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using GameplayAbilities.Attributes;
+using GameplayAbilities.Common;
 using GameplayAbilities.Effects;
 using GameplayAbilities.Modifiers;
 using UnityEngine;
@@ -55,7 +56,7 @@ namespace GameplayAbilities.Abilities {
             return this.AvailableAbilities.Remove(ability);
         }
 
-        internal bool TrySpend(IEnumerable<Cost> costs, AbilityExecutionUserData? userData) {
+        internal bool TrySpend(IEnumerable<Cost> costs, IUserData? userData) {
             Cost[] array = costs.ToArray();
             if (Array.Exists(array, cost => !cost.IsAffordable(this.AttributeSet))) {
                 return false;

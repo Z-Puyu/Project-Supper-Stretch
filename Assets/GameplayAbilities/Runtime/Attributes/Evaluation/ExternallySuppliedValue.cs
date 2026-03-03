@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GameplayAbilities.Common;
 using UnityEngine;
 
 namespace GameplayAbilities.Attributes.Evaluation {
@@ -9,8 +10,8 @@ namespace GameplayAbilities.Attributes.Evaluation {
         private string ValueKey { get; set; } = string.Empty;
 
         
-        public double Evaluate(IAttributeReader? attributes, IReadOnlyDictionary<string, double>? userData = null) {
-            return userData?.GetValueOrDefault(this.ValueKey, 0) ?? 0;
+        public double Evaluate(IAttributeReader? attributes, IUserData? userData = null) {
+            return userData?.ReadValue(this.ValueKey) ?? 0;
         }
         
         public override string ToString() {

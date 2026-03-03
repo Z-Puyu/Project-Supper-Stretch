@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using GameplayAbilities.Abilities.Predicate;
-using GameplayAbilities.Effects;
+using GameplayAbilities.Common;
 using GameplayAbilities.Runtime.EditorTooling;
 using UnityEngine;
 
@@ -27,7 +26,7 @@ namespace GameplayAbilities.Abilities {
                    Enumerable.Empty<AbilityResourceKey<T>>();
         }
 
-        internal bool TryCommit(AbilitySystem system, AbilityExecutionUserData? userData) {
+        internal bool TryCommit(AbilitySystem system, IUserData? userData) {
             foreach (IPredicate<AbilitySystem> condition in this.Conditions) {
                 if (condition.Holds(system)) {
                     continue;
@@ -39,7 +38,7 @@ namespace GameplayAbilities.Abilities {
             return system.TrySpend(this.Costs, userData);
         }
 
-        internal Awaitable Execute(AbilitySystem system, AbilityExecutionUserData? userData, CancellationToken interrupt) {
+        internal Awaitable Execute(AbilitySystem system, IUserData? userData, CancellationToken interrupt) {
             if (this.Execution is not null) {
                 return this.Execution.Execute(system, userData, interrupt);
             }

@@ -8,7 +8,7 @@ using UnityEngine.Events;
 
 namespace GameplayAbilities.Modifiers {
     [DisallowMultipleComponent]
-    public class ModifierEnvironment : MonoBehaviour, IModifiable {
+    public class ModifierEnvironment : MonoBehaviour {
         [field: SerializeField] private bool IsGlobalEnvironment { get; set; }
         [field: SerializeField] private ModifierEnvironment? ParentEnvironment { get; set; }
 

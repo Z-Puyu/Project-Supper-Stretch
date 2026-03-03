@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using GameplayAbilities.Abilities;
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Modifiers;
 using UnityEngine;

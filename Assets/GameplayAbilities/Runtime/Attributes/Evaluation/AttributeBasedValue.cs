@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using GameplayAbilities.Common;
 using UnityEngine;
 
 namespace GameplayAbilities.Attributes.Evaluation {
@@ -11,7 +12,7 @@ namespace GameplayAbilities.Attributes.Evaluation {
         [field: SerializeField] private double Coefficient { get; set; } = 1;
         [field: SerializeField] private double PostMultiplicationOffset { get; set; }
         
-        public double Evaluate(IAttributeReader? attributes, IReadOnlyDictionary<string, double>? userData = null) {
+        public double Evaluate(IAttributeReader? attributes, IUserData? userData = null) {
             if (!this.BackingAttribute) {
                 return 0;
             }

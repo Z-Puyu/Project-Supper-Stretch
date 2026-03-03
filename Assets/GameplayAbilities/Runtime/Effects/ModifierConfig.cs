@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Attributes.Evaluation;
+using GameplayAbilities.Common;
 using GameplayAbilities.Modifiers;
 using UnityEngine;
 
@@ -25,7 +26,7 @@ namespace GameplayAbilities.Effects {
         public ModifierConfig() { }
 
         internal Modifier Instantiate(
-            IAttributeReader source, IAttributeReader target, IReadOnlyDictionary<string, double>? userData
+            IAttributeReader source, IAttributeReader target, IUserData? userData
         ) {
             IAttributeReader attributes = this.BackingAttributeSource switch {
                 ValueSource.Target => target,

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Attributes.Evaluation;
+using GameplayAbilities.Common;
 using GameplayAbilities.Effects;
 using GameplayAbilities.Modifiers;
 using UnityEngine;
@@ -52,8 +51,8 @@ namespace GameplayAbilities.Abilities {
         }
 
         Awaitable IEffect.Execute(
-            EffectExecutionContext context, ModifierEnvironment target, 
-            AbilityExecutionUserData? userData, CancellationToken interrupt
+            EffectExecutionContext context, ModifierEnvironment target,
+            IUserData? userData, CancellationToken interrupt
         ) {
             AwaitableCompletionSource completed = new AwaitableCompletionSource();
             completed.Reset();

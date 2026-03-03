@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using GameplayAbilities.Abilities;
 using GameplayAbilities.Attributes;
-using GameplayAbilities.Effects.Schedulers;
+using GameplayAbilities.Common;
 using GameplayAbilities.Modifiers;
 using UnityEngine;
 
@@ -18,7 +18,7 @@ namespace GameplayAbilities.Effects {
         private IDictionary<Guid, EffectExecutionMetadata> Effects { get; } =
             new Dictionary<Guid, EffectExecutionMetadata>();
 
-        public Guid AddEffect(IAttributeReader source, IEffect effect, AbilityExecutionUserData? userData = null) {
+        public Guid AddEffect(IAttributeReader source, IEffect effect, IUserData? userData = null) {
             if (!this.ModifierTarget || this.AttributeReader == null) {
                 return Guid.Empty;
             }
@@ -40,7 +40,7 @@ namespace GameplayAbilities.Effects {
         }
 
         private async Awaitable Execute(
-            Guid id, EffectExecutionMetadata metadata, IAttributeReader source, AbilityExecutionUserData? userData
+            Guid id, EffectExecutionMetadata metadata, IAttributeReader source, IUserData? userData
         ) {
             if (!this.ModifierTarget || this.AttributeReader == null) {
                 return;

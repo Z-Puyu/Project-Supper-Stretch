@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GameplayAbilities.Common;
 using UnityEngine;
 
 namespace GameplayAbilities.Attributes.Evaluation {
@@ -7,7 +8,7 @@ namespace GameplayAbilities.Attributes.Evaluation {
     internal class Constant : IAttributeMagnitude {
         [field: SerializeField] private double Value { get; set; }
         
-        public double Evaluate(IAttributeReader? attributes, IReadOnlyDictionary<string, double>? userData = null) {
+        public double Evaluate(IAttributeReader? attributes, IUserData? userData = null) {
             return this.Value;
         }
 
