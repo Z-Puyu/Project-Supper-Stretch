@@ -14,7 +14,7 @@ namespace GameplayAbilities.Effects {
         }
 
         internal IEnumerable<KeyValuePair<GameplayAttributeType, Modifier>> Apply(
-            IEffectEmitterFacade source, IEffectReceiverFacade target, IReadOnlyDictionary<string, double>? userData
+            IAttributeReader source, IAttributeReader target, IReadOnlyDictionary<string, double>? userData = null
         ) {
             foreach (ModifierConfig config in this.Modifiers) {
                 if (!config.Target) {

@@ -25,7 +25,7 @@ namespace GameplayAbilities.Effects {
         public ModifierConfig() { }
 
         internal Modifier Instantiate(
-            IEffectEmitterFacade source, IEffectReceiverFacade target, IReadOnlyDictionary<string, double>? userData
+            IAttributeReader source, IAttributeReader target, IReadOnlyDictionary<string, double>? userData
         ) {
             IAttributeReader attributes = this.BackingAttributeSource switch {
                 ValueSource.Target => target,

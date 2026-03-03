@@ -5,6 +5,7 @@ namespace GameplayAbilities.Modifiers {
         ModifierType Type,
         double Value
     ) {
+        public static readonly Modifier ZeroBaseOverride = new Modifier(ModifierType.SetBase, double.NaN);
         public static readonly Modifier ZeroShift = new Modifier(ModifierType.Shift, 0);
         public static readonly Modifier ZeroMultiplier = new Modifier(ModifierType.Multiplier, 0);
         public static readonly Modifier ZeroOffset = new Modifier(ModifierType.Offset, 0);
@@ -15,6 +16,7 @@ namespace GameplayAbilities.Modifiers {
             return this.Type switch {
                 ModifierType.Shift or ModifierType.Offset => value + this.Value,
                 ModifierType.Multiplier => value * Math.Max(100 + this.Value, 0) / 100.0f,
+                ModifierType.SetBase => double.IsNaN(this.Value) ? value : this.Value,
                 var _ => value
             };
         }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameplayAbilities.EditorTooling;
+using GameplayAbilities.Runtime.EditorTooling;
 using UnityEngine;
 
 namespace GameplayAbilities.Abilities.Predicate {

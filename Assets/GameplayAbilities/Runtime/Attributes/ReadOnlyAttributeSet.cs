@@ -5,17 +5,31 @@ using System.Linq;
 
 namespace GameplayAbilities.Attributes {
     public sealed class ReadOnlyAttributeSet : IAttributeReader {
-        private IReadOnlyDictionary<GameplayAttributeType, Entry> Attributes { get; }
+        private static readonly IDictionary<IAttributeReader, ReadOnlyAttributeSet> Cache =
+                new Dictionary<IAttributeReader, ReadOnlyAttributeSet>();
 
-        public ReadOnlyAttributeSet(IAttributeReader attributes) {
-            this.Attributes = new ReadOnlyDictionary<GameplayAttributeType, Entry>(
-                attributes.ToDictionary(
-                    attribute => attribute.Type,
-                    attribute => new Entry(
+        private IDictionary<GameplayAttributeType, Entry> Attributes { get; } =
+            new Dictionary<GameplayAttributeType, Entry>();
+
+        private ReadOnlyAttributeSet() { }
+        
+        public static ReadOnlyAttributeSet From(IAttributeReader attributes) {
+            if (!ReadOnlyAttributeSet.Cache.TryGetValue(attributes, out ReadOnlyAttributeSet set)) {
+                set = new ReadOnlyAttributeSet();
+                ReadOnlyAttributeSet.Cache.Add(attributes, set);
+            }
+            
+            set.Attributes.Clear();
+            foreach (GameplayAttribute attribute in attributes) {
+                set.Attributes.Add(
+                    attribute.Type,
+                    new Entry(
                         attribute.Value, attributes.QueryMax(attribute.Type), attributes.QueryMin(attribute.Type)
                     )
-                )
-            );
+                );
+            }
+                
+            return set;
         }
         
         public AttributeValue Query(GameplayAttributeType key) {

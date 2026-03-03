@@ -1,5 +1,5 @@
 ﻿using System;
-using GameplayAbilities.EditorTooling;
+using GameplayAbilities.Runtime.EditorTooling;
 using UnityEngine;
 
 namespace GameplayAbilities.Abilities.Predicate {

@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Attributes.Evaluation;
+using GameplayAbilities.Effects;
 using GameplayAbilities.Modifiers;
 using UnityEngine;
 
 namespace GameplayAbilities.Abilities {
     [Serializable]
-    internal sealed class Cost {
+    internal sealed class Cost : IEffect {
         private enum Verdict {
             [InspectorName("Has Enough")] HasEnough,
             [InspectorName("More than Enough")] MoreThanEnough,
@@ -46,20 +50,27 @@ namespace GameplayAbilities.Abilities {
                 var _ => false
             };
         }
-        
-        internal void Spend(IAttributeReader consumer, IModifiable wallet) {
+
+        Awaitable IEffect.Execute(
+            EffectExecutionContext context, ModifierEnvironment target, 
+            AbilityExecutionUserData? userData, CancellationToken interrupt
+        ) {
+            AwaitableCompletionSource completed = new AwaitableCompletionSource();
+            completed.Reset();
+            completed.SetResult();
             if (!this.CostAttribute) {
-                return;
+                return completed.Awaitable;
             }
             
-            double cost = this.Amount?.Evaluate(consumer) ?? 0;
+            double cost = this.Amount?.Evaluate(context.TargetAttributes, userData) ?? 0;
             double change = this.BenchmarkScheme switch {
                 Verdict.HasEnough or Verdict.MoreThanEnough or Verdict.HasAny => -cost,
                 Verdict.HasRoomForMore or Verdict.HasEnoughRoom or Verdict.MoreRoomThanNecessary => cost,
                 var _ => 0
             };
             
-            wallet.AddModifier(this.CostAttribute, new Modifier(ModifierType.Offset, change));
+            target.AddModifier(this.CostAttribute, new Modifier(ModifierType.Offset, change));
+            return completed.Awaitable;
         }
     }
 }

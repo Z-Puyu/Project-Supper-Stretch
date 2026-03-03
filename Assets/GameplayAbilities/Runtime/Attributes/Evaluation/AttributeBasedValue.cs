@@ -6,7 +6,7 @@ using UnityEngine;
 namespace GameplayAbilities.Attributes.Evaluation {
     [Serializable]
     internal sealed class AttributeBasedValue : IAttributeMagnitude {
-        [field: SerializeField] private GameplayAttributeType? BackingAttribute { get; set; }
+        [field: SerializeField] internal GameplayAttributeType? BackingAttribute { get; private set; }
         [field: SerializeField] private double PreMultiplicationOffset { get; set; }
         [field: SerializeField] private double Coefficient { get; set; } = 1;
         [field: SerializeField] private double PostMultiplicationOffset { get; set; }

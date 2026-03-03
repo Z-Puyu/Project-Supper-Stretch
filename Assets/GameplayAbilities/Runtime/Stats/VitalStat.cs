@@ -10,16 +10,16 @@ namespace GameplayAbilities.Stats {
         [field: SerializeField] private Effect? RegenerationEffect { get; set; }
         [field: SerializeField] private float RegenerationDelay { get; set; }
 
-        private IEffectEmitterFacade? RegenEmitter { get; set; }
-        private IEffectReceiverFacade? RegenReceiver { get; set; }
+        private IAttributeReader? RegenSource { get; set; }
+        private EffectReceiver? RegenReceiver { get; set; }
         
-        internal void Watch(AttributeSet set, IEffectEmitterFacade emitter, IEffectReceiverFacade receiver) {
+        internal void Watch(AttributeSet set, IAttributeReader source, EffectReceiver receiver) {
             if (this.TrackedAttribute) {
                 set.Observe(this.TrackedAttribute, this.React);
             }
 
             this.RegenReceiver = receiver;
-            this.RegenEmitter = emitter;
+            this.RegenSource = source;
         }
         
         private async void WaitAndRegenerate() {
@@ -32,11 +32,11 @@ namespace GameplayAbilities.Stats {
         }
 
         private void React(GameplayAttributeType _, AttributeChange change) {
-            if (change.IsNegligible || this.RegenReceiver == null || change >= 0) {
+            if (change.IsNegligible || this.RegenReceiver == null || change >= 0 || !this.RegenerationEffect) {
                 return;
             }
 
-            this.RegenReceiver.StopEffects(new EffectDescriptor(this.RegenerationEffect));
+            this.RegenReceiver.Stop(this.RegenerationEffect);
             if (this.RegenerationDelay > 0) {
                 this.WaitAndRegenerate();
             } else {
@@ -45,8 +45,8 @@ namespace GameplayAbilities.Stats {
         }
 
         private void Regenerate() {
-            if (this.RegenerationEffect && this.RegenReceiver != null && this.RegenEmitter != null) {
-                this.RegenerationEffect.Apply(this.RegenEmitter, this.RegenReceiver);
+            if (this.RegenerationEffect && this.RegenReceiver != null && this.RegenSource != null) {
+                this.RegenReceiver.AddEffect(this.RegenSource, this.RegenerationEffect);
             }
         }
     }

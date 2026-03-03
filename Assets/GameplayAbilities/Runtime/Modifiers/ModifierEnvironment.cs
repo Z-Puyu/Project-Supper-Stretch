@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text;
 using GameplayAbilities.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
@@ -13,15 +13,11 @@ namespace GameplayAbilities.Modifiers {
         [field: SerializeField] private ModifierEnvironment? ParentEnvironment { get; set; }
 
         private IDictionary<GameplayAttributeType, Node> Modifiers { get; } =
-            new Dictionary<GameplayAttributeType, Node>();
+            new ConcurrentDictionary<GameplayAttributeType, Node>();
 
         public event UnityAction<GameplayAttributeType> OnModifierUpdated = delegate { };
 
         public void AddModifier(GameplayAttributeType target, Modifier modifier) {
-            if (modifier.Type == ModifierType.SetBase) {
-                Debug.LogError($"Cannot set the base attribute value via an {nameof(ModifierEnvironment)}.", this);
-            }
-            
             if (modifier.Value == 0) {
                 return;
             }
@@ -40,38 +36,24 @@ namespace GameplayAbilities.Modifiers {
                     query.AddModifier(modifier);
                 }
             }
-            
+
             if (!this.IsGlobalEnvironment && this.ParentEnvironment) {
                 this.ParentEnvironment.Query(ref query);
-            } 
-        }
-
-        public override string ToString() {
-            StringBuilder sb = new StringBuilder($"Modifiers on {this.gameObject.name}:\n", this.Modifiers.Count + 1);
-            foreach (KeyValuePair<GameplayAttributeType, Node> entry in this.Modifiers) {
-                for (ModifierType op = ModifierType.Shift; op < ModifierType.Offset; op += 1) {
-                    sb.Append($"|{entry.Key}:{op} = {entry.Value[op].Value} ");
-                }
             }
-
-            return sb.ToString();
         }
 
         private sealed class Node : IEnumerable<Modifier> {
+            internal double BaseValueOverride { get; private set; } = 0;
             private double Shift { get; set; } = 0;
             private double Multiplier { get; set; } = 0;
             private double PositiveOffset { get; set; } = 0;
             private double NegativeOffset { get; set; } = 0;
 
-            internal Modifier this[ModifierType op] => op switch {
-                ModifierType.Shift => new Modifier(op, this.Shift),
-                ModifierType.Multiplier => new Modifier(op, this.Multiplier),
-                ModifierType.Offset => new Modifier(op, this.PositiveOffset + this.NegativeOffset),
-                var _ => throw new ArgumentOutOfRangeException(nameof(op), op, string.Empty)
-            };
-
             internal void Add(Modifier mod) {
                 switch (mod.Type) {
+                    case ModifierType.SetBase:
+                        this.BaseValueOverride = mod.Value;
+                        break;
                     case ModifierType.Shift:
                         this.Shift += mod.Value;
                         break;
@@ -92,6 +74,7 @@ namespace GameplayAbilities.Modifiers {
             }
 
             public IEnumerator<Modifier> GetEnumerator() {
+                yield return new Modifier(ModifierType.SetBase, this.BaseValueOverride);
                 yield return new Modifier(ModifierType.Shift, this.Shift);
                 yield return new Modifier(ModifierType.Multiplier, this.Multiplier);
                 yield return new Modifier(ModifierType.Offset, this.PositiveOffset);

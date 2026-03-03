@@ -1,9 +1,5 @@
-﻿using System;
-using UnityEngine;
-
-namespace GameplayAbilities.EditorTooling {
-    [AttributeUsage(AttributeTargets.Field)]
-    public sealed class SubtypeSelectorAttribute : PropertyAttribute {
+﻿namespace GameplayAbilities.Runtime.EditorTooling {
+    public sealed class SubtypeSelectorAttribute : CustomPropertyAttribute {
         public string PredicateName { get; set; }
 
         public SubtypeSelectorAttribute(string predicate = "") {

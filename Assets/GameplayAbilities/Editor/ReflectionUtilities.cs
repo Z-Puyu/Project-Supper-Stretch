@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace GameplayAbilities.Editor {
     internal static class ReflectionUtilities {

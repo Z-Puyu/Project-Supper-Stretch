@@ -5,26 +5,15 @@ using GameplayAbilities.Effects;
 using UnityEngine;
 
 namespace GameplayAbilities.Stats {
-    [AddComponentMenu("")]
     internal sealed class VitalStatistics : MonoBehaviour {
         [NotNull] [field: SerializeField] private AttributeSet? AttributeSet { get; set; }
-        [NotNull] private IEffectReceiverFacade? EffectReceiver { get; set; }
-        [NotNull] private IEffectEmitterFacade? EffectEmitter { get; set; }
+        [NotNull] [field: SerializeField] private EffectReceiver? EffectReceiver { get; set; }
+        [NotNull] [field: SerializeField] private IAttributeReader? RegenSource { get; set; }
         [field: SerializeField] private List<VitalStat> Stats { get; set; } = new List<VitalStat>();
-
-        private void Awake() {
-            /*this.AttributeSet = this.Root.GetOrAdd<AttributeSet>();
-            this.EffectReceiver = this.Root.HasModule(out IEffectReceiverFacade? facade)
-                    ? facade
-                    : this.Root.Add<AbilitySystem>();
-            this.EffectEmitter = this.Root.HasModule(out IEffectEmitterFacade? emitter)
-                    ? emitter
-                    : this.Root.Add<AbilitySystem>();*/
-        }
 
         private void Start() {
             foreach (VitalStat stat in this.Stats) {
-                stat.Watch(this.AttributeSet, this.EffectEmitter, this.EffectReceiver);
+                stat.Watch(this.AttributeSet, this.RegenSource, this.EffectReceiver);
             }
         }
     }

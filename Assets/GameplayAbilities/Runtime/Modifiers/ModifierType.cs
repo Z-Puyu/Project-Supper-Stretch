@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace GameplayAbilities.Modifiers {
     public enum ModifierType {
-        [InspectorName("Set Base Value")] SetBase = -1,
-        Shift = 0,
-        Multiplier = 1,
-        Offset = 2
+        [InspectorName("Set Base Value")] SetBase = 0,
+        Shift = 1,
+        Multiplier = 2,
+        Offset = 3
     }
 }
