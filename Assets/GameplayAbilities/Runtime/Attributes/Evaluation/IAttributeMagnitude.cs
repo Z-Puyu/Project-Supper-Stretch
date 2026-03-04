@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using GameplayAbilities.Common;
 
 namespace GameplayAbilities.Attributes.Evaluation {

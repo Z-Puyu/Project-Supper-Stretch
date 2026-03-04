@@ -45,18 +45,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameCharacterBehaviours.Runtime::GameCharacterBehaviours.Runtime.Movement.CharacterControllerLocomotion
   <ReferenceSpace>k__BackingField: {fileID: 0}
+  <UseRootMotion>k__BackingField: 1
   <OnlyAllowRotationWhenMoving>k__BackingField: 1
   <RotationModule>k__BackingField:
-    rid: 1692152385227718748
+    rid: 2920079781330157743
   <StateMachine>k__BackingField:
-    rid: 1000
-  <Mode>k__BackingField: 1
-  <WalkSpeedMultiplier>k__BackingField: 1
-  <RunSpeedMultiplier>k__BackingField: 2
-  <SprintSpeedMultiplier>k__BackingField: 3
-  <StealthSpeedMultiplier>k__BackingField: 0.5
+    rid: 2920079781330157748
   <GroundCheckCaster>k__BackingField:
-    rid: 1692152385227718749
+    rid: 2920079781330157753
   <GroundCheckPolicy>k__BackingField:
     <GroundLayers>k__BackingField:
       serializedVersion: 2
@@ -67,25 +63,25 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 1000
-      type: {class: AnimatorLocomotionStateMachine, ns: GameCharacterBehaviours.Runtime.Movement, asm: GameCharacterBehaviours.Runtime}
-      data:
-        <Animator>k__BackingField: {fileID: 0}
-        <RunningStateTrigger>k__BackingField: 1748754976
-        <WalkingStateTrigger>k__BackingField: 765711723
-        <SprintingStateTrigger>k__BackingField: -399748991
-    - rid: 1692152385227718748
-      type: {class: SmoothDampRotator, ns: GameCharacterBehaviours.Runtime.Movement, asm: GameCharacterBehaviours.Runtime}
+    - rid: 2920079781330157743
+      type: {class: SmoothDampRotator, ns: GameplayBehaviours.Movement, asm: GameplayBehaviours.Runtime}
       data:
         <SmoothTime>k__BackingField: 0.12
-    - rid: 1692152385227718749
-      type: {class: SphereCaster, ns: GameplaySensors.Runtime, asm: GameplaySensors.Runtime}
+    - rid: 2920079781330157748
+      type: {class: AnimatorLocomotionStateMachine, ns: GameplayBehaviours.Movement, asm: GameplayBehaviours.Runtime}
       data:
-        <MaxDistance>k__BackingField: 0.2
+        <Animator>k__BackingField: {fileID: 0}
+        <RunningStateFlag>k__BackingField: 0
+        <WalkingStateFlag>k__BackingField: 0
+        <SprintingStateFlag>k__BackingField: 0
+    - rid: 2920079781330157753
+      type: {class: SphereCaster, ns: GameplaySensors, asm: GameplaySensors.Runtime}
+      data:
+        <MaxDistance>k__BackingField: 100
         <IgnoredLayers>k__BackingField:
           serializedVersion: 2
           m_Bits: 0
         <CheckedLayers>k__BackingField:
           serializedVersion: 2
           m_Bits: 0
-        <Radius>k__BackingField: 0.4
+        <Radius>k__BackingField: 1

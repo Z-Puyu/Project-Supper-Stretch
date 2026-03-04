@@ -6,8 +6,7 @@ using UnityEditor;
 
 namespace GameplayAbilities.Editor {
     public record class SerialisedData(SerializedProperty SerialisedProperty, FieldInfo Field) {
-        public bool IsCollectionElement => this.Field.FieldType.IsGenericType &&
-                                           this.Field.FieldType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+        public bool IsCollectionElement => typeof(IEnumerable<>).IsRawGenericTypeOf(this.Field.FieldType);
 
         public Type Type => this.IsCollectionElement
                 ? this.Field.FieldType.GetParametrisedTypesOn(typeof(IEnumerable<>))[0]

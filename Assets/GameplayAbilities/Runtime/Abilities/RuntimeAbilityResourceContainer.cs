@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using GameplayAbilities.Runtime.EditorTooling;
 using UnityEngine;
 
 namespace GameplayAbilities.Abilities {
     [Serializable]
     public class RuntimeAbilityResourceContainer {
-        [field: SerializeReference]
-        private List<IAbilityResource> Resources { get; set; } = new List<IAbilityResource>();
-        
+        [field: SerializeReference, SubtypeSelector]
+        private List<IAbilityResource> RuntimeAbilityResources { get; set; } = new List<IAbilityResource>();
+
         private IDictionary<Type, Subcontainer> Subcontainers { get; } = new Dictionary<Type, Subcontainer>();
 
         internal void RegisterResources() {
-            foreach (IAbilityResource resource in this.Resources) {
+            foreach (IAbilityResource resource in this.RuntimeAbilityResources) {
                 if (this.Subcontainers.TryGetValue(resource.GetType(), out Subcontainer subcontainer)) {
                     subcontainer.Register(resource);
                     continue;
@@ -22,7 +23,7 @@ namespace GameplayAbilities.Abilities {
                 this.Subcontainers.Add(resource.GetType(), subcontainer);
             }
         }
-        
+
         internal bool HasResource<T>(AbilityResourceKey<T> key, [NotNullWhen(true)] out T? resource)
                 where T : IAbilityResource {
             if (this.Subcontainers.TryGetValue(typeof(T), out Subcontainer subcontainer)) {

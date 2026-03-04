@@ -1,6 +1,5 @@
 ﻿using GameplayAbilities.Editor.UI;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 namespace GameplayAbilities.Editor {

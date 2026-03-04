@@ -18,43 +18,39 @@ namespace GameplayAbilities.Editor {
 
         private static bool IsUserDefinedAssembly(Assembly assembly) {
             string name = assembly.GetName().Name;
-            return name == "Assembly-CSharp" || name == "Assembly-CSharp-Editor" || name.StartsWith("UnityEngine.") ||
-                   name.StartsWith("UnityEditor.") || name.StartsWith("System.");
+            return name != "Assembly-CSharp" && name != "Assembly-CSharp-Editor" && !name.StartsWith("UnityEngine.") &&
+                   !name.StartsWith("UnityEditor.") && !name.StartsWith("System.");
         }
 
         protected override AdvancedDropdownItem BuildRoot() {
             AdvancedDropdownItem root = new AdvancedDropdownItem("Subtypes");
-
-            // Add 'None' option
             root.AddChild(new Item(null));
             root.AddSeparator();
-
             foreach (Type? type in this.types) {
-                // Split by namespace to create a hierarchy
-                string path = type.FullName ?? type.Name;
-                string[] sections = path.Split('.');
-
                 AdvancedDropdownItem submenu = root;
                 if (SubtypeDropdownMenu.IsUserDefinedAssembly(type.Assembly)) {
-                    AdvancedDropdownItem category = new AdvancedDropdownItem(type.Assembly.GetName().Name);
-                    submenu.AddChild(category);
+                    AdvancedDropdownItem? category = 
+                            submenu.children.FirstOrDefault(c => c.name == type.Assembly.GetName().Name);
+                    if (category is null) {
+                        category = new AdvancedDropdownItem(type.Assembly.GetName().Name);
+                        submenu.AddChild(category);
+                    }
+
                     submenu = category;
                 }
-
-                for (int i = 0; i < sections.Length - 1; i += 1) {
-                    AdvancedDropdownItem? existing = submenu.children.FirstOrDefault(c => c.name == sections[i]);
-                    if (existing is not null) {
-                        submenu = existing;
-                    } else {
-                        AdvancedDropdownItem menu = new AdvancedDropdownItem(sections[i]);
-                        submenu.AddChild(menu);
-                        submenu = menu;
-                    }
+                
+                AdvancedDropdownItem? existing = submenu.children.FirstOrDefault(c => c.name == type.Namespace);
+                if (existing is not null) {
+                    submenu = existing;
+                } else {
+                    AdvancedDropdownItem menu = new AdvancedDropdownItem(type.Namespace);
+                    submenu.AddChild(menu);
+                    submenu = menu;
                 }
 
                 submenu.AddChild(new Item(type));
             }
-
+            
             return root;
         }
 
@@ -67,11 +63,7 @@ namespace GameplayAbilities.Editor {
         private class Item : AdvancedDropdownItem {
             internal Type? Type { get; }
 
-            internal Item(Type? type) : base(
-                ObjectNames.NicifyVariableName(
-                    type is null ? "null" : $"{type.Name} ({type.Assembly.GetName().Name}.{type.Namespace})"
-                )
-            ) {
+            internal Item(Type? type) : base(ObjectNames.NicifyVariableName(type is null ? "null" : $"{type.Name}")) {
                 this.Type = type;
             }
         }

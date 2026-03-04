@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using GameplayAbilities.Abilities;
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Common;
 using GameplayAbilities.Modifiers;
+using GameplayAbilities.Runtime.EditorTooling;
 using UnityEngine;
 
 namespace GameplayAbilities.Effects {
     [DisallowMultipleComponent, RequireComponent(typeof(ModifierEnvironment))]
     public class EffectReceiver : MonoBehaviour {
         [field: SerializeField] private ModifierEnvironment? ModifierTarget { get; set; }
-        [field: SerializeField] private IAttributeReader? AttributeReader { get; set; }
+        [field: SerializeField] private Ref<IAttributeReader> AttributeReader { get; set; }
 
         private IDictionary<IEffect, List<Guid>> EffectInstances { get; } = new Dictionary<IEffect, List<Guid>>();
 
@@ -42,12 +42,12 @@ namespace GameplayAbilities.Effects {
         private async Awaitable Execute(
             Guid id, EffectExecutionMetadata metadata, IAttributeReader source, IUserData? userData
         ) {
-            if (!this.ModifierTarget || this.AttributeReader == null) {
+            if (!this.ModifierTarget || this.AttributeReader.Value == null) {
                 return;
             }
 
             EffectExecutionContext context = new EffectExecutionContext(
-                source, this.AttributeReader, this.ModifierTarget
+                source, this.AttributeReader.Value, this.ModifierTarget
             );
             
             try {

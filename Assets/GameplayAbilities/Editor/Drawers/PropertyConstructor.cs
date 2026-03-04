@@ -1,5 +1,4 @@
 ﻿using GameplayAbilities.Runtime.EditorTooling;
-using UnityEditor;
 using UnityEngine.UIElements;
 
 namespace GameplayAbilities.Editor.Drawers {

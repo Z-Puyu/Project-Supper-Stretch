@@ -842,6 +842,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 97951859804305642, guid: 10970dbb52c8c134cb629434ecf2ddf2, type: 3}
+      propertyPath: <AttributeReader>k__BackingField.value
+      value: 
+      objectReference: {fileID: 5075196371078791115}
     - target: {fileID: 402384571435554881, guid: 10970dbb52c8c134cb629434ecf2ddf2, type: 3}
       propertyPath: <AnimationController>k__BackingField
       value: 
@@ -952,6 +956,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 10970dbb52c8c134cb629434ecf2ddf2, type: 3}
+--- !u!114 &5075196371078791115 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3304667604102116073, guid: 10970dbb52c8c134cb629434ecf2ddf2, type: 3}
+  m_PrefabInstance: {fileID: 5075196371078791114}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6019539295ff40da8efaeee6d6c947ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameplayAbilities.Runtime::GameplayAbilities.Attributes.AttributeSet
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

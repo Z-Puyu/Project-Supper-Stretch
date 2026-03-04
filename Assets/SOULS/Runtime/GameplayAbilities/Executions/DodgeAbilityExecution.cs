@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using GameplayAbilities.Abilities;
 using GameplayAbilities.Common;
-using GameplayAbilities.Effects;
 using UnityEngine;
 
 namespace SOULS.GameplayAbilities.Executions {

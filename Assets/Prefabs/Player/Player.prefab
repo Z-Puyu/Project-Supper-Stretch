@@ -91,8 +91,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afcff56d37a14f8baaac329b04f0fef6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Stats.VitalStatistics
+  <AttributeSet>k__BackingField: {fileID: 0}
+  <EffectReceiver>k__BackingField: {fileID: 0}
   <Stats>k__BackingField:
-  - <TrackedAttribute>k__BackingField: Stamina
+  - <TrackedAttribute>k__BackingField: {fileID: 0}
     <RegenerationEffect>k__BackingField: {fileID: 11400000, guid: ce0b259a5ffa8cd448302955c60f78f1, type: 2}
     <RegenerationDelay>k__BackingField: 1
 --- !u!1 &1236278017064777048
@@ -154,10 +156,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6019539295ff40da8efaeee6d6c947ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Attributes.AttributeSet
-  <DefaultBaseAttributes>k__BackingField: {fileID: 11400000, guid: 527565972748b7b47a3e5efc9af7dd4e, type: 2}
-  <Approximator>k__BackingField:
-    <PrecisionLevel>k__BackingField: 1
-    <ApproximationPolicy>k__BackingField: 1
+  <Owner>k__BackingField: {fileID: 0}
+  <DefaultRoundingPolicy>k__BackingField: 0
 --- !u!1 &2468385999987924416
 GameObject:
   m_ObjectHideFlags: 0
@@ -246,8 +246,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: CommonFrameworks::CommonFrameworks.Components.ModularEntity
   <Owner>k__BackingField: {fileID: 4223069083410452082}
   <NewModuleType>k__BackingField:
-    _typeNameAndAssembly: GameplayBehaviours.Movement.Locomotion, GameCharacterBehaviours.Runtime
-    _monoScriptGuid: d0ce46db85c846568888f49ebdff9546
+    <AssemblyQualifiedName>k__BackingField: System.Void, mscorlib, Version=4.0.0.0,
+      Culture=neutral, PublicKeyToken=b77a5c561934e089
 --- !u!143 &6524289295231924309
 CharacterController:
   m_ObjectHideFlags: 0
@@ -472,6 +472,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8053709025507055333}
   - component: {fileID: 402384571435554881}
+  - component: {fileID: 7403605642705994734}
+  - component: {fileID: 3304667604102116073}
+  - component: {fileID: 97951859804305642}
   m_Layer: 0
   m_Name: Ability Module
   m_TagString: Untagged
@@ -506,11 +509,64 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ac7568156bc4747a5ed7d8f1127f013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Abilities.AbilitySystem
+  <Owner>k__BackingField: {fileID: 0}
+  <Animator>k__BackingField: {fileID: 0}
   <DefaultAbilities>k__BackingField:
   - {fileID: 11400000, guid: 46e1df1ad72d91d45828c65fa4dad265, type: 2}
   - {fileID: 11400000, guid: d1b5f047207a9004b88750d8f1cecf3e, type: 2}
   - {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
   - {fileID: 11400000, guid: aa6eb1ac61788c34eb7fba511f3cc26e, type: 2}
+  <ResourceContainer>k__BackingField:
+    <Resources>k__BackingField:
+    - rid: -2
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+--- !u!114 &7403605642705994734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5183361691381169815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfbf91a367004839a740e7fcc4b30333, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameplayAbilities.Runtime::GameplayAbilities.Modifiers.ModifierEnvironment
+  <IsGlobalEnvironment>k__BackingField: 0
+  <ParentEnvironment>k__BackingField: {fileID: 0}
+--- !u!114 &3304667604102116073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5183361691381169815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6019539295ff40da8efaeee6d6c947ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameplayAbilities.Runtime::GameplayAbilities.Attributes.AttributeSet
+  <Owner>k__BackingField: {fileID: 0}
+  <DefaultRoundingPolicy>k__BackingField: 0
+--- !u!114 &97951859804305642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5183361691381169815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfddfa1d434040278ded2a8a44c75fae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameplayAbilities.Runtime::GameplayAbilities.Effects.EffectReceiver
+  <ModifierTarget>k__BackingField: {fileID: 0}
+  <AttributeReader>k__BackingField:
+    value: {fileID: 0}
 --- !u!1 &5962457325683517129
 GameObject:
   m_ObjectHideFlags: 0
@@ -748,27 +804,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0f942199c1042f2ad0bdc5af0c82df5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Scripts.UI::UI.Hud
-  <Presenters>k__BackingField:
-  - rid: 1692152357399822461
-  - rid: 1692152357399822469
+  <Presenters>k__BackingField: []
   <Owner>k__BackingField: {fileID: 0}
   references:
     version: 2
-    RefIds:
-    - rid: 1692152357399822461
-      type: {class: StatBarPresenter, ns: UI, asm: Scripts.UI}
-      data:
-        <Model>k__BackingField: {fileID: 0}
-        <View>k__BackingField: Vitals/HealthBar/StatBar (.unity-progress-bar)
-        <TrackedAttribute>k__BackingField: Health
-        <UnitLength>k__BackingField: 5
-    - rid: 1692152357399822469
-      type: {class: StatBarPresenter, ns: UI, asm: Scripts.UI}
-      data:
-        <Model>k__BackingField: {fileID: 0}
-        <View>k__BackingField: Vitals/StaminaBar/StatBar (.unity-progress-bar)
-        <TrackedAttribute>k__BackingField: Stamina
-        <UnitLength>k__BackingField: 5
+    RefIds: []
 --- !u!1001 &1050546759403989905
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -946,27 +986,63 @@ PrefabInstance:
       objectReference: {fileID: 6524289295231924309}
     - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: <StateMachine>k__BackingField
-      value: 1692152385227718807
+      value: 2920079781330157737
       objectReference: {fileID: 0}
     - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: <ReferenceSpace>k__BackingField
       value: 
       objectReference: {fileID: 6361964447197298950}
     - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <RotationModule>k__BackingField
+      value: 2920079781330157734
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: <GroundCheckCaster>k__BackingField
+      value: 2920079781330157740
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: 'managedReferences[1692152385227718807]'
       value: GameCharacterBehaviours.Runtime GameCharacterBehaviours.Runtime.Movement.AnimatorLocomotionStateMachine
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: 'managedReferences[2920079781330157734]'
+      value: GameplayBehaviours.Runtime GameplayBehaviours.Movement.SmoothDampRotator
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: 'managedReferences[2920079781330157737]'
+      value: GameplayBehaviours.Runtime GameplayBehaviours.Movement.AnimatorLocomotionStateMachine
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: 'managedReferences[2920079781330157740]'
+      value: GameplaySensors.Runtime GameplaySensors.SphereCaster
       objectReference: {fileID: 0}
     - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: managedReferences[1000].<Animator>k__BackingField
       value: 
       objectReference: {fileID: 1135260277088119739}
     - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: managedReferences[2920079781330157740].<Radius>k__BackingField
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: managedReferences[1692152385227718807].<Animator>k__BackingField
       value: 
       objectReference: {fileID: 1135260277088119739}
     - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: managedReferences[2920079781330157737].<Animator>k__BackingField
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: <GroundCheckPolicy>k__BackingField.<MaxSlopeAngle>k__BackingField
       value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: managedReferences[2920079781330157734].<SmoothTime>k__BackingField
+      value: 0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: managedReferences[2920079781330157740].<MaxDistance>k__BackingField
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: managedReferences[1692152385227718807].<RunningStateFlag>k__BackingField
@@ -977,8 +1053,20 @@ PrefabInstance:
       value: 1273789103
       objectReference: {fileID: 0}
     - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: managedReferences[2920079781330157737].<RunningStateFlag>k__BackingField
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: managedReferences[2920079781330157737].<WalkingStateFlag>k__BackingField
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: managedReferences[1692152385227718807].<SprintingStateFlag>k__BackingField
       value: -521096443
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: managedReferences[2920079781330157737].<SprintingStateFlag>k__BackingField
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: <GroundCheckPolicy>k__BackingField.<FloatingHeightTolerance>k__BackingField
@@ -990,6 +1078,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
       propertyPath: managedReferences[1692152385227718807].<WalkingStateTrigger>k__BackingField
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: managedReferences[2920079781330157740].<CheckedLayers>k__BackingField.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}
+      propertyPath: managedReferences[2920079781330157740].<IgnoredLayers>k__BackingField.m_Bits
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8863079818014629256, guid: 52314cc71f01ddc43b84aba99d00d135, type: 3}

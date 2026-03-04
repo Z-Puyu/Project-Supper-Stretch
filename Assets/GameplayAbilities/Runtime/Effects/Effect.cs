@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using GameplayAbilities.Abilities;
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Common;
 using GameplayAbilities.Effects.Schedulers;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using GameplayAbilities.Editor.Drawers;
-using GameplayAbilities.Editor.UI;
 using GameplayAbilities.Runtime.EditorTooling;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
@@ -12,9 +11,9 @@ using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace GameplayAbilities.Editor {
+    [CustomPropertyDrawer(typeof(InlineAttribute))]
     [CustomPropertyDrawer(typeof(SubtypeSelectorAttribute))]
-    [CustomPropertyDrawer(typeof(CustomPropertyAttribute))]
-    internal sealed class MasterPropertyDrawer : PropertyDrawer {
+    internal class MasterPropertyDrawer : PropertyDrawer {
         private Lazy<IEnumerable<Type>> CachedSubclasses { get; }
 
         private Type FieldType => this.IsCollectionField
@@ -25,13 +24,13 @@ namespace GameplayAbilities.Editor {
                                           this.fieldInfo.FieldType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
 
         private static IDictionary<Type, IPropertyDrawingLogic> PropertyConstructors { get; } =
-            typeof(PropertyConstructor<>).GetConcreteSubclasses().ToDictionary(
+            typeof(PropertyConstructor<>).GetConcreteSubtypes().ToDictionary(
                 type => type.GetParametrisedTypesOn(typeof(PropertyConstructor<>))[0],
                 type => (IPropertyDrawingLogic)Activator.CreateInstance(type)
             );
         
         private static IDictionary<Type, IPropertyDrawingLogic> PropertyPainters { get; } =
-            typeof(PropertyPainter<>).GetConcreteSubclasses().ToDictionary(
+            typeof(PropertyPainter<>).GetConcreteSubtypes().ToDictionary(
                 type => type.GetParametrisedTypesOn(typeof(PropertyPainter<>))[0],
                 type => (IPropertyDrawingLogic)Activator.CreateInstance(type)
             );
@@ -62,8 +61,13 @@ namespace GameplayAbilities.Editor {
         }
 
         public override VisualElement CreatePropertyGUI(SerializedProperty property) {
-            VisualElement drawer = base.CreatePropertyGUI(property);
+            VisualElement drawer = new VisualElement();
             SerialisedData data = new SerialisedData(property, this.fieldInfo);
+            this.Process(data, ref drawer);
+            return drawer;
+        }
+
+        private protected virtual void Process(SerialisedData data, ref VisualElement drawer) {
             foreach (CustomPropertyAttribute a in data.GetAttributes<CustomPropertyAttribute>()) {
                 MasterPropertyDrawer.ApplyPropertyConstructorLogic(a, drawer, data);
             }
@@ -71,66 +75,6 @@ namespace GameplayAbilities.Editor {
             foreach (CustomPropertyAttribute a in data.GetAttributes<CustomPropertyAttribute>()) {
                 MasterPropertyDrawer.ApplyPropertyPainterLogic(a, drawer, data);
             }
-            
-            Foldout container = new Foldout {
-                text = "", // We leave this empty and add our own custom layout
-                value = property.isExpanded
-            };
-
-            container.RegisterCallback<ChangeEvent<bool>, SerializedProperty>(
-                (e, p) => { p.isExpanded = e.newValue; }, property
-            );
-            
-            VisualElement header = new VisualElement {
-                style = {
-                    flexDirection = FlexDirection.Row,
-                    flexGrow = 1,
-                    marginBottom = 2
-                }
-            };
-            
-            container.Add(header);
-            Label label = new Label(property.displayName) {
-                style = {
-                    width = StyleKeyword.Null, // Reset to let flex handle it or match labelWidth
-                    flexBasis = 120, // Approximation of standard label width
-                    flexGrow = 0,
-                    unityTextAlign = TextAnchor.MiddleLeft
-                }
-            };
-            
-            label.AddToClassList("unity-property-field__label"); // Use Unity's internal style for alignment
-            Button button = new Button(() => this.ShowDropdown(property, container)) {
-                text = string.IsNullOrEmpty(property.managedReferenceFullTypename)
-                        ? "-"
-                        : MasterPropertyDrawer.GetTypeName(property),
-                style = { 
-                    marginTop = 2, 
-                    marginBottom = 2, 
-                    paddingLeft = 2,
-                    unityTextAlign = TextAnchor.MiddleLeft,
-                    flexGrow = 1,
-                    textOverflow = TextOverflow.Ellipsis,
-                }
-            };
-            
-            header.Add(label);
-            header.Add(button);
-            container.Q<Toggle>().Q<VisualElement>(className: "unity-toggle__input").Add(header);
-            if (property.propertyType != SerializedPropertyType.ManagedReference) {
-                container.Add(new HelpBox("Missing [SerializeReference]", HelpBoxMessageType.Error));
-                return container;
-            }
-
-            if (property.managedReferenceValue is null) {
-                return container;
-            }
-
-            // PropertyField field = new PropertyField(property, " ") { style = { display = DisplayStyle.Flex } };
-            // field.Bind(property.serializedObject);
-            // container.Add(field);
-            container.DrawPropertyInline(property);
-            return container;
         }
 
         private void ShowDropdown(SerializedProperty property, Foldout container) {

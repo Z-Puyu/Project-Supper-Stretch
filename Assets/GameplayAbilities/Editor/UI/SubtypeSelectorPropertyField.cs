@@ -12,13 +12,13 @@ namespace GameplayAbilities.Editor.UI {
         private static Label CreatePropertyLabel(SerializedProperty property) {
             Label label = new Label(property.displayName) {
                 style = {
-                    width = StyleKeyword.Null, 
-                    flexBasis = 120, 
+                    width = StyleKeyword.Null,
+                    flexBasis = 120,
                     flexGrow = 0,
                     unityTextAlign = TextAnchor.MiddleLeft
                 }
             };
-            
+
             label.AddToClassList("unity-property-field__label");
             return label;
         }
@@ -26,9 +26,7 @@ namespace GameplayAbilities.Editor.UI {
         private static Button CreateSelectorButton(SerializedProperty property) {
             return new Button {
                 text = property.GetTypeName(),
-                style = { 
-                    marginTop = 2, 
-                    marginBottom = 2, 
+                style = {
                     paddingLeft = 2,
                     unityTextAlign = TextAnchor.MiddleLeft,
                     flexGrow = 1,
@@ -36,28 +34,29 @@ namespace GameplayAbilities.Editor.UI {
                 }
             };
         }
-        
+
         private static VisualElement CreateContainerHeader(SerializedProperty property) {
             VisualElement header = new VisualElement {
-                style = { flexDirection = FlexDirection.Row, flexGrow = 1, marginBottom = 2 }
+                style = { flexDirection = FlexDirection.Row, flexGrow = 1 }
             };
-            
+
             header.Add(SubtypeSelectorPropertyField.CreatePropertyLabel(property));
             header.Add(SubtypeSelectorPropertyField.CreateSelectorButton(property));
             return header;
         }
-        
+
         private static Foldout CreateContainer(SerializedProperty property) {
             Foldout foldout = new Foldout { text = "", value = property.isExpanded };
             foldout.RegisterCallback<ChangeEvent<bool>, SerializedProperty>(
                 (e, p) => { p.isExpanded = e.newValue; }, property
             );
-            
-            foldout.Add(SubtypeSelectorPropertyField.CreateContainerHeader(property));
+
             return foldout;
         }
 
-        private static SubtypeDropdownMenu CreateDropdownMenu(SerialisedData data, SubtypeSelectorAttribute selector, Action<Type?> onSelected) {
+        private static SubtypeDropdownMenu CreateDropdownMenu(
+            SerialisedData data, SubtypeSelectorAttribute selector, Action<Type?> onSelected
+        ) {
             List<Type> types = TypeCache.GetTypesDerivedFrom(data.Type).Where(isValidType).ToList();
             SubtypeDropdownMenu dropdown = new SubtypeDropdownMenu(new AdvancedDropdownState(), types);
             dropdown.OnSelected += onSelected;
@@ -72,7 +71,7 @@ namespace GameplayAbilities.Editor.UI {
                        data.InvokeFromOwnerObject<bool>(selector.PredicateName, type);
             }
         }
-        
+
         public SubtypeSelectorPropertyField(SerialisedData data, SubtypeSelectorAttribute attribute) {
             Foldout container = SubtypeSelectorPropertyField.CreateContainer(data.SerialisedProperty);
             container.Q<Toggle>().Q<VisualElement>(className: "unity-toggle__input")
@@ -94,7 +93,8 @@ namespace GameplayAbilities.Editor.UI {
             container.Q<Button>().RegisterCallback<ClickEvent, (AdvancedDropdown menu, VisualElement anchor)>(
                 (_, pair) => pair.menu.Show(pair.anchor.worldBound), (dropdown, container.Q<Button>())
             );
-            
+
+            this.Add(container);
             if (data.SerialisedProperty.propertyType != SerializedPropertyType.ManagedReference) {
                 container.Add(new HelpBox("Missing [SerializeReference]", HelpBoxMessageType.Error));
             }

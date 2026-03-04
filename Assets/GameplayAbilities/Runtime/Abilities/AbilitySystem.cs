@@ -8,6 +8,7 @@ using GameplayAbilities.Attributes;
 using GameplayAbilities.Common;
 using GameplayAbilities.Effects;
 using GameplayAbilities.Modifiers;
+using GameplayAbilities.Runtime.EditorTooling;
 using UnityEngine;
 
 namespace GameplayAbilities.Abilities {
@@ -26,7 +27,7 @@ namespace GameplayAbilities.Abilities {
         
         [field: SerializeField] private List<Ability> DefaultAbilities { get; set; } = new List<Ability>();
 
-        [field: SerializeField]
+        [field: SerializeField, Inline]
         private RuntimeAbilityResourceContainer ResourceContainer { get; set; } = new RuntimeAbilityResourceContainer();
 
         private void Awake() {
