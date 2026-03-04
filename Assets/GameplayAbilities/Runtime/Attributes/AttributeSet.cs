@@ -14,8 +14,8 @@ namespace GameplayAbilities.Attributes {
         private IDictionary<GameplayAttributeType, Value> Attributes { get; } =
             new ConcurrentDictionary<GameplayAttributeType, Value>();
 
-        private IDictionary<GameplayAttributeType, Action<GameplayAttributeType, AttributeChange>> Observers { get; } =
-            new Dictionary<GameplayAttributeType, Action<GameplayAttributeType, AttributeChange>>();
+        private IDictionary<GameplayAttributeType, Action<AttributeChange>> Observers { get; } =
+            new Dictionary<GameplayAttributeType, Action<AttributeChange>>();
 
         [field: SerializeField]
         private GameplayAttributeType.RoundingMethod DefaultRoundingPolicy { get; set; } =
@@ -38,7 +38,7 @@ namespace GameplayAbilities.Attributes {
             
             foreach (GameplayAttributeType type in values.Keys) {
                 foreach (GameplayAttributeType dependency in type.GetDependencies()) {
-                    this.Observe(dependency, (key, _) => this.Evaluate(key));
+                    this.Observe(dependency, _ => this.Evaluate(type));
                 }
             }
             
@@ -65,8 +65,8 @@ namespace GameplayAbilities.Attributes {
 
         private void TriggerCallbacks(GameplayAttributeType key, AttributeChange change) {
             this.OnAnyAttributeUpdated.Invoke(key, change);
-            if (this.Observers.TryGetValue(key, out Action<GameplayAttributeType, AttributeChange> observer)) {
-                observer.Invoke(key, change);
+            if (this.Observers.TryGetValue(key, out Action<AttributeChange> observer)) {
+                observer.Invoke(change);
             }
         }
 
@@ -102,18 +102,18 @@ namespace GameplayAbilities.Attributes {
             this.Attributes.Clear();
         }
         
-        public void Observe(GameplayAttributeType attribute, Action<GameplayAttributeType, AttributeChange> callback) {
+        public void Observe(GameplayAttributeType attribute, Action<AttributeChange> callback) {
             if (!this.Observers.TryAdd(attribute, callback)) {
                 this.Observers[attribute] += callback;
             }
         }
 
-        public void RemoveObserver(GameplayAttributeType attribute, Action<GameplayAttributeType, AttributeChange> callback) {
-            if (!this.Observers.TryGetValue(attribute, out Action<GameplayAttributeType, AttributeChange>? observer)) {
+        public void RemoveObserver(GameplayAttributeType attribute, Action<AttributeChange> callback) {
+            if (!this.Observers.TryGetValue(attribute, out Action<AttributeChange>? observer)) {
                 return;
             }
 
-            Action<GameplayAttributeType, AttributeChange>? action = observer - callback;
+            Action<AttributeChange>? action = observer - callback;
             if (action is null) {
                 this.Observers.Remove(attribute);
                 return;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Effects;
 using UnityEngine;
@@ -6,8 +7,8 @@ using UnityEngine;
 namespace GameplayAbilities.Stats {
     [Serializable]
     public sealed class VitalStat {
-        [field: SerializeField] private GameplayAttributeType? TrackedAttribute { get; set; }
-        [field: SerializeField] private Effect? RegenerationEffect { get; set; }
+        [NotNull] [field: SerializeField] private GameplayAttributeType? TrackedAttribute { get; set; }
+        [NotNull] [field: SerializeField] private Effect? RegenerationEffect { get; set; }
         [field: SerializeField] private float RegenerationDelay { get; set; }
 
         private IAttributeReader? RegenSource { get; set; }
@@ -22,30 +23,26 @@ namespace GameplayAbilities.Stats {
             this.RegenSource = source;
         }
         
-        private async void WaitAndRegenerate() {
-            try {
-                await Awaitable.WaitForSecondsAsync(this.RegenerationDelay);
-                this.Regenerate();
-            } catch (Exception e) {
-                Debug.LogException(e);
-            }
+        private async Awaitable WaitAndRegenerate() {
+            await Awaitable.WaitForSecondsAsync(this.RegenerationDelay);
+            this.Regenerate();
         }
 
-        private void React(GameplayAttributeType _, AttributeChange change) {
+        private void React(AttributeChange change) {
             if (change.IsNegligible || this.RegenReceiver == null || change >= 0 || !this.RegenerationEffect) {
                 return;
             }
 
             this.RegenReceiver.Stop(this.RegenerationEffect);
             if (this.RegenerationDelay > 0) {
-                this.WaitAndRegenerate();
+                _ = this.WaitAndRegenerate();
             } else {
                 this.Regenerate();
             }
         }
 
         private void Regenerate() {
-            if (this.RegenerationEffect && this.RegenReceiver != null && this.RegenSource != null) {
+            if (this.RegenReceiver && this.RegenSource != null) {
                 this.RegenReceiver.AddEffect(this.RegenSource, this.RegenerationEffect);
             }
         }
