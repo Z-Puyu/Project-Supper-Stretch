@@ -9,7 +9,9 @@ namespace SOULS.GameplayAbilities.Executions {
     public sealed class DodgeAbilityExecution : AbilityExecution {
         [field: SerializeField] private AnimationClip? DodgeAnimation { get; set; }
         
-        protected override Awaitable Execute(AbilitySystem source, IUserData? userData, CancellationToken interrupt) {
+        protected override Awaitable Execute(
+            AbilitySystemController source, IUserData? userData, CancellationToken interrupt
+        ) {
             return Awaitable.EndOfFrameAsync();
         }
     }

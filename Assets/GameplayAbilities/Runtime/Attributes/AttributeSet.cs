@@ -17,8 +17,6 @@ namespace GameplayAbilities.Attributes {
         private IDictionary<GameplayAttributeType, Action<GameplayAttributeType, AttributeChange>> Observers { get; } =
             new Dictionary<GameplayAttributeType, Action<GameplayAttributeType, AttributeChange>>();
 
-        [NotNull] [field: SerializeField] private GameObject? Owner { get; set; }
-
         [field: SerializeField]
         private GameplayAttributeType.RoundingMethod DefaultRoundingPolicy { get; set; } =
             GameplayAttributeType.RoundingMethod.RoundToNearest;
@@ -47,7 +45,7 @@ namespace GameplayAbilities.Attributes {
             foreach (GameplayAttributeType type in values.Keys) {
                 this.Evaluate(type);
 #if DEBUG
-                Debug.Log($"Attribute {type.Id} initialised to {this.Query(type).Value}", this.Owner);
+                Debug.Log($"Attribute {type.Id} initialised to {this.Query(type).Value}");
 #endif
             }
         }

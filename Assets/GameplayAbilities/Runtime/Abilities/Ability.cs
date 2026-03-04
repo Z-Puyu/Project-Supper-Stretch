@@ -38,9 +38,9 @@ namespace GameplayAbilities.Abilities {
             return system.TrySpend(this.Costs, userData);
         }
 
-        internal Awaitable Execute(AbilitySystem system, IUserData? userData, CancellationToken interrupt) {
+        internal Awaitable Execute(AbilitySystemController controller, IUserData? userData, CancellationToken interrupt) {
             if (this.Execution is not null) {
-                return this.Execution.Execute(system, userData, interrupt);
+                return this.Execution.Execute(controller, userData, interrupt);
             }
 
             AwaitableCompletionSource completed = new AwaitableCompletionSource();

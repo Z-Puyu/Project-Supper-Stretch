@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Common;
@@ -10,16 +11,19 @@ using UnityEngine;
 namespace GameplayAbilities.Effects {
     [DisallowMultipleComponent, RequireComponent(typeof(ModifierEnvironment))]
     public class EffectReceiver : MonoBehaviour {
-        [field: SerializeField] private ModifierEnvironment? ModifierTarget { get; set; }
+        [NotNull] private ModifierEnvironment? ModifierTarget { get; set; }
         [field: SerializeField] private Ref<IAttributeReader> AttributeReader { get; set; }
-
         private IDictionary<IEffect, List<Guid>> EffectInstances { get; } = new Dictionary<IEffect, List<Guid>>();
 
         private IDictionary<Guid, EffectExecutionMetadata> Effects { get; } =
             new Dictionary<Guid, EffectExecutionMetadata>();
 
+        private void Awake() {
+            this.ModifierTarget = this.GetComponent<ModifierEnvironment>();
+        }
+
         public Guid AddEffect(IAttributeReader source, IEffect effect, IUserData? userData = null) {
-            if (!this.ModifierTarget || this.AttributeReader == null) {
+            if (!this.ModifierTarget || this.AttributeReader.Value == null) {
                 return Guid.Empty;
             }
 

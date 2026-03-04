@@ -7,7 +7,7 @@ namespace GameplayAbilities.Abilities {
     [Serializable]
     public abstract class AbilityExecution {
         protected internal abstract Awaitable Execute(
-            AbilitySystem source, IUserData? userData, CancellationToken interrupt
+            AbilitySystemController source, IUserData? userData, CancellationToken interrupt
         );
     }
 }

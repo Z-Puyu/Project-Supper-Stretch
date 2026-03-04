@@ -7,7 +7,6 @@ using System.Threading;
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Common;
 using GameplayAbilities.Effects;
-using GameplayAbilities.Modifiers;
 using GameplayAbilities.Runtime.EditorTooling;
 using UnityEngine;
 
@@ -19,12 +18,11 @@ namespace GameplayAbilities.Abilities {
         private IDictionary<Ability, CancellationTokenSource> RunningAbilities { get; } =
             new Dictionary<Ability, CancellationTokenSource>();
 
+        [NotNull] private AbilitySystemController? AbilitySystemController { get; set; }
         [NotNull] [field: SerializeField] private GameObject? Owner { get; set; }
         [NotNull] [field: SerializeField] private Animator? Animator { get; set; }
         [NotNull] private AttributeSet? AttributeSet { get; set; }
-        [NotNull] private ModifierEnvironment? ModifierEnvironment { get; set; }
         [NotNull] private EffectReceiver? EffectReceiver { get; set; }
-        
         [field: SerializeField] private List<Ability> DefaultAbilities { get; set; } = new List<Ability>();
 
         [field: SerializeField, Inline]
@@ -32,8 +30,11 @@ namespace GameplayAbilities.Abilities {
 
         private void Awake() {
             this.AttributeSet = this.GetComponent<AttributeSet>();
-            this.ModifierEnvironment = this.GetComponent<ModifierEnvironment>();
             this.EffectReceiver = this.GetComponent<EffectReceiver>();
+            this.AbilitySystemController = new AbilitySystemController(
+                this.Owner, this, this.EffectReceiver, this.ResourceContainer, this.AttributeSet, this.Animator
+            );
+            
             foreach (Ability ability in this.DefaultAbilities) {
                 this.Grant(ability);
             }
@@ -105,7 +106,7 @@ namespace GameplayAbilities.Abilities {
                     cts.Token, this.destroyCancellationToken
                 );
 
-                await ability.Execute(this, context.UserData, linked.Token);
+                await ability.Execute(this.AbilitySystemController, context.UserData, linked.Token);
             } catch (OperationCanceledException) { } catch (Exception e) {
 #if DEBUG
                 Debug.LogException(e);
@@ -134,42 +135,6 @@ namespace GameplayAbilities.Abilities {
             }
 
             interrupter.Cancel();
-        }
-
-        /// <summary>
-        /// Tries to get the ability resource with the given key.
-        /// </summary>
-        /// <param name="key">The key of the resource to get.</param>
-        /// <param name="resource">The resource to get.</param>
-        /// <typeparam name="T">The type of the resource to get.</typeparam>
-        /// <returns><c>true</c> if the resource was found; otherwise, <c>false</c>.</returns>
-        public bool HasAbilityResource<T>(AbilityResourceKey<T> key, [NotNullWhen(true)] out T? resource)
-                where T : IAbilityResource {
-            return this.ResourceContainer.HasResource(key, out resource);
-        }
-
-        public bool IsRunningAbility(Ability ability) {
-            return this.RunningAbilities.ContainsKey(ability);
-        }
-
-        public void SetAnimatorInt(int hash, int value) {
-            this.Animator.SetInteger(hash, value);
-        }
-        
-        public void SetAnimatorFloat(int hash, float value) {
-            this.Animator.SetFloat(hash, value);
-        }
-        
-        public void SetAnimatorBool(int hash, bool value) {
-            this.Animator.SetBool(hash, value);
-        }
-        
-        public void SetAnimatorTrigger(int hash) {
-            this.Animator.SetTrigger(hash);
-        }
-
-        public void ResetAnimatorTrigger(int hash) {
-            this.Animator.ResetTrigger(hash);
         }
 
         public IEnumerator<Ability> GetEnumerator() {

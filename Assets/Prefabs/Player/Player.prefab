@@ -97,67 +97,6 @@ MonoBehaviour:
   - <TrackedAttribute>k__BackingField: {fileID: 0}
     <RegenerationEffect>k__BackingField: {fileID: 11400000, guid: ce0b259a5ffa8cd448302955c60f78f1, type: 2}
     <RegenerationDelay>k__BackingField: 1
---- !u!1 &1236278017064777048
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4435668326859617906}
-  - component: {fileID: 4841785305415936222}
-  - component: {fileID: 5766071080831145933}
-  m_Layer: 0
-  m_Name: Attributes Module
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4435668326859617906
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1236278017064777048}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5873235994450687505}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4841785305415936222
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1236278017064777048}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bfbf91a367004839a740e7fcc4b30333, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Modifiers.ModifierEnvironment
-  <IsGlobalEnvironment>k__BackingField: 1
-  <ParentEnvironment>k__BackingField: {fileID: 0}
---- !u!114 &5766071080831145933
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1236278017064777048}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6019539295ff40da8efaeee6d6c947ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Attributes.AttributeSet
-  <Owner>k__BackingField: {fileID: 0}
-  <DefaultRoundingPolicy>k__BackingField: 0
 --- !u!1 &2468385999987924416
 GameObject:
   m_ObjectHideFlags: 0
@@ -225,7 +164,6 @@ Transform:
   - {fileID: 6361964447197298950}
   - {fileID: 1465036431004469530}
   - {fileID: 3253346133024296643}
-  - {fileID: 4435668326859617906}
   - {fileID: 2066831801722292597}
   - {fileID: 8053709025507055333}
   - {fileID: 3529341965212875295}
@@ -517,13 +455,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ba692893efa215a4a81d61708700b868, type: 2}
   - {fileID: 11400000, guid: aa6eb1ac61788c34eb7fba511f3cc26e, type: 2}
   <ResourceContainer>k__BackingField:
-    <Resources>k__BackingField:
-    - rid: -2
+    <RuntimeAbilityResources>k__BackingField: []
   references:
     version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    RefIds: []
 --- !u!114 &7403605642705994734
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -564,9 +499,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfddfa1d434040278ded2a8a44c75fae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameplayAbilities.Runtime::GameplayAbilities.Effects.EffectReceiver
-  <ModifierTarget>k__BackingField: {fileID: 0}
+  <ModifierTarget>k__BackingField: {fileID: 7403605642705994734}
   <AttributeReader>k__BackingField:
-    value: {fileID: 0}
+    value: {fileID: 3304667604102116073}
 --- !u!1 &5962457325683517129
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,8 +6,7 @@ using UnityEditor.UIElements;
 using Object = UnityEngine.Object;
 
 namespace GameplayAbilities.Editor.Drawers {
-    [CustomPropertyDrawer(typeof(Ref<>))]
-    [CustomPropertyDrawer(typeof(Ref<,>))]
+    [CustomPropertyDrawer(typeof(Ref<>)), CustomPropertyDrawer(typeof(Ref<,>))]
     internal sealed class RefPropertyDrawer : MasterPropertyDrawer {
         private const string PropertyName = "value";
         
@@ -15,17 +14,18 @@ namespace GameplayAbilities.Editor.Drawers {
             drawer = new VisualElement();
             ObjectField field = new ObjectField(data.SerialisedProperty.displayName);
             SerializedProperty property = data.SerialisedProperty.FindPropertyRelative(RefPropertyDrawer.PropertyName);
-            Type @interface = data.Type.GetGenericArguments()[0];
-            field.objectType = @interface;
+            Type type = data.Type.GenericTypeArguments.Length == 1
+                    ? data.Type.GetGenericArguments()[0]
+                    : data.Type.GetGenericArguments()[1];
+            field.objectType = type;
             field.allowSceneObjects = true;
             field.BindProperty(property);
             drawer.Add(field);
             field.RegisterCallback<ChangeEvent<Object>, (SerializedProperty, Type)>(
-                (e, args) => RefPropertyDrawer.ValidateInterfaceImplementation(args.Item1, args.Item2, e.newValue),
-                (property, @interface)
+                (e, args) => RefPropertyDrawer.Validate(args.Item1, args.Item2, e.newValue), (property, type)
             );
 
-            if (property.objectReferenceValue && !@interface.IsInstanceOfType(property.objectReferenceValue)) {
+            if (property.objectReferenceValue && !type.IsInstanceOfType(property.objectReferenceValue)) {
                 property.objectReferenceValue = null;
                 property.serializedObject.ApplyModifiedProperties();
             }
@@ -33,8 +33,8 @@ namespace GameplayAbilities.Editor.Drawers {
             base.Process(data, ref drawer);
         }
         
-        private static void ValidateInterfaceImplementation(SerializedProperty property, Type @interface, Object? value) {
-            if (value && !@interface.IsInstanceOfType(value)) {
+        private static void Validate(SerializedProperty property, Type type, Object? value) {
+            if (value && !type.IsInstanceOfType(value)) {
                 return;
             }
             

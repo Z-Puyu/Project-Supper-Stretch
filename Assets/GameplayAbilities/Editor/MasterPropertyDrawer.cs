@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using GameplayAbilities.Editor.Drawers;
 using GameplayAbilities.Runtime.EditorTooling;
 using UnityEditor;
-using UnityEditor.IMGUI.Controls;
-using UnityEngine;
 using UnityEngine.UIElements;
-using Object = UnityEngine.Object;
 
 namespace GameplayAbilities.Editor {
     [CustomPropertyDrawer(typeof(InlineAttribute))]
@@ -37,11 +33,6 @@ namespace GameplayAbilities.Editor {
 
         public MasterPropertyDrawer() {
             this.CachedSubclasses = new Lazy<IEnumerable<Type>>(this.DenumerateTypes);
-        }
-
-        private static string GetTypeName(SerializedProperty property) {
-            string name = property.managedReferenceFullTypename.Split(' ').Last().Split('.').Last();
-            return ObjectNames.NicifyVariableName(name);
         }
 
         private static void ApplyPropertyConstructorLogic(
@@ -74,49 +65,6 @@ namespace GameplayAbilities.Editor {
 
             foreach (CustomPropertyAttribute a in data.GetAttributes<CustomPropertyAttribute>()) {
                 MasterPropertyDrawer.ApplyPropertyPainterLogic(a, drawer, data);
-            }
-        }
-
-        private void ShowDropdown(SerializedProperty property, Foldout container) {
-            SubtypeSelectorAttribute selector = (SubtypeSelectorAttribute)this.attribute;
-            List<Type> types = this.CachedSubclasses.Value.Where(isValidType).ToList();
-            SubtypeDropdownMenu dropdown = new SubtypeDropdownMenu(new AdvancedDropdownState(), types);
-            dropdown.OnSelected += type => {
-                if (type == property.managedReferenceValue?.GetType()) {
-                    return;
-                }
-                
-                property.managedReferenceValue = type == null ? null : Activator.CreateInstance(type);
-                property.serializedObject.ApplyModifiedProperties();
-                container.value = type is not null;
-            };
-            
-            // Calculate position relative to the button
-            Rect menuRect = container.Q<Button>().worldBound;
-            dropdown.Show(menuRect);
-            return;
-            
-            bool isValidType(Type type) {
-                if (string.IsNullOrWhiteSpace(selector.PredicateName)) {
-                    return true;
-                }
-                
-                Object obj = property.serializedObject.targetObject;
-                MethodInfo? method = obj.GetType().GetMethod(
-                    selector.PredicateName,
-                    BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic
-                ) ?? obj.GetType().GetProperty(selector.PredicateName)?.GetGetMethod(true);
-            
-                if (method is null || method.ReturnType != typeof(bool)) {
-                    return obj.GetType().GetField(
-                        selector.PredicateName,
-                        BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic
-                    )?.GetValue(obj) is true;
-                }
-                
-                ParameterInfo[] parameters = method.GetParameters();
-                return parameters.Length == 1 && parameters[0].ParameterType == typeof(Type) &&
-                       (bool)method.Invoke(obj, new object[] { type });
             }
         }
 
