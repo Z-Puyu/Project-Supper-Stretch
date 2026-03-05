@@ -10,21 +10,41 @@ using UnityEngine;
 namespace GameplayAbilities.Abilities {
     [CreateAssetMenu(fileName = "New Ability", menuName = "Gameplay Abilities/Ability")]
     public sealed class Ability : ScriptableObject {
+        private static readonly HashSet<Ability> Instances = new HashSet<Ability>();
+        
         [field: SerializeField] private List<Cost> Costs { get; set; } = new List<Cost>();
 
         [field: SerializeReference, Tooltip("Conditions on the ability system for this ability to be usable")]
         private List<IPredicate<AbilitySystem>> Conditions { get; set; } = new List<IPredicate<AbilitySystem>>();
         
         [field: SerializeReference, SubtypeSelector] private AbilityExecution? Execution { get; set; }
-        [field: SerializeField] private AbilityResourceKey<string> TestResource { get; set; }
 
-        internal IEnumerable<AbilityResourceKey<T>> ExtractResourceKeys<T>() {
+        private void OnEnable() {
+            Ability.Instances.Add(this);
+        }
+        
+        private void OnDisable() {
+            Ability.Instances.Remove(this);
+        }
+
+        internal static IEnumerable<AbilityResourceKey<T>> ExtractAllResourceKeys<T>() {
+            return Ability.Instances.SelectMany(a => a.ExtractResourceKeys<T>());
+        }
+
+        private IEnumerable<AbilityResourceKey<T>> ExtractResourceKeys<T>() {
             return this.Execution?.GetType()
                        .GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
                        .Select(field => field.GetValue(this.Execution))
                        .OfType<AbilityResourceKey<T>>()
-                       .Where(key => !key.IsEmpty) ??
-                   Enumerable.Empty<AbilityResourceKey<T>>();
+                       .Where(key => !key.IsEmpty) ?? Enumerable.Empty<AbilityResourceKey<T>>();
+        }
+
+        internal bool RequiresResource<T>(AbilityResourceKey<T> key) {
+            return this.Execution?.GetType()
+                       .GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                       .Select(field => field.GetValue(this.Execution))
+                       .OfType<AbilityResourceKey<T>>()
+                       .Any(key.IsSameKey) ?? false;
         }
 
         internal bool TryCommit(AbilitySystem system, IUserData? userData) {
@@ -48,6 +68,10 @@ namespace GameplayAbilities.Abilities {
             completed.Reset();
             completed.SetResult();
             return completed.Awaitable;
+        }
+
+        private void OnValidate() {
+            int a = 0;
         }
     }
 }

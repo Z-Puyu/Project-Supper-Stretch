@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using GameplayAbilities.Runtime.EditorTooling;
 using UnityEngine;
 
@@ -10,8 +11,13 @@ namespace GameplayAbilities.Abilities {
         
         internal bool IsEmpty => string.IsNullOrWhiteSpace(this.Key);
 
+        internal bool IsSameKey(AbilityResourceKey<T> other) {
+            return string.Equals(this.Key, other.Key, StringComparison.OrdinalIgnoreCase);
+        }
+        
         private static bool IsValidKey(string key) {
-            return !string.IsNullOrWhiteSpace(key);
+            return !string.IsNullOrWhiteSpace(key) && 
+                   Ability.ExtractAllResourceKeys<T>().Count(k => k.Key == key) == 1;
         }
     }
 }

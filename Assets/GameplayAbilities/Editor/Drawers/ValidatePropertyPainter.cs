@@ -1,5 +1,4 @@
-﻿using GameplayAbilities.Editor.UI;
-using GameplayAbilities.Runtime.EditorTooling;
+﻿using GameplayAbilities.Runtime.EditorTooling;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
@@ -24,15 +23,15 @@ namespace GameplayAbilities.Editor.Drawers {
             drawer.TrackPropertyValue(data.SerialisedProperty, validate);
             validate(data.SerialisedProperty);
             return;
-            
+
             void validate(SerializedProperty property) {
                 HelpBox? validator = drawer.Bottom.Q<HelpBox>(ValidatePropertyPainter.ValidatorElementName);
                 if (validator is null) {
                     return;
                 }
-
+                
                 bool pass = string.IsNullOrWhiteSpace(attribute.PredicateName) ||
-                            data.ResolveCallback<bool>(attribute.PredicateName, data.Value);
+                            data.ResolveCallback<bool>(attribute.PredicateName, property.boxedValue);
                 validator.style.display = pass ? DisplayStyle.None : DisplayStyle.Flex;
             }
         }
