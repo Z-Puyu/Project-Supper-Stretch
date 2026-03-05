@@ -113,7 +113,7 @@ namespace GameplayAbilities.Editor.Drawers {
             return false;
         }
 
-        private protected override void Process(SerialisedData data, ref VisualElement drawer) {
+        private protected override void Process(SerialisedData data, in CustomisablePropertyField drawer) {
             Foldout foldout = new Foldout {
                 text = data.SerialisedProperty.displayName,
                 value = data.SerialisedProperty.isExpanded
@@ -170,7 +170,7 @@ namespace GameplayAbilities.Editor.Drawers {
             this.List.columns.Add(keys);
             this.List.columns.Add(values);
             foldout.Add(this.List);
-            drawer = foldout;
+            drawer.ReplacePropertyField(foldout);
         }
     }
 }

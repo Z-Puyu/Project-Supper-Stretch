@@ -2,6 +2,6 @@
 
 namespace GameplayAbilities.Editor.Drawers {
     internal interface IPropertyDrawingLogic {
-        internal void Apply(in VisualElement drawer, in SerialisedData data);
+        internal void Apply(in CustomisablePropertyField drawer, in SerialisedData data);
     }
 }

@@ -2,19 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace GameplayAbilities.Attributes {
-    public sealed class ReadOnlyAttributeSet : IAttributeReader {
-        private static readonly IDictionary<IAttributeReader, ReadOnlyAttributeSet> Cache =
-                new Dictionary<IAttributeReader, ReadOnlyAttributeSet>();
+    public sealed class CapturedAttributes : IAttributeReader {
+        private static readonly IDictionary<IAttributeReader, CapturedAttributes> Cache =
+                new Dictionary<IAttributeReader, CapturedAttributes>();
 
         private IDictionary<GameplayAttributeType, Entry> Attributes { get; } =
             new Dictionary<GameplayAttributeType, Entry>();
 
-        private ReadOnlyAttributeSet() { }
+        private CapturedAttributes() { }
         
-        public static ReadOnlyAttributeSet From(IAttributeReader attributes) {
-            if (!ReadOnlyAttributeSet.Cache.TryGetValue(attributes, out ReadOnlyAttributeSet set)) {
-                set = new ReadOnlyAttributeSet();
-                ReadOnlyAttributeSet.Cache.Add(attributes, set);
+        public static CapturedAttributes From(IAttributeReader attributes) {
+            if (!CapturedAttributes.Cache.TryGetValue(attributes, out CapturedAttributes set)) {
+                set = new CapturedAttributes();
+                CapturedAttributes.Cache.Add(attributes, set);
             }
             
             set.Attributes.Clear();

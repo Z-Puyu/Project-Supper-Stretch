@@ -10,8 +10,8 @@ namespace GameplayAbilities.Editor.Drawers {
     internal sealed class RefPropertyDrawer : MasterPropertyDrawer {
         private const string PropertyName = "value";
         
-        private protected override void Process(SerialisedData data, ref VisualElement drawer) {
-            drawer = new VisualElement();
+        private protected override void Process(SerialisedData data, in CustomisablePropertyField drawer) {
+            drawer.ReplacePropertyField(new VisualElement());
             ObjectField field = new ObjectField(data.SerialisedProperty.displayName);
             SerializedProperty property = data.SerialisedProperty.FindPropertyRelative(RefPropertyDrawer.PropertyName);
             Type type = data.Type.GenericTypeArguments.Length == 1
@@ -20,7 +20,7 @@ namespace GameplayAbilities.Editor.Drawers {
             field.objectType = type;
             field.allowSceneObjects = true;
             field.BindProperty(property);
-            drawer.Add(field);
+            drawer.PropertyField.Add(field);
             field.RegisterCallback<ChangeEvent<Object>, (SerializedProperty, Type)>(
                 (e, args) => RefPropertyDrawer.Validate(args.Item1, args.Item2, e.newValue), (property, type)
             );
@@ -30,7 +30,7 @@ namespace GameplayAbilities.Editor.Drawers {
                 property.serializedObject.ApplyModifiedProperties();
             }
             
-            base.Process(data, ref drawer);
+            base.Process(data, in drawer);
         }
         
         private static void Validate(SerializedProperty property, Type type, Object? value) {

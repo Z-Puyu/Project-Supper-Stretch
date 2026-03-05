@@ -4,10 +4,10 @@ using UnityEngine.UIElements;
 
 namespace GameplayAbilities.Editor.Drawers {
     public abstract class PropertyPainter<A> : IPropertyDrawingLogic where A : CustomPropertyAttribute {
-        public abstract void Paint(in VisualElement drawer, in SerializedProperty property, in A attribute);
+        protected abstract void Paint(CustomisablePropertyField drawer, SerialisedData data, A attribute);
         
-        public void Apply(in VisualElement drawer, in SerialisedData data) {
-            this.Paint(drawer, data.SerialisedProperty, data.GetAttribute<A>()!);
+        public void Apply(in CustomisablePropertyField drawer, in SerialisedData data) {
+            this.Paint(drawer, data, data.GetAttribute<A>()!);
         }
     }
 }

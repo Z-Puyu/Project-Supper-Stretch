@@ -16,6 +16,7 @@ namespace GameplayAbilities.Abilities {
         private List<IPredicate<AbilitySystem>> Conditions { get; set; } = new List<IPredicate<AbilitySystem>>();
         
         [field: SerializeReference, SubtypeSelector] private AbilityExecution? Execution { get; set; }
+        [field: SerializeField] private AbilityResourceKey<string> TestResource { get; set; }
 
         internal IEnumerable<AbilityResourceKey<T>> ExtractResourceKeys<T>() {
             return this.Execution?.GetType()

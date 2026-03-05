@@ -3,11 +3,11 @@ using GameplayAbilities.Modifiers;
 
 namespace GameplayAbilities.Effects {
     public readonly record struct EffectExecutionContext(
-        ReadOnlyAttributeSet SourceAttributes,
-        ReadOnlyAttributeSet TargetAttributes,
+        CapturedAttributes SourceAttributes,
+        CapturedAttributes TargetAttributes,
         ModifierEnvironment Target
     ) {
         public EffectExecutionContext(IAttributeReader source, IAttributeReader target, ModifierEnvironment environment)
-                : this(ReadOnlyAttributeSet.From(source), ReadOnlyAttributeSet.From(target), environment) { }
+                : this(CapturedAttributes.From(source), CapturedAttributes.From(target), environment) { }
     }
 }

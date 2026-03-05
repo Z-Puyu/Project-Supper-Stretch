@@ -9,6 +9,7 @@ using UnityEngine.UIElements;
 namespace GameplayAbilities.Editor {
     [CustomPropertyDrawer(typeof(InlineAttribute))]
     [CustomPropertyDrawer(typeof(SubtypeSelectorAttribute))]
+    [CustomPropertyDrawer(typeof(ValidateAttribute))]
     internal class MasterPropertyDrawer : PropertyDrawer {
         private Lazy<IEnumerable<Type>> CachedSubclasses { get; }
 
@@ -18,14 +19,6 @@ namespace GameplayAbilities.Editor {
 
         private bool IsCollectionField => this.fieldInfo.FieldType.IsGenericType &&
                                           this.fieldInfo.FieldType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
-
-        private protected static bool IsReferenceType(SerializedProperty property) {
-            return property.propertyType is SerializedPropertyType.ObjectReference
-                                         or SerializedPropertyType.ExposedReference 
-                                         or SerializedPropertyType.Generic
-                                         or SerializedPropertyType.ManagedReference
-                                         or SerializedPropertyType.AnimationCurve;
-        }
 
         private protected static bool IsNull(SerializedProperty? prop) {
             return prop is null || 
@@ -53,7 +46,7 @@ namespace GameplayAbilities.Editor {
         }
 
         private static void ApplyPropertyConstructorLogic(
-            in CustomPropertyAttribute a, in VisualElement drawer, in SerialisedData data
+            in CustomPropertyAttribute a, in CustomisablePropertyField drawer, in SerialisedData data
         ) {
             if (MasterPropertyDrawer.PropertyConstructors.TryGetValue(a.GetType(), out IPropertyDrawingLogic logic)) {
                 logic.Apply(drawer, data);
@@ -61,7 +54,7 @@ namespace GameplayAbilities.Editor {
         }
         
         private static void ApplyPropertyPainterLogic(
-            in CustomPropertyAttribute a, in VisualElement drawer, in SerialisedData data
+            in CustomPropertyAttribute a, in CustomisablePropertyField drawer, in SerialisedData data
         ) {
             if (MasterPropertyDrawer.PropertyPainters.TryGetValue(a.GetType(), out IPropertyDrawingLogic logic)) {
                 logic.Apply(drawer, data);
@@ -69,17 +62,17 @@ namespace GameplayAbilities.Editor {
         }
 
         public override VisualElement CreatePropertyGUI(SerializedProperty property) {
-            VisualElement drawer = new VisualElement();
+            CustomisablePropertyField drawer = new CustomisablePropertyField(property);
             SerialisedData data = new SerialisedData(property, this.fieldInfo);
-            this.Process(data, ref drawer);
+            this.Process(data, in drawer);
             return drawer;
         }
 
-        private protected virtual void Process(SerialisedData data, ref VisualElement drawer) {
+        private protected virtual void Process(SerialisedData data, in CustomisablePropertyField drawer) {
             foreach (CustomPropertyAttribute a in data.GetAttributes<CustomPropertyAttribute>()) {
                 MasterPropertyDrawer.ApplyPropertyConstructorLogic(a, drawer, data);
             }
-
+            
             foreach (CustomPropertyAttribute a in data.GetAttributes<CustomPropertyAttribute>()) {
                 MasterPropertyDrawer.ApplyPropertyPainterLogic(a, drawer, data);
             }
@@ -87,7 +80,7 @@ namespace GameplayAbilities.Editor {
 
         private IEnumerable<Type> DenumerateTypes() {
             return TypeCache.GetTypesDerivedFrom(this.FieldType)
-                            .Where(type => !type.IsAbstract && !type.IsInterface && !type.IsGenericType);
+                            .Where(type => !type.IsAbstract && type is { IsInterface: false, IsGenericType: false });
         }
     }
 }
