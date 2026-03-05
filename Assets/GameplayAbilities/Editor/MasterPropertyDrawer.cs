@@ -19,6 +19,23 @@ namespace GameplayAbilities.Editor {
         private bool IsCollectionField => this.fieldInfo.FieldType.IsGenericType &&
                                           this.fieldInfo.FieldType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
 
+        private protected static bool IsReferenceType(SerializedProperty property) {
+            return property.propertyType is SerializedPropertyType.ObjectReference
+                                         or SerializedPropertyType.ExposedReference 
+                                         or SerializedPropertyType.Generic
+                                         or SerializedPropertyType.ManagedReference
+                                         or SerializedPropertyType.AnimationCurve;
+        }
+
+        private protected static bool IsNull(SerializedProperty? prop) {
+            return prop is null || 
+                   (prop.propertyType == SerializedPropertyType.ObjectReference && !prop.objectReferenceValue) ||
+                   (prop.propertyType == SerializedPropertyType.ExposedReference && !prop.objectReferenceValue) ||
+                   (prop.propertyType == SerializedPropertyType.Generic && !prop.objectReferenceValue) ||
+                   prop is { propertyType: SerializedPropertyType.ManagedReference, managedReferenceValue: null } ||
+                   prop is { propertyType: SerializedPropertyType.AnimationCurve, animationCurveValue: null }; 
+        }
+
         private static IDictionary<Type, IPropertyDrawingLogic> PropertyConstructors { get; } =
             typeof(PropertyConstructor<>).GetConcreteSubtypes().ToDictionary(
                 type => type.GetParametrisedTypesOn(typeof(PropertyConstructor<>))[0],

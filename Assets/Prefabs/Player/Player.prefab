@@ -93,6 +93,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameplayAbilitiesSystem.Runtime::GameplayAbilitiesSystem.Runtime.Stats.VitalStatistics
   <AttributeSet>k__BackingField: {fileID: 0}
   <EffectReceiver>k__BackingField: {fileID: 0}
+  <RegenSource>k__BackingField:
+    value: {fileID: 0}
   <Stats>k__BackingField:
   - <TrackedAttribute>k__BackingField: {fileID: 0}
     <RegenerationEffect>k__BackingField: {fileID: 11400000, guid: ce0b259a5ffa8cd448302955c60f78f1, type: 2}
@@ -485,8 +487,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6019539295ff40da8efaeee6d6c947ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameplayAbilities.Runtime::GameplayAbilities.Attributes.AttributeSet
-  <Owner>k__BackingField: {fileID: 0}
   <DefaultRoundingPolicy>k__BackingField: 0
+  <StartingAttributes>k__BackingField:
+    <Entries>k__BackingField: []
+    <KeyLabel>k__BackingField: 
+    <ValueLabel>k__BackingField: 
 --- !u!114 &97951859804305642
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -499,7 +504,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfddfa1d434040278ded2a8a44c75fae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameplayAbilities.Runtime::GameplayAbilities.Effects.EffectReceiver
-  <ModifierTarget>k__BackingField: {fileID: 7403605642705994734}
   <AttributeReader>k__BackingField:
     value: {fileID: 3304667604102116073}
 --- !u!1 &5962457325683517129

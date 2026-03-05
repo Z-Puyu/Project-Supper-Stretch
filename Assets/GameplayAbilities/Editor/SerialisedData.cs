@@ -12,11 +12,13 @@ namespace GameplayAbilities.Editor {
                 ? this.Field.FieldType.GetParametrisedTypesOn(typeof(IEnumerable<>))[0]
                 : this.Field.FieldType;
         
+        public Type FieldType => this.Field.FieldType;
+        
         public T[] GetAttributes<T>() where T : Attribute {
             return this.Field.GetCustomAttributes<T>().ToArray();
         }
         
-        public T GetAttribute<T>() where T : Attribute {
+        public T? GetAttribute<T>() where T : Attribute {
             return this.Field.GetCustomAttribute<T>();
         }
 

@@ -6,7 +6,7 @@ namespace GameplayAbilities.Editor.Drawers {
         public abstract void Construct(in VisualElement drawer, in SerialisedData data, in A attribute);
         
         void IPropertyDrawingLogic.Apply(in VisualElement drawer, in SerialisedData data) {
-            this.Construct(drawer, data, data.GetAttribute<A>());
+            this.Construct(drawer, data, data.GetAttribute<A>()!);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace GameplayAbilities.Editor.Drawers {
         public abstract void Paint(in VisualElement drawer, in SerializedProperty property, in A attribute);
         
         public void Apply(in VisualElement drawer, in SerialisedData data) {
-            this.Paint(drawer, data.SerialisedProperty, data.GetAttribute<A>());
+            this.Paint(drawer, data.SerialisedProperty, data.GetAttribute<A>()!);
         }
     }
 }

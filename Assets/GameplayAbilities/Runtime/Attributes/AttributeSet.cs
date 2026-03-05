@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using GameplayAbilities.Modifiers;
+using GameplayAbilities.Runtime.EditorTooling;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -22,6 +23,10 @@ namespace GameplayAbilities.Attributes {
             GameplayAttributeType.RoundingMethod.RoundToNearest;
 
         [NotNull] private ModifierEnvironment? ModifierEnvironment { get; set; }
+
+        [field: SerializeField, Dictionary("Attribute")]
+        private Map<GameplayAttributeType, double> StartingAttributes { get; set; } =
+            new Map<GameplayAttributeType, double>();
 
         public event UnityAction<GameplayAttributeType, AttributeChange> OnAnyAttributeUpdated = delegate { };
 
