@@ -15,7 +15,7 @@ namespace GameplayAbilities.Abilities {
         [field: SerializeField] private List<Cost> Costs { get; set; } = new List<Cost>();
 
         [field: SerializeReference, Tooltip("Conditions on the ability system for this ability to be usable")]
-        private List<IPredicate<AbilitySystem>> Conditions { get; set; } = new List<IPredicate<AbilitySystem>>();
+        private List<IAbilityPrerequisite> Conditions { get; set; } = new List<IAbilityPrerequisite>();
         
         [field: SerializeReference, SubtypeSelector] private AbilityExecution? Execution { get; set; }
 
@@ -48,7 +48,7 @@ namespace GameplayAbilities.Abilities {
         }
 
         internal bool TryCommit(AbilitySystem system, IUserData? userData) {
-            foreach (IPredicate<AbilitySystem> condition in this.Conditions) {
+            foreach (IAbilityPrerequisite condition in this.Conditions) {
                 if (condition.Holds(system)) {
                     continue;
                 }

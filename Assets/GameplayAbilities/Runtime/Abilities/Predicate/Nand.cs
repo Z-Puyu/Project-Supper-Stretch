@@ -5,25 +5,18 @@ using UnityEngine;
 
 namespace GameplayAbilities.Abilities.Predicate {
     [Serializable]
-    internal struct Nand : IPredicate<AbilitySystem> {
+    internal sealed class Nand : IAbilityPrerequisite {
         [field: SerializeReference, SubtypeSelector]
-        private List<IPredicate<AbilitySystem>> Predicates { get; set; }
-
-        private List<Predicate<AbilitySystem>> CompiledPredicates { get; }
-
-        public Nand() {
-            this.Predicates = new List<IPredicate<AbilitySystem>>();
-            this.CompiledPredicates = new List<Predicate<AbilitySystem>>();
-        }
+        private List<IAbilityPrerequisite> Predicates { get; set; } = new List<IAbilityPrerequisite>();
 
         public bool Holds(AbilitySystem source) {
-            if (this.CompiledPredicates.Count == 0) {
-                foreach (IPredicate<AbilitySystem> predicate in this.Predicates) {
-                    this.CompiledPredicates.Add(r => predicate.Holds(r));
+            foreach (IAbilityPrerequisite p in this.Predicates) {
+                if (!p.Holds(source)) {
+                    return true;
                 }
             }
 
-            return this.CompiledPredicates.Exists(p => !p(source));
+            return false;
         }
         
         public override string ToString() {

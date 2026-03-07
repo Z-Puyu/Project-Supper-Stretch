@@ -4,16 +4,16 @@ using UnityEngine;
 
 namespace GameplayAbilities.Abilities.Predicate {
     [Serializable]
-    internal struct Not : IPredicate<AbilitySystem> {
+    internal sealed class Not : IAbilityPrerequisite {
         [field: SerializeReference, SubtypeSelector]
-        private IPredicate<AbilitySystem> Predicate { get; set; }
+        private IAbilityPrerequisite? AbilityPrerequisite { get; set; }
 
         public bool Holds(AbilitySystem source) {
-            return !this.Predicate.Holds(source);
+            return !(this.AbilityPrerequisite?.Holds(source) ?? true);
         }
         
         public override string ToString() {
-            return $"Not {this.Predicate}";
+            return $"Not {this.AbilityPrerequisite}";
         }
     }
 }
