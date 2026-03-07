@@ -23,23 +23,31 @@ namespace GameplayAbilities.Effects.Schedulers {
         private PersistentExecution() { }
 
         async Awaitable IScheduler.Execute(ModifierEnvironment target, CancellationToken interrupt) {
-            foreach (KeyValuePair<GameplayAttributeType, Modifier> modifier in this.Modifiers) {
-                target.AddModifier(modifier.Key, modifier.Value);
-            }
-
-            if (this.Duration <= 0) {
-                return;
-            }
-            
             try {
+                foreach (KeyValuePair<GameplayAttributeType, Modifier> modifier in this.Modifiers) {
+                    target.AddModifier(modifier.Key, modifier.Value);
+                }
+
+                if (this.Duration <= 0f) {
+                    while (true) {
+                        await Awaitable.NextFrameAsync(interrupt);
+                    }
+                } 
+
                 await Awaitable.WaitForSecondsAsync(this.Duration, interrupt);
             } catch (OperationCanceledException) { } finally {
                 foreach (KeyValuePair<GameplayAttributeType, Modifier> modifier in this.Modifiers) {
                     target.AddModifier(modifier.Key, -modifier.Value);
                 }
 
-                PersistentExecution.Pool.Release(this);
+                this.ReleaseToPool();
             }
+        }
+
+        private void ReleaseToPool() {
+            this.Modifiers.Clear();
+            this.Duration = 0f;
+            PersistentExecution.Pool.Release(this);
         }
 
         IScheduler IScheduler.Clone(IEnumerable<KeyValuePair<GameplayAttributeType, Modifier>> modifiers) {

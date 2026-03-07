@@ -23,13 +23,17 @@ namespace GameplayAbilities.Effects.Schedulers {
         private PeriodicExecution() { }
         
         async Awaitable IScheduler.Execute(ModifierEnvironment target, CancellationToken interrupt) {
-            if (this.ShouldExecuteOnStart) {
-                this.ApplyModifiers(target);
-            }
+            try {
+                if (this.ShouldExecuteOnStart) {
+                    this.ApplyModifiers(target);
+                }
 
-            while (this.NumberOfTicks > 0) {
-                await Awaitable.WaitForSecondsAsync(this.TickInterval, interrupt);
-                this.ApplyModifiers(target);
+                while (this.NumberOfTicks > 0) {
+                    await Awaitable.WaitForSecondsAsync(this.TickInterval, interrupt);
+                    this.ApplyModifiers(target);
+                }
+            } finally {
+                this.ReleaseToPool();
             }
         }
 
@@ -39,6 +43,14 @@ namespace GameplayAbilities.Effects.Schedulers {
             }   
             
             this.NumberOfTicks -= 1;
+        }
+
+        private void ReleaseToPool() {
+            this.Modifiers.Clear();
+            this.NumberOfTicks = 0;
+            this.TickInterval = 0f;
+            this.ShouldExecuteOnStart = false;
+            PeriodicExecution.Pool.Release(this);
         }
 
         IScheduler IScheduler.Clone(IEnumerable<KeyValuePair<GameplayAttributeType, Modifier>> modifiers) {

@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -14,10 +13,10 @@ namespace GameplayAbilities.Attributes {
     [RequireComponent(typeof(ModifierEnvironment))]
     public sealed class AttributeSet : MonoBehaviour, IAttributeReader {
         private IDictionary<GameplayAttributeType, Value> Attributes { get; } =
-            new ConcurrentDictionary<GameplayAttributeType, Value>();
+            new Dictionary<GameplayAttributeType, Value>();
 
         private IDictionary<GameplayAttributeType, Action<AttributeChange>> Observers { get; } =
-            new ConcurrentDictionary<GameplayAttributeType, Action<AttributeChange>>();
+            new Dictionary<GameplayAttributeType, Action<AttributeChange>>();
 
         [NotNull] private ModifierEnvironment? ModifierEnvironment { get; set; }
         [field: SerializeField] private AttributeTable? DefaultStartingAttributes { get; set; }
@@ -56,7 +55,8 @@ namespace GameplayAbilities.Attributes {
         /// <param name="attributes">The starting values for the attributes.</param>
         public void Initialise(IEnumerable<KeyValuePair<GameplayAttributeType, double>> attributes) {
             this.Attributes.Clear();
-            IReadOnlyDictionary<GameplayAttributeType, double> map = attributes.ToDictionary(x => x.Key, x => x.Value);
+            IReadOnlyDictionary<GameplayAttributeType, double> map = 
+                    attributes.ToDictionary(pair => pair.Key, pair => pair.Value);
             foreach ((GameplayAttributeType type, double value) in map) {
                 this.Attributes.Add(type, new Value(value, 0, 0));
             }

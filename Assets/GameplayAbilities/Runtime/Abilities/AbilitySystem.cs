@@ -34,7 +34,10 @@ namespace GameplayAbilities.Abilities {
             this.AbilitySystemController = new AbilitySystemController(
                 this.Owner, this, this.EffectReceiver, this.ResourceContainer, this.AttributeSet, this.Animator
             );
-            
+        }
+
+        private void Start() {
+            this.ResourceContainer.RegisterResources();
             foreach (Ability ability in this.DefaultAbilities) {
                 this.Grant(ability);
             }
@@ -87,7 +90,15 @@ namespace GameplayAbilities.Abilities {
         /// </summary>
         /// <param name="context">The context of the ability execution.</param>
         /// <returns>An awaitable that completes when the ability has finished executing.</returns>
-        public async void Perform(AbilityExecutionContext context) {
+        public void Perform(AbilityExecutionContext context) {
+            this.PerformFireAndForget(context);
+        }
+
+        private async void PerformFireAndForget(AbilityExecutionContext context) {
+            await this.PerformInternal(context);
+        }
+
+        private async Awaitable PerformInternal(AbilityExecutionContext context) {
             try {
                 Ability ability = context.Ability;
                 this.Stop(ability);
@@ -108,12 +119,15 @@ namespace GameplayAbilities.Abilities {
 
                 await ability.Execute(this.AbilitySystemController, context.UserData, linked.Token);
             } catch (OperationCanceledException) { } catch (Exception e) {
-#if DEBUG
-                Debug.LogException(e);
-#endif
+                this.LogExecutionFailure(context.Ability, e);
             } finally {
                 this.Conclude(context.Ability);
             }
+        }
+
+        private void LogExecutionFailure(Ability ability, Exception exception) {
+            Debug.LogError($"Ability execution failed. Ability: {ability.name}.", this);
+            Debug.LogException(exception, this);
         }
 
         private void Conclude(Ability ability) {

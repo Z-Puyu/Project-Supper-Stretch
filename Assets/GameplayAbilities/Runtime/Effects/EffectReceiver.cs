@@ -21,6 +21,14 @@ namespace GameplayAbilities.Effects {
         private void Awake() {
             this.ModifierTarget = this.GetComponent<ModifierEnvironment>();
         }
+
+        private void OnDisable() {
+            this.InterruptAll();
+        }
+
+        private void OnDestroy() {
+            this.InterruptAll();
+        }
         
         internal Guid RegisterEffect(IAttributeReader source, IEffect effect, IUserData? userData = null) {
             if (!this.ModifierTarget || this.AttributeReader.Value == null) {
@@ -28,18 +36,21 @@ namespace GameplayAbilities.Effects {
             }
 
             Guid id = Guid.NewGuid();
+            if (this.Effects.ContainsKey(id)) {
+                return Guid.Empty;
+            }
+
             CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(
                 this.ModifierTarget.destroyCancellationToken, this.destroyCancellationToken
             );
-
+            
+            EffectExecutionMetadata metadata = new EffectExecutionMetadata(effect, cts);
             if (!this.EffectInstances.TryGetValue(effect, out List<Guid> instances)) {
                 this.EffectInstances.Add(effect, instances = new List<Guid>());
             }
-
+            
             instances.Add(id);
-            EffectExecutionMetadata metadata = new EffectExecutionMetadata(effect, cts);
-            this.Effects.Add(id, metadata);
-            _ = this.Execute(id, metadata, source, userData);
+            this.Execute(id, metadata, source, userData);
             return id;
         }
 
@@ -66,57 +77,80 @@ namespace GameplayAbilities.Effects {
                     : this.AddEffect(this.AttributeReader.Value, effect, userData);
         }
 
-        private async Awaitable Execute(
+        private async void Execute(
             Guid id, EffectExecutionMetadata metadata, IAttributeReader source, IUserData? userData
         ) {
-            if (!this.ModifierTarget || this.AttributeReader.Value == null) {
-                return;
-            }
-
-            EffectExecutionContext context = new EffectExecutionContext(
-                source, this.AttributeReader.Value, this.ModifierTarget
-            );
-            
             try {
+                if (!this.ModifierTarget || this.AttributeReader.Value == null || !this.Effects.ContainsKey(id)) {
+                    return;
+                }
+
+                EffectExecutionContext context = new EffectExecutionContext(
+                    source, this.AttributeReader.Value, this.ModifierTarget
+                );
+
                 await metadata.Effect.Execute(context, this.ModifierTarget, userData, metadata.Interrupter.Token);
-            } catch (OperationCanceledException) { } finally {
-                this.DisposeEffectInstance(id);
+            } catch (OperationCanceledException) { } catch (Exception e) {
+#if DEBUG
+                Debug.LogException(e, this);
+#endif
+            } finally {
+                this.RemoveInstance(id);
             }
         }
 
-        private void DisposeEffectInstance(Guid id) {
+        private void Dispose(Guid id) {
+            if (this.Effects.TryGetValue(id, out EffectExecutionMetadata metadata)) {
+                metadata.Interrupter.Dispose();
+            }
+        }
+
+        private void RemoveInstance(Guid id) {
             if (!this.Effects.Remove(id, out EffectExecutionMetadata metadata)) {
                 return;
             }
-
-            metadata.Interrupter.Dispose();
-            this.RemoveInstance(metadata.Effect, id);
+            
+            if (!this.EffectInstances.TryGetValue(metadata.Effect, out List<Guid> instances)) {
+                return;
+            }
+            
+            instances.Remove(id);
+            if (instances.Count == 0) {
+                this.EffectInstances.Remove(metadata.Effect);
+            }
         }
 
-        private void RemoveInstance(IEffect effect, Guid id) {
+        private void InterruptAll() {
+            foreach (Guid id in this.Effects.Keys) {
+                this.Interrupt(id);
+                this.Dispose(id);
+            }
+            
+            this.Effects.Clear();
+            this.EffectInstances.Clear();
+        }
+
+        private void Interrupt(IEffect effect) {
             if (!this.EffectInstances.TryGetValue(effect, out List<Guid> instances)) {
                 return;
             }
+            
+            foreach (Guid id in instances) {
+                this.Interrupt(id);
+                this.Dispose(id);
+            }
 
-            instances.Remove(id);
-            if (instances.Count == 0) {
-                this.EffectInstances.Remove(effect);
+            foreach (Guid id in instances.ToArray()) {
+                this.RemoveInstance(id);
             }
         }
 
-        internal void Interrupt(IEffect effect) {
-            if (!this.EffectInstances.Remove(effect, out List<Guid> instances)) {
+        private void Interrupt(Guid id) {
+            if (!this.Effects.TryGetValue(id, out EffectExecutionMetadata metadata)) {
                 return;
             }
-
-            foreach (Guid id in instances) {
-                if (!this.Effects.Remove(id, out EffectExecutionMetadata metadata)) {
-                    continue;
-                }
-
-                metadata.Interrupter.Cancel();
-                metadata.Interrupter.Dispose();
-            }
+            
+            metadata.Interrupter.Cancel();
         }
 
         /// <summary>
@@ -132,17 +166,13 @@ namespace GameplayAbilities.Effects {
         /// </summary>
         /// <param name="id"></param>
         public void Stop(Guid id) {
-            if (!this.Effects.Remove(id, out EffectExecutionMetadata metadata)) {
-                return;
-            }
-            
-            metadata.Interrupter.Cancel();
-            metadata.Interrupter.Dispose();
-            this.RemoveInstance(metadata.Effect, id);
+            this.Interrupt(id);
+            this.Dispose(id);
+            this.RemoveInstance(id);
         }
 
         public void StopEarliest(Effect effect) {
-            if (!this.EffectInstances.TryGetValue(effect, out List<Guid> instances)) {
+            if (!this.EffectInstances.TryGetValue(effect, out List<Guid> instances) || instances.Count == 0) {
                 return;
             }
             
@@ -150,10 +180,10 @@ namespace GameplayAbilities.Effects {
         }
 
         public void StopLatest(Effect effect) {
-            if (!this.EffectInstances.TryGetValue(effect, out List<Guid> instances)) {
+            if (!this.EffectInstances.TryGetValue(effect, out List<Guid> instances) || instances.Count == 0) {
                 return;
             }
-            
+
             this.Stop(instances[^1]);
         }
 

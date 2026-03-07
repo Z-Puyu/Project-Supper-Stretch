@@ -13,50 +13,81 @@ namespace GameplayAbilities.Effects.Triggers {
 
         [field: SerializeReference, SubtypeSelector]
         private List<IEffectTriggerCondition<T>> Conditions { get; set; } = new List<IEffectTriggerCondition<T>>();
-        
-        private bool IsTriggering { get; set; }
+
+        private bool HasBeenTriggered { get; set; }
+        private int TriggerVersion { get; set; }
         private CancellationTokenSource DelayTimerInterrupter { get; set; } = new CancellationTokenSource();
-        
+
         public virtual bool ShouldTrigger(T context) {
             foreach (IEffectTriggerCondition<T> condition in this.Conditions) {
                 if (!condition.Holds(context)) {
                     return false;
                 }
             }
-            
+
             return true;
         }
-        
+
         public void TriggerEffect(T context, Effect effect) {
-            if (this.EffectReceiver && this.Effect) {
-                this.EffectReceiver.AddEffectToSelf(this.Effect);
+            if (this.EffectReceiver) {
+                this.EffectReceiver.AddEffectToSelf(effect);
             }
         }
 
+        private int BeginTriggerAttempt() {
+            this.TriggerVersion += 1;
+            this.HasBeenTriggered = true;
+            return this.TriggerVersion;
+        }
+
+        private void CancelPendingTrigger() {
+            if (!this.HasBeenTriggered) {
+                return;
+            }
+
+            this.TriggerVersion += 1;
+            this.HasBeenTriggered = false;
+            this.InterruptOngoingDelay();
+        }
+
         private void InterruptOngoingDelay() {
+            if (!this.DelayTimerInterrupter.IsCancellationRequested) {
+                return;
+            }
+            
             this.DelayTimerInterrupter.Cancel();
             this.DelayTimerInterrupter.Dispose();
             this.DelayTimerInterrupter = new CancellationTokenSource();
         }
-        
-        internal async Awaitable TryTrigger(T context) {
-            if (!this.Effect) {
-                return;
-            }
-            
-            if (this.ShouldTrigger(context)) {
-                this.IsTriggering = true;
-                if (this.DelayInSeconds > 0) {
-                    this.InterruptOngoingDelay();
-                    await Awaitable.WaitForSecondsAsync(this.DelayInSeconds, this.DelayTimerInterrupter.Token);
+
+        internal async void TryTrigger(T context) {
+            try {
+                Effect? effect = this.Effect;
+                if (!effect) {
+                    return;
                 }
 
-                this.TriggerEffect(context, this.Effect);
-            } else if (this.IsTriggering) {
+                if (!this.ShouldTrigger(context)) {
+                    this.CancelPendingTrigger();
+                    return;
+                }
+
+                int version = this.BeginTriggerAttempt();
                 this.InterruptOngoingDelay();
+                if (this.DelayInSeconds > 0f) {
+                    await Awaitable.WaitForSecondsAsync(this.DelayInSeconds, this.DelayTimerInterrupter.Token);
+                    if (version != this.TriggerVersion) {
+                        return;
+                    }
+                }
+
+                this.TriggerEffect(context, effect);
+                this.HasBeenTriggered = false;
+            } catch (OperationCanceledException) { } catch (Exception e) {
+#if DEBUG
+                Debug.LogException(e);
+#endif
             }
-            
-            this.IsTriggering = false;
         }
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using GameplayAbilities.Attributes;
 using UnityEngine;
@@ -13,7 +12,7 @@ namespace GameplayAbilities.Modifiers {
         [field: SerializeField] private ModifierEnvironment? ParentEnvironment { get; set; }
 
         private IDictionary<GameplayAttributeType, Node> Modifiers { get; } =
-            new ConcurrentDictionary<GameplayAttributeType, Node>();
+            new Dictionary<GameplayAttributeType, Node>();
 
         public event UnityAction<GameplayAttributeType> OnModifierUpdated = delegate { };
 
