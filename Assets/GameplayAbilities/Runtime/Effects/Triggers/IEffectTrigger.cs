@@ -1,4 +1,4 @@
-﻿namespace GameplayAbilities.Effects {
+﻿namespace GameplayAbilities.Effects.Triggers {
     /// <summary>
     /// A trigger that can be used to fire effects based on a given context.
     /// </summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using GameplayAbilities.Attributes;
+using GameplayAbilities.Effects.Stacking;
 using GameplayAbilities.Modifiers;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -17,9 +18,34 @@ namespace GameplayAbilities.Effects.Schedulers {
         [field: SerializeField, Min(0)] private float TickInterval { get; set; }
         [field: SerializeField] private bool ShouldExecuteOnStart { get; set; }
 
+        private float Duration => this.ShouldExecuteOnStart
+                ? this.TickInterval * (this.NumberOfTicks - 1)
+                : this.TickInterval * this.NumberOfTicks;
+
         private List<KeyValuePair<GameplayAttributeType, Modifier>> Modifiers { get; } =
             new List<KeyValuePair<GameplayAttributeType, Modifier>>();
+
+        EffectExecutionSchedule IScheduler.ExecutionSchedule => new EffectExecutionSchedule {
+            NumberOfTicks = this.NumberOfTicks,
+            PersistentDuration = Math.Max(0, this.Duration)
+        };
         
+        EffectExecutionState IScheduler.CurrentState => new EffectExecutionState {
+            RemainingTicks = this.NumberOfTicks,
+            RemainingDuration = Math.Max(0, this.Duration),
+            Modifiers = this.Modifiers
+        };
+
+        public IScheduler Schedule(EffectExecutionScheme scheme) {
+            PeriodicExecution execution = PeriodicExecution.Pool.Get();
+            execution.Modifiers.Clear();
+            execution.Modifiers.AddRange(scheme.Modifiers);
+            execution.NumberOfTicks = scheme.ExecutionSchedule.NumberOfTicks;
+            execution.TickInterval = scheme.ExecutionSchedule.TickInterval;
+            execution.ShouldExecuteOnStart = scheme.ExecutionSchedule.ShouldTickOnStart;
+            return execution;
+        }
+
         private PeriodicExecution() { }
         
         async Awaitable IScheduler.Execute(ModifierEnvironment target, CancellationToken interrupt) {
@@ -51,16 +77,6 @@ namespace GameplayAbilities.Effects.Schedulers {
             this.TickInterval = 0f;
             this.ShouldExecuteOnStart = false;
             PeriodicExecution.Pool.Release(this);
-        }
-
-        IScheduler IScheduler.Clone(IEnumerable<KeyValuePair<GameplayAttributeType, Modifier>> modifiers) {
-            PeriodicExecution execution = PeriodicExecution.Pool.Get();
-            execution.Modifiers.Clear();
-            execution.Modifiers.AddRange(modifiers);
-            execution.NumberOfTicks = this.NumberOfTicks;
-            execution.TickInterval = this.TickInterval;
-            execution.ShouldExecuteOnStart = this.ShouldExecuteOnStart;
-            return execution;
         }
     }
 }

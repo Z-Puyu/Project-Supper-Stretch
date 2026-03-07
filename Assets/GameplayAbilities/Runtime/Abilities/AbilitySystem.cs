@@ -68,7 +68,8 @@ namespace GameplayAbilities.Abilities {
             }
             
             foreach (Cost cost in array) {
-                this.EffectReceiver.RegisterEffect(this.AttributeSet, cost, userData);
+                EffectExecutionContext context = EffectExecutionContext.FromSelfOnSelf(this.AttributeSet);
+                this.EffectReceiver.RegisterEffect(cost, cost.CreateExecutionScheme(context, userData));
             }
             
             return true;

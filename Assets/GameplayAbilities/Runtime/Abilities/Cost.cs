@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Attributes.Evaluation;
 using GameplayAbilities.Common;
 using GameplayAbilities.Effects;
+using GameplayAbilities.Effects.Schedulers;
 using GameplayAbilities.Modifiers;
 using UnityEngine;
 
@@ -50,15 +53,15 @@ namespace GameplayAbilities.Abilities {
             };
         }
 
-        Awaitable IEffect.Execute(
-            EffectExecutionContext context, ModifierEnvironment target,
-            IUserData? userData, CancellationToken interrupt
+        RuntimeEffect IEffect.Execute(
+            EffectExecutionScheme scheme, ModifierEnvironment target, CancellationTokenSource interrupter
         ) {
-            AwaitableCompletionSource completed = new AwaitableCompletionSource();
-            completed.Reset();
-            completed.SetResult();
+            return RuntimeEffect.With(this, InstantExecution.Create(scheme.Modifiers), interrupter, target);
+        }
+
+        public EffectExecutionScheme CreateExecutionScheme(EffectExecutionContext context, IUserData? userData) {
             if (!this.CostAttribute) {
-                return completed.Awaitable;
+                return default;
             }
             
             double cost = this.Amount?.Evaluate(context.TargetAttributes, userData) ?? 0;
@@ -68,8 +71,11 @@ namespace GameplayAbilities.Abilities {
                 var _ => 0
             };
             
-            target.AddModifier(this.CostAttribute, new Modifier(ModifierType.Offset, change));
-            return completed.Awaitable;
+            KeyValuePair<GameplayAttributeType, Modifier> modifier = new KeyValuePair<GameplayAttributeType, Modifier>(
+                this.CostAttribute, new Modifier(ModifierType.Offset, change)
+            );
+            
+            return new EffectExecutionScheme(Enumerable.Repeat(modifier, 1));
         }
     }
 }

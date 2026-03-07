@@ -1,13 +1,15 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using GameplayAbilities.Common;
 using GameplayAbilities.Modifiers;
 using UnityEngine;
 
 namespace GameplayAbilities.Effects {
     internal interface IEffect {
-        internal Awaitable Execute(
-            EffectExecutionContext context, ModifierEnvironment target, 
-            IUserData? userData, CancellationToken interrupt
+        internal RuntimeEffect Execute(
+            EffectExecutionScheme scheme, ModifierEnvironment target, CancellationTokenSource interrupter
         );
+        
+        internal EffectExecutionScheme CreateExecutionScheme(EffectExecutionContext context, IUserData? userData);
     }
 }

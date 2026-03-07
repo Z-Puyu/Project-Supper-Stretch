@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using GameplayAbilities.Attributes;
+﻿using System.Threading;
 using GameplayAbilities.Modifiers;
 using UnityEngine;
 
 namespace GameplayAbilities.Effects.Schedulers {
     internal interface IScheduler {
         internal Awaitable Execute(ModifierEnvironment target, CancellationToken interrupt);
-        
-        internal IScheduler Clone(IEnumerable<KeyValuePair<GameplayAttributeType, Modifier>> modifiers);
+        internal IScheduler Schedule(EffectExecutionScheme scheme);
+        internal EffectExecutionSchedule ExecutionSchedule { get; }
+        internal EffectExecutionState CurrentState { get; }
     }
 }

@@ -16,6 +16,21 @@ namespace GameplayAbilities.Effects.Schedulers {
         private List<KeyValuePair<GameplayAttributeType, Modifier>> Modifiers { get; } =
             new List<KeyValuePair<GameplayAttributeType, Modifier>>();
 
+        EffectExecutionSchedule IScheduler.ExecutionSchedule => default;
+
+        EffectExecutionState IScheduler.CurrentState => new EffectExecutionState {
+            RemainingTicks = 0,
+            RemainingDuration = 0,
+            Modifiers = this.Modifiers
+        };
+
+        IScheduler IScheduler.Schedule(EffectExecutionScheme scheme) {
+            InstantExecution clone = InstantExecution.Pool.Get();
+            clone.Modifiers.Clear();
+            clone.Modifiers.AddRange(scheme.Modifiers);
+            return clone;
+        }
+        
         internal static InstantExecution Create(IEnumerable<KeyValuePair<GameplayAttributeType, Modifier>> modifiers) {
             InstantExecution clone = InstantExecution.Pool.Get();
             clone.Modifiers.Clear();
@@ -28,15 +43,16 @@ namespace GameplayAbilities.Effects.Schedulers {
                 target.AddModifier(modifier.Key, modifier.Value);
             }
             
-            InstantExecution.Pool.Release(this);
+            this.ReleaseToPool();
             AwaitableCompletionSource completed = new AwaitableCompletionSource();
             completed.Reset();
             completed.SetResult();
             return completed.Awaitable;
         }
 
-        IScheduler IScheduler.Clone(IEnumerable<KeyValuePair<GameplayAttributeType, Modifier>> modifiers) {
-            return InstantExecution.Create(modifiers);
+        private void ReleaseToPool() {
+            this.Modifiers.Clear();
+            InstantExecution.Pool.Release(this);
         }
     }
 }
