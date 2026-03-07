@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
+using GameplayAbilities.Attributes.EffectTriggers;
+using GameplayAbilities.Effects.Triggers;
 using GameplayAbilities.Modifiers;
 using UnityEngine;
 using UnityEngine.Events;
@@ -20,6 +22,10 @@ namespace GameplayAbilities.Attributes {
 
         [NotNull] private ModifierEnvironment? ModifierEnvironment { get; set; }
         [field: SerializeField] private AttributeTable? DefaultStartingAttributes { get; set; }
+
+        [field: SerializeField]
+        private List<AttributeSetEffectTrigger> EffectTriggers { get; set; } =
+            new List<AttributeSetEffectTrigger>();
         
         [field: SerializeField]
         private GameplayAttributeType.RoundingMethod DefaultRoundingPolicy { get; set; } =
@@ -79,13 +85,20 @@ namespace GameplayAbilities.Attributes {
             double current = this.QueryCurrentValue(key, ref @base);
             this.Attributes[key] = new Value(@base, current, key.Approximate(current));
             AttributeValue old = new AttributeValue(value.Base, value.Effective, value.Current);
-            AttributeChange change = new AttributeChange(old, this.Query(key));
-            this.TriggerCallbacks(key, change);
+            AttributeChange change = new AttributeChange(key, old, this.Query(key));
+            this.TriggerCallbacks(change);
+            this.TriggerInternalEffects(change);
         }
 
-        private void TriggerCallbacks(GameplayAttributeType key, AttributeChange change) {
-            this.OnAnyAttributeUpdated.Invoke(key, change);
-            if (this.Observers.TryGetValue(key, out Action<AttributeChange> observer)) {
+        private void TriggerInternalEffects(AttributeChange change) {
+            foreach (AttributeSetEffectTrigger trigger in this.EffectTriggers) {
+                trigger.TryTrigger(change);
+            }
+        }
+
+        private void TriggerCallbacks(AttributeChange change) {
+            this.OnAnyAttributeUpdated.Invoke(change.AttributeType, change);
+            if (this.Observers.TryGetValue(change.AttributeType, out Action<AttributeChange> observer)) {
                 observer.Invoke(change);
             }
         }

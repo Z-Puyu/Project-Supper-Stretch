@@ -65,7 +65,7 @@ namespace GameplayAbilities.Abilities {
             }
             
             foreach (Cost cost in array) {
-                this.EffectReceiver.AddEffect(this.AttributeSet, cost, userData);
+                this.EffectReceiver.RegisterEffect(this.AttributeSet, cost, userData);
             }
             
             return true;

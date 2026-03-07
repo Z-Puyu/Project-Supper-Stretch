@@ -21,8 +21,8 @@ namespace GameplayAbilities.Effects {
         private void Awake() {
             this.ModifierTarget = this.GetComponent<ModifierEnvironment>();
         }
-
-        public Guid AddEffect(IAttributeReader source, IEffect effect, IUserData? userData = null) {
+        
+        internal Guid RegisterEffect(IAttributeReader source, IEffect effect, IUserData? userData = null) {
             if (!this.ModifierTarget || this.AttributeReader.Value == null) {
                 return Guid.Empty;
             }
@@ -41,6 +41,29 @@ namespace GameplayAbilities.Effects {
             this.Effects.Add(id, metadata);
             _ = this.Execute(id, metadata, source, userData);
             return id;
+        }
+
+        /// <summary>
+        /// Adds an effect to the given source.
+        /// </summary>
+        /// <param name="source">The source of the effect.</param>
+        /// <param name="effect">The effect to add.</param>
+        /// <param name="userData">The optional user data associated with the effect.</param>
+        /// <returns>The unique identifier to the effect instance.</returns>
+        public Guid AddEffect(IAttributeReader source, Effect effect, IUserData? userData = null) {
+            return this.RegisterEffect(source, effect, userData);
+        }
+
+        /// <summary>
+        /// Adds an effect to self.
+        /// </summary>
+        /// <param name="effect">The effect to add.</param>
+        /// <param name="userData">Optional user data for the effect.</param>
+        /// <returns>The unique identifier for the effect instance.</returns>
+        public Guid AddEffectToSelf(Effect effect, IUserData? userData = null) {
+            return this.AttributeReader.Value == null
+                    ? Guid.Empty
+                    : this.AddEffect(this.AttributeReader.Value, effect, userData);
         }
 
         private async Awaitable Execute(
@@ -81,7 +104,7 @@ namespace GameplayAbilities.Effects {
             }
         }
 
-        public void Stop(IEffect effect) {
+        internal void Interrupt(IEffect effect) {
             if (!this.EffectInstances.Remove(effect, out List<Guid> instances)) {
                 return;
             }
@@ -96,6 +119,18 @@ namespace GameplayAbilities.Effects {
             }
         }
 
+        /// <summary>
+        /// Stops all instances of the given effect.
+        /// </summary>
+        /// <param name="effect">The effect to stop.</param>
+        public void Stop(Effect effect) {
+            this.Interrupt(effect);
+        }
+
+        /// <summary>
+        /// Stops the given effect instance.
+        /// </summary>
+        /// <param name="id"></param>
         public void Stop(Guid id) {
             if (!this.Effects.Remove(id, out EffectExecutionMetadata metadata)) {
                 return;
@@ -106,7 +141,7 @@ namespace GameplayAbilities.Effects {
             this.RemoveInstance(metadata.Effect, id);
         }
 
-        public void StopEarliest(IEffect effect) {
+        public void StopEarliest(Effect effect) {
             if (!this.EffectInstances.TryGetValue(effect, out List<Guid> instances)) {
                 return;
             }
@@ -114,7 +149,7 @@ namespace GameplayAbilities.Effects {
             this.Stop(instances[0]);
         }
 
-        public void StopLatest(IEffect effect) {
+        public void StopLatest(Effect effect) {
             if (!this.EffectInstances.TryGetValue(effect, out List<Guid> instances)) {
                 return;
             }
