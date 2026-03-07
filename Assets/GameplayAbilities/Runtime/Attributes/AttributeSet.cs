@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text;
 using GameplayAbilities.Modifiers;
-using GameplayAbilities.Runtime.EditorTooling;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -18,36 +18,51 @@ namespace GameplayAbilities.Attributes {
         private IDictionary<GameplayAttributeType, Action<AttributeChange>> Observers { get; } =
             new Dictionary<GameplayAttributeType, Action<AttributeChange>>();
 
+        [NotNull] private ModifierEnvironment? ModifierEnvironment { get; set; }
+        [field: SerializeField] private AttributeTable? DefaultStartingAttributes { get; set; }
+        
         [field: SerializeField]
         private GameplayAttributeType.RoundingMethod DefaultRoundingPolicy { get; set; } =
             GameplayAttributeType.RoundingMethod.RoundToNearest;
-
-        [NotNull] private ModifierEnvironment? ModifierEnvironment { get; set; }
-
-        [field: SerializeField, Dictionary("Attribute")]
-        private Map<GameplayAttributeType, double> StartingAttributes { get; set; } =
-            new Map<GameplayAttributeType, double>();
 
         public event UnityAction<GameplayAttributeType, AttributeChange> OnAnyAttributeUpdated = delegate { };
 
         private void Awake() {
             this.ModifierEnvironment = this.GetComponent<ModifierEnvironment>();
+        }
+
+        private void OnEnable() {
             this.ModifierEnvironment.OnModifierUpdated += this.Evaluate;
         }
         
-        private void Initialise(IDictionary<GameplayAttributeType, double> values) {
+        private void OnDisable() {
+            this.ModifierEnvironment.OnModifierUpdated -= this.Evaluate;
+        }
+
+        private void Start() {
+            if (this.Attributes.Count == 0 && this.DefaultStartingAttributes) {
+                this.Initialise(this.DefaultStartingAttributes);
+            }
+        }
+
+        /// <summary>
+        /// Initialises the attribute set with the given starting values.
+        /// </summary>
+        /// <param name="attributes">The starting values for the attributes.</param>
+        public void Initialise(IEnumerable<KeyValuePair<GameplayAttributeType, double>> attributes) {
             this.Attributes.Clear();
-            foreach ((GameplayAttributeType type, double value) in values) {
+            IReadOnlyDictionary<GameplayAttributeType, double> map = attributes.ToDictionary(x => x.Key, x => x.Value);
+            foreach ((GameplayAttributeType type, double value) in map) {
                 this.Attributes.Add(type, new Value(value, 0, 0));
             }
             
-            foreach (GameplayAttributeType type in values.Keys) {
+            foreach (GameplayAttributeType type in map.Keys) {
                 foreach (GameplayAttributeType dependency in type.GetDependencies()) {
                     this.Observe(dependency, _ => this.Evaluate(type));
                 }
             }
             
-            foreach (GameplayAttributeType type in values.Keys) {
+            foreach (GameplayAttributeType type in map.Keys) {
                 this.Evaluate(type);
 #if DEBUG
                 Debug.Log($"Attribute {type.Id} initialised to {this.Query(type).Value}");
@@ -107,12 +122,22 @@ namespace GameplayAbilities.Attributes {
             this.Attributes.Clear();
         }
         
+        /// <summary>
+        /// Registers a callback to be invoked when the given attribute changes.
+        /// </summary>
+        /// <param name="attribute">The attribute to observe.</param>
+        /// <param name="callback">The callback to invoke when the attribute changes.</param>
         public void Observe(GameplayAttributeType attribute, Action<AttributeChange> callback) {
             if (!this.Observers.TryAdd(attribute, callback)) {
                 this.Observers[attribute] += callback;
             }
         }
 
+        /// <summary>
+        /// Removes a previously registered callback from the given attribute.
+        /// </summary>
+        /// <param name="attribute">The attribute to remove the observer from.</param>
+        /// <param name="callback">The callback to remove.</param>
         public void RemoveObserver(GameplayAttributeType attribute, Action<AttributeChange> callback) {
             if (!this.Observers.TryGetValue(attribute, out Action<AttributeChange>? observer)) {
                 return;
