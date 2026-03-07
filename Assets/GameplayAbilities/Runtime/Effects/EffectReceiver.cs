@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading;
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Common;
-using GameplayAbilities.Effects.Schedulers;
 using GameplayAbilities.Effects.Stacking;
 using GameplayAbilities.Modifiers;
 using GameplayAbilities.Runtime.EditorTooling;
@@ -65,7 +63,7 @@ namespace GameplayAbilities.Effects {
             
             EffectExecutionContext context = new EffectExecutionContext(source, this.AttributeReader.Value);
             if (!this.HasEffect(effect, out List<Guid> existing)) {
-                return this.RegisterEffect(effect, effect.CreateExecution(context, userData));
+                return this.RegisterEffect(effect, effect.CreateExecutionScheme(context, userData));
             }
 
             EffectStackingResult res = effect.StackWith(this.StateOf(existing[^1]), context, userData);

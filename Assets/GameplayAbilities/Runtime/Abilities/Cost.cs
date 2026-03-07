@@ -59,7 +59,7 @@ namespace GameplayAbilities.Abilities {
             return RuntimeEffect.With(this, InstantExecution.Create(scheme.Modifiers), interrupter, target);
         }
 
-        public EffectExecutionScheme CreateExecutionScheme(EffectExecutionContext context, IUserData? userData) {
+        internal EffectExecutionScheme CreateExecutionScheme(EffectExecutionContext context, IUserData? userData) {
             if (!this.CostAttribute) {
                 return default;
             }

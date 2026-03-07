@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Common;
@@ -23,15 +22,8 @@ namespace GameplayAbilities.Effects {
             EffectExecutionState existing, EffectExecutionContext context, IUserData? userData
         ) {
             return this.StackingScheme is null
-                    ? EffectStackingResult.DirectStackingOf(this.CreateExecution(context, userData))
-                    : this.StackingScheme.Stack(existing, this.CreateExecution(context, userData));
-        }
-
-        internal EffectExecutionScheme CreateExecution(EffectExecutionContext context, IUserData? userData) {
-            return new EffectExecutionScheme {
-                Modifiers = this.MakeModifiers(context, userData),
-                ExecutionSchedule = this.ExecutionScheduler?.ExecutionSchedule ?? default
-            };
+                    ? EffectStackingResult.DirectStackingOf(this.CreateExecutionScheme(context, userData))
+                    : this.StackingScheme.Stack(existing, this.CreateExecutionScheme(context, userData));
         }
 
         RuntimeEffect IEffect.Execute(
@@ -42,8 +34,11 @@ namespace GameplayAbilities.Effects {
             return RuntimeEffect.With(this, scheduler, interrupter, target);
         }
 
-        EffectExecutionScheme IEffect.CreateExecutionScheme(EffectExecutionContext context, IUserData? userData) {
-            return this.CreateExecution(context, userData);
+        internal EffectExecutionScheme CreateExecutionScheme(EffectExecutionContext context, IUserData? userData) {
+            return new EffectExecutionScheme {
+                Modifiers = this.MakeModifiers(context, userData),
+                ExecutionSchedule = this.ExecutionScheduler?.ExecutionSchedule ?? default
+            };
         }
 
         private IEnumerable<KeyValuePair<GameplayAttributeType, Modifier>> MakeModifiers(

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using GameplayAbilities.Attributes;
-using GameplayAbilities.Effects.Stacking;
 using GameplayAbilities.Modifiers;
 using UnityEngine;
 using UnityEngine.Pool;

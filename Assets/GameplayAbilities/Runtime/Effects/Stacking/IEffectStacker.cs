@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using GameplayAbilities.Effects.Schedulers;
-using UnityEngine;
-
-namespace GameplayAbilities.Effects.Stacking {
+﻿namespace GameplayAbilities.Effects.Stacking {
     public interface IEffectStacker {
         /// <summary>
         /// Stacks the new effect on top of the last one.

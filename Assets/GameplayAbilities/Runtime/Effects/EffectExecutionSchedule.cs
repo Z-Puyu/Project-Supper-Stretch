@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace GameplayAbilities.Effects {
+﻿namespace GameplayAbilities.Effects {
     internal readonly record struct EffectExecutionSchedule(
         int NumberOfTicks,
         int TickInterval,
