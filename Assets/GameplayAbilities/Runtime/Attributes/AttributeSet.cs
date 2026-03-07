@@ -6,7 +6,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using GameplayAbilities.Attributes.EffectTriggers;
-using GameplayAbilities.Effects.Triggers;
 using GameplayAbilities.Modifiers;
 using UnityEngine;
 using UnityEngine.Events;
@@ -18,7 +17,7 @@ namespace GameplayAbilities.Attributes {
             new ConcurrentDictionary<GameplayAttributeType, Value>();
 
         private IDictionary<GameplayAttributeType, Action<AttributeChange>> Observers { get; } =
-            new Dictionary<GameplayAttributeType, Action<AttributeChange>>();
+            new ConcurrentDictionary<GameplayAttributeType, Action<AttributeChange>>();
 
         [NotNull] private ModifierEnvironment? ModifierEnvironment { get; set; }
         [field: SerializeField] private AttributeTable? DefaultStartingAttributes { get; set; }
