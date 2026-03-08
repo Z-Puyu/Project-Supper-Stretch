@@ -28,13 +28,12 @@ namespace GameplayAbilities.Abilities {
         [field: SerializeField] private GameplayAttributeType? CostAttribute { get; set; }
         [field: SerializeReference] private IAttributeMagnitude? Amount { get; set; } = new Constant();
         
-        
-        internal bool IsAffordable(IAttributeReader consumer) {
+        internal bool IsAffordable(IAttributeReader consumer, IUserData? userData) {
             if (!this.CostAttribute) {
                 return true;
             }
             
-            double cost = this.Amount?.Evaluate(consumer) ?? 0;
+            double cost = this.Amount?.Evaluate(consumer, userData) ?? 0;
             const double d = 0.001;
             return this.BenchmarkScheme switch {
                 Verdict.HasEnough => consumer.HasAtLeast(cost, this.CostAttribute),
@@ -54,17 +53,26 @@ namespace GameplayAbilities.Abilities {
         }
 
         RuntimeEffect IEffect.Execute(
-            EffectExecutionScheme scheme, ModifierEnvironment target, CancellationTokenSource interrupter
+            EffectExecutionContext context, ModifierEnvironment target, CancellationTokenSource interrupter
         ) {
-            return RuntimeEffect.With(this, InstantExecution.Create(scheme.Modifiers), interrupter, target);
+            EffectExecutionScheduler executor = InstantExecution.NewInstance.Schedule(this.MakeModifiers(context));
+            return new RuntimeEffect {
+                Id = Guid.NewGuid(),
+                Source = this,
+                Executor = executor,
+                Interrupter = interrupter,
+                Task = executor.Execute(target, interrupter.Token)
+            };
         }
 
-        internal EffectExecutionScheme CreateExecutionScheme(EffectExecutionContext context, IUserData? userData) {
+        private IEnumerable<KeyValuePair<GameplayAttributeType, Modifier>> MakeModifiers(
+            EffectExecutionContext context
+        ) {
             if (!this.CostAttribute) {
-                return default;
+                return Enumerable.Empty<KeyValuePair<GameplayAttributeType, Modifier>>();
             }
             
-            double cost = this.Amount?.Evaluate(context.TargetAttributes, userData) ?? 0;
+            double cost = this.Amount?.Evaluate(context.TargetAttributes, context.UserData) ?? 0;
             double change = this.BenchmarkScheme switch {
                 Verdict.HasEnough or Verdict.MoreThanEnough or Verdict.HasAny => -cost,
                 Verdict.HasRoomForMore or Verdict.HasEnoughRoom or Verdict.MoreRoomThanNecessary => cost,
@@ -75,7 +83,7 @@ namespace GameplayAbilities.Abilities {
                 this.CostAttribute, new Modifier(ModifierType.Offset, change)
             );
             
-            return new EffectExecutionScheme(Enumerable.Repeat(modifier, 1));
+            return new[] { modifier };
         }
     }
 }

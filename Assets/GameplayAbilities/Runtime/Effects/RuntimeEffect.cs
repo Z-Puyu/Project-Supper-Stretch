@@ -9,15 +9,7 @@ namespace GameplayAbilities.Effects {
         Guid Id,
         IEffect Source,
         CancellationTokenSource Interrupter,
-        IScheduler Executor,
+        EffectExecutionScheduler Executor,
         Awaitable Task
-    ) {
-        internal static RuntimeEffect With(
-            IEffect source, IScheduler scheduler, CancellationTokenSource interrupter, ModifierEnvironment target
-        ) {
-            return new RuntimeEffect(
-                scheduler.ExecutionId, source, interrupter, scheduler, scheduler.Execute(target, interrupter.Token)
-            );
-        }
-    }
+    );
 }

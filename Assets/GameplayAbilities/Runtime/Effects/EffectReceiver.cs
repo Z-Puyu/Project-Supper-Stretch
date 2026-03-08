@@ -31,27 +31,30 @@ namespace GameplayAbilities.Effects {
         private void OnDestroy() {
             this.InterruptAll();
         }
+        
+        private CancellationTokenSource NewInterrupter => CancellationTokenSource.CreateLinkedTokenSource(
+            this.ModifierTarget.destroyCancellationToken, this.destroyCancellationToken
+        );
 
-        internal Guid RegisterEffect(IEffect effect, EffectExecutionScheme scheme) {
-            CancellationTokenSource interrupter = CancellationTokenSource.CreateLinkedTokenSource(
-                this.ModifierTarget.destroyCancellationToken, this.destroyCancellationToken
-            );
-            
-            RuntimeEffect instance = effect.Execute(scheme, this.ModifierTarget, interrupter);
-            if (instance.Id != Guid.Empty) {
-                if (!this.RunningEffects.TryAdd(instance.Id, instance)) {
+        private Guid Register(RuntimeEffect execution, int stackSize = 1) {
+            if (execution.Id != Guid.Empty) {
+                if (!this.RunningEffects.TryAdd(execution.Id, execution)) {
                     return Guid.Empty;
                 }
-                
-                if (!this.CancellableEffects.TryGetValue(effect, out List<EffectInstance> instances)) {
-                    this.CancellableEffects.Add(effect, instances = new List<EffectInstance>());
-                }    
-                
-                instances.Add(new EffectInstance(instance.Id, scheme.StackSize));
+
+                if (!this.CancellableEffects.TryGetValue(execution.Source, out List<EffectInstance> instances)) {
+                    this.CancellableEffects.Add(execution.Source, instances = new List<EffectInstance>());
+                }
+
+                instances.Add(new EffectInstance(execution.Id, stackSize));
             }
-            
-            this.Wait(instance);
-            return instance.Id;
+
+            this.Wait(execution);
+            return execution.Id;
+        }
+
+        internal Guid AddNewEffect(IEffect effect, EffectExecutionContext context) {
+            return this.Register(effect.Execute(context, this.ModifierTarget, this.NewInterrupter));
         }
 
         private EffectExecutionState StateOf(EffectInstance instance) {
@@ -78,17 +81,24 @@ namespace GameplayAbilities.Effects {
                 return Guid.Empty;
             }
             
-            EffectExecutionContext context = new EffectExecutionContext(source, this.AttributeReader.Value);
+            EffectExecutionContext context = new EffectExecutionContext(source, this.AttributeReader.Value, userData);
             if (!this.HasEffect(effect, out List<EffectInstance> existing)) {
-                return this.RegisterEffect(effect, effect.CreateExecutionScheme(context, userData));
+                return this.AddNewEffect(effect, context);
             }
 
-            EffectStackingResult res = effect.StackWith(this.StateOf(existing[^1]), context, userData);
-            if (res.OverridesLastEffectInstance) {
+            RuntimeEffect execution = effect.StackAndExecute(
+                new EffectStackingContext {
+                    CurrentExecutionState = this.StateOf(existing[^1]),
+                    NewEffectExecutionContext = context,
+                    NewEffectInterrupter = this.NewInterrupter,
+                }, out StackingResult res
+            );
+            
+            if (res.OverridesLastExecution) {
                 this.Stop(existing[^1].Id);
             }
 
-            return this.RegisterEffect(effect, res.NewEffectExecutionScheme);
+            return this.Register(execution, res.NewStackSize);
         }
 
         /// <summary>

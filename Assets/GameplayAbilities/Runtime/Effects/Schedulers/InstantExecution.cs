@@ -8,53 +8,33 @@ using UnityEngine.Pool;
 
 namespace GameplayAbilities.Effects.Schedulers {
     [Serializable]
-    internal sealed class InstantExecution : IScheduler {
+    internal sealed class InstantExecution : EffectExecutionScheduler {
         private static readonly ObjectPool<InstantExecution> Pool = new ObjectPool<InstantExecution>(
-            () => new InstantExecution(), defaultCapacity: 20, maxSize: 200
+            () => new InstantExecution(), defaultCapacity: 20, maxSize: 200, actionOnRelease: execution => execution.Reset()
         );
+        
+        internal static EffectExecutionScheduler NewInstance => InstantExecution.Pool.Get();
 
-        private List<KeyValuePair<GameplayAttributeType, Modifier>> Modifiers { get; } =
-            new List<KeyValuePair<GameplayAttributeType, Modifier>>();
-
-        Guid IScheduler.ExecutionId => Guid.Empty;
-        EffectExecutionSchedule IScheduler.ExecutionSchedule => default;
-
-        EffectExecutionState IScheduler.CurrentState => new EffectExecutionState {
+        internal override Guid ExecutionId => Guid.Empty;
+        
+        internal override EffectExecutionState CurrentState => new EffectExecutionState {
             StackSize = 1,
             RemainingTicks = 0,
             RemainingDuration = 0,
             Modifiers = this.Modifiers
         };
 
-        IScheduler IScheduler.Schedule(EffectExecutionScheme scheme) {
-            InstantExecution clone = InstantExecution.Pool.Get();
-            clone.Modifiers.Clear();
-            clone.Modifiers.AddRange(scheme.Modifiers);
-            return clone;
-        }
-        
-        internal static InstantExecution Create(IEnumerable<KeyValuePair<GameplayAttributeType, Modifier>> modifiers) {
-            InstantExecution clone = InstantExecution.Pool.Get();
-            clone.Modifiers.Clear();
-            clone.Modifiers.AddRange(modifiers);
-            return clone;
-        }
-
-        Awaitable IScheduler.Execute(ModifierEnvironment target, CancellationToken interrupt) {
+        internal override Awaitable Execute(ModifierEnvironment target, CancellationToken interrupt) {
+            this.CurrentTarget = target;
             foreach (KeyValuePair<GameplayAttributeType, Modifier> modifier in this.Modifiers) {
-                target.AddModifier(modifier.Key, modifier.Value);
+                this.CurrentTarget.AddModifier(modifier.Key, modifier.Value);
             }
             
-            this.ReleaseToPool();
+            InstantExecution.Pool.Release(this);
             AwaitableCompletionSource completed = new AwaitableCompletionSource();
             completed.Reset();
             completed.SetResult();
             return completed.Awaitable;
-        }
-
-        private void ReleaseToPool() {
-            this.Modifiers.Clear();
-            InstantExecution.Pool.Release(this);
         }
     }
 }

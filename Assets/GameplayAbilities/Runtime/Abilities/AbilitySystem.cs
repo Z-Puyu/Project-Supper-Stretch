@@ -18,8 +18,8 @@ namespace GameplayAbilities.Abilities {
         private IDictionary<Ability, CancellationTokenSource> RunningAbilities { get; } =
             new Dictionary<Ability, CancellationTokenSource>();
 
-        private IDictionary<Ability, CancellationTokenSource> AbilityCooldowns { get; } =
-            new Dictionary<Ability, CancellationTokenSource>();
+        private IDictionary<Ability, AbilityCooldown> AbilityCooldowns { get; } =
+            new Dictionary<Ability, AbilityCooldown>();
 
         [NotNull] private AbilitySystemController? AbilitySystemController { get; set; }
         [NotNull] [field: SerializeField] private GameObject? Owner { get; set; }
@@ -66,13 +66,13 @@ namespace GameplayAbilities.Abilities {
 
         internal bool TrySpend(IEnumerable<Cost> costs, IUserData? userData) {
             Cost[] array = costs.ToArray();
-            if (Array.Exists(array, cost => !cost.IsAffordable(this.AttributeSet))) {
+            if (Array.Exists(array, cost => !cost.IsAffordable(this.AttributeSet, userData))) {
                 return false;
             }
             
             foreach (Cost cost in array) {
-                EffectExecutionContext context = EffectExecutionContext.FromSelfOnSelf(this.AttributeSet);
-                this.EffectReceiver.RegisterEffect(cost, cost.CreateExecutionScheme(context, userData));
+                EffectExecutionContext context = EffectExecutionContext.FromSelfOnSelf(this.AttributeSet, userData);
+                this.EffectReceiver.AddNewEffect(cost, context);
             }
             
             return true;
@@ -119,6 +119,14 @@ namespace GameplayAbilities.Abilities {
             }
         }
 
+        public float GetRemainingCooldownDuration(Ability ability) {
+            if (this.AbilityCooldowns.TryGetValue(ability, out AbilityCooldown cooldown)) {
+                return cooldown.RemainingDuration;
+            }
+            
+            return 0;
+        }
+
         private async Awaitable Execute(Ability ability, IUserData? userData) {
             using CancellationTokenSource execution = new CancellationTokenSource();
             this.RunningAbilities.Add(ability, execution);
@@ -130,16 +138,16 @@ namespace GameplayAbilities.Abilities {
         }
 
         public void InterruptCooldown(Ability ability) {
-            if (this.AbilityCooldowns.TryGetValue(ability, out CancellationTokenSource cooldown)) {
-                cooldown.Cancel();
+            if (this.AbilityCooldowns.TryGetValue(ability, out AbilityCooldown cooldown)) {
+                cooldown.Interrupter.Cancel();
             }
         }
 
         private async Awaitable Cooldown(Ability ability) {
-            using CancellationTokenSource cooldown = new CancellationTokenSource();
-            this.AbilityCooldowns.Add(ability, cooldown);
+            using CancellationTokenSource interrupter = new CancellationTokenSource();
+            this.AbilityCooldowns.Add(ability, new AbilityCooldown(Time.time, ability.Cooldown, interrupter));
             using CancellationTokenSource linked = CancellationTokenSource.CreateLinkedTokenSource(
-                cooldown.Token, this.destroyCancellationToken
+                interrupter.Token, this.destroyCancellationToken
             );
 
             try {
@@ -177,6 +185,15 @@ namespace GameplayAbilities.Abilities {
 
         IEnumerator IEnumerable.GetEnumerator() {
             return this.GetEnumerator();
+        }
+
+        private readonly record struct AbilityCooldown(
+            float StartingTime,
+            float Duration,
+            CancellationTokenSource Interrupter
+        ) {
+            internal float EndTime => this.StartingTime + this.Duration;
+            internal float RemainingDuration => this.EndTime - Time.time;
         }
     }
 }

@@ -8,83 +8,74 @@ using UnityEngine.Pool;
 
 namespace GameplayAbilities.Effects.Schedulers {
     [Serializable]
-    internal sealed class PeriodicExecution : IScheduler {
+    internal sealed class PeriodicExecution : EffectExecutionScheduler {
         private static readonly ObjectPool<PeriodicExecution> Pool = new ObjectPool<PeriodicExecution>(
-            () => new PeriodicExecution(), defaultCapacity: 20, maxSize: 200
+            () => new PeriodicExecution(), defaultCapacity: 20, maxSize: 200,
+            actionOnRelease: execution => execution.Reset()
         );
-        
+
         private Guid Id { get; set; }
-        private int EffectStackSize { get; set; } = 1;
-        [field: SerializeField, Min(1)] private int NumberOfTicks { get; set; }
-        [field: SerializeField, Min(0)] private float TickInterval { get; set; }
-        [field: SerializeField] private bool ShouldExecuteOnStart { get; set; }
+        private float WaitingTimeBeforeFirstTick { get; set; }
+        private int NumberOfTicks { get; set; }
+        private float TickInterval { get; set; }
 
-        private float Duration => this.ShouldExecuteOnStart
-                ? this.TickInterval * (this.NumberOfTicks - 1)
-                : this.TickInterval * this.NumberOfTicks;
+        private float Duration => this.WaitingTimeBeforeFirstTick + this.TickInterval * (this.NumberOfTicks - 1);
+        private float WaitingTimeUntilNextTick => this.TickInterval - (Time.time - this.StartTime) % this.TickInterval;
+        internal override Guid ExecutionId => this.Id;
 
-        private List<KeyValuePair<GameplayAttributeType, Modifier>> Modifiers { get; } =
-            new List<KeyValuePair<GameplayAttributeType, Modifier>>();
-
-        Guid IScheduler.ExecutionId => this.Id;
-        
-        EffectExecutionSchedule IScheduler.ExecutionSchedule => new EffectExecutionSchedule {
-            NumberOfTicks = this.NumberOfTicks,
-            PersistentDuration = Math.Max(0, this.Duration)
-        };
-        
-        EffectExecutionState IScheduler.CurrentState => new EffectExecutionState {
+        internal override EffectExecutionState CurrentState => new EffectExecutionState {
             StackSize = this.EffectStackSize,
             RemainingTicks = this.NumberOfTicks,
             RemainingDuration = Math.Max(0, this.Duration),
+            WaitingTimeUntilNextTick = this.WaitingTimeUntilNextTick,
             Modifiers = this.Modifiers
         };
-        
+
         private PeriodicExecution() { }
 
-        public IScheduler Schedule(EffectExecutionScheme scheme) {
+        internal static EffectExecutionScheduler Create(EffectExecutionSchedule schedule) {
             PeriodicExecution execution = PeriodicExecution.Pool.Get();
-            execution.Id = Guid.NewGuid();
-            execution.EffectStackSize = scheme.StackSize;
-            execution.Modifiers.Clear();
-            execution.Modifiers.AddRange(scheme.Modifiers);
-            execution.NumberOfTicks = scheme.ExecutionSchedule.NumberOfTicks;
-            execution.TickInterval = scheme.ExecutionSchedule.TickInterval;
-            execution.ShouldExecuteOnStart = scheme.ExecutionSchedule.ShouldTickOnStart;
+            execution.Reset();
+            execution.StartTime = Time.time;
+            execution.NumberOfTicks = schedule.NumberOfTicks;
+            execution.TickInterval = schedule.TickInterval;
+            execution.WaitingTimeBeforeFirstTick = schedule.WaitingTimeBeforeFirstTick;
             return execution;
         }
-        
-        async Awaitable IScheduler.Execute(ModifierEnvironment target, CancellationToken interrupt) {
+
+        internal override async Awaitable Execute(ModifierEnvironment target, CancellationToken interrupt) {
+            this.CurrentTarget = target;
+            this.StartTime = Time.time;
             try {
-                if (this.ShouldExecuteOnStart) {
-                    this.ApplyModifiers(target);
+                if (this.WaitingTimeBeforeFirstTick > 0) {
+                    await Awaitable.WaitForSecondsAsync(this.WaitingTimeBeforeFirstTick, interrupt);
                 }
 
+                this.ApplyModifiers(this.CurrentTarget);
                 while (this.NumberOfTicks > 0) {
                     await Awaitable.WaitForSecondsAsync(this.TickInterval, interrupt);
-                    this.ApplyModifiers(target);
+                    this.ApplyModifiers(this.CurrentTarget);
                 }
             } finally {
-                this.ReleaseToPool();
+                PeriodicExecution.Pool.Release(this);
             }
         }
 
         private void ApplyModifiers(ModifierEnvironment target) {
             foreach (KeyValuePair<GameplayAttributeType, Modifier> modifier in this.Modifiers) {
                 target.AddModifier(modifier.Key, modifier.Value);
-            }   
-            
+            }
+
             this.NumberOfTicks -= 1;
         }
 
-        private void ReleaseToPool() {
+        private protected override void Reset() {
+            base.Reset();
             this.Id = Guid.Empty;
-            this.EffectStackSize = 1;
-            this.Modifiers.Clear();
             this.NumberOfTicks = 0;
             this.TickInterval = 0f;
-            this.ShouldExecuteOnStart = false;
-            PeriodicExecution.Pool.Release(this);
+            this.WaitingTimeBeforeFirstTick = 0f;
+            this.StartTime = -1;
         }
     }
 }

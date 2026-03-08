@@ -19,62 +19,73 @@ namespace GameplayAbilities.Effects {
             [InspectorName("Merge Modifiers and Reset Duration")] MergeAndOverride
         }
         
-        [field: SerializeReference, SubtypeSelector] internal IScheduler? ExecutionScheduler { get; private set; }
+        [field: SerializeField] private EffectExecutionPolicy ExecutionPolicy { get; set; }
         [field: SerializeField] private List<ModifierConfig> Modifiers { get; set; } = new List<ModifierConfig>();
         [field: SerializeField, Min(1)] private int StackingLimit { get; set; } = 1;
         [field: SerializeField] private StackingRule StackingPolicy { get; set; } = StackingRule.Independent;
         internal int StackLimit => Math.Max(this.StackingLimit, 1);
 
-        internal EffectStackingResult StackWith(
-            EffectExecutionState existing, EffectExecutionContext context, IUserData? userData
-        ) {
-            EffectExecutionScheme @new = this.CreateExecutionScheme(context, userData);
-            return new EffectStackingResult {
-                NewEffectExecutionScheme = this.StackingPolicy switch {
-                    StackingRule.Independent => @new,
-                    StackingRule.Extend => @new with {
-                        StackSize = existing.StackSize + 1,
-                        ExecutionSchedule = (existing + @new.ExecutionSchedule) with { ShouldTickOnStart = true }
-                    },
-                    StackingRule.MergeAndExtend => new EffectExecutionScheme(
-                        @new.Modifiers.Concat(existing.Modifiers),
-                        (existing + @new.ExecutionSchedule) with { ShouldTickOnStart = true },
-                        existing.StackSize + 1
-                    ),
-                    StackingRule.MergeAndOverride => @new with {
-                        StackSize = existing.StackSize + 1,
-                        Modifiers = existing.Modifiers.Concat(@new.Modifiers)
-                    },
-                    var _ => throw new ArgumentOutOfRangeException(nameof(this.StackingPolicy))
-                }
+        internal RuntimeEffect StackAndExecute(EffectStackingContext context, out StackingResult res) {
+            IEnumerable<KeyValuePair<GameplayAttributeType, Modifier>> modifiers =
+                    this.StackingPolicy == StackingRule.Independent
+                            ? this.MakeModifiers(context.NewEffectExecutionContext)
+                            : context.CurrentModifiers.Concat(
+                                this.MakeModifiers(context.NewEffectExecutionContext)
+                            );
+            res = new StackingResult {
+                OverridesLastExecution = this.StackingPolicy != StackingRule.Independent,
+                NewStackSize = this.StackingPolicy == StackingRule.Independent ? 1 : context.CurrentStackSize + 1
+            };
+
+            bool resetDuration = this.StackingPolicy is StackingRule.MergeAndOverride or StackingRule.MergeAndExtend;
+            EffectExecutionSchedule schedule = this.ExecutionPolicy.Schedule with {
+                NumberOfTicks = resetDuration
+                        ? this.ExecutionPolicy.Schedule.NumberOfTicks
+                        : context.RemainingTicks + this.ExecutionPolicy.Schedule.NumberOfTicks,
+                Duration = resetDuration
+                        ? this.ExecutionPolicy.Schedule.Duration
+                        : context.RemainingDuration + this.ExecutionPolicy.Schedule.Duration,
+                WaitingTimeBeforeFirstTick = resetDuration
+                        ? this.ExecutionPolicy.Schedule.WaitingTimeBeforeFirstTick
+                        : context.WaitingTimeUntilNextTick,
+            };
+            
+            EffectExecutionScheduler executor = this.ExecutionPolicy.CreateScheduler(schedule)
+                                                    .Schedule(modifiers, res.NewStackSize);
+            return new RuntimeEffect {
+                Id = Guid.NewGuid(),
+                Source = this,
+                Executor = executor,
+                Interrupter = context.NewEffectInterrupter,
+                Task = executor.Execute(context.CurrentTarget, context.NewEffectInterrupter.Token)
             };
         }
 
         RuntimeEffect IEffect.Execute(
-            EffectExecutionScheme scheme, ModifierEnvironment target, CancellationTokenSource interrupter
+            EffectExecutionContext context, ModifierEnvironment target, CancellationTokenSource interrupter
         ) {
-            IScheduler scheduler = this.ExecutionScheduler?.Schedule(scheme) ??
-                                   InstantExecution.Create(scheme.Modifiers);
-            return RuntimeEffect.With(this, scheduler, interrupter, target);
-        }
-
-        internal EffectExecutionScheme CreateExecutionScheme(EffectExecutionContext context, IUserData? userData) {
-            return new EffectExecutionScheme {
-                StackSize = 1,
-                Modifiers = this.MakeModifiers(context, userData),
-                ExecutionSchedule = this.ExecutionScheduler?.ExecutionSchedule ?? default
+            EffectExecutionScheduler executor = this.ExecutionPolicy.DefaultScheduler.Schedule(this.MakeModifiers(context));
+            return new RuntimeEffect {
+                Id = Guid.NewGuid(),
+                Source = this,
+                Executor = executor,
+                Interrupter = interrupter,
+                Task = executor.Execute(target, interrupter.Token)
             };
         }
 
         private IEnumerable<KeyValuePair<GameplayAttributeType, Modifier>> MakeModifiers(
-            EffectExecutionContext context, IUserData? userData
+            EffectExecutionContext context
         ) {
             foreach (ModifierConfig config in this.Modifiers) {
                 if (!config.Target) {
                     continue;
                 }
+
+                Modifier modifier = config.Instantiate(
+                    context.SourceAttributes, context.TargetAttributes, context.UserData
+                );
                 
-                Modifier modifier = config.Instantiate(context.SourceAttributes, context.TargetAttributes, userData);
                 foreach (GameplayAttributeType t in config.Target.Resolve()) {
                     yield return new KeyValuePair<GameplayAttributeType, Modifier>(t, modifier);
                 }
