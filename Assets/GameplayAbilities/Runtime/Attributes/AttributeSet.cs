@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 namespace GameplayAbilities.Attributes {
-    [RequireComponent(typeof(ModifierEnvironment))]
+    [DisallowMultipleComponent, RequireComponent(typeof(ModifierEnvironment))]
     public sealed class AttributeSet : MonoBehaviour, IAttributeReader {
         private IDictionary<GameplayAttributeType, Value> Attributes { get; } =
             new Dictionary<GameplayAttributeType, Value>();
