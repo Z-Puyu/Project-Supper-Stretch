@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using GameplayAbilities.Effects.Schedulers;
-using GameplayAbilities.Modifiers;
 using UnityEngine;
 
 namespace GameplayAbilities.Effects {

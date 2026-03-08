@@ -33,13 +33,18 @@ namespace GameplayAbilities.Effects.Schedulers {
 
         private PersistentExecution() { }
 
-        internal static PersistentExecution Create(EffectExecutionSchedule schedule) {
+        internal static EffectExecutionScheduler Create(EffectExecutionSchedule schedule) {
             PersistentExecution execution = PersistentExecution.Pool.Get();
             execution.Reset();
             execution.Id = Guid.NewGuid();
-            execution.IsInfinite = schedule.IsInfinite;
-            execution.Duration = schedule.Duration;
-            return execution;
+            return execution.With(schedule);
+        }
+        
+        internal override EffectExecutionScheduler With(EffectExecutionSchedule schedule) {
+            base.With(schedule);
+            this.IsInfinite = schedule.IsInfinite;
+            this.Duration = schedule.Duration;
+            return this;
         }
 
         internal override async Awaitable Execute(ModifierEnvironment target, CancellationToken interrupt) {

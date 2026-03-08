@@ -14,16 +14,13 @@ namespace GameplayAbilities.Effects.Schedulers {
         [field: SerializeField, Min(0)] private float Duration { get; set; }
 
         internal EffectExecutionSchedule Schedule => this;
-        internal EffectExecutionScheduler DefaultScheduler => this.CreateScheduler(this);
-
-        internal EffectExecutionScheduler CreateScheduler(EffectExecutionSchedule schedule) {
-            return this.Type switch {
-                EffectType.Instant => InstantExecution.NewInstance,
-                EffectType.Persistent => PersistentExecution.Create(schedule),
-                EffectType.Periodic => PeriodicExecution.Create(schedule),
-                var _ => throw new ArgumentOutOfRangeException(nameof(this.Type))
-            };
-        }
+        
+        internal EffectExecutionScheduler Scheduler => this.Type switch {
+            EffectType.Instant => InstantExecution.NewInstance,
+            EffectType.Persistent => PersistentExecution.Create(this),
+            EffectType.Periodic => PeriodicExecution.Create(this),
+            var _ => throw new ArgumentOutOfRangeException(nameof(this.Type))
+        };
 
         public static implicit operator EffectExecutionSchedule(EffectExecutionPolicy policy) {
             return new EffectExecutionSchedule {

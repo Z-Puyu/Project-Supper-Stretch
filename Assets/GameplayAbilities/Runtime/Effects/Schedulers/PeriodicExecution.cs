@@ -36,11 +36,16 @@ namespace GameplayAbilities.Effects.Schedulers {
         internal static EffectExecutionScheduler Create(EffectExecutionSchedule schedule) {
             PeriodicExecution execution = PeriodicExecution.Pool.Get();
             execution.Reset();
-            execution.StartTime = Time.time;
-            execution.NumberOfTicks = schedule.NumberOfTicks;
-            execution.TickInterval = schedule.TickInterval;
-            execution.WaitingTimeBeforeFirstTick = schedule.WaitingTimeBeforeFirstTick;
-            return execution;
+            execution.Id = Guid.NewGuid();
+            return execution.With(schedule);
+        }
+        
+        internal override EffectExecutionScheduler With(EffectExecutionSchedule schedule) {
+            base.With(schedule);
+            this.NumberOfTicks = schedule.NumberOfTicks;
+            this.TickInterval = schedule.TickInterval;
+            this.WaitingTimeBeforeFirstTick = schedule.WaitingTimeBeforeFirstTick;
+            return this;
         }
 
         internal override async Awaitable Execute(ModifierEnvironment target, CancellationToken interrupt) {

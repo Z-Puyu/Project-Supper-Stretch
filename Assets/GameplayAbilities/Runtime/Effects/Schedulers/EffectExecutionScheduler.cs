@@ -28,6 +28,11 @@ namespace GameplayAbilities.Effects.Schedulers {
             return this;
         }
 
+        internal virtual EffectExecutionScheduler With(EffectExecutionSchedule schedule) {
+            this.StartTime = Time.time;
+            return this;
+        }
+
         private protected virtual void Reset() {
             this.EffectStackSize = 1;
             this.Modifiers.Clear();

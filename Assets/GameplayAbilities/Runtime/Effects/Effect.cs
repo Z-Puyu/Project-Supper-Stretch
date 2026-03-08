@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using GameplayAbilities.Attributes;
-using GameplayAbilities.Common;
 using GameplayAbilities.Effects.Schedulers;
 using GameplayAbilities.Modifiers;
-using GameplayAbilities.Runtime.EditorTooling;
 using UnityEngine;
 
 namespace GameplayAbilities.Effects {
@@ -50,7 +48,7 @@ namespace GameplayAbilities.Effects {
                         : context.WaitingTimeUntilNextTick,
             };
             
-            EffectExecutionScheduler executor = this.ExecutionPolicy.CreateScheduler(schedule)
+            EffectExecutionScheduler executor = this.ExecutionPolicy.Scheduler.With(schedule)
                                                     .Schedule(modifiers, res.NewStackSize);
             return new RuntimeEffect {
                 Id = Guid.NewGuid(),
@@ -64,7 +62,7 @@ namespace GameplayAbilities.Effects {
         RuntimeEffect IEffect.Execute(
             EffectExecutionContext context, ModifierEnvironment target, CancellationTokenSource interrupter
         ) {
-            EffectExecutionScheduler executor = this.ExecutionPolicy.DefaultScheduler.Schedule(this.MakeModifiers(context));
+            EffectExecutionScheduler executor = this.ExecutionPolicy.Scheduler.Schedule(this.MakeModifiers(context));
             return new RuntimeEffect {
                 Id = Guid.NewGuid(),
                 Source = this,

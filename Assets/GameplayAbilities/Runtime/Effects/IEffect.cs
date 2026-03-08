@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using GameplayAbilities.Attributes;
+﻿using System.Threading;
 using GameplayAbilities.Modifiers;
 
 namespace GameplayAbilities.Effects {
