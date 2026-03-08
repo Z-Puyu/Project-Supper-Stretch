@@ -16,7 +16,7 @@ namespace GameplayAbilities.Effects {
             IEffect source, IScheduler scheduler, CancellationTokenSource interrupter, ModifierEnvironment target
         ) {
             return new RuntimeEffect(
-                Guid.NewGuid(), source, interrupter, scheduler, scheduler.Execute(target, interrupter.Token)
+                scheduler.ExecutionId, source, interrupter, scheduler, scheduler.Execute(target, interrupter.Token)
             );
         }
     }

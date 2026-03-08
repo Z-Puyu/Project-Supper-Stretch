@@ -13,6 +13,8 @@ namespace GameplayAbilities.Effects.Schedulers {
             () => new PeriodicExecution(), defaultCapacity: 20, maxSize: 200
         );
         
+        private Guid Id { get; set; }
+        private int EffectStackSize { get; set; } = 1;
         [field: SerializeField, Min(1)] private int NumberOfTicks { get; set; }
         [field: SerializeField, Min(0)] private float TickInterval { get; set; }
         [field: SerializeField] private bool ShouldExecuteOnStart { get; set; }
@@ -24,19 +26,26 @@ namespace GameplayAbilities.Effects.Schedulers {
         private List<KeyValuePair<GameplayAttributeType, Modifier>> Modifiers { get; } =
             new List<KeyValuePair<GameplayAttributeType, Modifier>>();
 
+        Guid IScheduler.ExecutionId => this.Id;
+        
         EffectExecutionSchedule IScheduler.ExecutionSchedule => new EffectExecutionSchedule {
             NumberOfTicks = this.NumberOfTicks,
             PersistentDuration = Math.Max(0, this.Duration)
         };
         
         EffectExecutionState IScheduler.CurrentState => new EffectExecutionState {
+            StackSize = this.EffectStackSize,
             RemainingTicks = this.NumberOfTicks,
             RemainingDuration = Math.Max(0, this.Duration),
             Modifiers = this.Modifiers
         };
+        
+        private PeriodicExecution() { }
 
         public IScheduler Schedule(EffectExecutionScheme scheme) {
             PeriodicExecution execution = PeriodicExecution.Pool.Get();
+            execution.Id = Guid.NewGuid();
+            execution.EffectStackSize = scheme.StackSize;
             execution.Modifiers.Clear();
             execution.Modifiers.AddRange(scheme.Modifiers);
             execution.NumberOfTicks = scheme.ExecutionSchedule.NumberOfTicks;
@@ -44,8 +53,6 @@ namespace GameplayAbilities.Effects.Schedulers {
             execution.ShouldExecuteOnStart = scheme.ExecutionSchedule.ShouldTickOnStart;
             return execution;
         }
-
-        private PeriodicExecution() { }
         
         async Awaitable IScheduler.Execute(ModifierEnvironment target, CancellationToken interrupt) {
             try {
@@ -71,6 +78,8 @@ namespace GameplayAbilities.Effects.Schedulers {
         }
 
         private void ReleaseToPool() {
+            this.Id = Guid.Empty;
+            this.EffectStackSize = 1;
             this.Modifiers.Clear();
             this.NumberOfTicks = 0;
             this.TickInterval = 0f;

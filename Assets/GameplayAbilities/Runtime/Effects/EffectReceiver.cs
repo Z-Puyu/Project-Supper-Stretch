@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using GameplayAbilities.Attributes;
 using GameplayAbilities.Common;
-using GameplayAbilities.Effects.Stacking;
 using GameplayAbilities.Modifiers;
 using GameplayAbilities.Runtime.EditorTooling;
 using UnityEngine;
@@ -14,7 +14,10 @@ namespace GameplayAbilities.Effects {
     public class EffectReceiver : MonoBehaviour {
         [NotNull] private ModifierEnvironment? ModifierTarget { get; set; }
         [field: SerializeField] private Ref<IAttributeReader> AttributeReader { get; set; }
-        private IDictionary<IEffect, List<Guid>> EffectInstances { get; } = new Dictionary<IEffect, List<Guid>>();
+
+        private IDictionary<IEffect, List<EffectInstance>> EffectInstances { get; } =
+            new Dictionary<IEffect, List<EffectInstance>>();
+        
         private IDictionary<Guid, RuntimeEffect> RunningEffects { get; } = new Dictionary<Guid, RuntimeEffect>();
 
         private void Awake() {
@@ -39,14 +42,16 @@ namespace GameplayAbilities.Effects {
             return instance.Id;
         }
 
-        private EffectExecutionState StateOf(Guid id) {
-            return this.RunningEffects.TryGetValue(id, out RuntimeEffect metadata)
+        private EffectExecutionState StateOf(EffectInstance instance) {
+            return this.RunningEffects.TryGetValue(instance.Id, out RuntimeEffect metadata)
                     ? metadata.Executor.CurrentState
                     : default;
         }
 
         private int Count(IEffect effect) {
-            return this.EffectInstances.TryGetValue(effect, out List<Guid> instances) ? instances.Count : 0;
+            return this.EffectInstances.TryGetValue(effect, out List<EffectInstance> instances)
+                    ? instances.Sum(instance => instance.StackSize)
+                    : 0;
         }
 
         /// <summary>
@@ -62,13 +67,21 @@ namespace GameplayAbilities.Effects {
             }
             
             EffectExecutionContext context = new EffectExecutionContext(source, this.AttributeReader.Value);
-            if (!this.HasEffect(effect, out List<Guid> existing)) {
+            if (!this.HasEffect(effect, out List<EffectInstance> existing)) {
                 return this.RegisterEffect(effect, effect.CreateExecutionScheme(context, userData));
             }
 
             EffectStackingResult res = effect.StackWith(this.StateOf(existing[^1]), context, userData);
-            this.Stop(res.ObsoleteEffect);
-            return this.RegisterEffect(effect, res.NewEffectExecutionScheme);
+            if (res.OverridesLastEffectInstance) {
+                this.Stop(existing[^1].Id);
+            }
+
+            Guid id = this.RegisterEffect(effect, res.NewEffectExecutionScheme);
+            if (id != Guid.Empty) {
+                existing.Add(new EffectInstance(id, res.NewEffectExecutionScheme.StackSize));
+            }
+
+            return id;
         }
 
         /// <summary>
@@ -83,7 +96,7 @@ namespace GameplayAbilities.Effects {
                     : this.AddEffect(this.AttributeReader.Value, effect, userData);
         }
 
-        private bool HasEffect(IEffect effect, out List<Guid> instances) {
+        private bool HasEffect(IEffect effect, out List<EffectInstance> instances) {
             return this.EffectInstances.TryGetValue(effect, out instances) && instances.Count > 0;
         }
 
@@ -104,11 +117,11 @@ namespace GameplayAbilities.Effects {
                 return;
             }
             
-            if (!this.EffectInstances.TryGetValue(effect.Source, out List<Guid> instances)) {
+            if (!this.EffectInstances.TryGetValue(effect.Source, out List<EffectInstance> instances)) {
                 return;
             }
             
-            instances.Remove(id);
+            instances.RemoveAt(instances.FindIndex(instance => instance.Id == id));
             if (instances.Count == 0) {
                 this.EffectInstances.Remove(effect.Source);
             }
@@ -125,11 +138,12 @@ namespace GameplayAbilities.Effects {
         }
 
         private void Interrupt(IEffect effect) {
-            if (!this.EffectInstances.Remove(effect, out List<Guid> instances)) {
+            if (!this.EffectInstances.Remove(effect, out List<EffectInstance> instances)) {
                 return;
             }
             
-            foreach (Guid id in instances) {
+            foreach (EffectInstance instance in instances) {
+                Guid id = instance.Id;
                 this.Interrupt(id);
                 this.Dispose(id);
                 this.RunningEffects.Remove(id);
@@ -167,19 +181,21 @@ namespace GameplayAbilities.Effects {
         }
 
         public void StopEarliest(Effect effect) {
-            if (!this.EffectInstances.TryGetValue(effect, out List<Guid> instances) || instances.Count == 0) {
+            if (!this.HasEffect(effect, out List<EffectInstance> instances)) {
                 return;
             }
             
-            this.Stop(instances[0]);
+            this.Stop(instances[0].Id);
         }
 
         public void StopLatest(Effect effect) {
-            if (!this.EffectInstances.TryGetValue(effect, out List<Guid> instances) || instances.Count == 0) {
+            if (!this.HasEffect(effect, out List<EffectInstance> instances)) {
                 return;
             }
 
-            this.Stop(instances[^1]);
+            this.Stop(instances[^1].Id);
         }
+
+        private readonly record struct EffectInstance(Guid Id, int StackSize = 1);
     }
 }

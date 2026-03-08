@@ -16,9 +16,11 @@ namespace GameplayAbilities.Effects.Schedulers {
         private List<KeyValuePair<GameplayAttributeType, Modifier>> Modifiers { get; } =
             new List<KeyValuePair<GameplayAttributeType, Modifier>>();
 
+        Guid IScheduler.ExecutionId => Guid.Empty;
         EffectExecutionSchedule IScheduler.ExecutionSchedule => default;
 
         EffectExecutionState IScheduler.CurrentState => new EffectExecutionState {
+            StackSize = 1,
             RemainingTicks = 0,
             RemainingDuration = 0,
             Modifiers = this.Modifiers

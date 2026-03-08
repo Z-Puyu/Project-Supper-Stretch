@@ -15,6 +15,9 @@ namespace GameplayAbilities.Effects.Schedulers {
             () => new PersistentExecution(), defaultCapacity: 20, maxSize: 200
         );
         
+        private Guid Id { get; set; }
+        private int EffectStackSize { get; set; } = 1;
+        
         [field: SerializeField, Min(0)] 
         [field: Tooltip("Duration of the effect in seconds. Set to 0 for infinite duration.")]
         private float Duration { get; set; }
@@ -25,9 +28,7 @@ namespace GameplayAbilities.Effects.Schedulers {
         private List<KeyValuePair<GameplayAttributeType, Modifier>> Modifiers { get; } =
             new List<KeyValuePair<GameplayAttributeType, Modifier>>();
 
-        public IScheduler Compose(EffectExecutionScheme effect, IScheduler execution) {
-            throw new NotImplementedException();
-        }
+        Guid IScheduler.ExecutionId => this.Id;
 
         EffectExecutionSchedule IScheduler.ExecutionSchedule => new EffectExecutionSchedule {
             NumberOfTicks = 0,
@@ -37,21 +38,24 @@ namespace GameplayAbilities.Effects.Schedulers {
         };
 
         EffectExecutionState IScheduler.CurrentState => new EffectExecutionState {
+            StackSize = this.EffectStackSize,
             RemainingTicks = 0,
             RemainingDuration = this.RemainingTime, 
             Modifiers = this.Modifiers
         };
+        
+        private PersistentExecution() { }
 
         public IScheduler Schedule(EffectExecutionScheme scheme) {
             PersistentExecution execution = PersistentExecution.Pool.Get();
+            execution.Id = Guid.NewGuid();
+            execution.EffectStackSize = scheme.StackSize;
             execution.Modifiers.Clear();
             execution.Modifiers.AddRange(scheme.Modifiers);
             execution.Duration = scheme.ExecutionSchedule.PersistentDuration;
             execution.ElapsedTime = 0;
             return execution;
         }
-
-        private PersistentExecution() { }
 
         async Awaitable IScheduler.Execute(ModifierEnvironment target, CancellationToken interrupt) {
             try {
@@ -81,6 +85,8 @@ namespace GameplayAbilities.Effects.Schedulers {
 
         private void ReleaseToPool() {
             this.Modifiers.Clear();
+            this.Id = Guid.Empty;
+            this.EffectStackSize = 1;
             this.Duration = 0;
             this.ElapsedTime = 0;
             PersistentExecution.Pool.Release(this);
