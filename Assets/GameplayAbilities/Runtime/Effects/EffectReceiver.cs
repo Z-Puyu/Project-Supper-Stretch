@@ -15,7 +15,7 @@ namespace GameplayAbilities.Effects {
         [NotNull] private ModifierEnvironment? ModifierTarget { get; set; }
         [field: SerializeField] private Ref<IAttributeReader> AttributeReader { get; set; }
 
-        private IDictionary<IEffect, List<EffectInstance>> EffectInstances { get; } =
+        private IDictionary<IEffect, List<EffectInstance>> CancellableEffects { get; } =
             new Dictionary<IEffect, List<EffectInstance>>();
         
         private IDictionary<Guid, RuntimeEffect> RunningEffects { get; } = new Dictionary<Guid, RuntimeEffect>();
@@ -38,7 +38,19 @@ namespace GameplayAbilities.Effects {
             );
             
             RuntimeEffect instance = effect.Execute(scheme, this.ModifierTarget, interrupter);
-            this.RunningEffects.TryAdd(instance.Id, instance);
+            if (instance.Id != Guid.Empty) {
+                if (!this.RunningEffects.TryAdd(instance.Id, instance)) {
+                    return Guid.Empty;
+                }
+                
+                if (!this.CancellableEffects.TryGetValue(effect, out List<EffectInstance> instances)) {
+                    this.CancellableEffects.Add(effect, instances = new List<EffectInstance>());
+                }    
+                
+                instances.Add(new EffectInstance(instance.Id, scheme.StackSize));
+            }
+            
+            this.Wait(instance);
             return instance.Id;
         }
 
@@ -49,7 +61,7 @@ namespace GameplayAbilities.Effects {
         }
 
         private int Count(IEffect effect) {
-            return this.EffectInstances.TryGetValue(effect, out List<EffectInstance> instances)
+            return this.CancellableEffects.TryGetValue(effect, out List<EffectInstance> instances)
                     ? instances.Sum(instance => instance.StackSize)
                     : 0;
         }
@@ -76,12 +88,7 @@ namespace GameplayAbilities.Effects {
                 this.Stop(existing[^1].Id);
             }
 
-            Guid id = this.RegisterEffect(effect, res.NewEffectExecutionScheme);
-            if (id != Guid.Empty) {
-                existing.Add(new EffectInstance(id, res.NewEffectExecutionScheme.StackSize));
-            }
-
-            return id;
+            return this.RegisterEffect(effect, res.NewEffectExecutionScheme);
         }
 
         /// <summary>
@@ -97,7 +104,7 @@ namespace GameplayAbilities.Effects {
         }
 
         private bool HasEffect(IEffect effect, out List<EffectInstance> instances) {
-            return this.EffectInstances.TryGetValue(effect, out instances) && instances.Count > 0;
+            return this.CancellableEffects.TryGetValue(effect, out instances) && instances.Count > 0;
         }
 
         private async void Wait(RuntimeEffect effect) {
@@ -117,13 +124,13 @@ namespace GameplayAbilities.Effects {
                 return;
             }
             
-            if (!this.EffectInstances.TryGetValue(effect.Source, out List<EffectInstance> instances)) {
+            if (!this.CancellableEffects.TryGetValue(effect.Source, out List<EffectInstance> instances)) {
                 return;
             }
             
             instances.RemoveAt(instances.FindIndex(instance => instance.Id == id));
             if (instances.Count == 0) {
-                this.EffectInstances.Remove(effect.Source);
+                this.CancellableEffects.Remove(effect.Source);
             }
         }
 
@@ -134,11 +141,11 @@ namespace GameplayAbilities.Effects {
             }
             
             this.RunningEffects.Clear();
-            this.EffectInstances.Clear();
+            this.CancellableEffects.Clear();
         }
 
         private void Interrupt(IEffect effect) {
-            if (!this.EffectInstances.Remove(effect, out List<EffectInstance> instances)) {
+            if (!this.CancellableEffects.Remove(effect, out List<EffectInstance> instances)) {
                 return;
             }
             

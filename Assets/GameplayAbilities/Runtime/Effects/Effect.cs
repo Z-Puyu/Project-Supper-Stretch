@@ -18,8 +18,7 @@ namespace GameplayAbilities.Effects {
             [InspectorName("Merge Modifiers and Extend Duration")] MergeAndExtend,
             [InspectorName("Merge Modifiers and Reset Duration")] MergeAndOverride
         }
-
-
+        
         [field: SerializeReference, SubtypeSelector] internal IScheduler? ExecutionScheduler { get; private set; }
         [field: SerializeField] private List<ModifierConfig> Modifiers { get; set; } = new List<ModifierConfig>();
         [field: SerializeField, Min(1)] private int StackingLimit { get; set; } = 1;

@@ -13,6 +13,7 @@ namespace GameplayAbilities.Abilities {
         private static readonly HashSet<Ability> Instances = new HashSet<Ability>();
         
         [field: SerializeField] private List<Cost> Costs { get; set; } = new List<Cost>();
+        [field: SerializeField, Min(0)] internal float Cooldown { get; private set; }
 
         [field: SerializeReference, Tooltip("Conditions on the ability system for this ability to be usable")]
         private List<IAbilityPrerequisite> Conditions { get; set; } = new List<IAbilityPrerequisite>();

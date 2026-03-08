@@ -18,6 +18,9 @@ namespace GameplayAbilities.Abilities {
         private IDictionary<Ability, CancellationTokenSource> RunningAbilities { get; } =
             new Dictionary<Ability, CancellationTokenSource>();
 
+        private IDictionary<Ability, CancellationTokenSource> AbilityCooldowns { get; } =
+            new Dictionary<Ability, CancellationTokenSource>();
+
         [NotNull] private AbilitySystemController? AbilitySystemController { get; set; }
         [NotNull] [field: SerializeField] private GameObject? Owner { get; set; }
         [NotNull] [field: SerializeField] private Animator? Animator { get; set; }
@@ -91,53 +94,65 @@ namespace GameplayAbilities.Abilities {
         /// </summary>
         /// <param name="context">The context of the ability execution.</param>
         /// <returns>An awaitable that completes when the ability has finished executing.</returns>
-        public void Perform(AbilityExecutionContext context) {
-            this.PerformFireAndForget(context);
-        }
-
-        private async void PerformFireAndForget(AbilityExecutionContext context) {
-            await this.PerformInternal(context);
-        }
-
-        private async Awaitable PerformInternal(AbilityExecutionContext context) {
+        public async void Perform(AbilityExecutionContext context) {
             try {
                 Ability ability = context.Ability;
+                IUserData? userData = context.UserData;
                 this.Stop(ability);
                 if (!this.AvailableAbilities.Remove(ability)) {
                     return;
                 }
 
-                if (!ability.TryCommit(this, context.UserData)) {
+                if (!ability.TryCommit(this, userData)) {
                     this.AvailableAbilities.Add(ability);
                     return;
                 }
 
-                CancellationTokenSource cts = new CancellationTokenSource();
-                this.RunningAbilities.Add(ability, cts);
-                using CancellationTokenSource linked = CancellationTokenSource.CreateLinkedTokenSource(
-                    cts.Token, this.destroyCancellationToken
-                );
-
-                await ability.Execute(this.AbilitySystemController, context.UserData, linked.Token);
+                await this.Execute(ability, userData);
             } catch (OperationCanceledException) { } catch (Exception e) {
-                this.LogExecutionFailure(context.Ability, e);
+#if DEBUG
+                Debug.LogException(e, this);
+#endif
             } finally {
+                await this.Cooldown(context.Ability);
                 this.Conclude(context.Ability);
             }
         }
 
-        private void LogExecutionFailure(Ability ability, Exception exception) {
-            Debug.LogError($"Ability execution failed. Ability: {ability.name}.", this);
-            Debug.LogException(exception, this);
+        private async Awaitable Execute(Ability ability, IUserData? userData) {
+            using CancellationTokenSource execution = new CancellationTokenSource();
+            this.RunningAbilities.Add(ability, execution);
+            using CancellationTokenSource linked = CancellationTokenSource.CreateLinkedTokenSource(
+                execution.Token, this.destroyCancellationToken
+            );
+
+            await ability.Execute(this.AbilitySystemController, userData, linked.Token);
+        }
+
+        public void InterruptCooldown(Ability ability) {
+            if (this.AbilityCooldowns.TryGetValue(ability, out CancellationTokenSource cooldown)) {
+                cooldown.Cancel();
+            }
+        }
+
+        private async Awaitable Cooldown(Ability ability) {
+            using CancellationTokenSource cooldown = new CancellationTokenSource();
+            this.AbilityCooldowns.Add(ability, cooldown);
+            using CancellationTokenSource linked = CancellationTokenSource.CreateLinkedTokenSource(
+                cooldown.Token, this.destroyCancellationToken
+            );
+
+            try {
+                await Awaitable.WaitForSecondsAsync(ability.Cooldown, linked.Token);
+            } catch (OperationCanceledException) { } finally {
+                this.AbilityCooldowns.Remove(ability);
+            }
         }
 
         private void Conclude(Ability ability) {
-            if (!this.RunningAbilities.Remove(ability, out CancellationTokenSource cts)) {
-                return;
+            if (this.RunningAbilities.Remove(ability)) {
+                this.AvailableAbilities.Add(ability);
             }
-            
-            this.AvailableAbilities.Add(ability);
-            cts.Dispose();
         }
 
         /// <summary>
@@ -145,11 +160,9 @@ namespace GameplayAbilities.Abilities {
         /// </summary>
         /// <param name="ability">The ability to stop.</param>
         public void Stop(Ability ability) {
-            if (!this.RunningAbilities.TryGetValue(ability, out CancellationTokenSource interrupter)) {
-                return;
+            if (this.RunningAbilities.TryGetValue(ability, out CancellationTokenSource interrupter)) {
+                interrupter.Cancel();
             }
-
-            interrupter.Cancel();
         }
 
         public IEnumerator<Ability> GetEnumerator() {
